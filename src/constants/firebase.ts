@@ -65,7 +65,10 @@ export const COLLECTIONS = {
   
   // EMR integrations
   EMR_CONNECTIONS: 'emr_connections',
-  EMR_MAPPINGS: 'emr_mappings'
+  EMR_MAPPINGS: 'emr_mappings',
+  EMR_MESSAGES: 'emr_messages',
+  EMR_FIELD_MAPPINGS: 'emr_field_mappings',
+  EMR_INTEGRATION_LOGS: 'emr_integration_logs'
 };
 
 /**

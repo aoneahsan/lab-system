@@ -23,7 +23,9 @@ const ResultsPage = lazy(() => import('@pages/results/ResultsPage'));
 const BillingPage = lazy(() => import('@pages/billing/BillingPage'));
 const InventoryPage = lazy(() => import('@pages/inventory/InventoryPage'));
 const QualityControlPage = lazy(() => import('@pages/quality-control/QualityControlPage'));
-const ReportsPage = lazy(() => import('@pages/reports/ReportsPage'));
+const ReportsPage = lazy(() => import('@pages/ReportsPage'));
+const AnalyticsPage = lazy(() => import('@pages/AnalyticsPage'));
+const EMRConnectionsPage = lazy(() => import('@pages/emr/EMRConnectionsPage'));
 const SettingsPage = lazy(() => import('@pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@pages/profile/ProfilePage'));
 const BiometricSettingsPage = lazy(() => import('@pages/settings/BiometricSettingsPage'));
@@ -57,6 +59,8 @@ export const AppRouter = () => {
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/quality-control" element={<QualityControlPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/emr/connections" element={<EMRConnectionsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/biometric" element={<BiometricSettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />

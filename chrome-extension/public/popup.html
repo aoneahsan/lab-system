@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabFlow EMR Integration</title>
+  <style>
+    body {
+      width: 350px;
+      min-height: 400px;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F9FAFB;
+    }
+    
+    .header {
+      background-color: #3B82F6;
+      color: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .logo {
+      width: 32px;
+      height: 32px;
+      background-color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #3B82F6;
+    }
+    
+    .container {
+      padding: 16px;
+    }
+    
+    .status-card {
+      background-color: white;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-dot.connected {
+      background-color: #10B981;
+    }
+    
+    .status-dot.disconnected {
+      background-color: #EF4444;
+    }
+    
+    .status-dot.pending {
+      background-color: #F59E0B;
+    }
+    
+    .status-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .status-info {
+      font-size: 13px;
+      color: #6B7280;
+      line-height: 1.5;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+    
+    .input-group {
+      margin-bottom: 12px;
+    }
+    
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    
+    .input-field {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .button {
+      width: 100%;
+      padding: 10px 16px;
+      background-color: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: #2563EB;
+    }
+    
+    .button:disabled {
+      background-color: #9CA3AF;
+      cursor: not-allowed;
+    }
+    
+    .button.secondary {
+      background-color: #6B7280;
+    }
+    
+    .button.secondary:hover {
+      background-color: #4B5563;
+    }
+    
+    .patient-context {
+      background-color: #EFF6FF;
+      border: 1px solid #DBEAFE;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+    
+    .patient-context-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1E40AF;
+      margin-bottom: 4px;
+    }
+    
+    .patient-context-info {
+      font-size: 12px;
+      color: #3730A3;
+    }
+    
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .help-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    
+    .help-link a {
+      color: #3B82F6;
+      text-decoration: none;
+    }
+    
+    .help-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">LF</div>
+    <h1>LabFlow EMR Integration</h1>
+  </div>
+  
+  <div class="container">
+    <div class="status-card">
+      <div class="status-header">
+        <div id="status-dot" class="status-dot disconnected"></div>
+        <div id="status-title" class="status-title">Not Connected</div>
+      </div>
+      <div id="status-info" class="status-info">
+        Configure your API key to connect to LabFlow
+      </div>
+      <div id="patient-context" class="patient-context" style="display: none;">
+        <div class="patient-context-title">Active Patient</div>
+        <div id="patient-info" class="patient-context-info"></div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Configuration</div>
+      <div class="input-group">
+        <label class="input-label" for="api-key">API Key</label>
+        <input 
+          type="password" 
+          id="api-key" 
+          class="input-field" 
+          placeholder="Enter your LabFlow API key"
+        />
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="server-url">Server URL (Optional)</label>
+        <input 
+          type="text" 
+          id="server-url" 
+          class="input-field" 
+          placeholder="http://localhost:5173"
+        />
+      </div>
+      <button id="save-config" class="button">Save Configuration</button>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Quick Actions</div>
+      <div class="actions">
+        <button id="extract-patient" class="button secondary" disabled>
+          Extract Patient from Current Page
+        </button>
+        <button id="extract-order" class="button secondary" disabled>
+          Extract Lab Order from Current Page
+        </button>
+        <button id="test-connection" class="button secondary" disabled>
+          Test Connection
+        </button>
+      </div>
+    </div>
+    
+    <div class="help-link">
+      <a href="https://docs.labflow.com/emr-integration" target="_blank">
+        View Documentation
+      </a>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
