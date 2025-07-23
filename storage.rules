@@ -1,0 +1,124 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+    
+    function hasAnyRole(roles) {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in roles;
+    }
+    
+    function isTenantUser(tenantId) {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.tenantId == tenantId;
+    }
+    
+    function canAccessTenant(tenantId) {
+      return isTenantUser(tenantId) || hasRole('super_admin');
+    }
+    
+    // Multi-tenant storage pattern: /labflow_{tenantId}/{module}/{path}
+    match /labflow_{tenantId}/{module}/{allPaths=**} {
+      // Patient photos and documents
+      allow read: if module == 'patients' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'phlebotomist', 'pathologist', 'radiologist', 'clinician', 'front_desk']);
+      allow write: if module == 'patients' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'front_desk']) &&
+        request.resource.size < 10 * 1024 * 1024; // 10MB limit
+      
+      // Test results and reports
+      allow read: if module == 'results' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'pathologist', 'radiologist', 'clinician']);
+      allow write: if module == 'results' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'pathologist', 'radiologist']) &&
+        request.resource.size < 50 * 1024 * 1024 && // 50MB limit
+        request.resource.contentType.matches('application/pdf|image/.*');
+      
+      // Sample images
+      allow read: if module == 'samples' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'phlebotomist', 'pathologist']);
+      allow write: if module == 'samples' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'phlebotomist']) &&
+        request.resource.size < 20 * 1024 * 1024 && // 20MB limit
+        request.resource.contentType.matches('image/.*');
+      
+      // Quality control charts and documents
+      allow read: if module == 'quality_control' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 
+                   'pathologist']);
+      allow write: if module == 'quality_control' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']) &&
+        request.resource.size < 10 * 1024 * 1024; // 10MB limit
+      
+      // Billing documents
+      allow read: if module == 'billing' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'billing_staff']);
+      allow write: if module == 'billing' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'billing_staff']) &&
+        request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+        request.resource.contentType.matches('application/pdf|image/.*');
+      
+      // Reports
+      allow read: if module == 'reports' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'pathologist', 
+                   'radiologist', 'clinician']);
+      allow write: if module == 'reports' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager']) &&
+        request.resource.size < 50 * 1024 * 1024 && // 50MB limit
+        request.resource.contentType == 'application/pdf';
+      
+      // Inventory images
+      allow read: if module == 'inventory' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']);
+      allow write: if module == 'inventory' && 
+        canAccessTenant(tenantId) && 
+        hasAnyRole(['super_admin', 'lab_admin', 'lab_manager']) &&
+        request.resource.size < 5 * 1024 * 1024 && // 5MB limit
+        request.resource.contentType.matches('image/.*');
+      
+      // System backups (super admin only)
+      allow read, write: if module == 'backups' && hasRole('super_admin');
+    }
+    
+    // Patient access to their own files
+    match /labflow_{tenantId}/patients/{patientId}/{allPaths=**} {
+      allow read: if isAuthenticated() && 
+        firestore.exists(/databases/(default)/documents/labflow_$(tenantId)_patients/$(patientId)) &&
+        firestore.get(/databases/(default)/documents/labflow_$(tenantId)_patients/$(patientId)).data.userId == request.auth.uid;
+    }
+    
+    // Patient access to their own results
+    match /labflow_{tenantId}/results/{resultId}/{allPaths=**} {
+      allow read: if isAuthenticated() && 
+        firestore.exists(/databases/(default)/documents/labflow_$(tenantId)_results/$(resultId)) &&
+        firestore.get(/databases/(default)/documents/labflow_$(tenantId)_results/$(resultId)).data.patientId != null &&
+        firestore.get(/databases/(default)/documents/labflow_$(tenantId)_patients/$(firestore.get(/databases/(default)/documents/labflow_$(tenantId)_results/$(resultId)).data.patientId)).data.userId == request.auth.uid;
+    }
+  }
+}

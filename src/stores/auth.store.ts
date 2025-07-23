@@ -1,0 +1,288 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updateProfile,
+  onAuthStateChanged,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, firestore } from '@config/firebase.config';
+import { COLLECTION_NAMES } from '@constants/tenant.constants';
+import type { User, LoginCredentials, RegisterData, AuthState } from '@types/auth.types';
+import { biometricService } from '@/services/biometric.service';
+import type { BiometricAuthResult } from '@/types/biometric.types';
+
+interface AuthStore extends AuthState {
+  setFirebaseUser: (user: FirebaseUser | null) => void;
+  setCurrentUser: (user: User | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
+  
+  login: (credentials: LoginCredentials) => Promise<User>;
+  loginWithBiometric: () => Promise<BiometricAuthResult>;
+  register: (data: RegisterData) => Promise<User>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  
+  fetchUserData: (uid: string) => Promise<User | null>;
+  updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
+  refreshUser: () => Promise<void>;
+  
+  initializeAuth: () => void;
+}
+
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      firebaseUser: null,
+      currentUser: null,
+      isLoading: true,
+      isAuthenticated: false,
+      error: null,
+      
+      setFirebaseUser: (user) => set({ firebaseUser: user, isAuthenticated: !!user }),
+      setCurrentUser: (user) => set({ currentUser: user }),
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => set({ error }),
+      
+      login: async (credentials) => {
+        const { setLoading, setError, fetchUserData } = get();
+        
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            credentials.email,
+            credentials.password
+          );
+          
+          const userData = await fetchUserData(userCredential.user.uid);
+          
+          if (!userData) {
+            throw new Error('User data not found');
+          }
+          
+          if (!userData.isActive) {
+            await signOut(auth);
+            throw new Error('Account is deactivated');
+          }
+          
+          // Update last login
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
+            lastLoginAt: serverTimestamp(),
+          });
+          
+          return userData;
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
+      
+      register: async (data) => {
+        const { setLoading, setError, setCurrentUser } = get();
+        
+        try {
+          setLoading(true);
+          setError(null);
+          
+          // Create Firebase Auth user
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            data.email,
+            data.password
+          );
+          
+          // Update display name
+          await updateProfile(userCredential.user, {
+            displayName: `${data.firstName} ${data.lastName}`,
+          });
+          
+          // Create user document in Firestore
+          const userData: User = {
+            id: userCredential.user.uid,
+            email: data.email,
+            displayName: `${data.firstName} ${data.lastName}`,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phoneNumber: data.phoneNumber,
+            role: data.role || 'patient',
+            tenantId: data.tenantCode,
+            permissions: [],
+            isActive: true,
+            isEmailVerified: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          
+          await setDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
+            ...userData,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          
+          setCurrentUser(userData);
+          return userData;
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
+      
+      loginWithBiometric: async () => {
+        const { firebaseUser } = get();
+        
+        if (!firebaseUser) {
+          return {
+            success: false,
+            error: 'No authenticated user found',
+            errorCode: 'NO_USER',
+          };
+        }
+        
+        try {
+          // Authenticate with biometrics
+          const result = await biometricService.authenticate({
+            reason: 'Authenticate to access LabFlow',
+          });
+          
+          if (!result.success) {
+            return result;
+          }
+          
+          // Refresh user data after successful biometric auth
+          await get().refreshUser();
+          
+          return { success: true };
+        } catch (error) {
+          console.error('Biometric login error:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            errorCode: 'AUTH_ERROR',
+          };
+        }
+      },
+      
+      logout: async () => {
+        const { setLoading, setError, setFirebaseUser, setCurrentUser } = get();
+        
+        try {
+          setLoading(true);
+          setError(null);
+          
+          // Clear biometric data on logout
+          await biometricService.clearBiometricData();
+          
+          await signOut(auth);
+          setFirebaseUser(null);
+          setCurrentUser(null);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
+      
+      resetPassword: async (email) => {
+        const { setLoading, setError } = get();
+        
+        try {
+          setLoading(true);
+          setError(null);
+          
+          await sendPasswordResetEmail(auth, email);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
+      
+      fetchUserData: async (uid) => {
+        const { setCurrentUser } = get();
+        
+        try {
+          const userDoc = await getDoc(doc(firestore, COLLECTION_NAMES.USERS, uid));
+          
+          if (!userDoc.exists()) {
+            return null;
+          }
+          
+          const userData = {
+            id: userDoc.id,
+            ...userDoc.data(),
+            createdAt: userDoc.data().createdAt?.toDate() || new Date(),
+            updatedAt: userDoc.data().updatedAt?.toDate() || new Date(),
+            lastLoginAt: userDoc.data().lastLoginAt?.toDate(),
+          } as User;
+          
+          setCurrentUser(userData);
+          return userData;
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          return null;
+        }
+      },
+      
+      updateUserProfile: async (userId, data) => {
+        const { setError, fetchUserData } = get();
+        
+        try {
+          setError(null);
+          
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userId), {
+            ...data,
+            updatedAt: serverTimestamp(),
+          });
+          
+          await fetchUserData(userId);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        }
+      },
+      
+      refreshUser: async () => {
+        const { firebaseUser, fetchUserData } = get();
+        
+        if (firebaseUser) {
+          await fetchUserData(firebaseUser.uid);
+        }
+      },
+      
+      initializeAuth: () => {
+        const { setFirebaseUser, fetchUserData, setLoading } = get();
+        
+        onAuthStateChanged(auth, async (user) => {
+          setFirebaseUser(user);
+          
+          if (user) {
+            await fetchUserData(user.uid);
+          }
+          
+          setLoading(false);
+        });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        currentUser: state.currentUser,
+      }),
+    }
+  )
+);
