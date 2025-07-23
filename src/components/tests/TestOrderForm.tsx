@@ -1,0 +1,351 @@
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Search, X, AlertCircle } from 'lucide-react';
+import { useTests, useTestPanels } from '@/hooks/useTests';
+import { usePatients } from '@/hooks/usePatients';
+import type { TestOrderFormData, TestDefinition, TestPanel } from '@/types/test.types';
+import type { Patient } from '@/types/patient.types';
+
+interface TestOrderFormProps {
+  onSubmit: (data: TestOrderFormData) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+const TestOrderForm: React.FC<TestOrderFormProps> = ({
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}) => {
+  const [patientSearch, setPatientSearch] = useState('');
+  const [testSearch, setTestSearch] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedTests, setSelectedTests] = useState<TestDefinition[]>([]);
+  const [showPanels, setShowPanels] = useState(false);
+
+  const { data: patients = [] } = usePatients();
+  const { data: tests = [] } = useTests({ isActive: true });
+  const { data: panels = [] } = useTestPanels();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+  } = useForm<TestOrderFormData>({
+    defaultValues: {
+      priority: 'routine',
+      fasting: false,
+      tests: [],
+    },
+  });
+
+  const priority = watch('priority');
+
+  const filteredPatients = patients.filter(
+    patient =>
+      patient.firstName.toLowerCase().includes(patientSearch.toLowerCase()) ||
+      patient.lastName.toLowerCase().includes(patientSearch.toLowerCase()) ||
+      patient.medicalRecordNumber.toLowerCase().includes(patientSearch.toLowerCase())
+  );
+
+  const filteredTests = tests.filter(
+    test =>
+      !selectedTests.some(st => st.id === test.id) &&
+      (test.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+       test.code.toLowerCase().includes(testSearch.toLowerCase()))
+  );
+
+  const handlePatientSelect = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setValue('patientId', patient.id);
+    setPatientSearch('');
+  };
+
+  const handleTestSelect = (test: TestDefinition) => {
+    setSelectedTests([...selectedTests, test]);
+    setValue('tests', [...selectedTests.map(t => t.id), test.id]);
+    setTestSearch('');
+  };
+
+  const handlePanelSelect = (panel: TestPanel) => {
+    const panelTests = tests.filter(test => panel.testIds.includes(test.id));
+    const newTests = panelTests.filter(
+      test => !selectedTests.some(st => st.id === test.id)
+    );
+    setSelectedTests([...selectedTests, ...newTests]);
+    setValue('tests', [...selectedTests.map(t => t.id), ...newTests.map(t => t.id)]);
+  };
+
+  const handleRemoveTest = (testId: string) => {
+    setSelectedTests(selectedTests.filter(t => t.id !== testId));
+    setValue('tests', selectedTests.filter(t => t.id !== testId).map(t => t.id));
+  };
+
+  const calculateTotalCost = () => {
+    return selectedTests.reduce((sum, test) => sum + (test.cost || 0), 0);
+  };
+
+  const onFormSubmit = (data: TestOrderFormData) => {
+    if (!selectedPatient) return;
+    onSubmit(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+      {/* Patient Selection */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Information</h3>
+        
+        {!selectedPatient ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search Patient
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={patientSearch}
+                onChange={(e) => setPatientSearch(e.target.value)}
+                placeholder="Search by name or MRN..."
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+
+            {patientSearch && filteredPatients.length > 0 && (
+              <div className="mt-2 border rounded-md max-h-48 overflow-y-auto">
+                {filteredPatients.slice(0, 5).map((patient) => (
+                  <button
+                    key={patient.id}
+                    type="button"
+                    onClick={() => handlePatientSelect(patient)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                  >
+                    <div className="font-medium">
+                      {patient.firstName} {patient.lastName}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      MRN: {patient.medicalRecordNumber} | DOB: {new Date(patient.dateOfBirth).toLocaleDateString()}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-blue-50 p-4 rounded-md">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-medium">
+                  {selectedPatient.firstName} {selectedPatient.lastName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  MRN: {selectedPatient.medicalRecordNumber} | 
+                  DOB: {new Date(selectedPatient.dateOfBirth).toLocaleDateString()} |
+                  Gender: {selectedPatient.gender}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPatient(null);
+                  setValue('patientId', '');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Order Details */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Order Details</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Priority</label>
+            <select
+              {...register('priority')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="routine">Routine</option>
+              <option value="stat">STAT</option>
+              <option value="asap">ASAP</option>
+            </select>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              {...register('fasting')}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label className="ml-2 block text-sm text-gray-900">
+              Fasting Required
+            </label>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Clinical History
+            </label>
+            <textarea
+              {...register('clinicalHistory')}
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Diagnosis/Reason for Testing
+            </label>
+            <input
+              type="text"
+              {...register('diagnosis')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {priority === 'stat' && (
+          <div className="mt-4 p-3 bg-yellow-50 rounded-md flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-yellow-800">
+              STAT orders require immediate processing. Please ensure specimen collection is prioritized.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Test Selection */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Tests</h3>
+          <button
+            type="button"
+            onClick={() => setShowPanels(!showPanels)}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            {showPanels ? 'Show Individual Tests' : 'Show Panels'}
+          </button>
+        </div>
+
+        {/* Test/Panel Search */}
+        <div className="mb-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={testSearch}
+              onChange={(e) => setTestSearch(e.target.value)}
+              placeholder={showPanels ? "Search panels..." : "Search tests..."}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+
+          {testSearch && (showPanels ? panels : filteredTests).length > 0 && (
+            <div className="mt-2 border rounded-md max-h-48 overflow-y-auto">
+              {showPanels ? (
+                panels
+                  .filter(panel => 
+                    panel.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+                    panel.code.toLowerCase().includes(testSearch.toLowerCase())
+                  )
+                  .map((panel) => (
+                    <button
+                      key={panel.id}
+                      type="button"
+                      onClick={() => handlePanelSelect(panel)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                    >
+                      <div className="font-medium">{panel.name}</div>
+                      <div className="text-sm text-gray-600">
+                        Code: {panel.code} | Tests: {panel.testIds.length}
+                      </div>
+                    </button>
+                  ))
+              ) : (
+                filteredTests.slice(0, 10).map((test) => (
+                  <button
+                    key={test.id}
+                    type="button"
+                    onClick={() => handleTestSelect(test)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                  >
+                    <div className="font-medium">{test.name}</div>
+                    <div className="text-sm text-gray-600">
+                      Code: {test.code} | {test.specimen.type} | ${test.cost || 0}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Selected Tests */}
+        <div className="space-y-2">
+          {selectedTests.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">
+              No tests selected. Search and add tests or panels.
+            </p>
+          ) : (
+            <>
+              {selectedTests.map((test) => (
+                <div
+                  key={test.id}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                >
+                  <div>
+                    <div className="font-medium">{test.name}</div>
+                    <div className="text-sm text-gray-600">
+                      Code: {test.code} | TAT: {test.turnaroundTime.routine}h | ${test.cost || 0}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTest(test.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              ))}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-between text-lg font-medium">
+                  <span>Total Cost:</span>
+                  <span>${calculateTotalCost().toFixed(2)}</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading || !selectedPatient || selectedTests.length === 0}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isLoading ? 'Creating Order...' : 'Create Order'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default TestOrderForm;

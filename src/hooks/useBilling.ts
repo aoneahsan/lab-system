@@ -1,0 +1,239 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { billingService } from '@/services/billing.service';
+import { useTenantStore } from '@/stores/tenant.store';
+import { useAuthStore } from '@/stores/auth.store';
+import { toast } from '@/hooks/useToast';
+import type {
+  Invoice,
+  // Payment,
+  // InsuranceClaim,
+  // InsuranceProvider,
+  BillingFilter,
+  InvoiceFormData,
+  PaymentFormData,
+  ClaimFormData,
+} from '@/types/billing.types';
+
+// Query keys
+const BILLING_KEYS = {
+  all: ['billing'] as const,
+  invoices: () => [...BILLING_KEYS.all, 'invoices'] as const,
+  invoice: (filter?: BillingFilter) => [...BILLING_KEYS.invoices(), filter] as const,
+  invoiceDetail: (id: string) => [...BILLING_KEYS.invoices(), id] as const,
+  payments: () => [...BILLING_KEYS.all, 'payments'] as const,
+  payment: (invoiceId?: string) => [...BILLING_KEYS.payments(), invoiceId] as const,
+  claims: () => [...BILLING_KEYS.all, 'claims'] as const,
+  claim: (id: string) => [...BILLING_KEYS.claims(), id] as const,
+  providers: () => [...BILLING_KEYS.all, 'providers'] as const,
+  statistics: () => [...BILLING_KEYS.all, 'statistics'] as const,
+};
+
+// Get invoices
+export const useInvoices = (filter?: BillingFilter) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.invoice(filter),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getInvoices(currentTenant.id, filter);
+    },
+    enabled: !!currentTenant,
+  });
+};
+
+// Get single invoice
+export const useInvoice = (invoiceId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.invoiceDetail(invoiceId),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getInvoice(currentTenant.id, invoiceId);
+    },
+    enabled: !!currentTenant && !!invoiceId,
+  });
+};
+
+// Create invoice
+export const useCreateInvoice = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (data: InvoiceFormData) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.createInvoice(currentTenant.id, user.uid, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.statistics() });
+      toast.success('Invoice created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create invoice');
+      console.error('Error creating invoice:', error);
+    },
+  });
+};
+
+// Update invoice
+export const useUpdateInvoice = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: ({ invoiceId, data }: { invoiceId: string; data: Partial<Invoice> }) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.updateInvoice(currentTenant.id, user.uid, invoiceId, data);
+    },
+    onSuccess: (_, { invoiceId }) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoiceDetail(invoiceId) });
+      toast.success('Invoice updated successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to update invoice');
+      console.error('Error updating invoice:', error);
+    },
+  });
+};
+
+// Send invoice
+export const useSendInvoice = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (invoiceId: string) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.sendInvoice(currentTenant.id, user.uid, invoiceId);
+    },
+    onSuccess: (_, invoiceId) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoiceDetail(invoiceId) });
+      toast.success('Invoice sent successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to send invoice');
+      console.error('Error sending invoice:', error);
+    },
+  });
+};
+
+// Record payment
+export const useRecordPayment = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (data: PaymentFormData) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.recordPayment(currentTenant.id, user.uid, data);
+    },
+    onSuccess: (_, data) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoiceDetail(data.invoiceId) });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.payments() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.statistics() });
+      toast.success('Payment recorded successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to record payment');
+      console.error('Error recording payment:', error);
+    },
+  });
+};
+
+// Get payments
+export const usePayments = (invoiceId?: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.payment(invoiceId),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getPayments(currentTenant.id, invoiceId);
+    },
+    enabled: !!currentTenant,
+  });
+};
+
+// Create insurance claim
+export const useCreateInsuranceClaim = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (data: ClaimFormData) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.createInsuranceClaim(currentTenant.id, user.uid, data);
+    },
+    onSuccess: (_, data) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoiceDetail(data.invoiceId) });
+      toast.success('Insurance claim created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create insurance claim');
+      console.error('Error creating claim:', error);
+    },
+  });
+};
+
+// Submit claim
+export const useSubmitClaim = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { user } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (claimId: string) => {
+      if (!currentTenant || !user) throw new Error('No tenant or user');
+      return billingService.submitClaim(currentTenant.id, user.uid, claimId);
+    },
+    onSuccess: (_, claimId) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claim(claimId) });
+      toast.success('Claim submitted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to submit claim');
+      console.error('Error submitting claim:', error);
+    },
+  });
+};
+
+// Get insurance providers
+export const useInsuranceProviders = () => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.providers(),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getInsuranceProviders(currentTenant.id);
+    },
+    enabled: !!currentTenant,
+  });
+};
+
+// Get billing statistics
+export const useBillingStatistics = () => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.statistics(),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getBillingStatistics(currentTenant.id);
+    },
+    enabled: !!currentTenant,
+  });
+};

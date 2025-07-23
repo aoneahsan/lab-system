@@ -13,7 +13,11 @@ const RegisterPage = lazy(() => import('@pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@pages/auth/ForgotPasswordPage'));
 const DashboardPage = lazy(() => import('@pages/dashboard/DashboardPage'));
 const PatientsPage = lazy(() => import('@pages/patients/PatientsPage'));
+const PatientDetailPage = lazy(() => import('@pages/patients/PatientDetailPage'));
 const TestsPage = lazy(() => import('@pages/tests/TestsPage'));
+const TestDetailPage = lazy(() => import('@pages/tests/TestDetailPage'));
+const TestPanelsPage = lazy(() => import('@pages/tests/TestPanelsPage'));
+const TestOrdersPage = lazy(() => import('@pages/tests/TestOrdersPage'));
 const SamplesPage = lazy(() => import('@pages/samples/SamplesPage'));
 const ResultsPage = lazy(() => import('@pages/results/ResultsPage'));
 const BillingPage = lazy(() => import('@pages/billing/BillingPage'));
@@ -42,7 +46,11 @@ export const AppRouter = () => {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/patients/:patientId" element={<PatientDetailPage />} />
             <Route path="/tests" element={<TestsPage />} />
+            <Route path="/tests/panels" element={<TestPanelsPage />} />
+            <Route path="/tests/orders" element={<TestOrdersPage />} />
+            <Route path="/tests/:testId" element={<TestDetailPage />} />
             <Route path="/samples" element={<SamplesPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/billing" element={<BillingPage />} />
