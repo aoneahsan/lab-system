@@ -81,7 +81,7 @@ export interface JoinConfig {
 export interface ReportFilter {
   field: string;
   operator: FilterOperator;
-  value: any;
+  value: string | number | boolean | Date | string[];
   label?: string;
   type?: 'date' | 'number' | 'string' | 'boolean' | 'select';
   options?: { value: string; label: string }[];
@@ -125,7 +125,7 @@ export interface ChartConfig {
   xAxis: string;
   yAxis: string | string[];
   series?: SeriesConfig[];
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 // Series configuration
@@ -178,7 +178,7 @@ export interface Report {
   type: ReportType;
   status: ReportStatus;
   config: ReportConfig;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   schedule?: ReportSchedule;
   output?: ReportOutput;
   error?: string;
@@ -207,7 +207,7 @@ export interface ReportSchedule {
 
 // Report output
 export interface ReportOutput {
-  data: any[];
+  data: unknown[];
   charts?: ChartData[];
   summary?: ReportSummary;
   metadata: ReportMetadata;
@@ -218,8 +218,8 @@ export interface ReportOutput {
 export interface ChartData {
   chartId: string;
   type: ChartType;
-  data: any[];
-  options: Record<string, any>;
+  data: unknown[];
+  options: Record<string, unknown>;
 }
 
 // Report summary
@@ -227,7 +227,7 @@ export interface ReportSummary {
   totalRecords: number;
   totals?: Record<string, number>;
   averages?: Record<string, number>;
-  customMetrics?: Record<string, any>;
+  customMetrics?: Record<string, unknown>;
 }
 
 // Report metadata
@@ -236,7 +236,7 @@ export interface ReportMetadata {
   generatedBy: string;
   duration: number; // milliseconds
   recordCount: number;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 // Analytics dashboard
@@ -343,7 +343,7 @@ export interface ReportFormData {
   description?: string;
   type: ReportType;
   templateId?: string;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   schedule?: ReportSchedule;
   formats: ReportFormat[];
 }

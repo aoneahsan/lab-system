@@ -13,55 +13,59 @@ export const PROJECT_PREFIX = 'labflow_';
  */
 export const COLLECTIONS = {
   // Core collections
-  tenants: 'tenants',
-  users: 'users',
+  TENANTS: 'tenants',
+  USERS: 'users',
   
   // Patient management
-  patients: 'patients',
-  patient_documents: 'patient_documents',
+  PATIENTS: 'patients',
+  PATIENT_DOCUMENTS: 'patient_documents',
   
   // Test management
-  tests: 'tests',
-  test_panels: 'test_panels',
-  test_orders: 'test_orders',
+  TESTS: 'tests',
+  TEST_PANELS: 'test_panels',
+  TEST_ORDERS: 'test_orders',
   
   // Sample tracking
-  samples: 'samples',
-  sample_tracking: 'sample_tracking',
+  SAMPLES: 'samples',
+  SAMPLE_TRACKING: 'sample_tracking',
   
   // Results management
-  results: 'results',
-  result_templates: 'result_templates',
+  RESULTS: 'results',
+  RESULT_TEMPLATES: 'result_templates',
   
   // Billing
-  invoices: 'invoices',
-  payments: 'payments',
-  insurance_claims: 'insurance_claims',
+  INVOICES: 'invoices',
+  PAYMENTS: 'payments',
+  INSURANCE_CLAIMS: 'insurance_claims',
   
   // Inventory management
-  inventory_items: 'inventory_items',
-  stock_transactions: 'stock_transactions',
-  lots: 'lots',
-  purchase_orders: 'purchase_orders',
-  inventory_alerts: 'inventory_alerts',
+  INVENTORY_ITEMS: 'inventory_items',
+  STOCK_TRANSACTIONS: 'stock_transactions',
+  LOTS: 'lots',
+  PURCHASE_ORDERS: 'purchase_orders',
+  INVENTORY_ALERTS: 'inventory_alerts',
   
   // Quality control
-  qc_runs: 'qc_runs',
-  qc_rules: 'qc_rules',
+  QC_RUNS: 'qc_runs',
+  QC_RULES: 'qc_rules',
+  QC_MATERIALS: 'qc_materials',
+  QC_STATISTICS: 'qc_statistics',
   
   // Reports
-  report_templates: 'report_templates',
-  generated_reports: 'generated_reports',
+  REPORT_TEMPLATES: 'report_templates',
+  GENERATED_REPORTS: 'generated_reports',
+  REPORTS: 'reports',
+  ANALYTICS_DASHBOARDS: 'analytics_dashboards',
   
   // Audit logs
-  audit_logs: 'audit_logs',
+  AUDIT_LOGS: 'audit_logs',
   
   // Settings
-  settings: 'settings',
+  SETTINGS: 'settings',
   
   // EMR integrations
-  emr_connections: 'emr_connections',
-  emr_mappings: 'emr_mappings'
+  EMR_CONNECTIONS: 'emr_connections',
+  EMR_MAPPINGS: 'emr_mappings'
 };
 
 /**

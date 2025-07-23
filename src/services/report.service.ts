@@ -39,14 +39,16 @@ const getDateRange = (preset: DateRangePreset): { start: Date; end: Date } => {
       return { start: today, end: now };
     case 'yesterday':
       return { start: yesterday, end: today };
-    case 'last7days':
+    case 'last7days': {
       const last7days = new Date(today);
       last7days.setDate(last7days.getDate() - 7);
       return { start: last7days, end: now };
-    case 'last30days':
+    }
+    case 'last30days': {
       const last30days = new Date(today);
       last30days.setDate(last30days.getDate() - 30);
       return { start: last30days, end: now };
+    }
     case 'thisMonth':
       return {
         start: new Date(now.getFullYear(), now.getMonth(), 1),
@@ -57,18 +59,20 @@ const getDateRange = (preset: DateRangePreset): { start: Date; end: Date } => {
         start: new Date(now.getFullYear(), now.getMonth() - 1, 1),
         end: new Date(now.getFullYear(), now.getMonth(), 0),
       };
-    case 'thisQuarter':
+    case 'thisQuarter': {
       const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
       return {
         start: new Date(now.getFullYear(), quarterMonth, 1),
         end: now,
       };
-    case 'lastQuarter':
+    }
+    case 'lastQuarter': {
       const lastQuarterMonth = Math.floor(now.getMonth() / 3) * 3 - 3;
       return {
         start: new Date(now.getFullYear(), lastQuarterMonth, 1),
         end: new Date(now.getFullYear(), lastQuarterMonth + 3, 0),
       };
+    }
     case 'thisYear':
       return {
         start: new Date(now.getFullYear(), 0, 1),
@@ -203,7 +207,7 @@ export const reportService = {
     const now = serverTimestamp() as Timestamp;
     
     // Get template if specified
-    let config = {} as any;
+    let config = {} as Record<string, unknown>;
     if (data.templateId) {
       const template = await this.getReportTemplate(tenantId, data.templateId);
       if (template) {
@@ -433,7 +437,7 @@ export const reportService = {
     testsSnapshot.forEach(doc => {
       const order = doc.data();
       if (order.tests) {
-        order.tests.forEach((test: any) => {
+        order.tests.forEach((test: { testCode: string; testName: string }) => {
           const current = testCounts.get(test.testCode) || { name: test.testName, count: 0 };
           current.count++;
           testCounts.set(test.testCode, current);
