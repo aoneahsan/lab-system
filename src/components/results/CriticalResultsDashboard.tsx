@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Clock, CheckCircle, Phone, Search } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle, Phone } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
@@ -34,7 +34,7 @@ const CriticalResultsDashboard: React.FC = () => {
     queryFn: async () => {
       if (!tenant) return [];
 
-      let q = query(
+      const q = query(
         collection(firestore, `labflow_${tenant.id}_results`),
         where('flag', 'in', ['critical_high', 'critical_low']),
         orderBy('createdAt', 'desc'),

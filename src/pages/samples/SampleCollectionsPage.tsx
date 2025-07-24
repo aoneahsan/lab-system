@@ -241,7 +241,6 @@ const SampleCollectionsPage: React.FC = () => {
           </button>
         </div>
       )}
-    </div>
 
       {/* Batch Collection Modal */}
       <BatchCollectionModal

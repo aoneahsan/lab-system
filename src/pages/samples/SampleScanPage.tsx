@@ -8,7 +8,7 @@ const SampleScanPage: React.FC = () => {
   const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
-  const [scanResult, setScanResult] = useState<any>(null);
+  const [scanResult, setScanResult] = useState<{ sampleId?: string; sampleNumber?: string } | null>(null);
 
   useEffect(() => {
     if (isScanning) {
@@ -32,7 +32,7 @@ const SampleScanPage: React.FC = () => {
         toast.error('Scanner Error', result.error || 'Failed to start scanner');
         setIsScanning(false);
       }
-    } catch (error) {
+    } catch {
       toast.error('Scanner Error', 'Failed to access camera');
       setIsScanning(false);
     }
@@ -47,7 +47,7 @@ const SampleScanPage: React.FC = () => {
         toast.success('Sample Found', `Sample ${parsed.sampleNumber} scanned successfully`);
         navigate(`/samples/${parsed.sampleId}`);
       }
-    } catch (error) {
+    } catch {
       toast.error('Invalid QR Code', 'The scanned code is not a valid sample QR code');
     }
   };

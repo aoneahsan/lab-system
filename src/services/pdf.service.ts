@@ -151,7 +151,7 @@ export class PDFService {
       },
     });
 
-    yPosition = (doc as any).lastAutoTable.finalY + 10;
+    yPosition = doc.lastAutoTable.finalY + 10;
 
     // Notes section if present
     if (data.result.notes) {
@@ -191,7 +191,6 @@ export class PDFService {
 
   generateBatchReport(results: ReportData[]): jsPDF {
     const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
     let currentPage = 1;
 
     results.forEach((data, index) => {
@@ -206,7 +205,7 @@ export class PDFService {
     return doc;
   }
 
-  private addReportPage(doc: jsPDF, data: ReportData, pageNumber: number): void {
+  private addReportPage(_doc: jsPDF, _data: ReportData, _pageNumber: number): void {
     // Similar to generateResultReport but as a reusable function
     // Implementation would be same as above but extracted into this method
   }

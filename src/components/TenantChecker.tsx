@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { toast } from '@/stores/toast.store';
 
 interface TenantCheckerProps {
   children: React.ReactNode;

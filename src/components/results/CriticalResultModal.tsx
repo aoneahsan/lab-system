@@ -126,7 +126,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="phone"
                     checked={notificationMethod === 'phone'}
-                    onChange={(e) => setNotificationMethod(e.target.value as any)}
+                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
                     className="mr-3"
                   />
                   <Phone className="h-5 w-5 text-gray-500 mr-2" />
@@ -143,7 +143,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="email"
                     checked={notificationMethod === 'email'}
-                    onChange={(e) => setNotificationMethod(e.target.value as any)}
+                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
                     className="mr-3"
                   />
                   <Mail className="h-5 w-5 text-gray-500 mr-2" />
@@ -160,7 +160,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="sms"
                     checked={notificationMethod === 'sms'}
-                    onChange={(e) => setNotificationMethod(e.target.value as any)}
+                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
                     className="mr-3"
                   />
                   <MessageSquare className="h-5 w-5 text-gray-500 mr-2" />

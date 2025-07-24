@@ -15,7 +15,6 @@ const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ResultFilter>({});
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
-  const [showCriticalDashboard, setShowCriticalDashboard] = useState(false);
   
   const { data: results = [], isLoading } = useResults(filters);
   const { data: statistics } = useResultStatistics();
@@ -80,7 +79,7 @@ const ResultsPage: React.FC = () => {
       
       pdfService.downloadReport(doc, `result_${result.id}_${patient.patientId}`);
       toast.success('PDF Generated', 'Result report has been downloaded');
-    } catch (error) {
+    } catch {
       toast.error('PDF Generation Failed', 'Failed to generate PDF report');
     }
   };
@@ -112,7 +111,7 @@ const ResultsPage: React.FC = () => {
       });
       
       pdfService.printReport(doc);
-    } catch (error) {
+    } catch {
       toast.error('Print Failed', 'Failed to print result report');
     }
   };
