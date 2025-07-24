@@ -7,6 +7,7 @@ import { AppRouter } from '@/routes/AppRouter';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Toaster } from '@/components/ui/Toaster';
+import InitializeDemoTenant from '@/components/setup/InitializeDemoTenant';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -34,6 +35,7 @@ function App() {
 		<ErrorBoundary>
 			<QueryClientProvider client={queryClient}>
 				<BrowserRouter>
+					<InitializeDemoTenant />
 					<AppRouter />
 					<Toaster />
 				</BrowserRouter>

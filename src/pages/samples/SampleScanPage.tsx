@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QrCode, Camera, X } from 'lucide-react';
+import { QrCode, Camera, X, Scan } from 'lucide-react';
 import { qrcodeService } from '@/services/qrcode.service';
 import { toast } from '@/stores/toast.store';
+import { Capacitor } from '@capacitor/core';
+import BarcodeScanner from '@/components/samples/BarcodeScanner';
 
 const SampleScanPage: React.FC = () => {
   const navigate = useNavigate();
   const [isScanning, setIsScanning] = useState(false);
+  const [isBarcodeScanning, setIsBarcodeScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [scanResult, setScanResult] = useState<{ sampleId?: string; sampleNumber?: string } | null>(null);
+  const isNativePlatform = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (isScanning) {
@@ -52,6 +56,13 @@ const SampleScanPage: React.FC = () => {
     }
   };
 
+  const handleBarcodeResult = async (barcode: string) => {
+    setManualInput(barcode);
+    // TODO: Search for sample by barcode
+    toast.info('Searching', `Searching for sample with barcode: ${barcode}`);
+    // For now, just set the manual input field
+  };
+
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (manualInput.trim()) {
@@ -79,19 +90,37 @@ const SampleScanPage: React.FC = () => {
 
       {/* Scanner Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">QR Code Scanner</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          {isNativePlatform ? 'Barcode Scanner' : 'QR Code Scanner'}
+        </h2>
         
         {!isScanning ? (
           <div className="text-center py-12">
-            <QrCode className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">Click below to start scanning</p>
-            <button
-              onClick={() => setIsScanning(true)}
-              className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2 mx-auto"
-            >
-              <Camera className="h-5 w-5" />
-              Start Scanner
-            </button>
+            {isNativePlatform ? (
+              <>
+                <Scan className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 mb-4">Scan barcode or QR code on sample containers</p>
+                <button
+                  onClick={() => setIsBarcodeScanning(true)}
+                  className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2 mx-auto"
+                >
+                  <Camera className="h-5 w-5" />
+                  Start Barcode Scanner
+                </button>
+              </>
+            ) : (
+              <>
+                <QrCode className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 mb-4">Click below to start scanning</p>
+                <button
+                  onClick={() => setIsScanning(true)}
+                  className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2 mx-auto"
+                >
+                  <Camera className="h-5 w-5" />
+                  Start QR Scanner
+                </button>
+              </>
+            )}
           </div>
         ) : (
           <div className="relative">
@@ -143,6 +172,14 @@ const SampleScanPage: React.FC = () => {
           </pre>
         </div>
       )}
+
+      {/* Native Barcode Scanner Modal */}
+      <BarcodeScanner
+        isOpen={isBarcodeScanning}
+        onClose={() => setIsBarcodeScanning(false)}
+        onScan={handleBarcodeResult}
+        supportedFormats={['CODE128', 'CODE39', 'EAN13', 'EAN8', 'QR_CODE', 'DATA_MATRIX', 'CODE93', 'CODABAR']}
+      />
     </div>
   );
 };

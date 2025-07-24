@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Package, Clock, CheckCircle, Users, FileText } from 'lucide-react';
+import { Plus, Package, Clock, CheckCircle, Users, FileText, Printer } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 import { useCreateSample } from '@/hooks/useSamples';
 import { useTenant } from '@/hooks/useTenant';
 import { useAuthStore } from '@/stores/auth.store';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import BatchCollectionModal from '@/components/samples/BatchCollectionModal';
-import type { SampleFormData } from '@/types/sample.types';
+import BatchBarcodesPrint from '@/components/samples/BatchBarcodesPrint';
+import type { SampleFormData, Sample } from '@/types/sample.types';
 
 interface CollectionBatch {
   id: string;
@@ -25,6 +26,8 @@ const SampleCollectionsPage: React.FC = () => {
   const [selectedBatch, setSelectedBatch] = useState<CollectionBatch | null>(null);
   const [isCreatingBatch, setIsCreatingBatch] = useState(false);
   const [showBatchModal, setShowBatchModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [batchSamples, setBatchSamples] = useState<Sample[]>([]);
   const createSampleMutation = useCreateSample();
   const { tenant } = useTenant();
   const { user } = useAuthStore();
@@ -69,7 +72,8 @@ const SampleCollectionsPage: React.FC = () => {
         updatedAt: serverTimestamp()
       });
 
-      // Create samples
+      // Create samples and collect created samples
+      const createdSamples: Sample[] = [];
       let created = 0;
       for (const sampleData of samples) {
         try {
@@ -84,7 +88,10 @@ const SampleCollectionsPage: React.FC = () => {
             batchId: batchRef.id
           };
           
-          await createSampleMutation.mutateAsync(formData);
+          const newSample = await createSampleMutation.mutateAsync(formData);
+          if (newSample) {
+            createdSamples.push(newSample as unknown as Sample);
+          }
           created++;
         } catch (error) {
           console.error('Error creating sample:', error);
@@ -93,10 +100,42 @@ const SampleCollectionsPage: React.FC = () => {
 
       toast.success('Batch Created', `Successfully created ${created} of ${samples.length} samples`);
       setShowBatchModal(false);
+      
+      // Show print dialog for barcode labels
+      if (createdSamples.length > 0) {
+        setBatchSamples(createdSamples);
+        setShowPrintModal(true);
+      }
     } catch (error) {
       toast.error('Batch Creation Failed', 'Failed to create batch');
     } finally {
       setIsCreatingBatch(false);
+    }
+  };
+
+  const handlePrintBarcodes = async (batchId: string) => {
+    if (!tenant) return;
+    
+    try {
+      // Fetch samples for this batch
+      const samplesQuery = query(
+        collection(firestore, `labflow_${tenant.id}_samples`),
+        where('batchId', '==', batchId)
+      );
+      const snapshot = await getDocs(samplesQuery);
+      const samples = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Sample[];
+      
+      if (samples.length > 0) {
+        setBatchSamples(samples);
+        setShowPrintModal(true);
+      } else {
+        toast.error('No Samples', 'No samples found for this batch');
+      }
+    } catch (error) {
+      toast.error('Error', 'Failed to fetch batch samples');
     }
   };
 
@@ -189,11 +228,13 @@ const SampleCollectionsPage: React.FC = () => {
           {mockBatches.map((batch) => (
             <div
               key={batch.id}
-              className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
-              onClick={() => setSelectedBatch(batch)}
+              className="px-6 py-4 hover:bg-gray-50"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+                <div 
+                  className="flex items-center space-x-4 flex-1 cursor-pointer"
+                  onClick={() => setSelectedBatch(batch)}
+                >
                   {getStatusIcon(batch.status)}
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -218,6 +259,16 @@ const SampleCollectionsPage: React.FC = () => {
                       />
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePrintBarcodes(batch.id);
+                    }}
+                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+                    title="Print barcode labels"
+                  >
+                    <Printer className="h-4 w-4" />
+                  </button>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(batch.status)}`}>
                     {batch.status.replace('_', ' ')}
                   </span>
@@ -247,6 +298,16 @@ const SampleCollectionsPage: React.FC = () => {
         isOpen={showBatchModal}
         onClose={() => setShowBatchModal(false)}
         onSubmit={handleBatchSubmit}
+      />
+
+      {/* Batch Barcodes Print Modal */}
+      <BatchBarcodesPrint
+        isOpen={showPrintModal}
+        onClose={() => {
+          setShowPrintModal(false);
+          setBatchSamples([]);
+        }}
+        samples={batchSamples}
       />
     </div>
   );

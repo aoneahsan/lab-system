@@ -212,3 +212,28 @@ body {
 .text-balance {
   text-wrap: balance;
 }
+
+/* Barcode Scanner Styles */
+.scanner-active {
+  background: transparent !important;
+}
+
+.scanner-active * {
+  visibility: hidden;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(256px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-scan {
+  animation: scan 2s linear infinite;
+}

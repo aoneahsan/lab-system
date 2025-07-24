@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, AlertCircle, FileText, BarChart3, Download, Printer } from 'lucide-react';
+import { Plus, AlertCircle, FileText, BarChart3, Download, Printer, Edit, History } from 'lucide-react';
 import { useResults, useResultStatistics } from '@/hooks/useResults';
 import { useTenant } from '@/hooks/useTenant';
 import { usePatients } from '@/hooks/usePatients';
@@ -9,12 +9,17 @@ import { useTests } from '@/hooks/useTests';
 import { pdfService } from '@/services/pdf.service';
 import { toast } from '@/stores/toast.store';
 import CriticalResultsDashboard from '@/components/results/CriticalResultsDashboard';
-import type { ResultFilter } from '@/types/result.types';
+import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
+import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
+import type { ResultFilter, TestResult } from '@/types/result.types';
+import type { Test } from '@/types';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ResultFilter>({});
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
+  const [amendmentModal, setAmendmentModal] = useState<{ isOpen: boolean; result: TestResult | null }>({ isOpen: false, result: null });
+  const [correctionModal, setCorrectionModal] = useState<{ isOpen: boolean; result: TestResult | null; test: Test | null }>({ isOpen: false, result: null, test: null });
   
   const { data: results = [], isLoading } = useResults(filters);
   const { data: statistics } = useResultStatistics();
@@ -124,6 +129,27 @@ const ResultsPage: React.FC = () => {
 
     // TODO: Implement batch PDF generation
     toast.info('Coming Soon', 'Batch PDF generation will be available soon');
+  };
+
+  const handleAmendResult = (result: TestResult) => {
+    if (result.status !== 'final') {
+      toast.error('Cannot Amend', 'Only finalized results can be amended. Use correction for non-final results.');
+      return;
+    }
+    setAmendmentModal({ isOpen: true, result });
+  };
+
+  const handleCorrectResult = (result: TestResult) => {
+    if (result.status === 'final') {
+      toast.error('Cannot Correct', 'Finalized results cannot be corrected. Use amendment instead.');
+      return;
+    }
+    const test = tests.find(t => t.id === result.testId);
+    if (!test) {
+      toast.error('Test Not Found', 'Unable to find test information');
+      return;
+    }
+    setCorrectionModal({ isOpen: true, result, test });
   };
 
   return (
@@ -310,6 +336,23 @@ const ResultsPage: React.FC = () => {
                         >
                           View
                         </button>
+                        {result.status === 'final' ? (
+                          <button
+                            onClick={() => handleAmendResult(result)}
+                            className="text-purple-600 hover:text-purple-900"
+                            title="Amend Result"
+                          >
+                            <History className="h-4 w-4" />
+                          </button>
+                        ) : result.status !== 'cancelled' && (
+                          <button
+                            onClick={() => handleCorrectResult(result)}
+                            className="text-orange-600 hover:text-orange-900"
+                            title="Correct Result"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleGeneratePDF(result.id)}
                           className="text-gray-600 hover:text-gray-900"
@@ -333,6 +376,25 @@ const ResultsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Amendment Modal */}
+      {amendmentModal.result && (
+        <ResultAmendmentModal
+          isOpen={amendmentModal.isOpen}
+          onClose={() => setAmendmentModal({ isOpen: false, result: null })}
+          result={amendmentModal.result}
+        />
+      )}
+
+      {/* Correction Modal */}
+      {correctionModal.result && correctionModal.test && (
+        <ResultCorrectionModal
+          isOpen={correctionModal.isOpen}
+          onClose={() => setCorrectionModal({ isOpen: false, result: null, test: null })}
+          result={correctionModal.result}
+          test={correctionModal.test}
+        />
+      )}
     </div>
   );
 };

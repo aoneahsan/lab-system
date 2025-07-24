@@ -23,6 +23,8 @@ import type {
   InsuranceProvider,
   BillingFilter,
   BillingStatistics,
+  ClaimFilter,
+  ClaimStatistics,
   InvoiceFormData,
   PaymentFormData,
   ClaimFormData,
@@ -442,5 +444,111 @@ export const billingService = {
       averagePaymentTime: 15, // TODO: Calculate actual average
       collectionRate: totalRevenue > 0 ? ((totalRevenue - pendingPayments) / totalRevenue) * 100 : 0,
     };
+  },
+
+  // Get insurance claims
+  async getClaims(tenantId: string, filter?: ClaimFilter): Promise<InsuranceClaim[]> {
+    const claimsRef = collection(db, COLLECTIONS.INSURANCE_CLAIMS);
+    let q = query(claimsRef, where('tenantId', '==', tenantId));
+
+    if (filter?.status) {
+      q = query(q, where('status', '==', filter.status));
+    }
+    if (filter?.insuranceProviderId) {
+      q = query(q, where('insuranceId', '==', filter.insuranceProviderId));
+    }
+    if (filter?.patientId) {
+      q = query(q, where('patientId', '==', filter.patientId));
+    }
+
+    q = query(q, orderBy('claimDate', 'desc'));
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InsuranceClaim));
+  },
+
+  // Get claim statistics
+  async getClaimStatistics(tenantId: string): Promise<ClaimStatistics> {
+    const claimsRef = collection(db, COLLECTIONS.INSURANCE_CLAIMS);
+    const q = query(claimsRef, where('tenantId', '==', tenantId));
+    const snapshot = await getDocs(q);
+
+    let totalClaims = 0;
+    let pendingClaims = 0;
+    let acceptedAmount = 0;
+    let rejectedClaims = 0;
+    let totalProcessingDays = 0;
+    let processedClaims = 0;
+
+    const providerStats: Record<string, {
+      claimCount: number;
+      acceptedCount: number;
+      totalReimbursement: number;
+    }> = {};
+
+    snapshot.docs.forEach(doc => {
+      const claim = doc.data() as InsuranceClaim;
+      totalClaims++;
+
+      if (claim.status === 'pending' || claim.status === 'submitted') {
+        pendingClaims++;
+      }
+      if (claim.status === 'denied') {
+        rejectedClaims++;
+      }
+      if (claim.paidAmount) {
+        acceptedAmount += claim.paidAmount;
+      }
+
+      // Calculate processing time
+      if (claim.submittedDate && claim.processedDate) {
+        const submittedDate = claim.submittedDate.toDate();
+        const processedDate = claim.processedDate.toDate();
+        const daysDiff = Math.floor((processedDate.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24));
+        totalProcessingDays += daysDiff;
+        processedClaims++;
+      }
+
+      // Track provider stats
+      if (!providerStats[claim.insuranceId]) {
+        providerStats[claim.insuranceId] = {
+          claimCount: 0,
+          acceptedCount: 0,
+          totalReimbursement: 0,
+        };
+      }
+      providerStats[claim.insuranceId].claimCount++;
+      if (claim.status === 'approved' || claim.status === 'paid') {
+        providerStats[claim.insuranceId].acceptedCount++;
+        providerStats[claim.insuranceId].totalReimbursement += claim.paidAmount || 0;
+      }
+    });
+
+    const rejectionRate = totalClaims > 0 ? (rejectedClaims / totalClaims) * 100 : 0;
+    const averageProcessingDays = processedClaims > 0 ? totalProcessingDays / processedClaims : 0;
+
+    const topInsuranceProviders = Object.entries(providerStats)
+      .map(([providerId, stats]) => ({
+        provider: providerId, // TODO: Get provider name
+        claimCount: stats.claimCount,
+        acceptanceRate: stats.claimCount > 0 ? (stats.acceptedCount / stats.claimCount) * 100 : 0,
+        averageReimbursement: stats.acceptedCount > 0 ? stats.totalReimbursement / stats.acceptedCount : 0,
+      }))
+      .sort((a, b) => b.claimCount - a.claimCount)
+      .slice(0, 5);
+
+    return {
+      totalClaims,
+      pendingClaims,
+      acceptedAmount,
+      rejectionRate,
+      averageProcessingDays,
+      topInsuranceProviders,
+    };
+  },
+
+  // Create insurance claim helper
+  async createClaim(tenantId: string, userId: string, data: ClaimFormData): Promise<string> {
+    return this.createInsuranceClaim(tenantId, userId, data);
   },
 };

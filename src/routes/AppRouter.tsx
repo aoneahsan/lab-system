@@ -35,6 +35,7 @@ const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
 const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
 const ResultReviewPage = lazy(() => import('@/pages/results/ResultReviewPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
+const InsuranceClaimsPage = lazy(() => import('@/pages/billing/InsuranceClaimsPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryPage'));
 const QualityControlPage = lazy(
 	() => import('@/pages/quality-control/QualityControlPage')
@@ -53,7 +54,7 @@ const BiometricSettingsPage = lazy(
 const ValidationRulesPage = lazy(
 	() => import('@/pages/settings/ValidationRulesPage')
 );
-const SetupDemoPage = lazy(() => import('@/pages/SetupDemoPage'));
+const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 
 export const AppRouter = () => {
 	const { isAuthenticated } = useAuthStore();
@@ -113,6 +114,7 @@ export const AppRouter = () => {
 						<Route path='/results/entry' element={<ResultEntryPage />} />
 						<Route path='/results/review' element={<ResultReviewPage />} />
 						<Route path='/billing' element={<BillingPage />} />
+						<Route path='/billing/claims' element={<InsuranceClaimsPage />} />
 						<Route path='/inventory' element={<InventoryPage />} />
 						<Route path='/quality-control' element={<QualityControlPage />} />
 						<Route path='/reports' element={<ReportsPage />} />

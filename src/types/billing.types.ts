@@ -352,3 +352,25 @@ export interface ClaimFormData {
   renderingProvider: string;
   notes?: string;
 }
+
+export interface ClaimFilter {
+  status?: ClaimStatus;
+  insuranceProviderId?: string;
+  patientId?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+export interface ClaimStatistics {
+  totalClaims: number;
+  pendingClaims: number;
+  acceptedAmount: number;
+  rejectionRate: number;
+  averageProcessingDays: number;
+  topInsuranceProviders: {
+    provider: string;
+    claimCount: number;
+    acceptanceRate: number;
+    averageReimbursement: number;
+  }[];
+}

@@ -5,13 +5,13 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
 import type {
   Invoice,
-  // Payment,
-  // InsuranceClaim,
-  // InsuranceProvider,
+  InsuranceClaim,
   BillingFilter,
+  ClaimFilter,
   InvoiceFormData,
   PaymentFormData,
   ClaimFormData,
+  ClaimStatistics,
 } from '@/types/billing.types';
 
 // Query keys
@@ -233,6 +233,34 @@ export const useBillingStatistics = () => {
     queryFn: () => {
       if (!currentTenant) throw new Error('No tenant selected');
       return billingService.getBillingStatistics(currentTenant.id);
+    },
+    enabled: !!currentTenant,
+  });
+};
+
+// Get insurance claims
+export const useClaims = (filter?: ClaimFilter) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: [...BILLING_KEYS.claims(), filter],
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getClaims(currentTenant.id, filter);
+    },
+    enabled: !!currentTenant,
+  });
+};
+
+// Get claim statistics
+export const useClaimStatistics = () => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: [...BILLING_KEYS.claims(), 'statistics'],
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getClaimStatistics(currentTenant.id);
     },
     enabled: !!currentTenant,
   });
