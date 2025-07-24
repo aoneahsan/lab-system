@@ -42,6 +42,7 @@ const TestForm: React.FC<TestFormProps> = ({
       resultType: 'numeric',
       isActive: true,
       isOrderable: true,
+      requiresApproval: false,
       decimalPlaces: 2,
     },
   });
@@ -118,6 +119,56 @@ const TestForm: React.FC<TestFormProps> = ({
               {...register('department')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Test Options */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Test Options
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                type="checkbox"
+                {...register('isActive')}
+                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label className="font-medium text-gray-700">Active</label>
+              <p className="text-gray-500">Test is available for ordering</p>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                type="checkbox"
+                {...register('isOrderable')}
+                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label className="font-medium text-gray-700">Orderable</label>
+              <p className="text-gray-500">Test can be ordered by providers</p>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                type="checkbox"
+                {...register('requiresApproval')}
+                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label className="font-medium text-gray-700">Requires Approval</label>
+              <p className="text-gray-500">Orders for this test require approval before processing</p>
+            </div>
           </div>
         </div>
       </div>

@@ -226,19 +226,24 @@ export const testService = {
     const orderNumber = `ORD-${dateStr}-${randomNum}`;
 
     // Get test details for ordered tests
-    const testDetails = await Promise.all(
+    const tests = await Promise.all(
       data.tests.map(async (testId) => {
         const test = await this.getTestById(testId);
         if (!test) throw new Error(`Test ${testId} not found`);
-        return {
-          testId: test.id,
-          testName: test.name,
-          testCode: test.code,
-          status: 'pending' as const,
-        };
+        return test;
       })
     );
 
+    const testDetails = tests.map(test => ({
+      testId: test.id,
+      testName: test.name,
+      testCode: test.code,
+      status: 'pending' as const,
+    }));
+
+    // Check if any test requires approval
+    const requiresApproval = tests.some(test => test.requiresApproval);
+    
     const orderData = {
       tenantId,
       patientId: data.patientId,
@@ -252,7 +257,8 @@ export const testService = {
       diagnosis: data.diagnosis,
       icdCodes: data.icdCodes || [],
       fasting: data.fasting || false,
-      status: 'pending' as const,
+      status: requiresApproval ? 'awaiting_approval' as const : 'pending' as const,
+      requiresApproval,
       notes: data.notes,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -324,6 +330,38 @@ export const testService = {
     const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
     await updateDoc(docRef, {
       ...data,
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    });
+  },
+
+  async approveTestOrder(
+    orderId: string,
+    userId: string,
+    notes?: string
+  ): Promise<void> {
+    const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
+    await updateDoc(docRef, {
+      status: 'approved',
+      approvedBy: userId,
+      approvedAt: serverTimestamp(),
+      notes,
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    });
+  },
+
+  async rejectTestOrder(
+    orderId: string,
+    userId: string,
+    reason: string
+  ): Promise<void> {
+    const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
+    await updateDoc(docRef, {
+      status: 'rejected',
+      rejectedBy: userId,
+      rejectedAt: serverTimestamp(),
+      rejectionReason: reason,
       updatedAt: serverTimestamp(),
       updatedBy: userId,
     });

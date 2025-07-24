@@ -219,6 +219,44 @@ export const useCreateTestOrder = () => {
   });
 };
 
+export const useApproveTestOrder = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: ({ orderId, notes }: { orderId: string; notes?: string }) => 
+      testService.approveTestOrder(orderId, user!.uid, notes),
+    onSuccess: (_, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['testOrders'] });
+      queryClient.invalidateQueries({ queryKey: ['testOrder', orderId] });
+      showToast('Order approved successfully', 'success');
+    },
+    onError: (error) => {
+      showToast(error.message || 'Failed to approve order', 'error');
+    },
+  });
+};
+
+export const useRejectTestOrder = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const { showToast } = useToastStore();
+
+  return useMutation({
+    mutationFn: ({ orderId, reason }: { orderId: string; reason: string }) => 
+      testService.rejectTestOrder(orderId, user!.uid, reason),
+    onSuccess: (_, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['testOrders'] });
+      queryClient.invalidateQueries({ queryKey: ['testOrder', orderId] });
+      showToast('Order rejected', 'success');
+    },
+    onError: (error) => {
+      showToast(error.message || 'Failed to reject order', 'error');
+    },
+  });
+};
+
 export const useUpdateTestOrderStatus = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();

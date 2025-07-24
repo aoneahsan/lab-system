@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useTestOrders, useCreateTestOrder, useUpdateTestOrderStatus } from '@/hooks/useTests';
 import TestOrderForm from '@/components/tests/TestOrderForm';
 import type { TestOrder, TestOrderFormData, TestOrderFilter } from '@/types/test.types';
@@ -37,6 +37,10 @@ const TestOrdersPage: React.FC = () => {
     switch (status) {
       case 'pending':
         return <Clock className="h-5 w-5 text-yellow-500" />;
+      case 'awaiting_approval':
+        return <AlertCircle className="h-5 w-5 text-orange-500" />;
+      case 'approved':
+        return <CheckCircle className="h-5 w-5 text-blue-500" />;
       case 'specimen_collected':
         return <FileText className="h-5 w-5 text-blue-500" />;
       case 'in_progress':
@@ -45,6 +49,10 @@ const TestOrdersPage: React.FC = () => {
         return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'cancelled':
         return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'rejected':
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      default:
+        return null;
     }
   };
 
@@ -52,6 +60,10 @@ const TestOrdersPage: React.FC = () => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'awaiting_approval':
+        return 'bg-orange-100 text-orange-800';
+      case 'approved':
+        return 'bg-blue-100 text-blue-800';
       case 'specimen_collected':
         return 'bg-blue-100 text-blue-800';
       case 'in_progress':
@@ -60,6 +72,10 @@ const TestOrdersPage: React.FC = () => {
         return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -119,10 +135,13 @@ const TestOrdersPage: React.FC = () => {
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
+            <option value="awaiting_approval">Awaiting Approval</option>
+            <option value="approved">Approved</option>
             <option value="specimen_collected">Specimen Collected</option>
             <option value="in_progress">In Progress</option>
             <option value="resulted">Resulted</option>
             <option value="cancelled">Cancelled</option>
+            <option value="rejected">Rejected</option>
           </select>
 
           <select
@@ -195,7 +214,7 @@ const TestOrdersPage: React.FC = () => {
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      onClick={() => navigate(`/orders/${order.id}`)}
+                      onClick={() => navigate(`/tests/orders/${order.id}`)}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
                       {order.orderNumber}
@@ -238,18 +257,28 @@ const TestOrdersPage: React.FC = () => {
                     {new Date(order.orderDate).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <select
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order, e.target.value as TestOrder['status'])}
-                      className="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      disabled={order.status === 'cancelled' || order.status === 'resulted'}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="specimen_collected">Specimen Collected</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="resulted">Resulted</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+                    {order.status === 'awaiting_approval' ? (
+                      <button
+                        onClick={() => navigate(`/tests/orders/${order.id}`)}
+                        className="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                      >
+                        Review Required
+                      </button>
+                    ) : (
+                      <select
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order, e.target.value as TestOrder['status'])}
+                        className="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        disabled={order.status === 'cancelled' || order.status === 'resulted' || order.status === 'rejected'}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="specimen_collected">Specimen Collected</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resulted">Resulted</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    )}
                   </td>
                 </tr>
               ))}

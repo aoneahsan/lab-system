@@ -106,8 +106,14 @@ export interface TestOrder {
   fasting?: boolean;
   collectionDateTime?: Date | Timestamp;
   specimenId?: string;
-  status: 'pending' | 'specimen_collected' | 'in_progress' | 'resulted' | 'cancelled';
+  status: 'pending' | 'awaiting_approval' | 'approved' | 'specimen_collected' | 'in_progress' | 'resulted' | 'cancelled' | 'rejected';
   cancelReason?: string;
+  rejectionReason?: string;
+  requiresApproval?: boolean;
+  approvedBy?: string;
+  approvedAt?: Date | Timestamp;
+  rejectedBy?: string;
+  rejectedAt?: Date | Timestamp;
   notes?: string;
   createdAt: Date | Timestamp;
   updatedAt: Date | Timestamp;

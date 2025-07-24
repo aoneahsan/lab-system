@@ -117,6 +117,16 @@ const TestDetailPage: React.FC = () => {
                 <dt className="text-sm font-medium text-gray-500">Orderable</dt>
                 <dd className="mt-1 text-sm text-gray-900">{test.isOrderable ? 'Yes' : 'No'}</dd>
               </div>
+              {test.requiresApproval && (
+                <div>
+                  <dt className="text-sm font-medium text-gray-500">Requires Approval</dt>
+                  <dd className="mt-1">
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
+                      Yes
+                    </span>
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
 
