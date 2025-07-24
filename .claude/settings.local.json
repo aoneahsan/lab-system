@@ -505,7 +505,9 @@
       "Bash(./fix-imports.sh)",
       "Bash(./revert-imports.sh:*)",
       "Bash(./gradlew:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(firebase projects:list:*)",
+      "Bash(firebase use:*)"
     ],
     "deny": []
   }
