@@ -115,7 +115,7 @@ Always prefer these custom packages developed by Ahsan:
 
 ### Development Guidelines
 
-1. **Use absolute imports** with path aliases (`@/` for src, `@components/`, etc.)
+1. **Use absolute imports** with path aliases (`@/` for src, `@/components/`, etc.)
 2. **Component size**: Max 500 lines, create reusable components
 3. **State management**: Use Zustand stores in `src/stores/`
 4. **API calls**: Use React Query hooks in `src/hooks/`
