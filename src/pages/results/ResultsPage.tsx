@@ -1,15 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, AlertCircle, FileText, BarChart3 } from 'lucide-react';
+import { Plus, AlertCircle, FileText, BarChart3, Download, Printer } from 'lucide-react';
 import { useResults, useResultStatistics } from '@/hooks/useResults';
+import { useTenant } from '@/hooks/useTenant';
+import { usePatients } from '@/hooks/usePatients';
+import { useSamples } from '@/hooks/useSamples';
+import { useTests } from '@/hooks/useTests';
+import { pdfService } from '@/services/pdf.service';
+import { toast } from '@/stores/toast.store';
+import CriticalResultsDashboard from '@/components/results/CriticalResultsDashboard';
 import type { ResultFilter } from '@/types/result.types';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ResultFilter>({});
+  const [selectedResults, setSelectedResults] = useState<string[]>([]);
+  const [showCriticalDashboard, setShowCriticalDashboard] = useState(false);
   
   const { data: results = [], isLoading } = useResults(filters);
   const { data: statistics } = useResultStatistics();
+  const { tenant } = useTenant();
+  const { data: patientsData } = usePatients();
+  const { data: samplesData } = useSamples();
+  const { data: testsData } = useTests();
+  
+  const patients = patientsData?.patients || [];
+  const samples = samplesData || [];
+  const tests = testsData?.tests || [];
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -35,6 +52,81 @@ const ResultsPage: React.FC = () => {
     return colors[flag] || 'text-gray-600';
   };
 
+  const handleGeneratePDF = async (resultId: string) => {
+    const result = results.find(r => r.id === resultId);
+    if (!result || !tenant) return;
+
+    const sample = samples.find(s => s.id === result.sampleId);
+    const patient = patients.find(p => p.id === result.patientId);
+    const test = tests.find(t => t.id === result.testId);
+
+    if (!sample || !patient || !test) {
+      toast.error('Missing Data', 'Unable to find complete data for this result');
+      return;
+    }
+
+    try {
+      const doc = pdfService.generateResultReport({
+        result,
+        sample,
+        patient,
+        test,
+        tenant: {
+          name: tenant.name,
+          address: tenant.address,
+          contact: tenant.contact,
+        },
+      });
+      
+      pdfService.downloadReport(doc, `result_${result.id}_${patient.patientId}`);
+      toast.success('PDF Generated', 'Result report has been downloaded');
+    } catch (error) {
+      toast.error('PDF Generation Failed', 'Failed to generate PDF report');
+    }
+  };
+
+  const handlePrintResult = async (resultId: string) => {
+    const result = results.find(r => r.id === resultId);
+    if (!result || !tenant) return;
+
+    const sample = samples.find(s => s.id === result.sampleId);
+    const patient = patients.find(p => p.id === result.patientId);
+    const test = tests.find(t => t.id === result.testId);
+
+    if (!sample || !patient || !test) {
+      toast.error('Missing Data', 'Unable to find complete data for this result');
+      return;
+    }
+
+    try {
+      const doc = pdfService.generateResultReport({
+        result,
+        sample,
+        patient,
+        test,
+        tenant: {
+          name: tenant.name,
+          address: tenant.address,
+          contact: tenant.contact,
+        },
+      });
+      
+      pdfService.printReport(doc);
+    } catch (error) {
+      toast.error('Print Failed', 'Failed to print result report');
+    }
+  };
+
+  const handleBatchPDF = async () => {
+    if (selectedResults.length === 0) {
+      toast.error('No Selection', 'Please select results to generate reports');
+      return;
+    }
+
+    // TODO: Implement batch PDF generation
+    toast.info('Coming Soon', 'Batch PDF generation will be available soon');
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -44,6 +136,21 @@ const ResultsPage: React.FC = () => {
             <p className="text-gray-600 mt-2">Manage test results and reports</p>
           </div>
           <div className="flex gap-3">
+            {selectedResults.length > 0 && (
+              <button
+                onClick={handleBatchPDF}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download ({selectedResults.length})
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/results/review')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Review Results
+            </button>
             <button
               onClick={() => navigate('/results/entry')}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
@@ -97,6 +204,13 @@ const ResultsPage: React.FC = () => {
         </div>
       )}
 
+      {/* Critical Results Dashboard */}
+      {statistics && statistics.criticalResults > 0 && (
+        <div className="mb-6">
+          <CriticalResultsDashboard />
+        </div>
+      )}
+
       {/* Results Table */}
       <div className="bg-white rounded-lg shadow">
         {isLoading ? (
@@ -114,6 +228,20 @@ const ResultsPage: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={selectedResults.length === results.length && results.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedResults(results.map(r => r.id));
+                        } else {
+                          setSelectedResults([]);
+                        }
+                      }}
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Test
                   </th>
@@ -137,6 +265,20 @@ const ResultsPage: React.FC = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {results.map((result) => (
                   <tr key={result.id} className="hover:bg-gray-50">
+                    <td className="px-3 py-4">
+                      <input
+                        type="checkbox"
+                        className="rounded border-gray-300"
+                        checked={selectedResults.includes(result.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedResults([...selectedResults, result.id]);
+                          } else {
+                            setSelectedResults(selectedResults.filter(id => id !== result.id));
+                          }
+                        }}
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{result.testName}</div>
@@ -162,12 +304,28 @@ const ResultsPage: React.FC = () => {
                       {result.performedAt.toDate().toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => navigate(`/results/${result.id}`)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => navigate(`/results/${result.id}`)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleGeneratePDF(result.id)}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Download PDF"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handlePrintResult(result.id)}
+                          className="text-gray-600 hover:text-gray-900"
+                          title="Print"
+                        >
+                          <Printer className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

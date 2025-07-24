@@ -33,6 +33,7 @@ const SampleCollectionsPage = lazy(
 const SampleScanPage = lazy(() => import('@/pages/samples/SampleScanPage'));
 const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
 const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
+const ResultReviewPage = lazy(() => import('@/pages/results/ResultReviewPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryPage'));
 const QualityControlPage = lazy(
@@ -110,6 +111,7 @@ export const AppRouter = () => {
 						<Route path='/samples/:sampleId' element={<SampleDetailPage />} />
 						<Route path='/results' element={<ResultsPage />} />
 						<Route path='/results/entry' element={<ResultEntryPage />} />
+						<Route path='/results/review' element={<ResultReviewPage />} />
 						<Route path='/billing' element={<BillingPage />} />
 						<Route path='/inventory' element={<InventoryPage />} />
 						<Route path='/quality-control' element={<QualityControlPage />} />
