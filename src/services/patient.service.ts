@@ -18,6 +18,7 @@ import {
 } from 'firebase/firestore';
 import { firestore } from '@config/firebase.config';
 import { getCollectionName } from '@constants/tenant.constants';
+import { webhookService } from '@/services/webhook.service';
 import type {
   Patient,
   CreatePatientData,
@@ -153,10 +154,31 @@ class PatientService {
       const docRef = await addDoc(collection(firestore, collectionName), patientData);
       const newDoc = await getDoc(docRef);
       
-      return this.formatPatientData({
+      const createdPatient = this.formatPatientData({
         id: docRef.id,
         ...newDoc.data(),
       });
+
+      // Trigger webhook event
+      try {
+        await webhookService.triggerWebhookEvent(tenantId, 'patient.created', {
+          patient: {
+            id: createdPatient.id,
+            mrn: createdPatient.mrn,
+            firstName: createdPatient.firstName,
+            lastName: createdPatient.lastName,
+            dateOfBirth: createdPatient.dateOfBirth.toISOString(),
+            gender: createdPatient.gender,
+            email: createdPatient.email,
+            phoneNumber: createdPatient.phoneNumbers[0]?.value,
+          },
+        });
+      } catch (webhookError) {
+        console.error('Error triggering webhook:', webhookError);
+        // Don't fail the patient creation if webhook fails
+      }
+      
+      return createdPatient;
     } catch (error) {
       console.error('Error creating patient:', error);
       throw error;
@@ -174,10 +196,26 @@ class PatientService {
       });
       
       const updatedDoc = await getDoc(docRef);
-      return this.formatPatientData({
+      const updatedPatient = this.formatPatientData({
         id: patientId,
         ...updatedDoc.data(),
       });
+
+      // Trigger webhook event
+      try {
+        await webhookService.triggerWebhookEvent(tenantId, 'patient.updated', {
+          patient: {
+            id: updatedPatient.id,
+            mrn: updatedPatient.mrn,
+            changes: data,
+          },
+        });
+      } catch (webhookError) {
+        console.error('Error triggering webhook:', webhookError);
+        // Don't fail the patient update if webhook fails
+      }
+      
+      return updatedPatient;
     } catch (error) {
       console.error('Error updating patient:', error);
       throw error;
