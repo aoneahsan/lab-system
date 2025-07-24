@@ -508,7 +508,8 @@
       "Bash(curl:*)",
       "Bash(firebase projects:list:*)",
       "Bash(firebase use:*)",
-      "Bash(firebase emulators:exec:*)"
+      "Bash(firebase emulators:exec:*)",
+      "Bash(firebase functions:shell:*)"
     ],
     "deny": []
   }

@@ -106,6 +106,12 @@ export const useAuthStore = create<AuthStore>()(
 					setLoading(true);
 					setError(null);
 
+					// First check if tenant exists
+					const tenantDoc = await getDoc(doc(firestore, 'tenants', data.tenantCode.toLowerCase()));
+					if (!tenantDoc.exists()) {
+						throw new Error('Invalid laboratory code. Please check and try again.');
+					}
+
 					// Create Firebase Auth user
 					const userCredential = await createUserWithEmailAndPassword(
 						auth,
@@ -127,7 +133,7 @@ export const useAuthStore = create<AuthStore>()(
 						lastName: data.lastName,
 						phoneNumber: data.phoneNumber,
 						role: data.role || 'patient',
-						tenantId: data.tenantCode,
+						tenantId: data.tenantCode.toLowerCase(),
 						permissions: [],
 						isActive: true,
 						isEmailVerified: false,
@@ -137,6 +143,18 @@ export const useAuthStore = create<AuthStore>()(
 
 					await setDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
 						...userData,
+						createdAt: serverTimestamp(),
+						updatedAt: serverTimestamp(),
+					});
+
+					// Create tenant_users entry
+					const tenantUserId = `${userData.id}_${data.tenantCode.toLowerCase()}`;
+					await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+						userId: userData.id,
+						tenantId: data.tenantCode.toLowerCase(),
+						role: userData.role,
+						permissions: [],
+						isActive: true,
 						createdAt: serverTimestamp(),
 						updatedAt: serverTimestamp(),
 					});
@@ -232,6 +250,7 @@ export const useAuthStore = create<AuthStore>()(
 					);
 
 					if (!userDoc.exists()) {
+						console.error('User document not found for uid:', uid);
 						return null;
 					}
 

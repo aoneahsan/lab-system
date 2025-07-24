@@ -27,6 +27,10 @@ const TestOrderDetailPage = lazy(
 );
 const SamplesPage = lazy(() => import('@/pages/samples/SamplesPage'));
 const SampleDetailPage = lazy(() => import('@/pages/samples/SampleDetailPage'));
+const SampleCollectionsPage = lazy(
+	() => import('@/pages/samples/SampleCollectionsPage')
+);
+const SampleScanPage = lazy(() => import('@/pages/samples/SampleScanPage'));
 const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
 const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
@@ -48,6 +52,7 @@ const BiometricSettingsPage = lazy(
 const ValidationRulesPage = lazy(
 	() => import('@/pages/settings/ValidationRulesPage')
 );
+const SetupDemoPage = lazy(() => import('@/pages/SetupDemoPage'));
 
 export const AppRouter = () => {
 	const { isAuthenticated } = useAuthStore();
@@ -79,6 +84,7 @@ export const AppRouter = () => {
 							)
 						}
 					/>
+					<Route path='/setup-demo' element={<SetupDemoPage />} />
 				</Route>
 
 				{/* Protected routes */}
@@ -99,6 +105,8 @@ export const AppRouter = () => {
 						/>
 						<Route path='/tests/:testId' element={<TestDetailPage />} />
 						<Route path='/samples' element={<SamplesPage />} />
+						<Route path='/samples/collections' element={<SampleCollectionsPage />} />
+						<Route path='/samples/scan' element={<SampleScanPage />} />
 						<Route path='/samples/:sampleId' element={<SampleDetailPage />} />
 						<Route path='/results' element={<ResultsPage />} />
 						<Route path='/results/entry' element={<ResultEntryPage />} />
