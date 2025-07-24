@@ -265,3 +265,44 @@ export const useClaimStatistics = () => {
     enabled: !!currentTenant,
   });
 };
+
+// Get single claim
+export const useClaim = (claimId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: BILLING_KEYS.claim(claimId),
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getClaim(currentTenant.id, claimId);
+    },
+    enabled: !!currentTenant && !!claimId,
+  });
+};
+
+// Appeal claim
+export const useAppealClaim = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { currentUser } = useAuthStore();
+
+  return useMutation({
+    mutationFn: ({ claimId, appealReason, additionalDocuments }: { 
+      claimId: string; 
+      appealReason: string;
+      additionalDocuments?: string;
+    }) => {
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.appealClaim(currentTenant.id, currentUser.id, claimId, appealReason, additionalDocuments);
+    },
+    onSuccess: (_, { claimId }) => {
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });
+      queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claim(claimId) });
+      toast.success('Appeal submitted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to submit appeal');
+      console.error('Error submitting appeal:', error);
+    },
+  });
+};

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useClaim, useSubmitClaim } from '@/hooks/useBilling';
 import { format } from 'date-fns';
+import AppealClaimModal from '@/components/billing/AppealClaimModal';
 
 const ClaimDetailPage: React.FC = () => {
   const { claimId } = useParams<{ claimId: string }>();
@@ -292,6 +293,15 @@ const ClaimDetailPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Appeal Modal */}
+      {showAppealModal && claim && (
+        <AppealClaimModal
+          isOpen={showAppealModal}
+          onClose={() => setShowAppealModal(false)}
+          claim={claim}
+        />
+      )}
     </div>
   );
 };

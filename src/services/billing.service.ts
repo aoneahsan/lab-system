@@ -467,6 +467,18 @@ export const billingService = {
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InsuranceClaim));
   },
 
+  // Get single claim
+  async getClaim(tenantId: string, claimId: string): Promise<InsuranceClaim | null> {
+    const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
+    const claimDoc = await getDoc(claimRef);
+    
+    if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
+      return null;
+    }
+
+    return { id: claimDoc.id, ...claimDoc.data() } as InsuranceClaim;
+  },
+
   // Get claim statistics
   async getClaimStatistics(tenantId: string): Promise<ClaimStatistics> {
     const claimsRef = collection(db, COLLECTIONS.INSURANCE_CLAIMS);
@@ -550,5 +562,30 @@ export const billingService = {
   // Create insurance claim helper
   async createClaim(tenantId: string, userId: string, data: ClaimFormData): Promise<string> {
     return this.createInsuranceClaim(tenantId, userId, data);
+  },
+
+  // Appeal claim
+  async appealClaim(
+    tenantId: string,
+    userId: string,
+    claimId: string,
+    appealReason: string,
+    additionalDocuments?: string
+  ): Promise<void> {
+    const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
+    const claimDoc = await getDoc(claimRef);
+    
+    if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
+      throw new Error('Claim not found');
+    }
+
+    await updateDoc(claimRef, {
+      status: 'appealing',
+      appealDate: serverTimestamp(),
+      appealReason,
+      additionalDocuments,
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    });
   },
 };
