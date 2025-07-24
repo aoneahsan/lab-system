@@ -507,7 +507,8 @@
       "Bash(./gradlew:*)",
       "Bash(curl:*)",
       "Bash(firebase projects:list:*)",
-      "Bash(firebase use:*)"
+      "Bash(firebase use:*)",
+      "Bash(firebase emulators:exec:*)"
     ],
     "deny": []
   }
