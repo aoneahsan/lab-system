@@ -374,3 +374,56 @@ export interface ClaimStatistics {
     averageReimbursement: number;
   }[];
 }
+
+export interface InsuranceEligibility {
+  id: string;
+  tenantId: string;
+  patientId: string;
+  insuranceProviderId: string;
+  memberNumber: string;
+  groupNumber?: string;
+  checkDate: Timestamp;
+  status: 'checking' | 'active' | 'inactive' | 'error';
+  coverage: {
+    medical: boolean;
+    dental: boolean;
+    vision: boolean;
+    lab: boolean;
+  };
+  deductible: {
+    individual: number;
+    individualMet: number;
+    family: number;
+    familyMet: number;
+  };
+  outOfPocketMax: {
+    individual: number;
+    individualMet: number;
+    family: number;
+    familyMet: number;
+  };
+  copay?: {
+    primaryCare?: number;
+    specialist?: number;
+    lab?: number;
+    emergency?: number;
+  };
+  coinsurance?: {
+    inNetwork: number;
+    outOfNetwork: number;
+  };
+  effectiveDate: Timestamp;
+  terminationDate?: Timestamp;
+  responseMessage?: string;
+  rawResponse?: Record<string, unknown>;
+  createdAt: Timestamp;
+  createdBy: string;
+}
+
+export interface EligibilityCheckRequest {
+  patientId: string;
+  insuranceProviderId: string;
+  memberNumber: string;
+  groupNumber?: string;
+  dateOfService?: Date;
+}

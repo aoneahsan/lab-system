@@ -12,6 +12,7 @@ import type {
   PaymentFormData,
   ClaimFormData,
   ClaimStatistics,
+  EligibilityCheckRequest,
 } from '@/types/billing.types';
 
 // Query keys
@@ -304,5 +305,57 @@ export const useAppealClaim = () => {
       toast.error('Failed to submit appeal');
       console.error('Error submitting appeal:', error);
     },
+  });
+};
+
+// Get patient insurance
+export const usePatientInsurance = (patientId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: ['patient-insurance', currentTenant?.id, patientId],
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getPatientInsurance(currentTenant.id, patientId);
+    },
+    enabled: !!currentTenant && !!patientId,
+  });
+};
+
+// Check insurance eligibility
+export const useCheckEligibility = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+  const { currentUser } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (request: EligibilityCheckRequest) => {
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.checkEligibility(currentTenant.id, currentUser.id, request);
+    },
+    onSuccess: (_, request) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['eligibility-history', currentTenant?.id, request.patientId] 
+      });
+      toast.success('Eligibility check completed');
+    },
+    onError: (error) => {
+      toast.error('Failed to check eligibility');
+      console.error('Error checking eligibility:', error);
+    },
+  });
+};
+
+// Get eligibility history
+export const useEligibilityHistory = (patientId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: ['eligibility-history', currentTenant?.id, patientId],
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      return billingService.getEligibilityHistory(currentTenant.id, patientId);
+    },
+    enabled: !!currentTenant && !!patientId,
   });
 };

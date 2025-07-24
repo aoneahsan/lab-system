@@ -93,6 +93,12 @@ export const COLLECTIONS = {
 	get INSURANCE_PROVIDERS() {
 		return getCollectionName('insurance_providers');
 	},
+	get PATIENT_INSURANCE() {
+		return getCollectionName('patient_insurance');
+	},
+	get INSURANCE_ELIGIBILITY() {
+		return getCollectionName('insurance_eligibility');
+	},
 	// Root collections (no tenant prefix)
 	TENANTS: 'tenants',
 	TENANT_USERS: 'tenant_users',

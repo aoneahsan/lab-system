@@ -30,6 +30,9 @@ import type {
   ClaimFormData,
   InvoiceStatus,
   PaymentStatus,
+  InsuranceEligibility,
+  EligibilityCheckRequest,
+  PatientInsurance,
 } from '@/types/billing.types';
 
 export const billingService = {
@@ -587,5 +590,104 @@ export const billingService = {
       updatedAt: serverTimestamp(),
       updatedBy: userId,
     });
+  },
+
+  // Get patient insurance
+  async getPatientInsurance(tenantId: string, patientId: string): Promise<PatientInsurance[]> {
+    const insuranceRef = collection(db, COLLECTIONS.PATIENT_INSURANCE);
+    const q = query(
+      insuranceRef,
+      where('patientId', '==', patientId),
+      where('active', '==', true),
+      orderBy('insuranceType')
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as PatientInsurance));
+  },
+
+  // Check insurance eligibility
+  async checkEligibility(
+    tenantId: string,
+    userId: string,
+    request: EligibilityCheckRequest
+  ): Promise<InsuranceEligibility> {
+    // In a real implementation, this would call an external eligibility API
+    // For demo purposes, we'll simulate the check
+    
+    const eligibilityData: Omit<InsuranceEligibility, 'id'> = {
+      tenantId,
+      patientId: request.patientId,
+      insuranceProviderId: request.insuranceProviderId,
+      memberNumber: request.memberNumber,
+      groupNumber: request.groupNumber,
+      checkDate: Timestamp.now(),
+      status: 'active', // Simulated response
+      coverage: {
+        medical: true,
+        dental: false,
+        vision: false,
+        lab: true,
+      },
+      deductible: {
+        individual: 2000,
+        individualMet: 750,
+        family: 4000,
+        familyMet: 1200,
+      },
+      outOfPocketMax: {
+        individual: 5000,
+        individualMet: 1000,
+        family: 10000,
+        familyMet: 2500,
+      },
+      copay: {
+        primaryCare: 25,
+        specialist: 50,
+        lab: 20,
+        emergency: 150,
+      },
+      coinsurance: {
+        inNetwork: 20,
+        outOfNetwork: 40,
+      },
+      effectiveDate: Timestamp.fromDate(new Date(new Date().getFullYear(), 0, 1)),
+      responseMessage: 'Coverage verified successfully',
+      createdAt: Timestamp.now(),
+      createdBy: userId,
+    };
+
+    // Store the eligibility check result
+    const eligibilityRef = collection(db, COLLECTIONS.INSURANCE_ELIGIBILITY);
+    const docRef = await addDoc(eligibilityRef, eligibilityData);
+
+    return {
+      id: docRef.id,
+      ...eligibilityData,
+    };
+  },
+
+  // Get eligibility history
+  async getEligibilityHistory(
+    tenantId: string,
+    patientId: string,
+    limitCount: number = 10
+  ): Promise<InsuranceEligibility[]> {
+    const eligibilityRef = collection(db, COLLECTIONS.INSURANCE_ELIGIBILITY);
+    const q = query(
+      eligibilityRef,
+      where('patientId', '==', patientId),
+      orderBy('checkDate', 'desc'),
+      limit(limitCount)
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as InsuranceEligibility));
   },
 };

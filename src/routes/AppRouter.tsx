@@ -37,6 +37,8 @@ const ResultReviewPage = lazy(() => import('@/pages/results/ResultReviewPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
 const InsuranceClaimsPage = lazy(() => import('@/pages/billing/InsuranceClaimsPage'));
 const ClaimDetailPage = lazy(() => import('@/pages/billing/ClaimDetailPage'));
+const InvoiceDetailPage = lazy(() => import('@/pages/billing/InvoiceDetailPage'));
+const PaymentsPage = lazy(() => import('@/pages/billing/PaymentsPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryPage'));
 const QualityControlPage = lazy(
 	() => import('@/pages/quality-control/QualityControlPage')
@@ -115,6 +117,8 @@ export const AppRouter = () => {
 						<Route path='/results/entry' element={<ResultEntryPage />} />
 						<Route path='/results/review' element={<ResultReviewPage />} />
 						<Route path='/billing' element={<BillingPage />} />
+						<Route path='/billing/invoices/:invoiceId' element={<InvoiceDetailPage />} />
+						<Route path='/billing/payments' element={<PaymentsPage />} />
 						<Route path='/billing/claims' element={<InsuranceClaimsPage />} />
 						<Route path='/billing/claims/:claimId' element={<ClaimDetailPage />} />
 						<Route path='/inventory' element={<InventoryPage />} />
