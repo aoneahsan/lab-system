@@ -1,8 +1,9 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, FlaskRound } from 'lucide-react';
 import { useTestOrder, useApproveTestOrder, useRejectTestOrder } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
+import { useSampleByOrderId } from '@/hooks/useSamples';
 import TestOrderReview from '@/components/tests/TestOrderReview';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
@@ -13,6 +14,7 @@ const TestOrderDetailPage: React.FC = () => {
   
   const { data: order, isLoading: orderLoading, error: orderError } = useTestOrder(orderId!);
   const { data: patient, isLoading: patientLoading } = usePatient(order?.patientId || '');
+  const { data: sample } = useSampleByOrderId(orderId!);
   
   const approveOrderMutation = useApproveTestOrder();
   const rejectOrderMutation = useRejectTestOrder();
@@ -173,19 +175,30 @@ const TestOrderDetailPage: React.FC = () => {
             <div className="space-y-3">
               {order.tests.map((test, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">{test.testName}</p>
                     <p className="text-sm text-gray-600">Code: {test.testCode}</p>
                   </div>
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    test.status === 'completed' ? 'bg-green-100 text-green-800' :
-                    test.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                    test.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                    test.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {test.status.replace(/_/g, ' ')}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      test.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      test.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                      test.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                      test.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {test.status.replace(/_/g, ' ')}
+                    </span>
+                    {test.status !== 'completed' && test.status !== 'cancelled' && test.status !== 'rejected' && sample && order.status !== 'awaiting_approval' && (
+                      <button
+                        onClick={() => navigate(`/results/entry?orderId=${orderId}&sampleId=${sample.id}&testId=${test.testId}`)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
+                      >
+                        <FlaskRound className="h-3 w-3" />
+                        Enter Result
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

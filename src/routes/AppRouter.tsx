@@ -26,7 +26,9 @@ const TestOrderDetailPage = lazy(
 	() => import('@/pages/tests/TestOrderDetailPage')
 );
 const SamplesPage = lazy(() => import('@/pages/samples/SamplesPage'));
+const SampleDetailPage = lazy(() => import('@/pages/samples/SampleDetailPage'));
 const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
+const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryPage'));
 const QualityControlPage = lazy(
@@ -97,7 +99,9 @@ export const AppRouter = () => {
 						/>
 						<Route path='/tests/:testId' element={<TestDetailPage />} />
 						<Route path='/samples' element={<SamplesPage />} />
+						<Route path='/samples/:sampleId' element={<SampleDetailPage />} />
 						<Route path='/results' element={<ResultsPage />} />
+						<Route path='/results/entry' element={<ResultEntryPage />} />
 						<Route path='/billing' element={<BillingPage />} />
 						<Route path='/inventory' element={<InventoryPage />} />
 						<Route path='/quality-control' element={<QualityControlPage />} />

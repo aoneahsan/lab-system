@@ -18,6 +18,7 @@ const SAMPLE_KEYS = {
   list: (filter?: SampleFilter) => [...SAMPLE_KEYS.lists(), filter] as const,
   details: () => [...SAMPLE_KEYS.all, 'detail'] as const,
   detail: (id: string) => [...SAMPLE_KEYS.details(), id] as const,
+  byOrder: (orderId: string) => [...SAMPLE_KEYS.all, 'order', orderId] as const,
   statistics: () => [...SAMPLE_KEYS.all, 'statistics'] as const,
   collections: () => [...SAMPLE_KEYS.all, 'collections'] as const,
   collection: (filter?: { status?: string; phlebotomistId?: string }) => [...SAMPLE_KEYS.collections(), filter] as const,
@@ -48,6 +49,21 @@ export const useSample = (sampleId: string) => {
       return sampleService.getSample(currentTenant.id, sampleId);
     },
     enabled: !!currentTenant && !!sampleId,
+  });
+};
+
+// Get sample by order ID
+export const useSampleByOrderId = (orderId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: SAMPLE_KEYS.byOrder(orderId),
+    queryFn: async () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      const samples = await sampleService.getSamples(currentTenant.id, { orderId });
+      return samples[0] || null;
+    },
+    enabled: !!currentTenant && !!orderId,
   });
 };
 
