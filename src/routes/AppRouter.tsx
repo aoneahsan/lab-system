@@ -31,6 +31,7 @@ const EMRConnectionDetailPage = lazy(() => import('@pages/emr/EMRConnectionDetai
 const SettingsPage = lazy(() => import('@pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@pages/profile/ProfilePage'));
 const BiometricSettingsPage = lazy(() => import('@pages/settings/BiometricSettingsPage'));
+const ValidationRulesPage = lazy(() => import('@pages/settings/ValidationRulesPage'));
 
 export const AppRouter = () => {
   const { isAuthenticated } = useAuthStore();
@@ -67,6 +68,7 @@ export const AppRouter = () => {
             <Route path="/emr/connections/:connectionId" element={<EMRConnectionDetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/biometric" element={<BiometricSettingsPage />} />
+            <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useTestOrder, useApproveTestOrder, useRejectTestOrder } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
-import { useAuthStore } from '@/stores/auth.store';
 import TestOrderReview from '@/components/tests/TestOrderReview';
 import LoadingState from '@/components/common/LoadingState';
 import ErrorState from '@/components/common/ErrorState';
@@ -11,7 +10,6 @@ import ErrorState from '@/components/common/ErrorState';
 const TestOrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
   
   const { data: order, isLoading: orderLoading, error: orderError } = useTestOrder(orderId!);
   const { data: patient, isLoading: patientLoading } = usePatient(order?.patientId || '');

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FlaskRound, AlertCircle } from 'lucide-react';
+import { FlaskRound, AlertCircle, AlertTriangle } from 'lucide-react';
 import { useSample } from '@/hooks/useSamples';
 import { useTest } from '@/hooks/useTests';
+import { usePatient } from '@/hooks/usePatients';
+import { useValidateResult } from '@/hooks/useResultValidation';
 import type { ResultEntryFormData, ResultFlag } from '@/types/result.types';
 
 interface ResultEntryFormProps {
@@ -23,9 +25,13 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
   isLoading = false,
 }) => {
   const [showCriticalWarning, setShowCriticalWarning] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   
   const { data: sample } = useSample(sampleId);
   const { data: test } = useTest(testId);
+  const { data: patient } = usePatient(sample?.patientId || '');
+  const validateResult = useValidateResult();
 
   const {
     register,
@@ -44,7 +50,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     },
   });
 
-  // const value = watch('value');
+  const value = watch('value');
   const flag = watch('flag');
 
   useEffect(() => {
@@ -59,7 +65,47 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     }
   }, [flag]);
 
-  const onFormSubmit = (data: ResultEntryFormData) => {
+  // Validate on value change
+  useEffect(() => {
+    if (value && test && patient) {
+      const validateAsync = async () => {
+        const result = await validateResult.mutateAsync({
+          testId,
+          value,
+          patientId: patient.id,
+          referenceRange: test.referenceRange
+        });
+
+        setValidationErrors(result.errors);
+        setValidationWarnings(result.warnings);
+        
+        // Auto-set flag based on validation
+        if (result.flags.length > 0 && !flag) {
+          setValue('flag', result.flags[0]);
+        }
+        
+        setShowCriticalWarning(result.isCritical);
+      };
+      
+      validateAsync();
+    }
+  }, [value, test, patient, testId, flag, setValue, validateResult]);
+
+  const onFormSubmit = async (data: ResultEntryFormData) => {
+    // Final validation before submit
+    if (test && patient) {
+      const result = await validateResult.mutateAsync({
+        testId,
+        value: data.value,
+        patientId: patient.id,
+        referenceRange: test.referenceRange
+      });
+      
+      if (!result.isValid) {
+        return; // Don't submit if validation fails
+      }
+    }
+    
     onSubmit(data);
   };
 
@@ -200,6 +246,40 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           </div>
         )}
 
+        {/* Validation Errors */}
+        {validationErrors.length > 0 && (
+          <div className="mt-4 p-3 bg-red-50 rounded-md">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-red-800">Validation Errors</p>
+                <ul className="mt-1 text-sm text-red-700 list-disc list-inside">
+                  {validationErrors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Validation Warnings */}
+        {validationWarnings.length > 0 && (
+          <div className="mt-4 p-3 bg-yellow-50 rounded-md">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-yellow-800">Validation Warnings</p>
+                <ul className="mt-1 text-sm text-yellow-700 list-disc list-inside">
+                  {validationWarnings.map((warning, index) => (
+                    <li key={index}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Critical Value Warning */}
         {showCriticalWarning && (
           <div className="mt-4 p-3 bg-red-50 rounded-md flex items-start gap-2">
@@ -225,7 +305,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         </button>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || validationErrors.length > 0}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
         >
           {isLoading ? 'Saving...' : 'Save Result'}

@@ -32,6 +32,7 @@ export const COLLECTIONS = {
   // Results management
   RESULTS: 'results',
   RESULT_TEMPLATES: 'result_templates',
+  VALIDATION_RULES: 'validation_rules',
   
   // Billing
   INVOICES: 'invoices',

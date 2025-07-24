@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useLOINCSearch } from '@/hooks/useTests';
+import { Search } from 'lucide-react';
+import LOINCBrowser from './LOINCBrowser';
 import type { TestDefinitionFormData, LOINCCode } from '@/types/test.types';
 
 interface TestFormProps {
@@ -16,10 +17,8 @@ const TestForm: React.FC<TestFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [loincSearchTerm, setLoincSearchTerm] = useState('');
+  const [showLOINCBrowser, setShowLOINCBrowser] = useState(false);
   const [selectedLoinc, setSelectedLoinc] = useState<LOINCCode | null>(null);
-  
-  const { data: loincResults } = useLOINCSearch(loincSearchTerm);
 
   const {
     register,
@@ -52,12 +51,15 @@ const TestForm: React.FC<TestFormProps> = ({
   const handleLoincSelect = (loinc: LOINCCode) => {
     setSelectedLoinc(loinc);
     setValue('loincCode', loinc.code);
-    setValue('name', loinc.displayName);
-    setLoincSearchTerm('');
+    if (!initialData?.name) {
+      setValue('name', loinc.displayName);
+    }
+    setShowLOINCBrowser(false);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Basic Information */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -180,39 +182,46 @@ const TestForm: React.FC<TestFormProps> = ({
         </h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Search LOINC Code
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              LOINC Code
             </label>
-            <input
-              type="text"
-              value={loincSearchTerm}
-              onChange={(e) => setLoincSearchTerm(e.target.value)}
-              placeholder="Search by code or name..."
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
+            <button
+              type="button"
+              onClick={() => setShowLOINCBrowser(true)}
+              className="w-full px-4 py-2 text-left border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-gray-400" />
+                {selectedLoinc ? (
+                  <span>
+                    <span className="font-mono">{selectedLoinc.code}</span> - {selectedLoinc.displayName}
+                  </span>
+                ) : (
+                  <span className="text-gray-500">Browse LOINC codes...</span>
+                )}
+              </span>
+            </button>
           </div>
 
-          {loincResults && loincResults.length > 0 && (
-            <div className="border rounded-md max-h-48 overflow-y-auto">
-              {loincResults.map((loinc) => (
-                <button
-                  key={loinc.code}
-                  type="button"
-                  onClick={() => handleLoincSelect(loinc)}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
-                >
-                  <div className="font-medium">{loinc.code}</div>
-                  <div className="text-sm text-gray-600">{loinc.displayName}</div>
-                </button>
-              ))}
-            </div>
-          )}
-
           {selectedLoinc && (
-            <div className="bg-blue-50 p-3 rounded-md">
-              <p className="text-sm">
-                <span className="font-medium">Selected LOINC:</span> {selectedLoinc.code} - {selectedLoinc.displayName}
-              </p>
+            <div className="bg-blue-50 p-4 rounded-md">
+              <h4 className="text-sm font-medium text-blue-900 mb-2">Selected LOINC Code</h4>
+              <dl className="space-y-1 text-sm">
+                <div>
+                  <dt className="inline text-gray-600">Code:</dt>
+                  <dd className="inline ml-2 font-mono">{selectedLoinc.code}</dd>
+                </div>
+                <div>
+                  <dt className="inline text-gray-600">Name:</dt>
+                  <dd className="inline ml-2">{selectedLoinc.displayName}</dd>
+                </div>
+                {selectedLoinc.class && (
+                  <div>
+                    <dt className="inline text-gray-600">Class:</dt>
+                    <dd className="inline ml-2">{selectedLoinc.class}</dd>
+                  </div>
+                )}
+              </dl>
             </div>
           )}
         </div>
@@ -236,6 +245,16 @@ const TestForm: React.FC<TestFormProps> = ({
         </button>
       </div>
     </form>
+
+      {/* LOINC Browser Modal */}
+      {showLOINCBrowser && (
+        <LOINCBrowser
+          onSelect={handleLoincSelect}
+          onClose={() => setShowLOINCBrowser(false)}
+          selectedCode={selectedLoinc?.code}
+        />
+      )}
+    </>
   );
 };
 

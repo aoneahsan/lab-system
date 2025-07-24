@@ -1,4 +1,5 @@
 import type { LOINCCode } from '@/types/test.types';
+import { loincApiService } from './loinc-api.service';
 
 // Mock LOINC data for common lab tests
 const mockLOINCDatabase: LOINCCode[] = [
@@ -131,9 +132,17 @@ const mockLOINCDatabase: LOINCCode[] = [
   },
 ];
 
+// Check if we should use the real API or mock data
+const USE_LOINC_API = import.meta.env.VITE_USE_LOINC_API === 'true' || false;
+
 export const loincService = {
   async searchLOINCCodes(searchTerm: string): Promise<LOINCCode[]> {
-    // Simulate API delay
+    // Use real API if enabled
+    if (USE_LOINC_API) {
+      return loincApiService.searchLOINCCodes(searchTerm);
+    }
+    
+    // Otherwise use mock data
     await new Promise(resolve => setTimeout(resolve, 100));
     
     const searchLower = searchTerm.toLowerCase();
@@ -147,14 +156,43 @@ export const loincService = {
   },
 
   async getLOINCByCode(code: string): Promise<LOINCCode | null> {
-    // Simulate API delay
+    // Use real API if enabled
+    if (USE_LOINC_API) {
+      return loincApiService.getLOINCByCode(code);
+    }
+    
+    // Otherwise use mock data
     await new Promise(resolve => setTimeout(resolve, 50));
     
     return mockLOINCDatabase.find(loinc => loinc.code === code) || null;
   },
 
   async getCommonTests(): Promise<LOINCCode[]> {
-    // Return most common tests
+    // Use real API if enabled
+    if (USE_LOINC_API) {
+      return loincApiService.getCommonTests();
+    }
+    
+    // Otherwise return mock common tests
     return mockLOINCDatabase.slice(0, 10);
+  },
+  
+  // Additional methods that use the API service
+  async searchByCategory(category: string, limit?: number): Promise<LOINCCode[]> {
+    if (USE_LOINC_API) {
+      return loincApiService.searchByCategory(category, limit);
+    }
+    
+    // Mock implementation
+    return mockLOINCDatabase.filter(code => code.class === category).slice(0, limit || 50);
+  },
+  
+  async validateLOINCCode(code: string): Promise<boolean> {
+    if (USE_LOINC_API) {
+      return loincApiService.validateLOINCCode(code);
+    }
+    
+    // Mock implementation
+    return mockLOINCDatabase.some(loinc => loinc.code === code);
   },
 };

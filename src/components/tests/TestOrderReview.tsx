@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, X, AlertCircle, Clock, FileText } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 import type { TestOrder } from '@/types/test.types';
 
 interface TestOrderReviewProps {

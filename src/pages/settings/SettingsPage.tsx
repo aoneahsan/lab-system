@@ -43,6 +43,13 @@ const settingCategories: SettingCategory[] = [
     roles: ['admin', 'lab_manager'],
   },
   {
+    title: 'Validation Rules',
+    description: 'Configure result validation rules and quality control checks',
+    link: '/settings/validation-rules',
+    icon: '✅',
+    roles: ['admin', 'lab_manager', 'lab_technician'],
+  },
+  {
     title: 'Billing & Insurance',
     description: 'Set up billing codes, insurance providers, and payment settings',
     link: '/settings/billing',
