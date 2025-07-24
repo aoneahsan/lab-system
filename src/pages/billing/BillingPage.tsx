@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, DollarSign, CreditCard, FileText, TrendingUp } from 'lucide-react';
+import { Plus, DollarSign, CreditCard, FileText, TrendingUp, BarChart3 } from 'lucide-react';
 import { useInvoices, useBillingStatistics, useCreateInvoice } from '@/hooks/useBilling';
 import InvoiceForm from '@/components/billing/InvoiceForm';
 import type { BillingFilter, InvoiceFormData } from '@/types/billing.types';
@@ -81,6 +81,13 @@ const BillingPage: React.FC = () => {
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
               Insurance Claims
+            </button>
+            <button
+              onClick={() => navigate('/billing/reports')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Financial Reports
             </button>
             <button
               onClick={() => setShowCreateForm(true)}

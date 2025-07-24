@@ -8,30 +8,23 @@ import {
   RefreshCw,
   Edit,
   Trash2,
-  Plus,
   CheckCircle,
   XCircle,
   AlertCircle,
   Clock
 } from 'lucide-react';
 import { useEMRConnection, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
-import { useWebhookEndpoints, useDeleteWebhookEndpoint } from '@/hooks/useWebhooks';
-import { WebhookEndpointCard } from '@/components/emr/WebhookEndpointCard';
-import { WebhookEndpointModal } from '@/components/emr/WebhookEndpointModal';
+import WebhookHandlers from '@/components/emr/WebhookHandlers';
 import type { ConnectionStatus } from '@/types/emr.types';
 
 const EMRConnectionDetailPage: React.FC = () => {
   const { connectionId } = useParams<{ connectionId: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'webhooks' | 'logs'>('overview');
-  const [showWebhookModal, setShowWebhookModal] = useState(false);
-  const [editingWebhook, setEditingWebhook] = useState<string | null>(null);
 
   const { data: connection, isLoading } = useEMRConnection(connectionId!);
-  const { data: webhookEndpoints = [] } = useWebhookEndpoints(connectionId!);
   const testConnection = useTestEMRConnection();
   const deleteConnection = useDeleteEMRConnection();
-  const deleteWebhook = useDeleteWebhookEndpoint();
 
   if (isLoading || !connection) {
     return (
@@ -65,11 +58,6 @@ const EMRConnectionDetailPage: React.FC = () => {
     }
   };
 
-  const handleDeleteWebhook = async (webhookId: string) => {
-    if (window.confirm('Are you sure you want to delete this webhook endpoint?')) {
-      deleteWebhook.mutate(webhookId);
-    }
-  };
 
   return (
     <div className="container mx-auto p-6">
@@ -150,7 +138,7 @@ const EMRConnectionDetailPage: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <Webhook className="h-4 w-4" />
-              Webhooks ({webhookEndpoints.length})
+              Webhooks
             </div>
           </button>
           <button
@@ -238,47 +226,7 @@ const EMRConnectionDetailPage: React.FC = () => {
       )}
 
       {activeTab === 'webhooks' && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-600">
-              Configure webhook endpoints to receive real-time updates from the EMR system.
-            </p>
-            <button
-              onClick={() => setShowWebhookModal(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Webhook
-            </button>
-          </div>
-
-          {webhookEndpoints.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
-              <Webhook className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No webhook endpoints configured.</p>
-              <button
-                onClick={() => setShowWebhookModal(true)}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-              >
-                Add First Webhook
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {webhookEndpoints.map(webhook => (
-                <WebhookEndpointCard
-                  key={webhook.id}
-                  endpoint={webhook}
-                  onEdit={() => {
-                    setEditingWebhook(webhook.id);
-                    setShowWebhookModal(true);
-                  }}
-                  onDelete={() => handleDeleteWebhook(webhook.id)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <WebhookHandlers connectionId={connectionId!} />
       )}
 
       {activeTab === 'logs' && (
@@ -289,17 +237,6 @@ const EMRConnectionDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Webhook Modal */}
-      {showWebhookModal && (
-        <WebhookEndpointModal
-          connectionId={connectionId!}
-          endpointId={editingWebhook}
-          onClose={() => {
-            setShowWebhookModal(false);
-            setEditingWebhook(null);
-          }}
-        />
-      )}
     </div>
   );
 };

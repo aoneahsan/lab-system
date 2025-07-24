@@ -226,14 +226,17 @@ export const useInsuranceProviders = () => {
 };
 
 // Get billing statistics
-export const useBillingStatistics = () => {
+export const useBillingStatistics = (startDate?: Date, endDate?: Date) => {
   const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: BILLING_KEYS.statistics(),
+    queryKey: [...BILLING_KEYS.statistics(), startDate, endDate],
     queryFn: () => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return billingService.getBillingStatistics(currentTenant.id);
+      return billingService.getBillingStatistics(currentTenant.id, { 
+        dateFrom: startDate, 
+        dateTo: endDate 
+      });
     },
     enabled: !!currentTenant,
   });

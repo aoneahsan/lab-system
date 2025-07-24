@@ -222,6 +222,14 @@ body {
   visibility: hidden;
 }
 
+body.barcode-scanner-active {
+  background: transparent !important;
+}
+
+body.barcode-scanner-active > * {
+  display: none !important;
+}
+
 @keyframes scan {
   0% {
     transform: translateY(0);

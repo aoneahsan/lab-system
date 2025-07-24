@@ -8,6 +8,8 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Toaster } from '@/components/ui/Toaster';
 import InitializeDemoTenant from '@/components/setup/InitializeDemoTenant';
+import { Capacitor } from '@capacitor/core';
+import { MobileAppSelector } from '@/mobile/MobileAppSelector';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -22,6 +24,7 @@ const queryClient = new QueryClient({
 
 function App() {
 	const { initializeAuth, isLoading } = useAuthStore();
+	const isNativePlatform = Capacitor.isNativePlatform();
 
 	useEffect(() => {
 		initializeAuth();
@@ -31,12 +34,15 @@ function App() {
 		return <LoadingScreen />;
 	}
 
+	// Use mobile app for native platforms
+	const RouterComponent = isNativePlatform ? MobileAppSelector : AppRouter;
+
 	return (
 		<ErrorBoundary>
 			<QueryClientProvider client={queryClient}>
 				<BrowserRouter>
 					<InitializeDemoTenant />
-					<AppRouter />
+					<RouterComponent />
 					<Toaster />
 				</BrowserRouter>
 				<ReactQueryDevtools initialIsOpen={false} />
