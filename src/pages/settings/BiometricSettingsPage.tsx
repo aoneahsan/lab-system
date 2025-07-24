@@ -250,3 +250,5 @@ export const BiometricSettingsPage = () => {
 		</div>
 	);
 };
+
+export default BiometricSettingsPage;

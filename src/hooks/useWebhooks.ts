@@ -48,12 +48,12 @@ export const useWebhookEndpoint = (endpointId: string) => {
 export const useCreateWebhookEndpoint = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: WebhookEndpointFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return webhookService.createEndpoint(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return webhookService.createEndpoint(currentTenant.id, currentUser.id, data);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: WEBHOOK_KEYS.endpoints() });
@@ -72,7 +72,7 @@ export const useCreateWebhookEndpoint = () => {
 export const useUpdateWebhookEndpoint = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ 
@@ -82,8 +82,8 @@ export const useUpdateWebhookEndpoint = () => {
       endpointId: string; 
       data: Partial<WebhookEndpointFormData> 
     }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return webhookService.updateEndpoint(currentTenant.id, user.uid, endpointId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return webhookService.updateEndpoint(currentTenant.id, currentUser.id, endpointId, data);
     },
     onSuccess: (_, { endpointId }) => {
       queryClient.invalidateQueries({ queryKey: WEBHOOK_KEYS.endpoints() });

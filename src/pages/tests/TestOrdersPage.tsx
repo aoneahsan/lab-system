@@ -254,7 +254,7 @@ const TestOrdersPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(order.orderDate).toLocaleDateString()}
+                    {(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {order.status === 'awaiting_approval' ? (

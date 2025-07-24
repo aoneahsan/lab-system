@@ -13,7 +13,8 @@ interface InvoiceFormProps {
 
 const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading = false }) => {
   const [items, setItems] = useState<Omit<InvoiceItem, 'id'>[]>([]);
-  const { data: patients = [] } = usePatients();
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.patients || [];
   const { data: tests = [] } = useTests();
 
   const {
@@ -55,7 +56,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
       if (test) {
         item.testCode = test.code;
         item.testName = test.name;
-        item.unitPrice = test.price || 0;
+        item.unitPrice = test.price || test.cost || 0;
       }
     } else {
       // @ts-expect-error - Dynamic field assignment
@@ -111,7 +112,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
               <option value="">Select a patient...</option>
               {patients.map(patient => (
                 <option key={patient.id} value={patient.id}>
-                  {patient.firstName} {patient.lastName} - {patient.medicalRecordNumber}
+                  {patient.fullName} - {patient.patientId}
                 </option>
               ))}
             </select>

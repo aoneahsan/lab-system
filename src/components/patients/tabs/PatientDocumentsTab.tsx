@@ -13,24 +13,25 @@ export const PatientDocumentsTab = ({ patient }: PatientDocumentsTabProps) => {
 	const [selectedCategory, setSelectedCategory] = useState<string>('all');
 	const [showUploadDialog, setShowUploadDialog] = useState(false);
 	const queryClient = useQueryClient();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 
 	const categories = [
 		{ id: 'all', label: 'All Documents' },
-		{ id: 'report', label: 'Lab Reports' },
+		{ id: 'lab_report', label: 'Lab Reports' },
 		{ id: 'prescription', label: 'Prescriptions' },
-		{ id: 'insurance', label: 'Insurance' },
-		{ id: 'consent', label: 'Consent Forms' },
+		{ id: 'insurance_card', label: 'Insurance Cards' },
+		{ id: 'medical_record', label: 'Medical Records' },
+		{ id: 'id_proof', label: 'ID Proofs' },
 		{ id: 'other', label: 'Other' },
 	];
 
 	const filteredDocuments =
 		selectedCategory === 'all'
-			? patient.documents
-			: patient.documents.filter((doc) => doc.category === selectedCategory);
+			? patient.documents || []
+			: (patient.documents || []).filter((doc) => doc.type === selectedCategory);
 
-	const getDocumentIcon = (type: string) => {
-		switch (type) {
+	const getDocumentIcon = (mimeType: string) => {
+		switch (mimeType) {
 			case 'application/pdf':
 				return 'M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
 			case 'image/jpeg':
@@ -94,17 +95,17 @@ export const PatientDocumentsTab = ({ patient }: PatientDocumentsTabProps) => {
 													strokeLinecap='round'
 													strokeLinejoin='round'
 													strokeWidth={2}
-													d={getDocumentIcon(document.type)}
+													d={getDocumentIcon(document.mimeType)}
 												/>
 											</svg>
 										</div>
 									</div>
 									<div className='flex-1 min-w-0'>
 										<h4 className='text-sm font-medium text-gray-900 dark:text-white truncate'>
-											{document.name}
+											{document.fileName}
 										</h4>
 										<p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
-											{formatFileSize(document.size)}
+											{formatFileSize(document.fileSize)}
 										</p>
 										<p className='text-xs text-gray-500 dark:text-gray-400'>
 											{format(document.uploadedAt, 'MMM dd, yyyy')}
@@ -128,26 +129,28 @@ export const PatientDocumentsTab = ({ patient }: PatientDocumentsTabProps) => {
 										</button>
 									</div>
 								</div>
-								{document.description && (
+								{document.notes && (
 									<p className='text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2'>
-										{document.description}
+										{document.notes}
 									</p>
 								)}
 								<div className='mt-3 flex items-center gap-2'>
 									<span
 										className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-											document.category === 'report'
+											document.type === 'lab_report'
 												? 'bg-blue-100 text-blue-800'
-												: document.category === 'prescription'
+												: document.type === 'prescription'
 												? 'bg-green-100 text-green-800'
-												: document.category === 'insurance'
+												: document.type === 'insurance_card'
 												? 'bg-purple-100 text-purple-800'
-												: document.category === 'consent'
+												: document.type === 'medical_record'
 												? 'bg-yellow-100 text-yellow-800'
+												: document.type === 'id_proof'
+												? 'bg-indigo-100 text-indigo-800'
 												: 'bg-gray-100 text-gray-800'
 										}`}
 									>
-										{document.category}
+										{document.type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
 									</span>
 								</div>
 							</div>

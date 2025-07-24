@@ -1,4 +1,4 @@
-import { QRCodeScanner, QRCodeGenerator, QRCodeGeneratorOptions } from 'qrcode-studio';
+import * as QRCodeStudio from 'qrcode-studio';
 import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
 
 export const qrcodeService = {
@@ -17,7 +17,7 @@ export const qrcodeService = {
       priority: sampleLabel.priority,
     };
 
-    const options: QRCodeGeneratorOptions = {
+    const options = {
       size: config?.size || 200,
       errorCorrectionLevel: config?.errorCorrectionLevel || 'M',
       margin: config?.includeMargin ? 4 : 0,
@@ -27,8 +27,7 @@ export const qrcodeService = {
       },
     };
 
-    const generator = new QRCodeGenerator();
-    const qrCodeDataUrl = await generator.generate(JSON.stringify(qrData), options);
+    const qrCodeDataUrl = await (QRCodeStudio as any).generateQRCode(JSON.stringify(qrData), options);
     return qrCodeDataUrl;
   },
 
@@ -42,8 +41,7 @@ export const qrcodeService = {
       includeText?: boolean;
     }
   ): Promise<string> {
-    // Using QRCodeGenerator's barcode functionality
-    const generator = new QRCodeGenerator();
+    // Using QRCodeStudio's barcode functionality
     const barcodeOptions = {
       format: config?.format || 'CODE128',
       width: config?.width || 300,
@@ -51,7 +49,7 @@ export const qrcodeService = {
       displayValue: config?.includeText !== false,
     };
 
-    const barcodeDataUrl = await generator.generateBarcode(barcode, barcodeOptions);
+    const barcodeDataUrl = await (QRCodeStudio as any).generateBarcode(barcode, barcodeOptions);
     return barcodeDataUrl;
   },
 
@@ -60,8 +58,8 @@ export const qrcodeService = {
     videoElement: HTMLVideoElement,
     onScanSuccess: (decodedText: string, decodedResult: unknown) => void,
     onScanFailure?: (error: string) => void
-  ): Promise<QRCodeScanner> {
-    const scanner = new QRCodeScanner();
+  ): Promise<any> {
+    const scanner = await (QRCodeStudio as any).createScanner();
     
     await scanner.start(videoElement, {
       fps: 10,
@@ -84,7 +82,7 @@ export const qrcodeService = {
   },
 
   // Stop scanner
-  async stopScanner(scanner: QRCodeScanner): Promise<void> {
+  async stopScanner(scanner: any): Promise<void> {
     await scanner.stop();
   },
 

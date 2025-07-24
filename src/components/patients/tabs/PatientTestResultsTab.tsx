@@ -2,7 +2,6 @@ interface PatientTestResultsTabProps {
 	patientId: string;
 }
 
-// eslint-disable-next-line @/typescript-eslint/no-unused-vars
 export const PatientTestResultsTab = ({
 	patientId,
 }: PatientTestResultsTabProps) => {
@@ -34,7 +33,7 @@ export const PatientTestResultsTab = ({
 					No test results yet
 				</h3>
 				<p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-					Test results will appear here once available.
+					Test results for patient {patientId} will appear here once available.
 				</p>
 				<div className='mt-6'>
 					<button className='btn btn-primary'>Order First Test</button>

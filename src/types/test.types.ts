@@ -50,6 +50,7 @@ export interface TestDefinition {
   isOrderable: boolean;
   requiresApproval?: boolean;
   cost?: number;
+  price?: number; // Patient price (may differ from cost)
   cptCode?: string;
   notes?: string;
   createdAt: Date | Timestamp;
@@ -125,6 +126,7 @@ export interface OrderedTest {
   testId: string;
   testName: string;
   testCode: string;
+  specimenType?: string;
   status: 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'rejected';
   resultId?: string;
   notes?: string;
@@ -213,6 +215,7 @@ export interface TestDefinitionFormData {
   isOrderable: boolean;
   requiresApproval?: boolean;
   cost?: number;
+  price?: number; // Patient price (may differ from cost)
   cptCode?: string;
   notes?: string;
 }

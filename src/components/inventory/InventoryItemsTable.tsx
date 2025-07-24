@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { InventoryItem } from '@/types/inventory.types';
+import type { InventoryItem } from '@/types/inventory.types';
 import { Package, AlertTriangle, Edit, Archive, TrendingUp } from 'lucide-react';
 
 interface InventoryItemsTableProps {
@@ -217,7 +217,9 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
                         <Edit className="w-5 h-5" />
                       </button>
                       {!item.isActive && (
-                        <Archive className="w-5 h-5 text-gray-400" title="Inactive" />
+                        <span title="Inactive">
+                          <Archive className="w-5 h-5 text-gray-400" />
+                        </span>
                       )}
                     </div>
                   </td>

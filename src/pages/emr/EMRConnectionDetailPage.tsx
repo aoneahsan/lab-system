@@ -188,12 +188,12 @@ const EMRConnectionDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <dt className="text-sm text-gray-600">Base URL:</dt>
-                  <dd className="text-sm font-medium">{connection.config?.baseUrl || 'N/A'}</dd>
+                  <dd className="text-sm font-medium">{connection.config?.fhirBaseUrl || connection.config?.apiBaseUrl || 'N/A'}</dd>
                 </div>
-                {connection.config?.authType && (
+                {(connection.config?.fhirAuth || connection.config?.apiAuth) && (
                   <div>
                     <dt className="text-sm text-gray-600">Authentication:</dt>
-                    <dd className="text-sm font-medium capitalize">{connection.config.authType}</dd>
+                    <dd className="text-sm font-medium capitalize">{connection.config.fhirAuth?.type || connection.config.apiAuth?.type || 'N/A'}</dd>
                   </div>
                 )}
               </dl>
@@ -222,11 +222,11 @@ const EMRConnectionDetailPage: React.FC = () => {
                     </dd>
                   </div>
                 )}
-                {connection.lastTestAt && (
+                {connection.lastSyncAt && (
                   <div>
-                    <dt className="text-sm text-gray-600">Last Test:</dt>
+                    <dt className="text-sm text-gray-600">Last Sync:</dt>
                     <dd className="text-sm font-medium">
-                      {connection.lastTestAt.toDate().toLocaleString()}
+                      {connection.lastSyncAt.toDate().toLocaleString()}
                     </dd>
                   </div>
                 )}
@@ -234,17 +234,6 @@ const EMRConnectionDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Field Mappings */}
-          {connection.fieldMappings && Object.keys(connection.fieldMappings).length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Field Mappings</h3>
-              <div className="bg-gray-50 rounded p-4">
-                <pre className="text-xs text-gray-600 overflow-x-auto">
-                  {JSON.stringify(connection.fieldMappings, null, 2)}
-                </pre>
-              </div>
-            </div>
-          )}
         </div>
       )}
 

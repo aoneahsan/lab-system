@@ -32,7 +32,7 @@ interface ValidationResult {
 
 export const resultValidationService = {
   async getValidationRules(testId?: string): Promise<ResultValidationRule[]> {
-    const tenantId = useTenantStore.getState().tenantId;
+    const tenantId = useTenantStore.getState().currentTenant?.id;
     if (!tenantId) throw new Error('No tenant selected');
 
     let q = query(
@@ -53,8 +53,8 @@ export const resultValidationService = {
   },
 
   async createValidationRule(data: Omit<ResultValidationRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    const tenantId = useTenantStore.getState().tenantId;
-    const user = useAuthStore.getState().user;
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    const user = useAuthStore.getState().currentUser;
     if (!tenantId || !user) throw new Error('Authentication required');
 
     const ruleData = {
@@ -62,8 +62,8 @@ export const resultValidationService = {
       tenantId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      createdBy: user.uid,
-      updatedBy: user.uid
+      createdBy: user.id,
+      updatedBy: user.id
     };
 
     const docRef = await addDoc(
@@ -75,13 +75,13 @@ export const resultValidationService = {
   },
 
   async updateValidationRule(id: string, data: Partial<ResultValidationRule>): Promise<void> {
-    const user = useAuthStore.getState().user;
+    const user = useAuthStore.getState().currentUser;
     if (!user) throw new Error('Authentication required');
 
     const updateData = {
       ...data,
       updatedAt: serverTimestamp(),
-      updatedBy: user.uid
+      updatedBy: user.id
     };
 
     await updateDoc(
@@ -224,7 +224,7 @@ export const resultValidationService = {
   },
 
   async getPreviousResult(testId: string, patientId: string): Promise<TestResult | null> {
-    const tenantId = useTenantStore.getState().tenantId;
+    const tenantId = useTenantStore.getState().currentTenant?.id;
     if (!tenantId) return null;
 
     const q = query(

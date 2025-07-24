@@ -5,7 +5,7 @@ import { useTestOrders } from '@/hooks/useTests';
 import { usePatients } from '@/hooks/usePatients';
 import type { SampleFormData } from '@/types/sample.types';
 import type { TestOrder } from '@/types/test.types';
-import type { Patient } from '@/types/patient.types';
+import type { PatientListItem } from '@/types/patient.types';
 
 interface SampleCollectionFormProps {
   orderId?: string;
@@ -21,10 +21,11 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
   isLoading = false,
 }) => {
   const [selectedOrder, setSelectedOrder] = useState<TestOrder | null>(null);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<PatientListItem | null>(null);
 
   const { data: orders = [] } = useTestOrders({ status: 'pending' });
-  const { data: patients = [] } = usePatients();
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.patients || [];
 
   const {
     register,
@@ -124,7 +125,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
               <option value="">Select an order...</option>
               {orders.map(order => (
                 <option key={order.id} value={order.id}>
-                  {order.orderNumber} - {new Date(order.orderDate).toLocaleDateString()}
+                  {order.orderNumber} - {new Date(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -139,10 +140,10 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-medium">
-                  {selectedPatient.firstName} {selectedPatient.lastName}
+                  {selectedPatient.fullName}
                 </p>
                 <p className="text-sm text-gray-600">
-                  MRN: {selectedPatient.medicalRecordNumber} | 
+                  Patient ID: {selectedPatient.patientId} | 
                   DOB: {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">

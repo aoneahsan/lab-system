@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Shield, AlertTriangle } from 'lucide-react';
 import { useValidationRules, useDeleteValidationRule } from '@/hooks/useResultValidation';
 import { useTests } from '@/hooks/useTests';
-import LoadingState from '@/components/common/LoadingState';
+import { LoadingState } from '@/components/common/LoadingState';
 import ValidationRuleModal from '@/components/results/ValidationRuleModal';
 import type { ResultValidationRule } from '@/types/result.types';
 

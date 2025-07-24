@@ -49,7 +49,7 @@ export const sampleService = {
     let q = query(collection(db, collectionName), orderBy('createdAt', 'desc'));
 
     if (filter) {
-      const constraints = [orderBy('createdAt', 'desc')];
+      const constraints: any[] = [];
 
       if (filter.status) {
         constraints.push(where('status', '==', filter.status));
@@ -69,6 +69,8 @@ export const sampleService = {
       if (filter.collectedBy) {
         constraints.push(where('collectedBy', '==', filter.collectedBy));
       }
+
+      constraints.push(orderBy('createdAt', 'desc'));
 
       q = query(collection(db, collectionName), ...constraints);
     }
@@ -109,7 +111,7 @@ export const sampleService = {
       timestamp: Timestamp.now(),
       action: 'collected',
       userId,
-      userName: useAuthStore.getState().user?.displayName || 'Unknown',
+      userName: useAuthStore.getState().currentUser?.displayName || 'Unknown',
       location: data.collectionSite,
       notes: 'Sample collected',
     };
@@ -157,7 +159,7 @@ export const sampleService = {
       updateData.collectionDate = Timestamp.fromDate(data.collectionDate);
     }
 
-    await updateDoc(docRef, updateData);
+    await updateDoc(docRef, updateData as any);
   },
 
   // Update sample status
@@ -182,7 +184,7 @@ export const sampleService = {
       timestamp: Timestamp.now(),
       action: this.mapStatusToAction(status),
       userId,
-      userName: useAuthStore.getState().user?.displayName || 'Unknown',
+      userName: useAuthStore.getState().currentUser?.displayName || 'Unknown',
       location,
       notes: notes || `Status changed to ${status}`,
     };
@@ -228,7 +230,7 @@ export const sampleService = {
     let q = query(collection(db, collectionName), orderBy('scheduledDate', 'desc'));
 
     if (filter) {
-      const constraints = [orderBy('scheduledDate', 'desc')];
+      const constraints: any[] = [];
 
       if (filter.status) {
         constraints.push(where('status', '==', filter.status));
@@ -236,6 +238,8 @@ export const sampleService = {
       if (filter.phlebotomistId) {
         constraints.push(where('phlebotomistId', '==', filter.phlebotomistId));
       }
+
+      constraints.push(orderBy('scheduledDate', 'desc'));
 
       q = query(collection(db, collectionName), ...constraints);
     }

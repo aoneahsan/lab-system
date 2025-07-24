@@ -7,13 +7,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { inventoryService } from '@/services/inventory.service';
 import { useTenant } from '@/hooks/useTenant';
 import { useAuthStore } from '@/stores/auth.store';
-import { 
+import type { 
   InventoryItemFormData, 
   StockTransactionFormData,
   PurchaseOrder
 } from '@/types/inventory.types';
 import { DocumentSnapshot } from 'firebase/firestore';
-import { toast } from 'react-hot-toast';
+import { toast } from '@/hooks/useToast';
 
 // Query keys
 const QUERY_KEYS = {
@@ -38,11 +38,12 @@ export function useInventoryItems(
   },
   pageSize: number = 20
 ) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: [...QUERY_KEYS.items(tenant.id), filters, pageSize],
+    queryKey: tenant?.id ? [...QUERY_KEYS.items(tenant.id), filters, pageSize] : ['inventory-no-tenant'],
     queryFn: async ({ pageParam }) => {
+      if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getItems(
         tenant.id,
         filters,
@@ -50,7 +51,7 @@ export function useInventoryItems(
         pageParam as DocumentSnapshot | undefined
       );
     },
-    enabled: !!tenant.id
+    enabled: !!tenant?.id
   });
 }
 
@@ -58,12 +59,15 @@ export function useInventoryItems(
  * Hook to get a single inventory item
  */
 export function useInventoryItem(itemId: string) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: QUERY_KEYS.item(tenant.id, itemId),
-    queryFn: () => inventoryService.getItem(tenant.id, itemId),
-    enabled: !!tenant.id && !!itemId
+    queryKey: tenant?.id ? QUERY_KEYS.item(tenant.id, itemId) : ['inventory-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getItem(tenant.id, itemId);
+    },
+    enabled: !!tenant?.id && !!itemId
   });
 }
 
@@ -71,17 +75,20 @@ export function useInventoryItem(itemId: string) {
  * Hook to create an inventory item
  */
 export function useCreateInventoryItem() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: InventoryItemFormData) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.createItem(tenant.id, data, user.uid);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.createItem(tenant.id, data, currentUser.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
+      }
       toast.success('Inventory item created successfully');
     },
     onError: (error: Error) => {
@@ -94,18 +101,21 @@ export function useCreateInventoryItem() {
  * Hook to update an inventory item
  */
 export function useUpdateInventoryItem(itemId: string) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: Partial<InventoryItemFormData>) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.updateItem(tenant.id, itemId, data, user.uid);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.updateItem(tenant.id, itemId, data, currentUser.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.item(tenant.id, itemId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.item(tenant.id, itemId) });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
+      }
       toast.success('Inventory item updated successfully');
     },
     onError: (error: Error) => {
@@ -118,23 +128,26 @@ export function useUpdateInventoryItem(itemId: string) {
  * Hook to record a stock transaction
  */
 export function useRecordTransaction() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: StockTransactionFormData) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.recordTransaction(tenant.id, data, user.uid);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.recordTransaction(tenant.id, data, currentUser.id);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.item(tenant.id, variables.itemId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.transactions(tenant.id, variables.itemId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.alerts(tenant.id) });
-      
-      if (variables.lotNumber) {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.lots(tenant.id, variables.itemId) });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.item(tenant.id, variables.itemId) });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.transactions(tenant.id, variables.itemId) });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.alerts(tenant.id) });
+        
+        if (variables.lotNumber) {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.lots(tenant.id, variables.itemId) });
+        }
       }
       
       toast.success('Stock transaction recorded successfully');
@@ -149,11 +162,12 @@ export function useRecordTransaction() {
  * Hook to get stock transactions
  */
 export function useStockTransactions(itemId: string, pageSize: number = 50) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: [...QUERY_KEYS.transactions(tenant.id, itemId), pageSize],
+    queryKey: tenant?.id ? [...QUERY_KEYS.transactions(tenant.id, itemId), pageSize] : ['transactions-no-tenant'],
     queryFn: async ({ pageParam }) => {
+      if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getTransactions(
         tenant.id,
         itemId,
@@ -161,7 +175,7 @@ export function useStockTransactions(itemId: string, pageSize: number = 50) {
         pageParam as DocumentSnapshot | undefined
       );
     },
-    enabled: !!tenant.id && !!itemId
+    enabled: !!tenant?.id && !!itemId
   });
 }
 
@@ -169,12 +183,15 @@ export function useStockTransactions(itemId: string, pageSize: number = 50) {
  * Hook to get active lots for an item
  */
 export function useActiveLots(itemId: string) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: QUERY_KEYS.lots(tenant.id, itemId),
-    queryFn: () => inventoryService.getActiveLots(tenant.id, itemId),
-    enabled: !!tenant.id && !!itemId
+    queryKey: tenant?.id ? QUERY_KEYS.lots(tenant.id, itemId) : ['lots-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getActiveLots(tenant.id, itemId);
+    },
+    enabled: !!tenant?.id && !!itemId
   });
 }
 
@@ -182,12 +199,15 @@ export function useActiveLots(itemId: string) {
  * Hook to get items needing reorder
  */
 export function useReorderItems() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: QUERY_KEYS.reorderItems(tenant.id),
-    queryFn: () => inventoryService.getReorderItems(tenant.id),
-    enabled: !!tenant.id
+    queryKey: tenant?.id ? QUERY_KEYS.reorderItems(tenant.id) : ['reorder-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getReorderItems(tenant.id);
+    },
+    enabled: !!tenant?.id
   });
 }
 
@@ -195,12 +215,15 @@ export function useReorderItems() {
  * Hook to get expiring items
  */
 export function useExpiringItems(daysAhead: number = 30) {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: [...QUERY_KEYS.expiringItems(tenant.id), daysAhead],
-    queryFn: () => inventoryService.getExpiringItems(tenant.id, daysAhead),
-    enabled: !!tenant.id
+    queryKey: tenant?.id ? [...QUERY_KEYS.expiringItems(tenant.id), daysAhead] : ['expiring-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getExpiringItems(tenant.id, daysAhead);
+    },
+    enabled: !!tenant?.id
   });
 }
 
@@ -208,12 +231,15 @@ export function useExpiringItems(daysAhead: number = 30) {
  * Hook to get active alerts
  */
 export function useInventoryAlerts() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: QUERY_KEYS.alerts(tenant.id),
-    queryFn: () => inventoryService.getActiveAlerts(tenant.id),
-    enabled: !!tenant.id,
+    queryKey: tenant?.id ? QUERY_KEYS.alerts(tenant.id) : ['alerts-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getActiveAlerts(tenant.id);
+    },
+    enabled: !!tenant?.id,
     refetchInterval: 60000 // Refresh every minute
   });
 }
@@ -222,17 +248,20 @@ export function useInventoryAlerts() {
  * Hook to acknowledge an alert
  */
 export function useAcknowledgeAlert() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ alertId, actionTaken }: { alertId: string; actionTaken?: string }) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.acknowledgeAlert(tenant.id, alertId, user.uid, actionTaken);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.acknowledgeAlert(tenant.id, alertId, currentUser.id, actionTaken);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.alerts(tenant.id) });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.alerts(tenant.id) });
+      }
       toast.success('Alert acknowledged');
     },
     onError: (error: Error) => {
@@ -245,12 +274,15 @@ export function useAcknowledgeAlert() {
  * Hook to get inventory value summary
  */
 export function useInventoryValue() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: QUERY_KEYS.value(tenant.id),
-    queryFn: () => inventoryService.getInventoryValue(tenant.id),
-    enabled: !!tenant.id
+    queryKey: tenant?.id ? QUERY_KEYS.value(tenant.id) : ['value-no-tenant'],
+    queryFn: () => {
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.getInventoryValue(tenant.id);
+    },
+    enabled: !!tenant?.id
   });
 }
 
@@ -258,17 +290,20 @@ export function useInventoryValue() {
  * Hook to create a purchase order
  */
 export function useCreatePurchaseOrder() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: Omit<PurchaseOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'updatedAt'>) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.createPurchaseOrder(tenant.id, data, user.uid);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.createPurchaseOrder(tenant.id, data, currentUser.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['purchaseOrders', tenant.id] });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: ['purchaseOrders', tenant.id] });
+      }
       toast.success('Purchase order created successfully');
     },
     onError: (error: Error) => {
@@ -281,17 +316,20 @@ export function useCreatePurchaseOrder() {
  * Hook to update purchase order status
  */
 export function useUpdatePurchaseOrderStatus() {
-  const tenant = useTenant();
+  const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: PurchaseOrder['status'] }) => {
-      if (!user) throw new Error('User not authenticated');
-      return inventoryService.updatePurchaseOrderStatus(tenant.id, orderId, status, user.uid);
+      if (!currentUser) throw new Error('User not authenticated');
+      if (!tenant?.id) throw new Error('No tenant');
+      return inventoryService.updatePurchaseOrderStatus(tenant.id, orderId, status, currentUser.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['purchaseOrders', tenant.id] });
+      if (tenant?.id) {
+        queryClient.invalidateQueries({ queryKey: ['purchaseOrders', tenant.id] });
+      }
       toast.success('Purchase order status updated');
     },
     onError: (error: Error) => {

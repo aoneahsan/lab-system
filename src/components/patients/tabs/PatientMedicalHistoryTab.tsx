@@ -21,9 +21,9 @@ export const PatientMedicalHistoryTab = ({ patient }: PatientMedicalHistoryTabPr
         
         {patient.allergies.length > 0 ? (
           <div className="space-y-3">
-            {patient.allergies.map((allergy) => (
+            {patient.allergies.map((allergy, index) => (
               <div
-                key={allergy.id}
+                key={index}
                 className={`p-4 rounded-lg border ${
                   allergy.severity === 'severe'
                     ? 'bg-danger-50 dark:bg-danger-900/20 border-danger-200 dark:border-danger-800'
@@ -86,9 +86,9 @@ export const PatientMedicalHistoryTab = ({ patient }: PatientMedicalHistoryTabPr
         
         {patient.medications.length > 0 ? (
           <div className="space-y-3">
-            {patient.medications.filter(med => !med.endDate || new Date(med.endDate) >= new Date()).map((medication) => (
+            {patient.medications.filter(med => !med.endDate || new Date(med.endDate) >= new Date()).map((medication, index) => (
               <div
-                key={medication.id}
+                key={index}
                 className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-start justify-between">
@@ -148,9 +148,9 @@ export const PatientMedicalHistoryTab = ({ patient }: PatientMedicalHistoryTabPr
         
         {patient.medicalHistory.length > 0 ? (
           <div className="space-y-3">
-            {patient.medicalHistory.map((history) => (
+            {patient.medicalHistory.map((history, index) => (
               <div
-                key={history.id}
+                key={index}
                 className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
               >
                 <div className="flex items-start justify-between">
@@ -211,9 +211,9 @@ export const PatientMedicalHistoryTab = ({ patient }: PatientMedicalHistoryTabPr
             Past Medications
           </h3>
           <div className="space-y-3">
-            {patient.medications.filter(med => med.endDate && new Date(med.endDate) < new Date()).map((medication) => (
+            {patient.medications.filter(med => med.endDate && new Date(med.endDate) < new Date()).map((medication, index) => (
               <div
-                key={medication.id}
+                key={index}
                 className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 opacity-75"
               >
                 <div className="flex items-start justify-between">

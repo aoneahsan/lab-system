@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Download, Upload, Flask, BarChart3 } from 'lucide-react';
+import { Plus, Download, Upload, TestTube, BarChart3 } from 'lucide-react';
 import { useTests, useCreateTest, useUpdateTest, useDeleteTest, useTestStatistics } from '@/hooks/useTests';
 import TestListTable from '@/components/tests/TestListTable';
 import TestSearchFilters from '@/components/tests/TestSearchFilters';
@@ -67,7 +67,10 @@ const TestsPage: React.FC = () => {
         </div>
 
         <TestForm
-          initialData={editingTest || undefined}
+          initialData={editingTest ? {
+            ...editingTest,
+            loincCode: editingTest.loincCode?.code
+          } : undefined}
           onSubmit={editingTest ? handleEditTest : handleAddTest}
           onCancel={() => {
             setShowAddForm(false);
@@ -134,7 +137,7 @@ const TestsPage: React.FC = () => {
                 <p className="text-sm text-gray-600">Total Tests</p>
                 <p className="text-2xl font-bold text-gray-900">{statistics.totalTests}</p>
               </div>
-              <Flask className="h-8 w-8 text-blue-500" />
+              <TestTube className="h-8 w-8 text-blue-500" />
             </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
@@ -187,7 +190,7 @@ const TestsPage: React.FC = () => {
           </div>
         ) : tests.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
-            <Flask className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <TestTube className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No tests found. Add your first test to get started.</p>
             <button
               onClick={() => setShowAddForm(true)}

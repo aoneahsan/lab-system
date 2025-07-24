@@ -73,7 +73,7 @@ const ChainOfCustody: React.FC<ChainOfCustodyProps> = ({ entries }) => {
                   </div>
                   <div className="mt-1 text-sm text-gray-500">
                     <Clock className="inline h-3 w-3 mr-1" />
-                    {new Date(entry.timestamp).toLocaleString()}
+                    {new Date(entry.timestamp.toDate()).toLocaleString()}
                   </div>
                   {entry.notes && (
                     <p className="mt-1 text-sm text-gray-600">{entry.notes}</p>

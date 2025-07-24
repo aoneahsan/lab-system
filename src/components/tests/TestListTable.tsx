@@ -7,9 +7,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  SortingState,
-  ColumnFiltersState,
 } from '@tanstack/react-table';
+import type { SortingState, ColumnFiltersState } from '@tanstack/react-table';
 import type { TestDefinition } from '@/types/test.types';
 
 interface TestListTableProps {

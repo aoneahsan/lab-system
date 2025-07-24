@@ -23,7 +23,7 @@ import {
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { getCollectionName } from '@/constants/tenant.constants';
-import {
+import type {
 	InventoryItem,
 	StockTransaction,
 	LotInfo,
@@ -431,7 +431,7 @@ class InventoryService {
 
 		await updateDoc(
 			doc(firestore, getCollectionName('purchase_orders', tenantId), orderId),
-			updateData
+			updateData as any
 		);
 	}
 

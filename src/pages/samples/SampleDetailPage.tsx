@@ -4,8 +4,8 @@ import { ArrowLeft, FileText, QrCode } from 'lucide-react';
 import { useSample } from '@/hooks/useSamples';
 import { usePatient } from '@/hooks/usePatients';
 import { useTestOrder } from '@/hooks/useTests';
-import LoadingState from '@/components/common/LoadingState';
-import ErrorState from '@/components/common/ErrorState';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 import ChainOfCustody from '@/components/samples/ChainOfCustody';
 
 const SampleDetailPage: React.FC = () => {
@@ -36,7 +36,7 @@ const SampleDetailPage: React.FC = () => {
   }
 
   if (sampleError || !sample) {
-    return <ErrorState message="Failed to load sample details" onRetry={() => navigate('/samples')} />;
+    return <ErrorState error="Failed to load sample details" onRetry={() => navigate('/samples')} />;
   }
 
   return (
@@ -134,10 +134,10 @@ const SampleDetailPage: React.FC = () => {
                 {order.tests.map((test, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                     <div>
-                      <p className="font-medium">{test.name}</p>
-                      <p className="text-sm text-gray-500">{test.code}</p>
+                      <p className="font-medium">{test.testName}</p>
+                      <p className="text-sm text-gray-500">{test.testCode}</p>
                     </div>
-                    <span className="text-sm text-gray-600">{test.loinc?.code || 'N/A'}</span>
+                    <span className="text-sm text-gray-600">LOINC: {test.testCode || 'N/A'}</span>
                   </div>
                 ))}
               </div>
@@ -162,7 +162,7 @@ const SampleDetailPage: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Collection Date/Time</p>
                 <p className="font-medium">
-                  {new Date(sample.collectionDate).toLocaleDateString()} at {sample.collectionTime}
+                  {(sample.collectionDate instanceof Date ? sample.collectionDate : sample.collectionDate.toDate()).toLocaleDateString()} at {sample.collectionTime}
                 </p>
               </div>
               <div>

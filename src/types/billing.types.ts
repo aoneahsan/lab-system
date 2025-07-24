@@ -62,7 +62,7 @@ export interface Invoice {
   items: InvoiceItem[];
   
   // Payment Information
-  payments: Payment[];
+  payments: string[]; // Array of payment IDs
   
   // Insurance
   insuranceClaimId?: string;

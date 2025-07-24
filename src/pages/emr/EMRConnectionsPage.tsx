@@ -12,7 +12,7 @@ import {
   Edit
 } from 'lucide-react';
 import { useEMRConnections, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
-import type { EMRConnectionFilter, ConnectionStatus } from '@/types/emr.types';
+import type { EMRConnectionFilter, ConnectionStatus, EMRSystemType, IntegrationProtocol } from '@/types/emr.types';
 
 const EMRConnectionsPage: React.FC = () => {
   const [filter, setFilter] = useState<EMRConnectionFilter>({});
@@ -82,7 +82,7 @@ const EMRConnectionsPage: React.FC = () => {
         <div className="flex items-center gap-4">
           <select
             value={filter.systemType || ''}
-            onChange={(e) => setFilter({ ...filter, systemType: e.target.value || undefined })}
+            onChange={(e) => setFilter({ ...filter, systemType: e.target.value as EMRSystemType || undefined })}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Systems</option>
@@ -98,7 +98,7 @@ const EMRConnectionsPage: React.FC = () => {
           
           <select
             value={filter.protocol || ''}
-            onChange={(e) => setFilter({ ...filter, protocol: e.target.value || undefined })}
+            onChange={(e) => setFilter({ ...filter, protocol: e.target.value as IntegrationProtocol || undefined })}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Protocols</option>
@@ -112,7 +112,7 @@ const EMRConnectionsPage: React.FC = () => {
           
           <select
             value={filter.status || ''}
-            onChange={(e) => setFilter({ ...filter, status: e.target.value || undefined })}
+            onChange={(e) => setFilter({ ...filter, status: e.target.value as ConnectionStatus || undefined })}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Status</option>

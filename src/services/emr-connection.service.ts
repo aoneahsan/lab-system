@@ -289,7 +289,7 @@ class EMRConnectionService {
   }
 
   private async processHL7Message(
-    connection: EMRConnection,
+    _connection: EMRConnection,
     message: EMRMessage,
     tenantId: string
   ): Promise<void> {
@@ -362,7 +362,7 @@ class EMRConnectionService {
       level,
       event,
       details: JSON.stringify(details),
-      metadata: details,
+      metadata: details as Record<string, unknown> | undefined,
       timestamp: serverTimestamp() as Timestamp,
     };
 

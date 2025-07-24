@@ -55,12 +55,12 @@ export const useResult = (resultId: string) => {
 export const useCreateResult = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: ResultEntryFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.createResult(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.createResult(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -78,12 +78,12 @@ export const useCreateResult = () => {
 export const useCreateBatchResults = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: BatchResultEntryData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.createBatchResults(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.createBatchResults(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -101,12 +101,12 @@ export const useCreateBatchResults = () => {
 export const useUpdateResult = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ resultId, data }: { resultId: string; data: Partial<TestResult> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.updateResult(currentTenant.id, user.uid, resultId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.updateResult(currentTenant.id, currentUser.id, resultId, data);
     },
     onSuccess: (_, { resultId }) => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -124,12 +124,12 @@ export const useUpdateResult = () => {
 export const useVerifyResult = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ resultId, comments }: { resultId: string; comments?: string }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.verifyResult(currentTenant.id, user.uid, resultId, comments);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.verifyResult(currentTenant.id, currentUser.id, resultId, comments);
     },
     onSuccess: (_, { resultId }) => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -147,12 +147,12 @@ export const useVerifyResult = () => {
 export const useApproveResult = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ resultId, comments }: { resultId: string; comments?: string }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.approveResult(currentTenant.id, user.uid, resultId, comments);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.approveResult(currentTenant.id, currentUser.id, resultId, comments);
     },
     onSuccess: (_, { resultId }) => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -170,12 +170,12 @@ export const useApproveResult = () => {
 export const useRejectResult = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ resultId, reason }: { resultId: string; reason: string }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.rejectResult(currentTenant.id, user.uid, resultId, reason);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.rejectResult(currentTenant.id, currentUser.id, resultId, reason);
     },
     onSuccess: (_, { resultId }) => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -229,12 +229,12 @@ export const useResultGroups = (orderId: string) => {
 export const useCreateResultReport = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ orderId, resultIds }: { orderId: string; resultIds: string[] }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return resultService.createResultReport(currentTenant.id, user.uid, orderId, resultIds);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return resultService.createResultReport(currentTenant.id, currentUser.id, orderId, resultIds);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });

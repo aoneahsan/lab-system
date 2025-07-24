@@ -38,6 +38,7 @@ export const COLLECTIONS = {
   INVOICES: 'invoices',
   PAYMENTS: 'payments',
   INSURANCE_CLAIMS: 'insurance_claims',
+  INSURANCE_PROVIDERS: 'insurance_providers',
   
   // Inventory management
   INVENTORY_ITEMS: 'inventory_items',
@@ -69,8 +70,13 @@ export const COLLECTIONS = {
   EMR_MAPPINGS: 'emr_mappings',
   EMR_MESSAGES: 'emr_messages',
   EMR_FIELD_MAPPINGS: 'emr_field_mappings',
-  EMR_INTEGRATION_LOGS: 'emr_integration_logs'
-};
+  EMR_INTEGRATION_LOGS: 'emr_integration_logs',
+  
+  // Additional collections
+  RESULT_GROUPS: 'result_groups',
+  RESULT_REPORTS: 'result_reports',
+  TENANT_USERS: 'tenant_users'
+} as const;
 
 /**
  * Storage paths (without tenant prefix)

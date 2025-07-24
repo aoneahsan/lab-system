@@ -57,12 +57,12 @@ export const useQCMaterial = (materialId: string) => {
 export const useCreateQCMaterial = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: QCMaterialFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return qcService.createQCMaterial(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return qcService.createQCMaterial(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QC_KEYS.materials() });
@@ -78,12 +78,12 @@ export const useCreateQCMaterial = () => {
 export const useUpdateQCMaterial = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ materialId, data }: { materialId: string; data: Partial<QCMaterial> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return qcService.updateQCMaterial(currentTenant.id, user.uid, materialId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return qcService.updateQCMaterial(currentTenant.id, currentUser.id, materialId, data);
     },
     onSuccess: (_, { materialId }) => {
       queryClient.invalidateQueries({ queryKey: QC_KEYS.materials() });
@@ -127,12 +127,12 @@ export const useQCRun = (runId: string) => {
 export const useCreateQCRun = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: QCRunFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return qcService.createQCRun(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return qcService.createQCRun(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QC_KEYS.runs() });
@@ -150,12 +150,12 @@ export const useCreateQCRun = () => {
 export const useReviewQCRun = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ runId, accept, comments }: { runId: string; accept: boolean; comments?: string }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return qcService.reviewQCRun(currentTenant.id, user.uid, runId, accept, comments);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return qcService.reviewQCRun(currentTenant.id, currentUser.id, runId, accept, comments);
     },
     onSuccess: (_, { runId }) => {
       queryClient.invalidateQueries({ queryKey: QC_KEYS.runs() });

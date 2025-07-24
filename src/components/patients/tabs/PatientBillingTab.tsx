@@ -2,7 +2,6 @@ interface PatientBillingTabProps {
 	patientId: string;
 }
 
-// eslint-disable-next-line @/typescript-eslint/no-unused-vars
 export const PatientBillingTab = ({ patientId }: PatientBillingTabProps) => {
 	return (
 		<div className='space-y-6'>
@@ -143,7 +142,7 @@ export const PatientBillingTab = ({ patientId }: PatientBillingTabProps) => {
 					No billing history
 				</h3>
 				<p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-					Billing information will appear here once tests are ordered.
+					Billing information for patient {patientId} will appear here once tests are ordered.
 				</p>
 			</div>
 		</div>

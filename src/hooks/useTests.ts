@@ -3,7 +3,7 @@ import { testService } from '@/services/test.service';
 import { loincService } from '@/services/loinc.service';
 import { useTenant } from '@/hooks/useTenant';
 import { useAuthStore } from '@/stores/auth.store';
-import { useToastStore } from '@/stores/toast.store';
+import { toast } from '@/hooks/useToast';
 import type {
   TestDefinitionFormData,
   TestPanel,
@@ -15,7 +15,7 @@ import type {
 
 // Test Definition Hooks
 export const useTests = (filter?: TestFilter) => {
-  const { currentTenant } = useTenant();
+  const { tenant: currentTenant } = useTenant();
 
   return useQuery({
     queryKey: ['tests', currentTenant?.id, filter],
@@ -34,28 +34,24 @@ export const useTest = (testId: string) => {
 
 export const useCreateTest = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useTenant();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { tenant: currentTenant } = useTenant();
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: (data: TestDefinitionFormData) =>
-      testService.createTest(currentTenant!.id, user!.uid, data),
+      testService.createTest(currentTenant!.id, currentUser!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tests'] });
-      showToast('Test created successfully', 'success');
+      toast.success('Test created successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to create test', 'error');
+      toast.error('Failed to create test', error.message);
     },
   });
 };
 
 export const useUpdateTest = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: ({
       testId,
@@ -63,37 +59,35 @@ export const useUpdateTest = () => {
     }: {
       testId: string;
       data: Partial<TestDefinitionFormData>;
-    }) => testService.updateTest(testId, user!.uid, data),
+    }) => testService.updateTest(testId, currentUser!.id, data),
     onSuccess: (_, { testId }) => {
       queryClient.invalidateQueries({ queryKey: ['tests'] });
       queryClient.invalidateQueries({ queryKey: ['test', testId] });
-      showToast('Test updated successfully', 'success');
+      toast.success('Test updated successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to update test', 'error');
+      toast.error('Failed to update test', error.message);
     },
   });
 };
 
 export const useDeleteTest = () => {
   const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
-
   return useMutation({
     mutationFn: (testId: string) => testService.deleteTest(testId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tests'] });
-      showToast('Test deleted successfully', 'success');
+      toast.success('Test deleted successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to delete test', 'error');
+      toast.error('Failed to delete test', error.message);
     },
   });
 };
 
 // Test Panel Hooks
 export const useTestPanels = () => {
-  const { currentTenant } = useTenant();
+  const { tenant: currentTenant } = useTenant();
 
   return useQuery({
     queryKey: ['testPanels', currentTenant?.id],
@@ -112,29 +106,25 @@ export const useTestPanel = (panelId: string) => {
 
 export const useCreateTestPanel = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useTenant();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { tenant: currentTenant } = useTenant();
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: (
       data: Omit<TestPanel, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
-    ) => testService.createTestPanel(currentTenant!.id, user!.uid, data),
+    ) => testService.createTestPanel(currentTenant!.id, currentUser!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testPanels'] });
-      showToast('Test panel created successfully', 'success');
+      toast.success('Test panel created successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to create test panel', 'error');
+      toast.error('Failed to create test panel', error.message);
     },
   });
 };
 
 export const useUpdateTestPanel = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: ({
       panelId,
@@ -142,37 +132,35 @@ export const useUpdateTestPanel = () => {
     }: {
       panelId: string;
       data: Partial<TestPanel>;
-    }) => testService.updateTestPanel(panelId, user!.uid, data),
+    }) => testService.updateTestPanel(panelId, currentUser!.id, data),
     onSuccess: (_, { panelId }) => {
       queryClient.invalidateQueries({ queryKey: ['testPanels'] });
       queryClient.invalidateQueries({ queryKey: ['testPanel', panelId] });
-      showToast('Test panel updated successfully', 'success');
+      toast.success('Test panel updated successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to update test panel', 'error');
+      toast.error('Failed to update test panel', error.message);
     },
   });
 };
 
 export const useDeleteTestPanel = () => {
   const queryClient = useQueryClient();
-  const { showToast } = useToastStore();
-
   return useMutation({
     mutationFn: (panelId: string) => testService.deleteTestPanel(panelId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testPanels'] });
-      showToast('Test panel deleted successfully', 'success');
+      toast.success('Test panel deleted successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to delete test panel', 'error');
+      toast.error('Failed to delete test panel', error.message);
     },
   });
 };
 
 // Test Order Hooks
 export const useTestOrders = (filter?: TestOrderFilter) => {
-  const { currentTenant } = useTenant();
+  const { tenant: currentTenant } = useTenant();
 
   return useQuery({
     queryKey: ['testOrders', currentTenant?.id, filter],
@@ -191,19 +179,17 @@ export const useTestOrder = (orderId: string) => {
 
 export const useCreateTestOrder = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useTenant();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { tenant: currentTenant } = useTenant();
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: (data: TestOrderFormData) => {
       // In a real app, get provider details from user profile
-      const providerId = user!.uid;
-      const providerName = user!.displayName || 'Unknown Provider';
+      const providerId = currentUser!.id;
+      const providerName = currentUser!.displayName || 'Unknown Provider';
       
       return testService.createTestOrder(
         currentTenant!.id,
-        user!.uid,
+        currentUser!.id,
         providerId,
         providerName,
         data
@@ -211,57 +197,51 @@ export const useCreateTestOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });
-      showToast('Test order created successfully', 'success');
+      toast.success('Test order created successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to create test order', 'error');
+      toast.error('Failed to create test order', error.message);
     },
   });
 };
 
 export const useApproveTestOrder = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: ({ orderId, notes }: { orderId: string; notes?: string }) => 
-      testService.approveTestOrder(orderId, user!.uid, notes),
+      testService.approveTestOrder(orderId, currentUser!.id, notes),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });
       queryClient.invalidateQueries({ queryKey: ['testOrder', orderId] });
-      showToast('Order approved successfully', 'success');
+      toast.success('Order approved successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to approve order', 'error');
+      toast.error('Failed to approve order', error.message);
     },
   });
 };
 
 export const useRejectTestOrder = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: ({ orderId, reason }: { orderId: string; reason: string }) => 
-      testService.rejectTestOrder(orderId, user!.uid, reason),
+      testService.rejectTestOrder(orderId, currentUser!.id, reason),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });
       queryClient.invalidateQueries({ queryKey: ['testOrder', orderId] });
-      showToast('Order rejected', 'success');
+      toast.success('Order rejected');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to reject order', 'error');
+      toast.error('Failed to reject order', error.message);
     },
   });
 };
 
 export const useUpdateTestOrderStatus = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
-  const { showToast } = useToastStore();
-
+  const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: ({
       orderId,
@@ -271,14 +251,14 @@ export const useUpdateTestOrderStatus = () => {
       orderId: string;
       status: TestOrder['status'];
       cancelReason?: string;
-    }) => testService.updateTestOrderStatus(orderId, user!.uid, status, cancelReason),
+    }) => testService.updateTestOrderStatus(orderId, currentUser!.id, status, cancelReason),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });
       queryClient.invalidateQueries({ queryKey: ['testOrder', orderId] });
-      showToast('Order status updated successfully', 'success');
+      toast.success('Order status updated successfully');
     },
     onError: (error) => {
-      showToast(error.message || 'Failed to update order status', 'error');
+      toast.error('Failed to update order status', error.message);
     },
   });
 };
@@ -301,7 +281,7 @@ export const useCommonLOINCTests = () => {
 
 // Statistics Hook
 export const useTestStatistics = () => {
-  const { currentTenant } = useTenant();
+  const { tenant: currentTenant } = useTenant();
 
   return useQuery({
     queryKey: ['testStatistics', currentTenant?.id],

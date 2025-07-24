@@ -73,7 +73,10 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           testId,
           value,
           patientId: patient.id,
-          referenceRange: test.referenceRange
+          referenceRange: test.referenceRanges?.[0] ? {
+            min: test.referenceRanges[0].normalMin,
+            max: test.referenceRanges[0].normalMax
+          } : undefined
         });
 
         setValidationErrors(result.errors);
@@ -98,7 +101,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         testId,
         value: data.value,
         patientId: patient.id,
-        referenceRange: test.referenceRange
+        referenceRange: test.referenceRanges?.[0] ? { min: test.referenceRanges[0].normalMin, max: test.referenceRanges[0].normalMax } : undefined
       });
       
       if (!result.isValid) {
@@ -140,7 +143,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
               </div>
               <div>
                 <p className="font-medium text-gray-700">Specimen Type:</p>
-                <p>{test.specimenType}</p>
+                <p>{test.specimen?.type || 'Not specified'}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-700">Method:</p>
@@ -237,11 +240,11 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         </div>
 
         {/* Reference Range Display */}
-        {test?.referenceRange && (
+        {test?.referenceRanges?.[0] && (
           <div className="mt-4 p-3 bg-gray-50 rounded-md">
             <p className="text-sm font-medium text-gray-700">Reference Range:</p>
             <p className="text-sm text-gray-600">
-              {test.referenceRange.min} - {test.referenceRange.max} {test.referenceRange.unit}
+              {test.referenceRanges[0].normalMin} - {test.referenceRanges[0].normalMax} {test.unit}
             </p>
           </div>
         )}

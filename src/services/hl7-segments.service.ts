@@ -107,7 +107,6 @@ export interface NTESegment {
 class HL7SegmentsService {
   private componentSeparator = '^';
   private repetitionSeparator = '~';
-  private subcomponentSeparator = '&';
 
   // Parse OBR segment
   parseOBRSegment(segment: HL7Segment): OBRSegment | null {

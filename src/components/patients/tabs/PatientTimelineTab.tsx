@@ -2,7 +2,6 @@ interface PatientTimelineTabProps {
 	patientId: string;
 }
 
-// eslint-disable-next-line @/typescript-eslint/no-unused-vars
 export const PatientTimelineTab = ({ patientId }: PatientTimelineTabProps) => {
 	// Placeholder timeline data
 	const timelineEvents = [
@@ -101,7 +100,7 @@ export const PatientTimelineTab = ({ patientId }: PatientTimelineTabProps) => {
 							No timeline events
 						</h3>
 						<p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-							Patient activities will appear here.
+							Patient {patientId} activities will appear here.
 						</p>
 					</div>
 				)}

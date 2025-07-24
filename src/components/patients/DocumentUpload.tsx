@@ -21,20 +21,19 @@ export const DocumentUpload = ({
 	onCancel,
 }: DocumentUploadProps) => {
 	const { currentUser } = useAuthStore();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 	const { showToast } = useToast();
 	const [isUploading, setIsUploading] = useState(false);
 	const [selectedCategory, setSelectedCategory] =
-		useState<PatientDocument['category']>('other');
-	const [description, setDescription] = useState('');
+		useState<PatientDocument['type']>('other');
+	const [notes, setNotes] = useState('');
 
-	const categories: { value: PatientDocument['category']; label: string }[] = [
-		{ value: 'report', label: 'Lab Report' },
+	const categories: { value: PatientDocument['type']; label: string }[] = [
+		{ value: 'lab_report', label: 'Lab Report' },
 		{ value: 'prescription', label: 'Prescription' },
-		{ value: 'insurance', label: 'Insurance Document' },
-		{ value: 'consent', label: 'Consent Form' },
-		{ value: 'referral', label: 'Referral Letter' },
-		{ value: 'imaging', label: 'Imaging/X-Ray' },
+		{ value: 'insurance_card', label: 'Insurance Card' },
+		{ value: 'medical_record', label: 'Medical Record' },
+		{ value: 'id_proof', label: 'ID Proof' },
 		{ value: 'other', label: 'Other' },
 	];
 
@@ -67,12 +66,13 @@ export const DocumentUpload = ({
 
 				// Create document record
 				const document: Omit<PatientDocument, 'id' | 'uploadedAt'> = {
-					name: file.name,
-					type: file.type,
-					size: file.size,
-					url: downloadUrl,
-					category: selectedCategory,
-					description: description.trim() || undefined,
+					title: file.name,
+					fileName: file.name,
+					mimeType: file.type,
+					fileSize: file.size,
+					fileUrl: downloadUrl,
+					type: selectedCategory,
+					notes: notes.trim() || undefined,
 					uploadedBy: currentUser.id,
 				};
 
@@ -109,7 +109,7 @@ export const DocumentUpload = ({
 			currentUser?.id,
 			patientId,
 			selectedCategory,
-			description,
+			notes,
 			showToast,
 			onUploadComplete,
 		]
@@ -132,14 +132,14 @@ export const DocumentUpload = ({
 	return (
 		<div className='space-y-4'>
 			<div>
-				<label htmlFor='category' className='label'>
-					Document Category
+				<label htmlFor='type' className='label'>
+					Document Type
 				</label>
 				<select
-					id='category'
+					id='type'
 					value={selectedCategory}
 					onChange={(e) =>
-						setSelectedCategory(e.target.value as PatientDocument['category'])
+						setSelectedCategory(e.target.value as PatientDocument['type'])
 					}
 					className='input'
 					disabled={isUploading}
@@ -153,16 +153,16 @@ export const DocumentUpload = ({
 			</div>
 
 			<div>
-				<label htmlFor='description' className='label'>
-					Description (Optional)
+				<label htmlFor='notes' className='label'>
+					Notes (Optional)
 				</label>
 				<textarea
-					id='description'
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
+					id='notes'
+					value={notes}
+					onChange={(e) => setNotes(e.target.value)}
 					className='input'
 					rows={2}
-					placeholder='Add a brief description of the document...'
+					placeholder='Add any notes about the document...'
 					disabled={isUploading}
 				/>
 			</div>

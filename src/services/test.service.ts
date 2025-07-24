@@ -384,7 +384,7 @@ export const testService = {
     }
 
     const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
-    await updateDoc(docRef, updateData);
+    await updateDoc(docRef, updateData as any);
   },
 
   async updateOrderedTestStatus(

@@ -79,8 +79,6 @@ class HL7ParserService {
   private fieldSeparator = '|';
   private componentSeparator = '^';
   private repetitionSeparator = '~';
-  private escapeCharacter = '\\';
-  private subcomponentSeparator = '&';
 
   // Parse HL7 message
   parseMessage(rawMessage: string): HL7Message {
@@ -146,8 +144,8 @@ class HL7ParserService {
       const encodingChars = segmentString.substring(4, 8);
       this.componentSeparator = encodingChars[0];
       this.repetitionSeparator = encodingChars[1];
-      this.escapeCharacter = encodingChars[2];
-      this.subcomponentSeparator = encodingChars[3];
+      // escapeCharacter = encodingChars[2];
+      // subcomponentSeparator = encodingChars[3];
       
       // Parse remaining fields
       const remainingFields = segmentString.substring(4).split(this.fieldSeparator);

@@ -70,7 +70,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
               </p>
               {endpoint.lastPingAt && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Last ping: {endpoint.lastPingAt.toDate().toLocaleString()}
+                  Last ping: {endpoint.lastPingAt.toLocaleString()}
                 </p>
               )}
             </div>
@@ -190,7 +190,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
                       <span className="text-gray-600">{formatEventType(event.eventType)}</span>
                     </div>
                     <span className="text-xs text-gray-500">
-                      {event.timestamp.toDate().toLocaleString()}
+                      {event.timestamp.toLocaleString()}
                     </span>
                   </div>
                 ))}

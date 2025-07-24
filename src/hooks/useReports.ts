@@ -56,12 +56,12 @@ export const useReportTemplate = (templateId: string) => {
 export const useCreateReportTemplate = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: ReportTemplateFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.createReportTemplate(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.createReportTemplate(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.templates() });
@@ -77,12 +77,12 @@ export const useCreateReportTemplate = () => {
 export const useUpdateReportTemplate = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ templateId, data }: { templateId: string; data: Partial<ReportTemplateFormData> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.updateReportTemplate(currentTenant.id, user.uid, templateId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.updateReportTemplate(currentTenant.id, currentUser.id, templateId, data);
     },
     onSuccess: (_, { templateId }) => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.templates() });
@@ -146,12 +146,12 @@ export const useReport = (reportId: string) => {
 export const useCreateReport = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: ReportFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.createReport(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.createReport(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.reports() });
@@ -167,12 +167,12 @@ export const useCreateReport = () => {
 export const useUpdateReport = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ reportId, data }: { reportId: string; data: Partial<Report> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.updateReport(currentTenant.id, user.uid, reportId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.updateReport(currentTenant.id, currentUser.id, reportId, data);
     },
     onSuccess: (_, { reportId }) => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.reports() });
@@ -209,12 +209,12 @@ export const useDeleteReport = () => {
 export const useGenerateReport = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (reportId: string) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.generateReport(currentTenant.id, user.uid, reportId);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.generateReport(currentTenant.id, currentUser.id, reportId);
     },
     onSuccess: (_, reportId) => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.report(reportId) });
@@ -258,12 +258,12 @@ export const useDashboard = (dashboardId: string) => {
 export const useCreateDashboard = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: DashboardFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.createDashboard(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.createDashboard(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.dashboards() });
@@ -279,12 +279,12 @@ export const useCreateDashboard = () => {
 export const useUpdateDashboard = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ dashboardId, data }: { dashboardId: string; data: Partial<AnalyticsDashboard> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return reportService.updateDashboard(currentTenant.id, user.uid, dashboardId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return reportService.updateDashboard(currentTenant.id, currentUser.id, dashboardId, data);
     },
     onSuccess: (_, { dashboardId }) => {
       queryClient.invalidateQueries({ queryKey: REPORT_KEYS.dashboards() });

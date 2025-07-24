@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { resultValidationService } from '@/services/result-validation.service';
 import type { ResultValidationRule } from '@/types/result.types';
-import { toast } from 'react-hot-toast';
+import { toast } from '@/hooks/useToast';
 
 const VALIDATION_RULES_KEY = 'validation-rules';
 

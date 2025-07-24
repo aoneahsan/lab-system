@@ -55,12 +55,12 @@ export const useSample = (sampleId: string) => {
 export const useCreateSample = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: SampleFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return sampleService.createSample(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return sampleService.createSample(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAMPLE_KEYS.lists() });
@@ -78,12 +78,12 @@ export const useCreateSample = () => {
 export const useUpdateSample = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ sampleId, data }: { sampleId: string; data: Partial<SampleFormData> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return sampleService.updateSample(currentTenant.id, user.uid, sampleId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return sampleService.updateSample(currentTenant.id, currentUser.id, sampleId, data);
     },
     onSuccess: (_, { sampleId }) => {
       queryClient.invalidateQueries({ queryKey: SAMPLE_KEYS.lists() });
@@ -101,7 +101,7 @@ export const useUpdateSample = () => {
 export const useUpdateSampleStatus = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({
@@ -115,10 +115,10 @@ export const useUpdateSampleStatus = () => {
       notes?: string;
       location?: string;
     }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return sampleService.updateSampleStatus(
         currentTenant.id,
-        user.uid,
+        currentUser.id,
         sampleId,
         status,
         notes,
@@ -178,14 +178,14 @@ export const useSampleCollections = (filter?: { status?: string; phlebotomistId?
 export const useCreateSampleCollection = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (
       data: Omit<SampleCollection, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
     ) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return sampleService.createSampleCollection(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return sampleService.createSampleCollection(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAMPLE_KEYS.collections() });
@@ -202,7 +202,7 @@ export const useCreateSampleCollection = () => {
 export const useCompleteSampleCollection = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({
@@ -212,10 +212,10 @@ export const useCompleteSampleCollection = () => {
       collectionId: string;
       collectedSamples: { testId: string; sampleId: string }[];
     }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return sampleService.completeSampleCollection(
         currentTenant.id,
-        user.uid,
+        currentUser.id,
         collectionId,
         collectedSamples
       );
@@ -235,7 +235,7 @@ export const useCompleteSampleCollection = () => {
 export const useBatchUpdateSamples = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({
@@ -245,8 +245,8 @@ export const useBatchUpdateSamples = () => {
       sampleIds: string[];
       updates: Partial<Sample>;
     }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return sampleService.batchUpdateSamples(currentTenant.id, user.uid, sampleIds, updates);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return sampleService.batchUpdateSamples(currentTenant.id, currentUser.id, sampleIds, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAMPLE_KEYS.lists() });

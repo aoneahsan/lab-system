@@ -3,7 +3,7 @@
  * Main page for managing laboratory inventory
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Download, Upload, AlertCircle } from 'lucide-react';
 import { InventoryItemsTable } from '@/components/inventory/InventoryItemsTable';
 import { InventoryItemForm } from '@/components/inventory/InventoryItemForm';
@@ -21,7 +21,7 @@ import {
   useReorderItems,
   useExpiringItems
 } from '@/hooks/useInventory';
-import { InventoryItem, InventoryCategory, InventoryItemFormData, StockTransactionFormData } from '@/types/inventory.types';
+import type { InventoryItem, InventoryCategory, InventoryItemFormData, StockTransactionFormData } from '@/types/inventory.types';
 
 export default function InventoryPage() {
   const [showForm, setShowForm] = useState(false);

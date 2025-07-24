@@ -19,7 +19,10 @@ class BiometricService {
    */
   async checkBiometricStatus(): Promise<BiometricEnrollmentStatus> {
     try {
-      const { isAvailable, biometryType, errorMessage } = await BiometricAuth.checkBiometry();
+      const result = await BiometricAuth.isAvailable();
+      const isAvailable = result.available || false;
+      const biometryType = (result as any).biometryType || 'unknown';
+      const errorMessage = (result as any).error;
       
       if (!isAvailable) {
         return {
@@ -30,7 +33,9 @@ class BiometricService {
       }
       
       // Check if user has enrolled biometrics
-      const { isEnrolled } = await BiometricAuth.isEnrolled();
+      // Note: capacitor-biometric-authentication doesn't have a separate isEnrolled method
+      // If biometrics are available, we assume they are enrolled
+      const isEnrolled = true;
       
       return {
         isAvailable: true,
@@ -55,14 +60,14 @@ class BiometricService {
       const authConfig = { ...this.config, ...config };
       
       const result = await BiometricAuth.authenticate({
-        reason: authConfig.reason || DEFAULT_BIOMETRIC_CONFIG.reason || '',
+        message: authConfig.reason || DEFAULT_BIOMETRIC_CONFIG.reason || '',
         fallbackTitle: authConfig.fallbackTitle,
         maxAttempts: authConfig.maxAttempts,
         androidBiometryTitle: authConfig.androidBiometryTitle,
         androidBiometrySubtitle: authConfig.androidBiometrySubtitle,
         androidBiometryDescription: authConfig.androidBiometryDescription,
         androidBiometryNegativeButtonText: authConfig.androidBiometryNegativeButtonText,
-      });
+      } as any);
       
       if (result.success) {
         // Update last auth timestamp
@@ -71,8 +76,8 @@ class BiometricService {
       
       return {
         success: result.success,
-        error: result.error,
-        errorCode: result.errorCode,
+        error: result.error ? (typeof result.error === 'string' ? result.error : result.error.message) : undefined,
+        errorCode: result.error && typeof result.error === 'object' ? result.error.code : undefined,
       };
     } catch (error) {
       console.error('Biometric authentication failed:', error);

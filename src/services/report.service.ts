@@ -132,7 +132,7 @@ export const reportService = {
       updatedBy: userId,
     };
     
-    const docRef = await addDoc(collection(db, COLLECTIONS.REPORT_TEMPLATES), templateData);
+    const docRef = await addDoc(collection(db, COLLECTIONS.REPORT_TEMPLATES), templateData as any);
     return docRef.id;
   },
 
@@ -207,11 +207,11 @@ export const reportService = {
     const now = serverTimestamp() as Timestamp;
     
     // Get template if specified
-    let config = {} as Record<string, unknown>;
+    let config: Record<string, unknown> = {};
     if (data.templateId) {
       const template = await this.getReportTemplate(tenantId, data.templateId);
       if (template) {
-        config = template.config;
+        config = template.config as unknown as Record<string, unknown>;
       }
     }
     
@@ -222,7 +222,7 @@ export const reportService = {
       description: data.description,
       type: data.type,
       status: data.schedule ? 'scheduled' : 'draft',
-      config,
+      config: config as any,
       parameters: data.parameters,
       schedule: data.schedule,
       createdAt: now,

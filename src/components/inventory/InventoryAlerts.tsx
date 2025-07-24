@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { InventoryAlert } from '@/types/inventory.types';
+import type { InventoryAlert } from '@/types/inventory.types';
 import { 
   AlertTriangle, 
   Package, 

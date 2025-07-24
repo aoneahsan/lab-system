@@ -10,7 +10,8 @@ import { COLLECTIONS } from '@/constants/firebase';
 import type { 
   EMRConnection, 
   FHIRAuthConfig,
-  EMRMessage
+  EMRMessage,
+  FHIRResourceType
 } from '@/types/emr.types';
 
 // FHIR Resource interfaces (simplified)
@@ -128,6 +129,19 @@ type FHIRResource = FHIRPatient | FHIRObservation | FHIRDiagnosticReport | FHIRS
 
 class FHIRService {
   private authTokens: Map<string, { token: string; expiresAt: Date }> = new Map();
+
+  // Helper method to map FHIR priority to EMR priority
+  private mapFHIRPriorityToEMRPriority(fhirPriority?: string): 'high' | 'normal' | 'low' {
+    switch (fhirPriority) {
+      case 'stat':
+      case 'urgent':
+        return 'high';
+      case 'asap':
+      case 'routine':
+      default:
+        return 'normal';
+    }
+  }
 
   // Authentication methods
   private async getAuthToken(connection: EMRConnection): Promise<string | null> {
@@ -303,7 +317,7 @@ class FHIRService {
         messageType: 'Patient',
         status: 'pending',
         priority: 'normal',
-        content: fhirPatient,
+        content: fhirPatient as unknown as Record<string, unknown>,
         metadata: {
           patientId: fhirPatient.id,
           sourceSystem: connection.systemType,
@@ -340,8 +354,8 @@ class FHIRService {
         protocol: 'fhir',
         messageType: 'ServiceRequest',
         status: 'completed',
-        priority: order.priority || 'normal',
-        content: createdOrder,
+        priority: this.mapFHIRPriorityToEMRPriority(order.priority),
+        content: createdOrder as unknown as Record<string, unknown>,
         metadata: {
           orderId: createdOrder.id,
           patientId: order.subject?.reference?.split('/')[1],

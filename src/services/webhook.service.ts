@@ -38,21 +38,19 @@ class WebhookService {
     userId: string,
     data: WebhookEndpointFormData
   ): Promise<string> {
-    const now = serverTimestamp() as Timestamp;
-    
     // Generate a secure webhook secret if not provided
     const secret = data.secret || this.generateWebhookSecret();
     
-    const endpoint: Omit<WebhookEndpoint, 'id'> = {
+    const endpoint = {
       tenantId,
       connectionId: data.connectionId,
       url: data.url,
       secret,
       events: data.events,
       isActive: data.isActive,
-      createdAt: now,
+      createdAt: serverTimestamp(),
       createdBy: userId,
-      updatedAt: now,
+      updatedAt: serverTimestamp(),
       updatedBy: userId,
     };
 
@@ -381,7 +379,7 @@ class WebhookService {
     const event = { id: eventDoc.id, ...eventDoc.data() } as WebhookEvent;
     
     // Check if event should be processed
-    if (event.status !== 'pending' && event.status !== 'processing') return;
+    if (event.status !== 'pending' && event.status !== 'processing' && event.status !== 'failed') return;
     if (event.status === 'failed' && event.attempts >= this.DEFAULT_RETRY_POLICY.maxAttempts) {
       await updateDoc(eventRef, { status: 'expired' });
       return;

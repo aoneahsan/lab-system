@@ -26,7 +26,8 @@ const SamplesPage: React.FC = () => {
 
   const { data: samples = [], isLoading } = useSamples(filters);
   const { data: statistics } = useSampleStatistics();
-  const { data: patients = [] } = usePatients();
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.patients || [];
   const createSampleMutation = useCreateSample();
   const updateSampleMutation = useUpdateSample();
   const deleteSampleMutation = useDeleteSample();
@@ -62,9 +63,9 @@ const SamplesPage: React.FC = () => {
 
     const sampleLabel: SampleLabel = {
       sampleId: sample.id,
-      patientName: `${patient.firstName} ${patient.lastName}`,
+      patientName: patient.fullName,
       patientDOB: new Date(patient.dateOfBirth).toLocaleDateString(),
-      medicalRecordNumber: patient.medicalRecordNumber,
+      medicalRecordNumber: patient.patientId,
       sampleNumber: sample.sampleNumber,
       barcode: sample.barcode,
       collectionDate: sample.collectionDate.toDate().toLocaleDateString(),
@@ -87,9 +88,9 @@ const SamplesPage: React.FC = () => {
 
     const sampleLabel: SampleLabel = {
       sampleId: sample.id,
-      patientName: `${patient.firstName} ${patient.lastName}`,
+      patientName: patient.fullName,
       patientDOB: new Date(patient.dateOfBirth).toLocaleDateString(),
-      medicalRecordNumber: patient.medicalRecordNumber,
+      medicalRecordNumber: patient.patientId,
       sampleNumber: sample.sampleNumber,
       barcode: sample.barcode,
       collectionDate: sample.collectionDate.toDate().toLocaleDateString(),

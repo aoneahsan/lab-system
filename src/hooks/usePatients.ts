@@ -13,7 +13,7 @@ export const usePatients = (
 	filters: PatientSearchFilters = {},
 	pageSize = 20
 ) => {
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 
 	return useQuery({
 		queryKey: ['patients', currentTenant?.id, filters, pageSize],
@@ -26,7 +26,7 @@ export const usePatients = (
 };
 
 export const usePatient = (patientId: string) => {
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 
 	return useQuery({
 		queryKey: ['patient', currentTenant?.id, patientId],
@@ -39,7 +39,7 @@ export const usePatient = (patientId: string) => {
 };
 
 export const usePatientStats = () => {
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 
 	return useQuery({
 		queryKey: ['patientStats', currentTenant?.id],
@@ -55,7 +55,7 @@ export const usePatientStats = () => {
 export const useCreatePatient = () => {
 	const queryClient = useQueryClient();
 	const { currentUser } = useAuthStore();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 	const { showToast } = useToast();
 
 	return useMutation({
@@ -101,7 +101,7 @@ export const useCreatePatient = () => {
 export const useUpdatePatient = () => {
 	const queryClient = useQueryClient();
 	const { currentUser } = useAuthStore();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 	const { showToast } = useToast();
 
 	return useMutation({
@@ -149,7 +149,7 @@ export const useUpdatePatient = () => {
 export const useDeactivatePatient = () => {
 	const queryClient = useQueryClient();
 	const { currentUser } = useAuthStore();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 	const { showToast } = useToast();
 
 	return useMutation({
@@ -193,7 +193,7 @@ export const useDeactivatePatient = () => {
 export const useActivatePatient = () => {
 	const queryClient = useQueryClient();
 	const { currentUser } = useAuthStore();
-	const { currentTenant } = useTenant();
+	const { tenant: currentTenant } = useTenant();
 	const { showToast } = useToast();
 
 	return useMutation({

@@ -1,13 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { emrConnectionService } from '@/services/emr-connection.service';
-import { fhirService } from '@/services/fhir.service';
+import { fhirService, type FHIRObservation } from '@/services/fhir.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
 import type {
   EMRConnectionFormData,
   EMRConnectionFilter,
+  EMRMessageFilter,
 } from '@/types/emr.types';
+import type { FHIRServiceRequest, FHIRDiagnosticReport } from '@/services/fhir.service';
 
 // Query keys
 const EMR_KEYS = {
@@ -55,12 +57,12 @@ export const useEMRConnection = (connectionId: string) => {
 export const useCreateEMRConnection = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: EMRConnectionFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return emrConnectionService.createConnection(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return emrConnectionService.createConnection(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.connections() });
@@ -76,12 +78,12 @@ export const useCreateEMRConnection = () => {
 export const useUpdateEMRConnection = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ connectionId, data }: { connectionId: string; data: Partial<EMRConnectionFormData> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return emrConnectionService.updateConnection(currentTenant.id, user.uid, connectionId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return emrConnectionService.updateConnection(currentTenant.id, currentUser.id, connectionId, data);
     },
     onSuccess: (_, { connectionId }) => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.connections() });
@@ -179,7 +181,7 @@ export const useCreateFHIRLabOrder = () => {
   const { currentTenant } = useTenantStore();
 
   return useMutation({
-    mutationFn: ({ connectionId, order }: { connectionId: string; order: Record<string, unknown> }) => {
+    mutationFn: ({ connectionId, order }: { connectionId: string; order: FHIRServiceRequest }) => {
       if (!currentTenant) throw new Error('No tenant selected');
       return emrConnectionService.getConnection(currentTenant.id, connectionId).then(connection => {
         if (!connection) throw new Error('Connection not found');
@@ -208,13 +210,13 @@ export const useSendFHIRResults = () => {
       observations 
     }: { 
       connectionId: string; 
-      results: Record<string, unknown>; 
+      results: FHIRDiagnosticReport; 
       observations: Array<Record<string, unknown>> 
     }) => {
       if (!currentTenant) throw new Error('No tenant selected');
       return emrConnectionService.getConnection(currentTenant.id, connectionId).then(connection => {
         if (!connection) throw new Error('Connection not found');
-        return fhirService.sendLabResults(connection, results, observations, currentTenant.id);
+        return fhirService.sendLabResults(connection, results, observations as unknown as FHIRObservation[], currentTenant.id);
       });
     },
     onSuccess: () => {

@@ -56,6 +56,7 @@ export interface PatientMedication {
   endDate?: Date;
   prescribedBy?: string;
   reason?: string;
+  notes?: string;
 }
 
 export interface PatientMedicalHistory {

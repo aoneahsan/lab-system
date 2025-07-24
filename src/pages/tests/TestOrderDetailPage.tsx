@@ -4,8 +4,8 @@ import { ArrowLeft, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, X
 import { useTestOrder, useApproveTestOrder, useRejectTestOrder } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
 import TestOrderReview from '@/components/tests/TestOrderReview';
-import LoadingState from '@/components/common/LoadingState';
-import ErrorState from '@/components/common/ErrorState';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 
 const TestOrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
@@ -91,7 +91,7 @@ const TestOrderDetailPage: React.FC = () => {
   }
 
   if (orderError || !order) {
-    return <ErrorState message="Failed to load order details" onRetry={() => navigate('/tests/orders')} />;
+    return <ErrorState error="Failed to load order details" onRetry={() => navigate('/tests/orders')} />;
   }
 
   return (
@@ -235,7 +235,7 @@ const TestOrderDetailPage: React.FC = () => {
                 <p className="text-sm text-gray-600">Order Date</p>
                 <p className="font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {new Date(order.orderDate).toLocaleString()}
+                  {(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleString()}
                 </p>
               </div>
               <div>
@@ -269,7 +269,7 @@ const TestOrderDetailPage: React.FC = () => {
                   <div className="border-l-4 border-green-500 pl-4">
                     <p className="text-sm font-medium">Approved</p>
                     <p className="text-xs text-gray-600">
-                      {new Date(order.approvedAt).toLocaleString()}
+                      {(order.approvedAt instanceof Date ? order.approvedAt : order.approvedAt.toDate()).toLocaleString()}
                     </p>
                     {order.approvedBy && (
                       <p className="text-xs text-gray-600">By: {order.approvedBy}</p>
@@ -280,7 +280,7 @@ const TestOrderDetailPage: React.FC = () => {
                   <div className="border-l-4 border-red-500 pl-4">
                     <p className="text-sm font-medium">Rejected</p>
                     <p className="text-xs text-gray-600">
-                      {new Date(order.rejectedAt).toLocaleString()}
+                      {(order.rejectedAt instanceof Date ? order.rejectedAt : order.rejectedAt.toDate()).toLocaleString()}
                     </p>
                     {order.rejectedBy && (
                       <p className="text-xs text-gray-600">By: {order.rejectedBy}</p>

@@ -6,8 +6,8 @@ import {
   getSortedRowModel,
   getPaginationRowModel,
   useReactTable,
-  SortingState,
 } from '@tanstack/react-table';
+import type { SortingState } from '@tanstack/react-table';
 import { ChevronUp, ChevronDown, Eye, Edit, Trash2, QrCode, Printer } from 'lucide-react';
 import type { Sample } from '@/types/sample.types';
 

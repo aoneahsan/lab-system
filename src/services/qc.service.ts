@@ -444,9 +444,9 @@ export const qcService = {
 		tenantId: string,
 		materialId: string,
 		testCode: string,
-		// eslint-disable-next-line @/typescript-eslint/no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_startDate?: Date, // TODO: Implement date filtering
-		// eslint-disable-next-line @/typescript-eslint/no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		_endDate?: Date // TODO: Implement date filtering
 	): Promise<QCStatistics | null> {
 		const statsRef = collection(db, COLLECTIONS.QC_STATISTICS);

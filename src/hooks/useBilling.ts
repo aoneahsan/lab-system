@@ -60,12 +60,12 @@ export const useInvoice = (invoiceId: string) => {
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: InvoiceFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.createInvoice(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.createInvoice(currentTenant.id, currentUser.id, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
@@ -83,12 +83,12 @@ export const useCreateInvoice = () => {
 export const useUpdateInvoice = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ invoiceId, data }: { invoiceId: string; data: Partial<Invoice> }) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.updateInvoice(currentTenant.id, user.uid, invoiceId, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.updateInvoice(currentTenant.id, currentUser.id, invoiceId, data);
     },
     onSuccess: (_, { invoiceId }) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
@@ -106,12 +106,12 @@ export const useUpdateInvoice = () => {
 export const useSendInvoice = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (invoiceId: string) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.sendInvoice(currentTenant.id, user.uid, invoiceId);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.sendInvoice(currentTenant.id, currentUser.id, invoiceId);
     },
     onSuccess: (_, invoiceId) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
@@ -129,12 +129,12 @@ export const useSendInvoice = () => {
 export const useRecordPayment = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: PaymentFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.recordPayment(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.recordPayment(currentTenant.id, currentUser.id, data);
     },
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.invoices() });
@@ -168,12 +168,12 @@ export const usePayments = (invoiceId?: string) => {
 export const useCreateInsuranceClaim = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: ClaimFormData) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.createInsuranceClaim(currentTenant.id, user.uid, data);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.createInsuranceClaim(currentTenant.id, currentUser.id, data);
     },
     onSuccess: (_, data) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });
@@ -191,12 +191,12 @@ export const useCreateInsuranceClaim = () => {
 export const useSubmitClaim = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (claimId: string) => {
-      if (!currentTenant || !user) throw new Error('No tenant or user');
-      return billingService.submitClaim(currentTenant.id, user.uid, claimId);
+      if (!currentTenant || !currentUser) throw new Error('No tenant or user');
+      return billingService.submitClaim(currentTenant.id, currentUser.id, claimId);
     },
     onSuccess: (_, claimId) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });

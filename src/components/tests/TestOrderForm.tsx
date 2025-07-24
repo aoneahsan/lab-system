@@ -4,7 +4,7 @@ import { Search, X, AlertCircle } from 'lucide-react';
 import { useTests, useTestPanels } from '@/hooks/useTests';
 import { usePatients } from '@/hooks/usePatients';
 import type { TestOrderFormData, TestDefinition, TestPanel } from '@/types/test.types';
-import type { Patient } from '@/types/patient.types';
+import type { PatientListItem } from '@/types/patient.types';
 
 interface TestOrderFormProps {
   onSubmit: (data: TestOrderFormData) => void;
@@ -19,11 +19,12 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
 }) => {
   const [patientSearch, setPatientSearch] = useState('');
   const [testSearch, setTestSearch] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<PatientListItem | null>(null);
   const [selectedTests, setSelectedTests] = useState<TestDefinition[]>([]);
   const [showPanels, setShowPanels] = useState(false);
 
-  const { data: patients = [] } = usePatients();
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.patients || [];
   const { data: tests = [] } = useTests({ isActive: true });
   const { data: panels = [] } = useTestPanels();
 
@@ -44,9 +45,8 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
 
   const filteredPatients = patients.filter(
     patient =>
-      patient.firstName.toLowerCase().includes(patientSearch.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(patientSearch.toLowerCase()) ||
-      patient.medicalRecordNumber.toLowerCase().includes(patientSearch.toLowerCase())
+      patient.fullName.toLowerCase().includes(patientSearch.toLowerCase()) ||
+      patient.patientId.toLowerCase().includes(patientSearch.toLowerCase())
   );
 
   const filteredTests = tests.filter(
@@ -56,7 +56,7 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
        test.code.toLowerCase().includes(testSearch.toLowerCase()))
   );
 
-  const handlePatientSelect = (patient: Patient) => {
+  const handlePatientSelect = (patient: PatientListItem) => {
     setSelectedPatient(patient);
     setValue('patientId', patient.id);
     setPatientSearch('');
@@ -123,10 +123,10 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
                     className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
                   >
                     <div className="font-medium">
-                      {patient.firstName} {patient.lastName}
+                      {patient.fullName}
                     </div>
                     <div className="text-sm text-gray-600">
-                      MRN: {patient.medicalRecordNumber} | DOB: {new Date(patient.dateOfBirth).toLocaleDateString()}
+                      Patient ID: {patient.patientId} | DOB: {new Date(patient.dateOfBirth).toLocaleDateString()}
                     </div>
                   </button>
                 ))}
@@ -138,10 +138,10 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-medium">
-                  {selectedPatient.firstName} {selectedPatient.lastName}
+                  {selectedPatient.fullName}
                 </p>
                 <p className="text-sm text-gray-600">
-                  MRN: {selectedPatient.medicalRecordNumber} | 
+                  Patient ID: {selectedPatient.patientId} | 
                   DOB: {new Date(selectedPatient.dateOfBirth).toLocaleDateString()} |
                   Gender: {selectedPatient.gender}
                 </p>
