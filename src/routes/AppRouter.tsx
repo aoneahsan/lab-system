@@ -59,6 +59,7 @@ const ValidationRulesPage = lazy(
 	() => import('@/pages/settings/ValidationRulesPage')
 );
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
+const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 
 export const AppRouter = () => {
 	const { isAuthenticated } = useAuthStore();
@@ -127,6 +128,7 @@ export const AppRouter = () => {
 						<Route path='/quality-control' element={<QualityControlPage />} />
 						<Route path='/reports' element={<ReportsPage />} />
 						<Route path='/analytics' element={<AnalyticsPage />} />
+						<Route path='/equipment' element={<EquipmentPage />} />
 						<Route path='/emr/connections' element={<EMRConnectionsPage />} />
 						<Route
 							path='/emr/connections/:connectionId'
