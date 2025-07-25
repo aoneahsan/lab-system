@@ -4,11 +4,13 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
+import CreateLaboratoryModal from './CreateLaboratoryModal';
 
 const RegisterPage = () => {
 	const navigate = useNavigate();
 	const { register, isLoading } = useAuthStore();
+	const [showCreateLabModal, setShowCreateLabModal] = useState(false);
 	const [formData, setFormData] = useState({
 		firstName: '',
 		lastName: '',
@@ -273,9 +275,20 @@ const RegisterPage = () => {
 							{tenantValidation.message}
 						</p>
 					)}
-					<p className='mt-1 text-xs text-gray-500'>
-						Try <span className='font-semibold'>DEMO</span> for testing or <Link to='/setup-demo' className='text-primary-600 hover:text-primary-500'>create your own demo lab</Link>
-					</p>
+					<div className='mt-2 flex items-center gap-2'>
+						<p className='text-xs text-gray-500'>
+							Try <span className='font-semibold'>DEMO</span> for testing
+						</p>
+						<span className='text-xs text-gray-400'>or</span>
+						<button
+							type='button'
+							onClick={() => setShowCreateLabModal(true)}
+							className='inline-flex items-center text-xs text-primary-600 hover:text-primary-500'
+						>
+							<Plus className='h-3 w-3 mr-1' />
+							Create new laboratory
+						</button>
+					</div>
 				</div>
 
 				<div>
@@ -429,6 +442,15 @@ const RegisterPage = () => {
 					</Link>
 				</p>
 			</div>
+
+			<CreateLaboratoryModal
+				isOpen={showCreateLabModal}
+				onClose={() => setShowCreateLabModal(false)}
+				onSuccess={(code) => {
+					setFormData({ ...formData, tenantCode: code });
+					setShowCreateLabModal(false);
+				}}
+			/>
 		</div>
 	);
 };
