@@ -25,13 +25,15 @@ const TestOrdersPage = lazy(() => import('@/pages/tests/TestOrdersPage'));
 const TestOrderDetailPage = lazy(
 	() => import('@/pages/tests/TestOrderDetailPage')
 );
-const SamplesPage = lazy(() => import('@/pages/samples/SamplesPage'));
+const OrderDashboardPage = lazy(() => import('@/pages/orders/OrderDashboard'));
+const SamplesPage = lazy(() => import('@/pages/samples/SampleDashboard'));
 const SampleDetailPage = lazy(() => import('@/pages/samples/SampleDetailPage'));
 const SampleCollectionsPage = lazy(
 	() => import('@/pages/samples/SampleCollectionsPage')
 );
 const SampleScanPage = lazy(() => import('@/pages/samples/SampleScanPage'));
-const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
+const SampleRegistrationPage = lazy(() => import('@/components/samples/SampleRegistration'));
+const ResultsPage = lazy(() => import('@/pages/results/ResultDashboard'));
 const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
 const ResultReviewPage = lazy(() => import('@/pages/results/ResultReviewPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
@@ -40,11 +42,11 @@ const ClaimDetailPage = lazy(() => import('@/pages/billing/ClaimDetailPage'));
 const InvoiceDetailPage = lazy(() => import('@/pages/billing/InvoiceDetailPage'));
 const PaymentsPage = lazy(() => import('@/pages/billing/PaymentsPage'));
 const FinancialReportsPage = lazy(() => import('@/pages/billing/FinancialReportsPage'));
-const InventoryPage = lazy(() => import('@/pages/inventory/InventoryPage'));
+const InventoryPage = lazy(() => import('@/pages/inventory/InventoryDashboard'));
 const QualityControlPage = lazy(
-	() => import('@/pages/quality-control/QualityControlPage')
+	() => import('@/pages/quality-control/QualityControlDashboard')
 );
-const ReportsPage = lazy(() => import('@/pages/ReportsPage'));
+const ReportsPage = lazy(() => import('@/pages/reports/ReportDashboard'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 const EMRConnectionsPage = lazy(() => import('@/pages/emr/EMRConnectionsPage'));
 const EMRConnectionDetailPage = lazy(
@@ -111,7 +113,9 @@ export const AppRouter = () => {
 							element={<TestOrderDetailPage />}
 						/>
 						<Route path='/tests/:testId' element={<TestDetailPage />} />
+						<Route path='/orders' element={<OrderDashboardPage />} />
 						<Route path='/samples' element={<SamplesPage />} />
+						<Route path='/samples/register' element={<SampleRegistrationPage />} />
 						<Route path='/samples/collections' element={<SampleCollectionsPage />} />
 						<Route path='/samples/scan' element={<SampleScanPage />} />
 						<Route path='/samples/:sampleId' element={<SampleDetailPage />} />
