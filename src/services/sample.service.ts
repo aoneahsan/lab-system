@@ -368,4 +368,49 @@ export const sampleService = {
 
     return statistics;
   },
+
+  // Update batch status with different statuses for each sample
+  async updateBatchStatus(
+    tenantId: string,
+    userId: string,
+    sampleUpdates: Array<{
+      sampleId: string;
+      status: SampleStatus;
+      notes?: string;
+      location?: string;
+    }>
+  ): Promise<void> {
+    const batch = writeBatch(db);
+    const userName = useAuthStore.getState().currentUser?.displayName || 'Unknown';
+
+    for (const update of sampleUpdates) {
+      // Get current sample to update chain of custody
+      const currentSample = await this.getSample(tenantId, update.sampleId);
+      if (!currentSample) {
+        console.error(`Sample ${update.sampleId} not found`);
+        continue;
+      }
+
+      const custodyEntry: ChainOfCustodyEntry = {
+        timestamp: Timestamp.now(),
+        action: this.mapStatusToAction(update.status),
+        userId,
+        userName,
+        location: update.location,
+        notes: update.notes || `Status changed to ${update.status}`,
+      };
+
+      const chainOfCustody = [...currentSample.chainOfCustody, custodyEntry];
+
+      const docRef = doc(db, COLLECTIONS.SAMPLES, update.sampleId);
+      batch.update(docRef, {
+        status: update.status,
+        chainOfCustody,
+        updatedAt: serverTimestamp(),
+        updatedBy: userId,
+      });
+    }
+
+    await batch.commit();
+  },
 };

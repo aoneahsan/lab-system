@@ -180,3 +180,32 @@ export interface QRCodeConfig {
     light: string;
   };
 }
+
+export interface BatchProcessingResult {
+  successful: string[];
+  failed: Array<{
+    sampleId: string;
+    error: string;
+  }>;
+  total: number;
+}
+
+export interface BatchRoutingAssignment {
+  sampleId: string;
+  department?: string;
+  analyzer?: string;
+  priority?: 'routine' | 'stat' | 'asap';
+}
+
+export interface LabelTemplate {
+  id: string;
+  name: string;
+  size: 'small' | 'medium' | 'large' | 'custom';
+  width?: number;
+  height?: number;
+  includeTestInfo: boolean;
+  includePatientInfo: boolean;
+  includeQRCode: boolean;
+  includeBarcode: boolean;
+  customFields?: string[];
+}

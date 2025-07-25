@@ -13,6 +13,7 @@ interface SampleStore {
   // Actions
   fetchSamples: (tenantId: string, filters?: any) => Promise<void>;
   fetchSample: (tenantId: string, id: string) => Promise<void>;
+  getSampleByBarcode: (barcode: string) => Promise<Sample | null>;
   createSample: (tenantId: string, userId: string, data: any) => Promise<string>;
   updateSample: (tenantId: string, userId: string, id: string, data: any) => Promise<void>;
   updateSampleStatus: (tenantId: string, userId: string, id: string, status: string, notes?: string, location?: string) => Promise<void>;
@@ -24,6 +25,8 @@ interface SampleStore {
   
   fetchSampleStatistics: (tenantId: string) => Promise<void>;
   batchUpdateSamples: (tenantId: string, userId: string, sampleIds: string[], updates: any) => Promise<void>;
+  updateBatchStatus: (tenantId: string, userId: string, sampleUpdates: Array<{ sampleId: string; status: string; notes?: string; location?: string }>) => Promise<void>;
+  updateBatchSamples: (updates: Array<{ id: string; [key: string]: any }>) => Promise<void>;
   
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -155,6 +158,55 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       set({ loading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
+    }
+  },
+
+  updateBatchStatus: async (tenantId, userId, sampleUpdates) => {
+    set({ loading: true, error: null });
+    try {
+      await sampleService.updateBatchStatus(tenantId, userId, sampleUpdates);
+      await get().fetchSamples(tenantId);
+      set({ loading: false });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
+      throw error;
+    }
+  },
+
+  getSampleByBarcode: async (barcode) => {
+    try {
+      // First check in current samples
+      const currentSamples = get().samples;
+      const sample = currentSamples.find(s => s.barcode === barcode);
+      if (sample) return sample;
+      
+      // If not found, fetch from service
+      // TODO: Implement in service
+      return null;
+    } catch (error) {
+      console.error('Error fetching sample by barcode:', error);
+      return null;
+    }
+  },
+
+  updateBatchSamples: async (updates) => {
+    set({ loading: true, error: null });
+    try {
+      // TODO: Get tenantId and userId from auth context
+      const tenantId = 'default-tenant';
+      const userId = 'current-user';
+      
+      // Group updates by operation type for efficiency
+      await Promise.all(updates.map(update => {
+        const { id, ...data } = update;
+        return sampleService.updateSample(tenantId, userId, id, data);
+      }));
+      
+      await get().fetchSamples(tenantId);
+      set({ loading: false });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
+      throw error;
     }
   },
 
