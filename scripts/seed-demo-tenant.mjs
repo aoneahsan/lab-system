@@ -10,15 +10,25 @@ import {
   createUserWithEmailAndPassword,
   updateProfile
 } from 'firebase/auth';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-// Firebase config - replace with your actual config
+// Get directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from .env.local
+dotenv.config({ path: join(__dirname, '..', '.env.local') });
+
+// Firebase config from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyAtp0fvAkoxdELUderlMYU7YAV8h_P92Sc",
-  authDomain: "labsystem-a1.firebaseapp.com",
-  projectId: "labsystem-a1",
-  storageBucket: "labsystem-a1.firebasestorage.app",
-  messagingSenderId: "151500597190",
-  appId: "1:151500597190:web:daf5ea2ae98b10709f5cf2"
+  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyAtp0fvAkoxdELUderlMYU7YAV8h_P92Sc",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "labsystem-a1.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "labsystem-a1",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "labsystem-a1.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "151500597190",
+  appId: process.env.VITE_FIREBASE_APP_ID || "1:151500597190:web:daf5ea2ae98b10709f5cf2"
 };
 
 // Initialize Firebase

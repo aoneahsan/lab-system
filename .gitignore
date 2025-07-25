@@ -43,6 +43,8 @@ firestore.indexes.json
 ui-debug.log*
 database-debug.log*
 pubsub-debug.log*
+serviceAccountKey.json
+scripts/serviceAccountKey.json
 
 # Testing
 coverage/
