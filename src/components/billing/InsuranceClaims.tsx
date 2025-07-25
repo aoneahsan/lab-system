@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { billingService, InsuranceClaim } from '@/services/billing';
+import { billingService } from '@/services/billing';
+import type { InsuranceClaim } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
 import {
   DocumentTextIcon,

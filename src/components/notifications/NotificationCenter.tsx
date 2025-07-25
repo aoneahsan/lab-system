@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { notificationService, Notification } from '../../services/notifications';
+import { notificationService } from '../../services/notifications';
+import type { Notification } from '../../services/notifications';
 import { BellIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 

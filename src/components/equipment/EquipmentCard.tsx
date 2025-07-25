@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Equipment, equipmentService } from '../../services/equipment';
+import { equipmentService } from '../../services/equipment';
+import type { Equipment } from '../../services/equipment';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CpuChipIcon,

@@ -509,7 +509,8 @@
       "Bash(firebase projects:list:*)",
       "Bash(firebase use:*)",
       "Bash(firebase emulators:exec:*)",
-      "Bash(firebase functions:shell:*)"
+      "Bash(firebase functions:shell:*)",
+      "Bash(kill:*)"
     ],
     "deny": []
   }

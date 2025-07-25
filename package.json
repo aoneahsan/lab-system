@@ -67,6 +67,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.60.0",
     "react-router-dom": "^7.7.0",
+    "recharts": "^3.1.0",
     "ts-buildkit": "^1.1.0",
     "unified-error-handling": "^1.2.0",
     "unified-tracking": "^1.5.0",

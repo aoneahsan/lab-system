@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { dataExportService, ExportOptions, ImportOptions } from '../../services/dataExport';
+import { dataExportService } from '../../services/dataExport';
+import type { ExportOptions, ImportOptions } from '../../services/dataExport';
 import {
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,

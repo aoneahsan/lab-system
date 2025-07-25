@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
-import { QCResult } from '@/types/quality-control';
+import type { QCResult } from '@/types/quality-control';
 
 export default function QCResultEntry() {
   const [selectedTest, setSelectedTest] = useState('');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { notificationService, CriticalValueNotification } from '../../services/notifications';
+import { notificationService } from '../../services/notifications';
+import type { CriticalValueNotification } from '../../services/notifications';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface CriticalValueAlertProps {

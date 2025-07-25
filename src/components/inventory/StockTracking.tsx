@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Package, TrendingUp, TrendingDown, RotateCcw, Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { StockMovement } from '@/types/inventory';
+import type { StockMovement } from '@/types/inventory';
 
 export default function StockTracking() {
   const [showAddMovement, setShowAddMovement] = useState(false);

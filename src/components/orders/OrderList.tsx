@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useOrderStore } from '@/stores/order.store';
-import { TestOrder } from '@/types/order';
+import type { TestOrder } from '@/types/order';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function OrderList() {

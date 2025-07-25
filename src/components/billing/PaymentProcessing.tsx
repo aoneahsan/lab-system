@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { billingService, Payment } from '@/services/billing';
+import { billingService } from '@/services/billing';
+import type { Payment } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
 import {
   CreditCardIcon,

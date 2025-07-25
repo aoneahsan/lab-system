@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, FileText, CheckCircle, XCircle, Clock, Package } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { PurchaseOrder } from '@/types/inventory';
+import type { PurchaseOrder } from '@/types/inventory';
 
 export default function PurchaseOrders() {
   const [showCreateOrder, setShowCreateOrder] = useState(false);

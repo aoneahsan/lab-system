@@ -28,13 +28,19 @@ export type ReportCategory =
 
 export type ReportType = 
   | 'patient_report'
+  | 'patient_results'
   | 'cumulative_report'
   | 'daily_summary'
   | 'monthly_summary'
+  | 'test_summary'
   | 'turnaround_time'
   | 'quality_control'
+  | 'qc_summary'
   | 'inventory_status'
+  | 'inventory'
   | 'financial_summary'
+  | 'financial'
+  | 'workload'
   | 'custom';
 
 export type ReportFormat = 'pdf' | 'excel' | 'csv' | 'html';
@@ -128,6 +134,22 @@ export type DateRangePreset =
   | 'thisYear'
   | 'lastYear'
   | 'custom';
+
+export interface ReportFormData {
+  name: string;
+  type: ReportType;
+  format: ReportFormat;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  filters?: Record<string, any>;
+  schedule?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    time: string;
+    recipients: string[];
+  };
+}
 
 export interface ReportData {
   patient?: {

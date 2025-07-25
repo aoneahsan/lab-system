@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Building2, Mail, Phone, Globe, Edit, Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { Supplier } from '@/types/inventory';
+import type { Supplier } from '@/types/inventory';
 
 export default function Suppliers() {
   const [showAddSupplier, setShowAddSupplier] = useState(false);

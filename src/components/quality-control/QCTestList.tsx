@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Beaker, Calendar, Edit } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
-import { QCTest } from '@/types/quality-control';
+import type { QCTest } from '@/types/quality-control';
 
 export default function QCTestList() {
   const [showAddTest, setShowAddTest] = useState(false);

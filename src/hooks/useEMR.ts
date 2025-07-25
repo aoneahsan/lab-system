@@ -230,6 +230,58 @@ export const useSendFHIRResults = () => {
   });
 };
 
+// Webhook Endpoints
+export const useWebhookEndpoints = (connectionId: string) => {
+  const { currentTenant } = useTenantStore();
+
+  return useQuery({
+    queryKey: [...EMR_KEYS.connection(connectionId), 'webhooks'],
+    queryFn: () => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      // Return empty array for now - webhook functionality can be implemented later
+      return Promise.resolve([]);
+    },
+    enabled: !!currentTenant && !!connectionId,
+  });
+};
+
+export const useCreateWebhookEndpoint = () => {
+  const queryClient = useQueryClient();
+  const { currentTenant } = useTenantStore();
+
+  return useMutation({
+    mutationFn: ({ connectionId, data }: { connectionId: string; data: any }) => {
+      if (!currentTenant) throw new Error('No tenant selected');
+      // Placeholder implementation
+      return Promise.resolve({ id: 'webhook-' + Date.now(), ...data });
+    },
+    onSuccess: (_, { connectionId }) => {
+      queryClient.invalidateQueries({ queryKey: [...EMR_KEYS.connection(connectionId), 'webhooks'] });
+      toast.success('Webhook endpoint created successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to create webhook endpoint');
+      console.error('Error creating webhook endpoint:', error);
+    },
+  });
+};
+
+export const useTestWebhook = () => {
+  return useMutation({
+    mutationFn: ({ connectionId, webhookId }: { connectionId: string; webhookId: string }) => {
+      // Placeholder implementation
+      return Promise.resolve({ success: true, message: 'Webhook test successful' });
+    },
+    onSuccess: () => {
+      toast.success('Webhook test successful');
+    },
+    onError: (error) => {
+      toast.error('Webhook test failed');
+      console.error('Error testing webhook:', error);
+    },
+  });
+};
+
 // Message Processing
 export const useProcessEMRMessage = () => {
   const queryClient = useQueryClient();

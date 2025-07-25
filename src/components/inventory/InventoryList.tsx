@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Package, AlertTriangle } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { InventoryItem } from '@/types/inventory';
+import type { InventoryItem } from '@/types/inventory';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function InventoryList() {
