@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { sampleService } from '@/services/sample.service';
-import { Sample, SampleCollection } from '@/types/sample.types';
+import type { Sample, SampleCollection } from '@/types/sample.types';
 
 interface SampleStore {
   samples: Sample[];
@@ -43,7 +43,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       const samples = await sampleService.getSamples(tenantId, filters);
       set({ samples, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -53,7 +53,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       const sample = await sampleService.getSample(tenantId, id);
       set({ currentSample: sample, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -65,7 +65,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       set({ loading: false });
       return sample.id;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -77,7 +77,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -88,7 +88,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -99,7 +99,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -109,7 +109,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       const collections = await sampleService.getSampleCollections(tenantId, filters);
       set({ sampleCollections: collections, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -121,7 +121,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       set({ loading: false });
       return collection.id;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -133,7 +133,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       await get().fetchSampleCollections(tenantId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -143,7 +143,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       const statistics = await sampleService.getSampleStatistics(tenantId);
       set({ statistics, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -154,7 +154,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 

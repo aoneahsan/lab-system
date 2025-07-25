@@ -1,4 +1,4 @@
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
 
@@ -9,7 +9,7 @@ export const enableFirestoreDebug = () => {
   (window as any).__firestoreCollection = originalCollection;
   (window as any).collection = (...args: any[]) => {
     console.log('🔥 Firestore Collection:', args[1]);
-    return originalCollection(...args);
+    return originalCollection(...args as [any, any, ...any[]]);
   };
 
   // Override query function to log query constraints
@@ -25,7 +25,7 @@ export const enableFirestoreDebug = () => {
         value: c?._delegate?.value
       }))
     });
-    return originalQuery(...args);
+    return originalQuery(...args as [any, ...any[]]);
   };
 
   // Override getDocs to catch permission errors

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { qualityControlService } from '@/services/quality-control.service';
-import { QCTest, QCResult, QCStatistics } from '@/types/quality-control';
+import type { QCTest, QCResult, QCStatistics } from '@/types/quality-control';
 
 interface QualityControlStore {
   qcTests: QCTest[];
@@ -38,7 +38,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       const tests = await qualityControlService.getQCTests(filters);
       set({ qcTests: tests, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -49,7 +49,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       await get().fetchQCTests();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -61,7 +61,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       set({ loading: false });
       return result;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -72,7 +72,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       const results = await qualityControlService.getQCResults(qcTestId, levelId, days);
       set({ qcResults: results, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -82,7 +82,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       const stats = await qualityControlService.calculateStatistics(qcTestId, levelId, period);
       set({ statistics: stats, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -92,7 +92,7 @@ export const useQualityControlStore = create<QualityControlStore>((set, get) => 
       const data = await qualityControlService.getLeveyJenningsData(qcTestId, levelId, days);
       set({ leveyJenningsData: data, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 

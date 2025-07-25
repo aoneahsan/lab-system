@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { equipmentService } from '../../services/equipment';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorAlert from '../common/ErrorAlert';
 import EquipmentCard from './EquipmentCard';
 import { CpuChipIcon } from '@heroicons/react/24/outline';
 
 const EquipmentList: React.FC = () => {
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
 
   const { data: equipment, isLoading, error, refetch } = useQuery({
     queryKey: ['equipment'],

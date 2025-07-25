@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { orderService } from '@/services/order.service';
-import { TestOrder, Specimen } from '@/types/order';
+import type { TestOrder, Specimen } from '@/types/order';
 
 interface OrderStore {
   orders: TestOrder[];
@@ -47,7 +47,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       await get().fetchTestOrders();
       return orderId;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -58,7 +58,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const orders = await orderService.getTestOrders(filters);
       set({ orders, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -68,7 +68,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const order = await orderService.getTestOrder(id);
       set({ currentOrder: order, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -79,7 +79,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       await get().fetchTestOrders();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -90,7 +90,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       await get().fetchTestOrder(orderId);
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -103,7 +103,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
       return specimenId;
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -114,7 +114,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const specimens = await orderService.getSpecimens(orderId);
       set({ specimens, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -125,7 +125,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       await get().fetchSpecimens();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -136,7 +136,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       await get().fetchSpecimens();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -146,7 +146,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const orders = await orderService.searchOrders(query);
       set({ orders, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -156,7 +156,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const collections = await orderService.getPendingCollections();
       set({ pendingCollections: collections, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -166,7 +166,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       const orders = await orderService.getTodayOrders();
       set({ todayOrders: orders, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 

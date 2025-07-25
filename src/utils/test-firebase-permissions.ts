@@ -63,7 +63,7 @@ export const runPermissionTests = async () => {
   for (const [name, collectionName] of Object.entries(ROOT_COLLECTIONS)) {
     try {
       const q = query(collection(db, collectionName), limit(1));
-      const snapshot = await getDocs(q);
+      await getDocs(q);
       console.log(`✅ ${name} (${collectionName}): Accessible`);
     } catch (error: any) {
       console.error(`❌ ${name} (${collectionName}): ${error.message}`);
@@ -75,7 +75,7 @@ export const runPermissionTests = async () => {
   for (const [name, collectionName] of Object.entries(SHARED_COLLECTIONS)) {
     try {
       const q = query(collection(db, collectionName), limit(1));
-      const snapshot = await getDocs(q);
+      await getDocs(q);
       console.log(`✅ ${name} (${collectionName}): Accessible`);
     } catch (error: any) {
       console.error(`❌ ${name} (${collectionName}): ${error.message}`);

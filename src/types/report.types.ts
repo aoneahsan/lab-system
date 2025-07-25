@@ -115,6 +115,20 @@ export type ReportStatus =
   | 'completed'
   | 'failed';
 
+export type DateRangePreset = 
+  | 'today'
+  | 'yesterday'
+  | 'last7days'
+  | 'last30days'
+  | 'last90days'
+  | 'thisMonth'
+  | 'lastMonth'
+  | 'thisQuarter'
+  | 'lastQuarter'
+  | 'thisYear'
+  | 'lastYear'
+  | 'custom';
+
 export interface ReportData {
   patient?: {
     id: string;

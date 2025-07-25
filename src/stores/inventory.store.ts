@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { inventoryService } from '@/services/inventory.service';
-import { InventoryItem, StockMovement, PurchaseOrder, Supplier } from '@/types/inventory';
+import { useTenantStore } from '@/stores/tenant.store';
+import { auth } from '@/config/firebase.config';
+import type { InventoryItem, StockMovement, PurchaseOrder, Supplier } from '@/types/inventory';
 
 interface InventoryStore {
   items: InventoryItem[];
@@ -48,7 +50,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       const items = await inventoryService.getInventoryItems(filters);
       set({ items, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -58,7 +60,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       const item = await inventoryService.getInventoryItem(id);
       set({ currentItem: item, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -69,7 +71,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchInventoryItems();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -80,7 +82,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchInventoryItems();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -91,7 +93,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchInventoryItems();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -105,7 +107,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       }
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -115,7 +117,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       const movements = await inventoryService.getStockMovements(itemId);
       set({ stockMovements: movements, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -125,18 +127,21 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       const orders = await inventoryService.getPurchaseOrders(filters);
       set({ purchaseOrders: orders, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
   createPurchaseOrder: async (data) => {
     set({ loading: true, error: null });
     try {
-      await inventoryService.createPurchaseOrder(data);
+      const tenantId = useTenantStore.getState().currentTenant?.id;
+      const userId = auth.currentUser?.uid;
+      if (!tenantId || !userId) throw new Error('No tenant or user');
+      await inventoryService.createPurchaseOrder(tenantId, data, userId);
       await get().fetchPurchaseOrders();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -147,7 +152,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchPurchaseOrders();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -157,7 +162,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       const suppliers = await inventoryService.getSuppliers();
       set({ suppliers, loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -168,7 +173,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchSuppliers();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
@@ -179,7 +184,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
       await get().fetchSuppliers();
       set({ loading: false });
     } catch (error) {
-      set({ error: error.message, loading: false });
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 

@@ -78,7 +78,7 @@ export const orderService = {
   },
 
   async getTestOrder(id: string): Promise<TestOrder | null> {
-    const docRef = doc(db, `${COLLECTION_PREFIX}test_orders`, id);
+    const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS, id);
     const snapshot = await getDoc(docRef);
     
     if (!snapshot.exists()) return null;
@@ -90,7 +90,7 @@ export const orderService = {
   },
 
   async updateTestOrder(id: string, data: Partial<TestOrder>): Promise<void> {
-    const docRef = doc(db, `${COLLECTION_PREFIX}test_orders`, id);
+    const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS, id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.now()
@@ -150,7 +150,7 @@ export const orderService = {
   },
 
   async updateSpecimen(id: string, data: Partial<Specimen>): Promise<void> {
-    const docRef = doc(db, `${COLLECTION_PREFIX}specimens`, id);
+    const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS, id);
     await updateDoc(docRef, {
       ...data,
       updatedAt: Timestamp.now()

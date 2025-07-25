@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { billingService } from '../../services/billing';
-import { formatCurrency } from '../../utils/formatters';
+import { billingService } from '@/services/billing';
+import { formatCurrency } from '@/utils/formatters';
 import {
   CurrencyDollarIcon,
   ClockIcon,

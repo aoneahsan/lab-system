@@ -121,7 +121,7 @@ const RegisterPage = () => {
 		if (!password) return null;
 
 		let strength = 0;
-		let requirements = [];
+		const requirements = [];
 
 		if (password.length >= 8) {
 			strength++;

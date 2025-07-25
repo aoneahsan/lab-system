@@ -21,8 +21,9 @@ import {
 	serverTimestamp,
 	increment,
 } from 'firebase/firestore';
-import { firestore } from '@/config/firebase.config';
+import { firestore, auth } from '@/config/firebase.config';
 import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
+import { useTenantStore } from '@/stores/tenant.store';
 import type {
 	InventoryItem,
 	StockTransaction,
@@ -512,4 +513,82 @@ class InventoryService {
 	}
 }
 
-export const inventoryService = new InventoryService();
+class InventoryServiceWrapper extends InventoryService {
+	// Wrapper methods to match store expectations
+	async getInventoryItems(filters?: any) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		if (!tenantId) throw new Error('No tenant selected');
+		return this.getItems(tenantId, filters);
+	}
+
+	async getInventoryItem(id: string) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		if (!tenantId) throw new Error('No tenant selected');
+		return this.getItem(tenantId, id);
+	}
+
+	async createInventoryItem(data: InventoryItemFormData) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		const userId = auth.currentUser?.uid;
+		if (!tenantId || !userId) throw new Error('No tenant or user');
+		return this.createItem(tenantId, data, userId);
+	}
+
+	async updateInventoryItem(id: string, data: Partial<InventoryItem>) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		const userId = auth.currentUser?.uid;
+		if (!tenantId || !userId) throw new Error('No tenant or user');
+		return this.updateItem(tenantId, id, data, userId);
+	}
+
+	async deleteInventoryItem(id: string) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		const userId = auth.currentUser?.uid;
+		if (!tenantId || !userId) throw new Error('No tenant or user');
+		return this.updateItem(tenantId, id, { isActive: false }, userId);
+	}
+
+	async recordStockMovement(data: StockTransactionFormData) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		const userId = auth.currentUser?.uid;
+		if (!tenantId || !userId) throw new Error('No tenant or user');
+		return this.recordTransaction(tenantId, data, userId);
+	}
+
+	async getStockMovements(itemId: string) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		if (!tenantId) throw new Error('No tenant selected');
+		return this.getTransactions(tenantId, { itemId });
+	}
+
+	async getPurchaseOrders() {
+		// This needs to be implemented in the base class
+		return [];
+	}
+
+	async updatePurchaseOrder(id: string, data: any) {
+		const tenantId = useTenantStore.getState().currentTenant?.id;
+		if (!tenantId) throw new Error('No tenant selected');
+		// For now, update status if provided
+		if (data.status) {
+			return this.updatePurchaseOrderStatus(tenantId, id, data.status);
+		}
+	}
+
+	async getSuppliers() {
+		// This needs to be implemented - return empty for now
+		return [];
+	}
+
+	async createSupplier(data: any) {
+		// This needs to be implemented
+		return '';
+	}
+
+	async updateSupplier(id: string, data: any) {
+		// This needs to be implemented
+		return;
+	}
+}
+
+export const inventoryService = new InventoryServiceWrapper();

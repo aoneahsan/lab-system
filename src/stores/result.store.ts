@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { resultService } from '@/services/result.service';
-import { TestResult, ResultEntry } from '@/types/result.types';
+import type { TestResult, ResultEntry } from '@/types/result.types';
 import type { Timestamp } from 'firebase/firestore';
 
 interface ResultStore {
@@ -68,14 +68,12 @@ export const useResultStore = create<ResultStore>((set, get) => ({
           status: 'entered',
           enteredBy: userId,
           enteredAt: new Date() as unknown as Timestamp,
-          createdAt: new Date() as unknown as Timestamp,
-          updatedAt: new Date() as unknown as Timestamp,
         });
       }
       await get().fetchResultsByOrder(tenantId, entry.orderId);
       set({ loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
       throw error;
     }
   },
@@ -107,7 +105,7 @@ export const useResultStore = create<ResultStore>((set, get) => ({
         validationWarnings: validation.warnings,
         validationErrors: validation.errors
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Validation error:', error);
     }
   },

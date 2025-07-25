@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { BeakerIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 
 const DemoDataLoader: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore((state) => state.currentUser);
 
   const loadDemoData = async () => {
     if (!user || user.role !== 'admin') {

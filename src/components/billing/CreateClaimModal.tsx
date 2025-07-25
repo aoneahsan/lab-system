@@ -21,7 +21,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
   preSelectedInvoiceId,
 }) => {
   const { tenant } = useTenant();
-  const { user } = useAuthStore();
+  const { currentUser: user } = useAuthStore();
   const queryClient = useQueryClient();
   
   const { data: invoices = [] } = useInvoices();

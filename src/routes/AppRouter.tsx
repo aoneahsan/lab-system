@@ -44,7 +44,7 @@ const PaymentsPage = lazy(() => import('@/pages/billing/PaymentsPage'));
 const FinancialReportsPage = lazy(() => import('@/pages/billing/FinancialReportsPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryDashboard'));
 const QualityControlPage = lazy(
-	() => import('@/pages/quality-control/QualityControlDashboard')
+	() => import('@/pages/quality-control/QualityControlPage')
 );
 const ReportsPage = lazy(() => import('@/pages/reports/ReportDashboard'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
