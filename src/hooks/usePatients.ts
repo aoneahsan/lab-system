@@ -3,6 +3,7 @@ import { patientService } from '@/services/patient.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { useToast } from '@/hooks/useToast';
+import { performanceMonitor } from '@/utils/performance-monitoring';
 import type {
 	CreatePatientData,
 	UpdatePatientData,
@@ -19,7 +20,10 @@ export const usePatients = (
 		queryKey: ['patients', currentTenant?.id, filters, pageSize],
 		queryFn: () => {
 			if (!currentTenant?.id) throw new Error('No tenant selected');
-			return patientService.searchPatients(currentTenant.id, filters, pageSize);
+			return performanceMonitor.trackApiCall(
+				'patients_search',
+				() => patientService.searchPatients(currentTenant.id, filters, pageSize)
+			);
 		},
 		enabled: !!currentTenant?.id,
 	});
@@ -32,7 +36,10 @@ export const usePatient = (patientId: string) => {
 		queryKey: ['patient', currentTenant?.id, patientId],
 		queryFn: () => {
 			if (!currentTenant?.id) throw new Error('No tenant selected');
-			return patientService.getPatient(currentTenant.id, patientId);
+			return performanceMonitor.trackApiCall(
+				'patient_get',
+				() => patientService.getPatient(currentTenant.id, patientId)
+			);
 		},
 		enabled: !!currentTenant?.id && !!patientId,
 	});
@@ -63,10 +70,13 @@ export const useCreatePatient = () => {
 			if (!currentTenant?.id) throw new Error('No tenant selected');
 			if (!currentUser?.id) throw new Error('No user logged in');
 
-			return patientService.createPatient(
-				currentTenant.id,
-				data,
-				currentUser.id
+			return performanceMonitor.trackApiCall(
+				'patient_create',
+				() => patientService.createPatient(
+					currentTenant.id,
+					data,
+					currentUser.id
+				)
 			);
 		},
 		onSuccess: (patient) => {

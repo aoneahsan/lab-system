@@ -10,6 +10,9 @@ import { Toaster } from '@/components/ui/Toaster';
 import InitializeDemoTenant from '@/components/setup/InitializeDemoTenant';
 import { Capacitor } from '@capacitor/core';
 import { MobileAppSelector } from '@/mobile/MobileAppSelector';
+import { PerformanceProvider } from '@/providers/PerformanceProvider';
+import { performanceMonitor } from '@/utils/performance-monitoring';
+import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -27,7 +30,11 @@ function App() {
 	const isNativePlatform = Capacitor.isNativePlatform();
 
 	useEffect(() => {
-		initializeAuth();
+		// Track app initialization
+		performanceMonitor.startTrace('app_initialization');
+		initializeAuth().finally(() => {
+			performanceMonitor.stopTrace('app_initialization');
+		});
 	}, [initializeAuth]);
 
 	if (isLoading) {
@@ -40,12 +47,15 @@ function App() {
 	return (
 		<ErrorBoundary>
 			<QueryClientProvider client={queryClient}>
-				<BrowserRouter>
-					<InitializeDemoTenant />
-					<RouterComponent />
-					<Toaster />
-				</BrowserRouter>
-				<ReactQueryDevtools initialIsOpen={false} />
+				<PerformanceProvider>
+					<BrowserRouter>
+						<InitializeDemoTenant />
+						<RouterComponent />
+						<Toaster />
+						<PerformanceMetrics />
+					</BrowserRouter>
+					<ReactQueryDevtools initialIsOpen={false} />
+				</PerformanceProvider>
 			</QueryClientProvider>
 		</ErrorBoundary>
 	);
