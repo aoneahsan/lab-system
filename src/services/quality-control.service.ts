@@ -12,11 +12,10 @@ import {
   Timestamp,
   limit
 } from 'firebase/firestore';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import { QCTest, QCResult, QCRule, QCStatistics } from '@/types/quality-control';
 import { getCurrentUser } from './auth.service';
 import { generateId } from '@/utils/helpers';
-
-const COLLECTION_PREFIX = 'labflow_';
 
 // Westgard Rules
 const WESTGARD_RULES: QCRule[] = [
@@ -40,7 +39,7 @@ export const qualityControlService = {
     constraints.push(orderBy('testName'));
     
     const q = query(
-      collection(db, `${COLLECTION_PREFIX}qc_tests`),
+      collection(db, COLLECTIONS.QC_TESTS),
       ...constraints
     );
     
@@ -53,7 +52,7 @@ export const qualityControlService = {
 
   async createQCTest(data: Partial<QCTest>): Promise<string> {
     const user = await getCurrentUser();
-    const docRef = await addDoc(collection(db, `${COLLECTION_PREFIX}qc_tests`), {
+    const docRef = await addDoc(collection(db, COLLECTIONS.QC_TESTS), {
       ...data,
       id: generateId(),
       status: 'active',
@@ -86,7 +85,7 @@ export const qualityControlService = {
     const acceptanceStatus = violations.length === 0 ? 'accepted' : 
       violations.some(v => WESTGARD_RULES.find(r => r.code === v)?.type === 'rejection') ? 'rejected' : 'warning';
     
-    const docRef = await addDoc(collection(db, `${COLLECTION_PREFIX}qc_results`), {
+    const docRef = await addDoc(collection(db, COLLECTIONS.QC_RESULTS), {
       ...data,
       id: generateId(),
       operatorId: user?.uid,
@@ -114,7 +113,7 @@ export const qualityControlService = {
     }
     
     const q = query(
-      collection(db, `${COLLECTION_PREFIX}qc_results`),
+      collection(db, COLLECTIONS.QC_RESULTS),
       ...constraints
     );
     
@@ -249,7 +248,7 @@ export const qualityControlService = {
 
   // Helper methods
   async getQCTest(id: string): Promise<QCTest | null> {
-    const docRef = doc(db, `${COLLECTION_PREFIX}qc_tests`, id);
+    const docRef = doc(db, COLLECTIONS.QC_TESTS, id);
     const snapshot = await getDoc(docRef);
     
     if (!snapshot.exists()) return null;

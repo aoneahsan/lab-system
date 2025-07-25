@@ -3,7 +3,7 @@ import { useTenantStore } from '@/stores/tenant.store';
 // Get tenant prefix
 const getTenantPrefix = () => {
 	const tenantStore = useTenantStore.getState();
-	return tenantStore.currentTenant?.id ? `${tenantStore.currentTenant.id}_` : 'labflow_';
+	return tenantStore.currentTenant?.id ? `labflow_${tenantStore.currentTenant.id}_` : 'labflow_';
 };
 
 // Collection names with tenant prefix
@@ -99,9 +99,56 @@ export const COLLECTIONS = {
 	get INSURANCE_ELIGIBILITY() {
 		return getCollectionName('insurance_eligibility');
 	},
+	get CRITICAL_NOTIFICATIONS() {
+		return getCollectionName('critical_notifications');
+	},
+	get BATCHES() {
+		return getCollectionName('batches');
+	},
+	get SAMPLE_COLLECTIONS() {
+		return getCollectionName('sampleCollections');
+	},
+	get INVENTORY_ITEMS() {
+		return getCollectionName('inventory_items');
+	},
+	get STOCK_TRANSACTIONS() {
+		return getCollectionName('stock_transactions');
+	},
+	get LOTS() {
+		return getCollectionName('lots');
+	},
+	get PURCHASE_ORDERS() {
+		return getCollectionName('purchase_orders');
+	},
+	get INVENTORY_ALERTS() {
+		return getCollectionName('inventory_alerts');
+	},
+	get QC_TESTS() {
+		return getCollectionName('qc_tests');
+	},
+	get QC_RESULTS() {
+		return getCollectionName('qc_results');
+	},
+	get ANALYTICS_DASHBOARDS() {
+		return getCollectionName('analytics_dashboards');
+	},
+	get RESULT_VALIDATIONS() {
+		return getCollectionName('resultValidations');
+	},
+	get TEST_ORDERS() {
+		return getCollectionName('test_orders');
+	},
+	get SETTINGS() {
+		return getCollectionName('settings');
+	},
 	// Root collections (no tenant prefix)
 	TENANTS: 'tenants',
 	TENANT_USERS: 'tenant_users',
+	// Non-tenant prefixed collections for shared data
+	LABFLOW_TESTS: 'labflow_tests',
+	LABFLOW_TEST_PANELS: 'labflow_test_panels',
+	LABFLOW_TEST_ORDERS: 'labflow_test_orders',
+	LABFLOW_SPECIMENS: 'labflow_specimens',
 };
 
 // Storage paths

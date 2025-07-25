@@ -17,7 +17,7 @@ import {
 	Timestamp,
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { getCollectionName } from '@/constants/tenant.constants';
+import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
 import { webhookService } from '@/services/webhook.service';
 import type {
 	Patient,
@@ -39,7 +39,7 @@ type FirestoreTimestamp =
 
 class PatientService {
 	private getCollectionName(tenantId: string): string {
-		return getCollectionName(tenantId, 'patients');
+		return getFirestoreCollectionName(COLLECTION_NAMES.PATIENTS, tenantId);
 	}
 
 	private generatePatientId(): string {

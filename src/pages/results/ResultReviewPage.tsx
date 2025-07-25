@@ -6,6 +6,7 @@ import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } fr
 import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
 
@@ -31,7 +32,7 @@ const ResultReviewPage: React.FC = () => {
       if (!tenant) return [];
 
       const resultsQuery = query(
-        collection(firestore, `labflow_${tenant.id}_results`),
+        collection(firestore, COLLECTIONS.RESULTS),
         where('status', 'in', ['preliminary', 'pending_review']),
         where('enteredBy', '!=', user?.email)
       );
@@ -52,7 +53,7 @@ const ResultReviewPage: React.FC = () => {
       if (!tenant || !user) throw new Error('Missing tenant or user');
 
       const updatePromises = resultIds.map(resultId =>
-        updateDoc(doc(firestore, `labflow_${tenant.id}_results`, resultId), {
+        updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'final',
           verifiedBy: user.displayName || user.email,
           verifiedAt: serverTimestamp(),
@@ -81,7 +82,7 @@ const ResultReviewPage: React.FC = () => {
       if (!tenant || !user) throw new Error('Missing tenant or user');
 
       const updatePromises = data.resultIds.map(resultId =>
-        updateDoc(doc(firestore, `labflow_${tenant.id}_results`, resultId), {
+        updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'rejected',
           rejectedBy: user.displayName || user.email,
           rejectedAt: serverTimestamp(),

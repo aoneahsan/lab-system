@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { useAuthStore } from '@/stores/auth.store';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import type {
   Sample,
   SampleCollection,
@@ -23,9 +24,6 @@ import type {
   ChainOfCustodyEntry,
   SampleStatus,
 } from '@/types/sample.types';
-
-const SAMPLES_COLLECTION = 'samples';
-const COLLECTIONS_COLLECTION = 'sampleCollections';
 
 // Generate unique sample number
 const generateSampleNumber = (): string => {
@@ -45,8 +43,7 @@ const generateBarcode = (sampleNumber: string): string => {
 export const sampleService = {
   // Get samples with filters
   async getSamples(tenantId: string, filter?: SampleFilter): Promise<Sample[]> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
-    let q = query(collection(db, collectionName), orderBy('createdAt', 'desc'));
+    let q = query(collection(db, COLLECTIONS.SAMPLES), orderBy('createdAt', 'desc'));
 
     if (filter) {
       const constraints: any[] = [];
@@ -72,7 +69,7 @@ export const sampleService = {
 
       constraints.push(orderBy('createdAt', 'desc'));
 
-      q = query(collection(db, collectionName), ...constraints);
+      q = query(collection(db, COLLECTIONS.SAMPLES), ...constraints);
     }
 
     const snapshot = await getDocs(q);
@@ -84,8 +81,7 @@ export const sampleService = {
 
   // Get single sample
   async getSample(tenantId: string, sampleId: string): Promise<Sample | null> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
-    const docRef = doc(db, collectionName, sampleId);
+    const docRef = doc(db, COLLECTIONS.SAMPLES, sampleId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -103,7 +99,6 @@ export const sampleService = {
     userId: string,
     data: SampleFormData
   ): Promise<Sample> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
     const sampleNumber = generateSampleNumber();
     const barcode = generateBarcode(sampleNumber);
 
@@ -130,7 +125,7 @@ export const sampleService = {
       updatedBy: userId,
     };
 
-    const docRef = await addDoc(collection(db, collectionName), sampleData);
+    const docRef = await addDoc(collection(db, COLLECTIONS.SAMPLES), sampleData);
     return {
       id: docRef.id,
       ...sampleData,
@@ -146,8 +141,7 @@ export const sampleService = {
     sampleId: string,
     data: Partial<SampleFormData>
   ): Promise<void> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
-    const docRef = doc(db, collectionName, sampleId);
+    const docRef = doc(db, COLLECTIONS.SAMPLES, sampleId);
 
     const updateData: Record<string, unknown> = {
       ...data,
@@ -171,8 +165,7 @@ export const sampleService = {
     notes?: string,
     location?: string
   ): Promise<void> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
-    const docRef = doc(db, collectionName, sampleId);
+    const docRef = doc(db, COLLECTIONS.SAMPLES, sampleId);
 
     // Get current sample to update chain of custody
     const currentSample = await this.getSample(tenantId, sampleId);
@@ -217,8 +210,7 @@ export const sampleService = {
 
   // Delete sample
   async deleteSample(tenantId: string, sampleId: string): Promise<void> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
-    await deleteDoc(doc(db, collectionName, sampleId));
+    await deleteDoc(doc(db, COLLECTIONS.SAMPLES, sampleId));
   },
 
   // Get sample collections
@@ -226,8 +218,7 @@ export const sampleService = {
     tenantId: string,
     filter?: { status?: string; phlebotomistId?: string }
   ): Promise<SampleCollection[]> {
-    const collectionName = `${tenantId}_${COLLECTIONS_COLLECTION}`;
-    let q = query(collection(db, collectionName), orderBy('scheduledDate', 'desc'));
+    let q = query(collection(db, COLLECTIONS.SAMPLE_COLLECTIONS), orderBy('scheduledDate', 'desc'));
 
     if (filter) {
       const constraints: any[] = [];
@@ -241,7 +232,7 @@ export const sampleService = {
 
       constraints.push(orderBy('scheduledDate', 'desc'));
 
-      q = query(collection(db, collectionName), ...constraints);
+      q = query(collection(db, COLLECTIONS.SAMPLES), ...constraints);
     }
 
     const snapshot = await getDocs(q);
@@ -257,7 +248,6 @@ export const sampleService = {
     userId: string,
     data: Omit<SampleCollection, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
   ): Promise<SampleCollection> {
-    const collectionName = `${tenantId}_${COLLECTIONS_COLLECTION}`;
 
     const collectionData = {
       ...data,
@@ -268,7 +258,7 @@ export const sampleService = {
       updatedBy: userId,
     };
 
-    const docRef = await addDoc(collection(db, collectionName), collectionData);
+    const docRef = await addDoc(collection(db, COLLECTIONS.SAMPLE_COLLECTIONS), collectionData);
     return {
       id: docRef.id,
       ...collectionData,
@@ -284,8 +274,7 @@ export const sampleService = {
     collectionId: string,
     collectedSamples: { testId: string; sampleId: string }[]
   ): Promise<void> {
-    const collectionName = `${tenantId}_${COLLECTIONS_COLLECTION}`;
-    const docRef = doc(db, collectionName, collectionId);
+    const docRef = doc(db, COLLECTIONS.SAMPLE_COLLECTIONS, collectionId);
 
     // Get current collection
     const currentCollection = await getDoc(docRef);
@@ -321,11 +310,10 @@ export const sampleService = {
     sampleIds: string[],
     updates: Partial<Sample>
   ): Promise<void> {
-    const collectionName = `${tenantId}_${SAMPLES_COLLECTION}`;
     const batch = writeBatch(db);
 
     for (const sampleId of sampleIds) {
-      const docRef = doc(db, collectionName, sampleId);
+      const docRef = doc(db, COLLECTIONS.SAMPLES, sampleId);
       batch.update(docRef, {
         ...updates,
         updatedAt: serverTimestamp(),

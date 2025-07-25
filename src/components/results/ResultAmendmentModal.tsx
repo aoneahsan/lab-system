@@ -5,6 +5,7 @@ import { doc, updateDoc, serverTimestamp, arrayUnion } from 'firebase/firestore'
 import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
 
@@ -53,7 +54,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
         notes: formData.notes || undefined,
       };
 
-      await updateDoc(doc(firestore, `labflow_${tenant.id}_results`, result.id), {
+      await updateDoc(doc(firestore, COLLECTIONS.RESULTS, result.id), {
         value: formData.newValue,
         amendments: arrayUnion(amendment),
         amendedAt: serverTimestamp(),

@@ -13,7 +13,7 @@ import {
 	serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
-import { COLLECTIONS } from '@/constants/firebase';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import type {
 	QCMaterial,
 	QCRun,

@@ -5,8 +5,8 @@ import {
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/constants/firebase';
+import { db } from '@/config/firebase';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import type { 
   EMRConnection, 
   FHIRAuthConfig,

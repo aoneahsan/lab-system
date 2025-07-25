@@ -22,7 +22,7 @@ import {
 	increment,
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { getCollectionName } from '@/constants/tenant.constants';
+import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
 import type {
 	InventoryItem,
 	StockTransaction,
@@ -54,7 +54,7 @@ class InventoryService {
 		};
 
 		const docRef = await addDoc(
-			collection(firestore, getCollectionName('inventory_items', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId)),
 			itemData
 		);
 
@@ -77,7 +77,7 @@ class InventoryService {
 		};
 
 		await updateDoc(
-			doc(firestore, getCollectionName('inventory_items', tenantId), itemId),
+			doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId), itemId),
 			updateData
 		);
 	}
@@ -90,7 +90,7 @@ class InventoryService {
 		itemId: string
 	): Promise<InventoryItem | null> {
 		const docSnap = await getDoc(
-			doc(firestore, getCollectionName('inventory_items', tenantId), itemId)
+			doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId), itemId)
 		);
 
 		if (!docSnap.exists()) {
@@ -121,7 +121,7 @@ class InventoryService {
 		hasMore: boolean;
 	}> {
 		let q = query(
-			collection(firestore, getCollectionName('inventory_items', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId)),
 			orderBy('name')
 		);
 
@@ -164,7 +164,7 @@ class InventoryService {
 			// Get the inventory item
 			const itemRef = doc(
 				firestore,
-				getCollectionName('inventory_items', tenantId),
+				getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId),
 				data.itemId
 			);
 			const itemDoc = await transaction.get(itemRef);
@@ -209,7 +209,7 @@ class InventoryService {
 
 			// Add transaction
 			const transactionRef = doc(
-				collection(firestore, getCollectionName('stock_transactions', tenantId))
+				collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.STOCK_TRANSACTIONS, tenantId))
 			);
 			transaction.set(transactionRef, transactionData);
 
@@ -247,7 +247,7 @@ class InventoryService {
 				};
 
 				const lotRef = doc(
-					collection(firestore, getCollectionName('lots', tenantId))
+					collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.LOTS, tenantId))
 				);
 				transaction.set(lotRef, lotData);
 			}
@@ -271,7 +271,7 @@ class InventoryService {
 				};
 
 				const alertRef = doc(
-					collection(firestore, getCollectionName('inventory_alerts', tenantId))
+					collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ALERTS, tenantId))
 				);
 				transaction.set(alertRef, alertData);
 			}
@@ -294,7 +294,7 @@ class InventoryService {
 		hasMore: boolean;
 	}> {
 		let q = query(
-			collection(firestore, getCollectionName('stock_transactions', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.STOCK_TRANSACTIONS, tenantId)),
 			where('itemId', '==', itemId),
 			orderBy('performedAt', 'desc'),
 			limit(pageSize + 1)
@@ -322,7 +322,7 @@ class InventoryService {
 	 */
 	async getActiveLots(tenantId: string, itemId: string): Promise<LotInfo[]> {
 		const q = query(
-			collection(firestore, getCollectionName('lots', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.LOTS, tenantId)),
 			where('itemId', '==', itemId),
 			where('isActive', '==', true),
 			where('quantityRemaining', '>', 0),
@@ -341,7 +341,7 @@ class InventoryService {
 	 */
 	async getReorderItems(tenantId: string): Promise<InventoryItem[]> {
 		const q = query(
-			collection(firestore, getCollectionName('inventory_items', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId)),
 			where('isActive', '==', true),
 			where('currentStock', '<=', where('reorderPoint', '>', 0))
 		);
@@ -364,7 +364,7 @@ class InventoryService {
 		expirationDate.setDate(expirationDate.getDate() + daysAhead);
 
 		const q = query(
-			collection(firestore, getCollectionName('lots', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.LOTS, tenantId)),
 			where('isActive', '==', true),
 			where('quantityRemaining', '>', 0),
 			where('expirationDate', '<=', Timestamp.fromDate(expirationDate)),
@@ -403,7 +403,7 @@ class InventoryService {
 		};
 
 		const docRef = await addDoc(
-			collection(firestore, getCollectionName('purchase_orders', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.PURCHASE_ORDERS, tenantId)),
 			orderData
 		);
 
@@ -430,7 +430,7 @@ class InventoryService {
 		}
 
 		await updateDoc(
-			doc(firestore, getCollectionName('purchase_orders', tenantId), orderId),
+			doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.PURCHASE_ORDERS, tenantId), orderId),
 			updateData as any
 		);
 	}
@@ -440,7 +440,7 @@ class InventoryService {
 	 */
 	async getActiveAlerts(tenantId: string): Promise<InventoryAlert[]> {
 		const q = query(
-			collection(firestore, getCollectionName('inventory_alerts', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ALERTS, tenantId)),
 			where('isActive', '==', true),
 			where('isAcknowledged', '==', false),
 			orderBy('priority', 'desc'),
@@ -464,7 +464,7 @@ class InventoryService {
 		actionTaken?: string
 	): Promise<void> {
 		await updateDoc(
-			doc(firestore, getCollectionName('inventory_alerts', tenantId), alertId),
+			doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ALERTS, tenantId), alertId),
 			{
 				isAcknowledged: true,
 				acknowledgedBy: userId,
@@ -485,7 +485,7 @@ class InventoryService {
 		categoryBreakdown: Record<string, number>;
 	}> {
 		const q = query(
-			collection(firestore, getCollectionName('inventory_items', tenantId)),
+			collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId)),
 			where('isActive', '==', true)
 		);
 

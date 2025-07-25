@@ -15,7 +15,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase.config';
-import { PROJECT_PREFIX } from '@/constants/tenant.constants';
+import { SHARED_COLLECTIONS } from '@/config/firebase-collections-helper';
 import type {
   TestDefinition,
   TestDefinitionFormData,
@@ -27,10 +27,10 @@ import type {
   OrderedTest,
 } from '@/types/test.types';
 
-const TESTS_COLLECTION = `${PROJECT_PREFIX}tests`;
-const TEST_PANELS_COLLECTION = `${PROJECT_PREFIX}test_panels`;
-const TEST_ORDERS_COLLECTION = `${PROJECT_PREFIX}test_orders`;
-// const TEST_RESULTS_COLLECTION = `${PROJECT_PREFIX}test_results`;
+// These are shared collections across all tenants
+const TESTS_COLLECTION = SHARED_COLLECTIONS.LABFLOW_TESTS;
+const TEST_PANELS_COLLECTION = SHARED_COLLECTIONS.LABFLOW_TEST_PANELS;
+const TEST_ORDERS_COLLECTION = SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS;
 
 export const testService = {
   // Test Definition CRUD

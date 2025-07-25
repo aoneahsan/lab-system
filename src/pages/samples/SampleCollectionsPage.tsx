@@ -7,6 +7,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { useAuthStore } from '@/stores/auth.store';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import BatchCollectionModal from '@/components/samples/BatchCollectionModal';
 import BatchBarcodesPrint from '@/components/samples/BatchBarcodesPrint';
 import type { SampleFormData, Sample } from '@/types/sample.types';
@@ -62,7 +63,7 @@ const SampleCollectionsPage: React.FC = () => {
     setIsCreatingBatch(true);
     try {
       // Create batch record
-      const batchRef = await addDoc(collection(firestore, `labflow_${tenant?.id}_batches`), {
+      const batchRef = await addDoc(collection(firestore, COLLECTIONS.BATCHES), {
         date: new Date(),
         totalSamples: samples.length,
         completedSamples: 0,
@@ -119,7 +120,7 @@ const SampleCollectionsPage: React.FC = () => {
     try {
       // Fetch samples for this batch
       const samplesQuery = query(
-        collection(firestore, `labflow_${tenant.id}_samples`),
+        collection(firestore, COLLECTIONS.SAMPLES),
         where('batchId', '==', batchId)
       );
       const snapshot = await getDocs(samplesQuery);

@@ -5,6 +5,7 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import { toast } from '@/stores/toast.store';
 import { resultValidationService } from '@/services/result-validation.service';
 import type { TestResult, Test } from '@/types';
@@ -50,7 +51,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
         throw new Error(validation.errors.join(', '));
       }
 
-      await updateDoc(doc(firestore, `labflow_${tenant.id}_results`, result.id), {
+      await updateDoc(doc(firestore, COLLECTIONS.RESULTS, result.id), {
         value: formData.value,
         notes: formData.notes,
         flag: validation.flags[0] || 'normal',

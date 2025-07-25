@@ -1,4 +1,5 @@
 import { db } from '@/config/firebase';
+import { SHARED_COLLECTIONS } from '@/config/firebase-collections-helper';
 import {
   collection,
   doc,
@@ -16,7 +17,7 @@ import { TestOrder, OrderedTest, Specimen } from '@/types/order';
 import { getCurrentUser } from './auth.service';
 import { generateId } from '@/utils/helpers';
 
-const COLLECTION_PREFIX = 'labflow_';
+// Order service uses shared collections
 
 export const orderService = {
   // Test Orders
@@ -25,7 +26,7 @@ export const orderService = {
     const orderNumber = `ORD-${Date.now()}`;
     const barcode = this.generateBarcode();
     
-    const docRef = await addDoc(collection(db, `${COLLECTION_PREFIX}test_orders`), {
+    const docRef = await addDoc(collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS), {
       ...data,
       id: generateId(),
       orderNumber,
@@ -65,7 +66,7 @@ export const orderService = {
     }
     
     const q = query(
-      collection(db, `${COLLECTION_PREFIX}test_orders`),
+      collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
       ...constraints
     );
     
@@ -113,7 +114,7 @@ export const orderService = {
     const specimenNumber = `SPC-${Date.now()}`;
     const barcode = this.generateBarcode();
     
-    const docRef = await addDoc(collection(db, `${COLLECTION_PREFIX}specimens`), {
+    const docRef = await addDoc(collection(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS), {
       ...data,
       id: generateId(),
       specimenNumber,
@@ -137,7 +138,7 @@ export const orderService = {
     constraints.push(orderBy('collectionDate', 'desc'));
     
     const q = query(
-      collection(db, `${COLLECTION_PREFIX}specimens`),
+      collection(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS),
       ...constraints
     );
     
@@ -177,7 +178,7 @@ export const orderService = {
     // For now, we'll search by order number and patient name
     const ordersByNumber = await getDocs(
       query(
-        collection(db, `${COLLECTION_PREFIX}test_orders`),
+        collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
         where('orderNumber', '>=', query),
         where('orderNumber', '<=', query + '\uf8ff'),
         limit(10)
@@ -186,7 +187,7 @@ export const orderService = {
     
     const ordersByPatient = await getDocs(
       query(
-        collection(db, `${COLLECTION_PREFIX}test_orders`),
+        collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
         where('patientName', '>=', query),
         where('patientName', '<=', query + '\uf8ff'),
         limit(10)

@@ -12,8 +12,8 @@ import {
   updateDoc,
   deleteDoc
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { COLLECTIONS } from '@/constants/firebase';
+import { db } from '@/config/firebase';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import { fhirService } from './fhir.service';
 import { hl7Parser } from './hl7-parser.service';
 import type { 

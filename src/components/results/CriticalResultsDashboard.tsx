@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { useTenant } from '@/hooks/useTenant';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import CriticalResultModal from './CriticalResultModal';
 
 interface CriticalResult {
@@ -35,7 +36,7 @@ const CriticalResultsDashboard: React.FC = () => {
       if (!tenant) return [];
 
       const q = query(
-        collection(firestore, `labflow_${tenant.id}_results`),
+        collection(firestore, COLLECTIONS.RESULTS),
         where('flag', 'in', ['critical_high', 'critical_low']),
         orderBy('createdAt', 'desc'),
         limit(50)

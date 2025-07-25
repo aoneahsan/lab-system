@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { doc, updateDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { useTenant } from '@/hooks/useTenant';
+import { COLLECTIONS } from '@/config/firebase-collections';
 
 interface CriticalResultModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
     setIsSubmitting(true);
     try {
       // Create critical notification record
-      await addDoc(collection(firestore, `labflow_${tenant?.id}_critical_notifications`), {
+      await addDoc(collection(firestore, COLLECTIONS.CRITICAL_NOTIFICATIONS), {
         resultId: result.id,
         testName: result.testName,
         value: result.value,
@@ -58,7 +59,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
       });
 
       // Update result with critical notification info
-      await updateDoc(doc(firestore, `labflow_${tenant?.id}_results`, result.id), {
+      await updateDoc(doc(firestore, COLLECTIONS.RESULTS, result.id), {
         criticalNotification: {
           notified: true,
           notifiedAt: serverTimestamp(),

@@ -11,21 +11,18 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
+import { COLLECTIONS } from '@/config/firebase-collections';
 import type {
   TestResult,
   ResultStatus,
   ResultFlag,
 } from '@/types/result.types';
 
-const RESULTS_COLLECTION = 'results';
-const VALIDATIONS_COLLECTION = 'resultValidations';
-
 export const resultService = {
   // Get results for an order
   async getResultsByOrder(tenantId: string, orderId: string): Promise<TestResult[]> {
-    const collectionName = `${tenantId}_${RESULTS_COLLECTION}`;
     const q = query(
-      collection(db, collectionName),
+      collection(db, COLLECTIONS.RESULTS),
       where('orderId', '==', orderId),
       orderBy('testName')
     );
@@ -39,9 +36,8 @@ export const resultService = {
 
   // Get results for a patient
   async getResultsByPatient(tenantId: string, patientId: string): Promise<TestResult[]> {
-    const collectionName = `${tenantId}_${RESULTS_COLLECTION}`;
     const q = query(
-      collection(db, collectionName),
+      collection(db, COLLECTIONS.RESULTS),
       where('patientId', '==', patientId),
       orderBy('createdAt', 'desc')
     );
@@ -136,9 +132,8 @@ export const resultService = {
 
   // Get validation rules for a test
   async getValidationRules(tenantId: string, testId: string) {
-    const collectionName = `${tenantId}_${VALIDATIONS_COLLECTION}`;
     const q = query(
-      collection(db, collectionName),
+      collection(db, COLLECTIONS.RESULTS),
       where('testId', '==', testId),
       where('enabled', '==', true)
     );
@@ -156,7 +151,6 @@ export const resultService = {
     userId: string,
     data: Omit<TestResult, 'id' | 'tenantId' | 'createdAt' | 'updatedAt'>
   ): Promise<TestResult> {
-    const collectionName = `${tenantId}_${RESULTS_COLLECTION}`;
     
     const resultData = {
       ...data,
@@ -168,7 +162,7 @@ export const resultService = {
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, collectionName), resultData);
+    const docRef = await addDoc(collection(db, COLLECTIONS.RESULTS), resultData);
     return {
       id: docRef.id,
       ...resultData,
@@ -184,8 +178,7 @@ export const resultService = {
     resultId: string,
     data: Partial<TestResult>
   ): Promise<void> {
-    const collectionName = `${tenantId}_${RESULTS_COLLECTION}`;
-    const docRef = doc(db, collectionName, resultId);
+    const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
     
     await updateDoc(docRef, {
       ...data,
@@ -199,8 +192,7 @@ export const resultService = {
     userId: string,
     resultId: string
   ): Promise<void> {
-    const collectionName = `${tenantId}_${RESULTS_COLLECTION}`;
-    const docRef = doc(db, collectionName, resultId);
+    const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
     
     await updateDoc(docRef, {
       status: 'verified',
