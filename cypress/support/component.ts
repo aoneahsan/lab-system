@@ -16,12 +16,14 @@ Cypress.Commands.add('mount', (component, options = {}) => {
     },
   });
 
-  const wrapped = (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {component}
-      </BrowserRouter>
-    </QueryClientProvider>
+  const wrapped = React.createElement(
+    QueryClientProvider,
+    { client: queryClient },
+    React.createElement(
+      BrowserRouter,
+      null,
+      component
+    )
   );
 
   return mount(wrapped, options);

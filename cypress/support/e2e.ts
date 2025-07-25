@@ -6,7 +6,7 @@ import './commands';
 import 'cypress-real-events/support';
 
 // Handle uncaught exceptions
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on('uncaught:exception', (err, _runnable) => {
   // Ignore Firebase auth errors in tests
   if (err.message.includes('Firebase')) {
     return false;
