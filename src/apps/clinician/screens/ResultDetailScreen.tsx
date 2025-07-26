@@ -18,7 +18,7 @@ import {
 import { useResult } from '@/hooks/useResult';
 import { useApproveResult } from '@/hooks/useApproveResult';
 import { format } from 'date-fns';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function ResultDetailScreen() {
   const { resultId } = useParams<{ resultId: string }>();
@@ -205,7 +205,7 @@ export function ResultDetailScreen() {
               Result History
             </h2>
             <div className="space-y-2">
-              {result.history.map((item, index) => (
+              {result.history.map((item: any, index: number) => (
                 <div key={index} className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">
                     {format(new Date(item.date), 'MMM d, yyyy')}

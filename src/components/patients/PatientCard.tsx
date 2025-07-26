@@ -1,5 +1,5 @@
 import React from 'react';
-import { Patient } from '@/types/patient.types';
+import type { Patient } from '@/types/patient.types';
 import { 
   PhoneIcon, 
   EnvelopeIcon, 
@@ -15,7 +15,7 @@ interface PatientCardProps {
 }
 
 export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) => {
-  const calculateAge = (dateOfBirth: string) => {
+  const calculateAge = (dateOfBirth: Date) => {
     const birthDate = new Date(dateOfBirth);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -29,7 +29,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) =>
   };
 
   const age = calculateAge(patient.dateOfBirth);
-  const primaryInsurance = patient.insuranceInfo?.find(ins => ins.isPrimary);
+  const primaryInsurance = patient.insurances?.find(ins => ins.isPrimary);
 
   return (
     <article
@@ -76,7 +76,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) =>
       <div className="space-y-2 mb-4">
         <div className="flex items-center space-x-2 text-sm">
           <PhoneIcon className="h-4 w-4 text-gray-400" />
-          <span className="text-gray-600">{patient.phone}</span>
+          <span className="text-gray-600">{patient.phoneNumbers?.[0]?.value || 'No phone'}</span>
         </div>
         <div className="flex items-center space-x-2 text-sm">
           <EnvelopeIcon className="h-4 w-4 text-gray-400" />

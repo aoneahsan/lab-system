@@ -10,7 +10,6 @@ import {
   CheckCircle,
   Clock,
   ChevronRight,
-  Filter,
   Download
 } from 'lucide-react';
 import { useClinicianResults } from '@/hooks/useClinicianResults';

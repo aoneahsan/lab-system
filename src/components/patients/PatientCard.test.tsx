@@ -37,11 +37,14 @@ describe('PatientCard', () => {
 
   it('displays insurance information when available', () => {
     const patientWithInsurance = createMockPatient({
-      insuranceInfo: [{
+      insurances: [{
+        id: '1',
         provider: 'Blue Cross',
         policyNumber: 'BC123456',
         groupNumber: 'GRP789',
         isPrimary: true,
+        validFrom: new Date(),
+        validTo: new Date(),
       }],
     });
     

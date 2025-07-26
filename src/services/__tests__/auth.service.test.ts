@@ -5,6 +5,9 @@ import {
   signOut,
   sendPasswordResetEmail,
   updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
   User
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -14,6 +17,12 @@ import { auth, db } from '@/lib/firebase';
 // Mock Firebase modules
 vi.mock('firebase/auth');
 vi.mock('firebase/firestore');
+vi.mock('@/lib/firebase', () => ({
+  auth: {
+    currentUser: { uid: 'test-uid', email: 'test@example.com' },
+  },
+  db: {},
+}));
 
 describe('AuthService', () => {
   const mockUser = {
@@ -217,10 +226,15 @@ describe('AuthService', () => {
 
   describe('changePassword', () => {
     it('should handle change password request', async () => {
-      // This would typically require reauthentication
-      // For now, we'll test the basic flow
-      const result = await authService.changePassword('old-password', 'new-password');
-      expect(result).toBeUndefined();
+      vi.mocked(EmailAuthProvider.credential).mockReturnValue({} as any);
+      vi.mocked(reauthenticateWithCredential).mockResolvedValue({} as any);
+      vi.mocked(updatePassword).mockResolvedValue(undefined);
+
+      await authService.changePassword('old-password', 'new-password');
+
+      expect(EmailAuthProvider.credential).toHaveBeenCalledWith('test@example.com', 'old-password');
+      expect(reauthenticateWithCredential).toHaveBeenCalled();
+      expect(updatePassword).toHaveBeenCalledWith(auth.currentUser, 'new-password');
     });
   });
 });

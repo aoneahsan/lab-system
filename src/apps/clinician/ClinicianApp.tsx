@@ -2,7 +2,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { BottomNav } from '@/components/mobile/BottomNav';
 import { TopBar } from '@/components/mobile/TopBar';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 import { Home, ClipboardList, FileText, Users, User } from 'lucide-react';
 
 // Screens
@@ -20,26 +20,26 @@ import { TestCatalogScreen } from './screens/TestCatalogScreen';
 
 export function ClinicianApp() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   useEffect(() => {
     // Redirect if not clinician
-    if (user && user.role !== 'clinician') {
+    if (currentUser && currentUser.role !== 'clinician') {
       navigate('/unauthorized');
     }
-  }, [user, navigate]);
+  }, [currentUser, navigate]);
 
   const navItems = [
-    { path: '/clinician', icon: Home, label: 'Home' },
-    { path: '/clinician/orders', icon: ClipboardList, label: 'Orders' },
-    { path: '/clinician/results', icon: FileText, label: 'Results' },
-    { path: '/clinician/patients', icon: Users, label: 'Patients' },
-    { path: '/clinician/profile', icon: User, label: 'Profile' },
+    { path: '/clinician', icon: <Home className="w-6 h-6" />, label: 'Home' },
+    { path: '/clinician/orders', icon: <ClipboardList className="w-6 h-6" />, label: 'Orders' },
+    { path: '/clinician/results', icon: <FileText className="w-6 h-6" />, label: 'Results' },
+    { path: '/clinician/patients', icon: <Users className="w-6 h-6" />, label: 'Patients' },
+    { path: '/clinician/profile', icon: <User className="w-6 h-6" />, label: 'Profile' },
   ];
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      <TopBar title="LabFlow Clinician" showNotifications />
+      <TopBar title="LabFlow Clinician" />
       
       <main className="flex-1 overflow-y-auto pb-16">
         <Routes>

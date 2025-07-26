@@ -1,5 +1,5 @@
 import React from 'react';
-import { WifiOff, Sync, Check, AlertCircle } from 'lucide-react';
+import { WifiOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
 import { useOffline } from '@/hooks/useOffline';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -21,7 +21,7 @@ export const OfflineIndicator: React.FC = () => {
 
   const getSyncStatusIcon = () => {
     if (syncInProgress) {
-      return <Sync className="w-4 h-4 animate-spin" />;
+      return <RefreshCw className="w-4 h-4 animate-spin" />;
     }
     if (isOffline) {
       return <WifiOff className="w-4 h-4" />;

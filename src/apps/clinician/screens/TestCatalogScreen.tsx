@@ -5,7 +5,6 @@ import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { 
   Search, 
-  FileText,
   Clock,
   Info,
   ChevronDown,
@@ -21,7 +20,7 @@ export function TestCatalogScreen() {
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
   
   const { data: tests = [], isLoading } = useTests({ 
-    search: searchQuery,
+    searchTerm: searchQuery,
     category: selectedCategory === 'all' ? undefined : selectedCategory 
   });
 
@@ -108,7 +107,7 @@ export function TestCatalogScreen() {
                         <Badge variant="outline" size="sm">
                           {test.code}
                         </Badge>
-                        {test.isPanel && (
+                        {false && (
                           <Badge className="bg-purple-100 text-purple-800" size="sm">
                             Panel
                           </Badge>
@@ -121,7 +120,7 @@ export function TestCatalogScreen() {
                         </span>
                         <span className="flex items-center">
                           <Clock className="h-4 w-4 mr-1" />
-                          TAT: {test.turnaroundTime}
+                          TAT: {test.turnaroundTime.routine}h
                         </span>
                         {test.price && (
                           <span className="flex items-center">
@@ -142,67 +141,48 @@ export function TestCatalogScreen() {
                 {isExpanded && (
                   <div className="px-4 pb-4 border-t bg-gray-50">
                     <div className="pt-4 space-y-3">
-                      {/* Description */}
-                      {test.description && (
+                      {/* Test Details */}
+                      {test.notes && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Description</h4>
-                          <p className="text-sm text-gray-700">{test.description}</p>
+                          <h4 className="font-medium text-gray-900 mb-1">Notes</h4>
+                          <p className="text-sm text-gray-700">{test.notes}</p>
                         </div>
                       )}
 
-                      {/* Clinical Use */}
-                      {test.clinicalUse && (
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Clinical Use</h4>
-                          <p className="text-sm text-gray-700">{test.clinicalUse}</p>
-                        </div>
-                      )}
 
                       {/* Specimen Requirements */}
                       <div>
                         <h4 className="font-medium text-gray-900 mb-1">Specimen Requirements</h4>
                         <div className="text-sm text-gray-700">
-                          <p>Type: {test.specimenType}</p>
-                          <p>Volume: {test.specimenVolume}</p>
-                          <p>Container: {test.container}</p>
-                          {test.specialInstructions && (
+                          <p>Type: {test.specimen.type}</p>
+                          <p>Volume: {test.specimen.volume} {test.specimen.volumeUnit}</p>
+                          <p>Container: {test.specimen.container || 'Standard'}</p>
+                          {test.specimen.specialInstructions && (
                             <p className="mt-1 italic">
-                              Special Instructions: {test.specialInstructions}
+                              Special Instructions: {test.specimen.specialInstructions}
                             </p>
                           )}
                         </div>
                       </div>
 
-                      {/* Reference Range */}
-                      {test.referenceRange && (
+                      {/* Reference Ranges */}
+                      {test.referenceRanges && test.referenceRanges.length > 0 && (
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Reference Range</h4>
-                          <p className="text-sm text-gray-700">{test.referenceRange}</p>
+                          <h4 className="font-medium text-gray-900 mb-1">Reference Ranges</h4>
+                          <p className="text-sm text-gray-700">
+                            {test.referenceRanges[0].textRange || 
+                             `${test.referenceRanges[0].normalMin || ''} - ${test.referenceRanges[0].normalMax || ''}`}
+                          </p>
                         </div>
                       )}
 
-                      {/* Panel Components */}
-                      {test.isPanel && test.components && (
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">
-                            Panel Components ({test.components.length})
-                          </h4>
-                          <div className="space-y-1">
-                            {test.components.map((component, index) => (
-                              <div key={index} className="text-sm text-gray-700 pl-4">
-                                • {component.name} ({component.code})
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
 
                       {/* Additional Info */}
                       <div className="flex items-start space-x-2 bg-blue-50 rounded-lg p-3">
                         <Info className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                         <div className="text-sm text-blue-700">
                           <p>CPT Code: {test.cptCode || 'N/A'}</p>
-                          <p>LOINC Code: {test.loincCode || 'N/A'}</p>
+                          <p>LOINC Code: {test.loincCode?.code || 'N/A'}</p>
                           {test.methodology && <p>Method: {test.methodology}</p>}
                         </div>
                       </div>

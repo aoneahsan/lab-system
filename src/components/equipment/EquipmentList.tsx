@@ -18,7 +18,7 @@ const EquipmentList: React.FC = () => {
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert error={error} />;
+  if (error) return <ErrorAlert message={error instanceof Error ? error.message : 'Failed to load equipment'} onRetry={refetch} />;
   if (!equipment || equipment.length === 0) {
     return (
       <div className="text-center py-12">

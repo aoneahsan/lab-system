@@ -246,7 +246,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
                 value={cardDetails.number}
                 onChange={(e) => handleCardInputChange('number', e.target.value)}
                 placeholder="1234 5678 9012 3456"
-                maxLength="19"
+                maxLength={19}
                 className="mt-1 block w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -263,7 +263,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
                   value={cardDetails.expiry}
                   onChange={(e) => handleCardInputChange('expiry', e.target.value)}
                   placeholder="MM/YY"
-                  maxLength="5"
+                  maxLength={5}
                   className="mt-1 block w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
@@ -279,7 +279,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
                   value={cardDetails.cvv}
                   onChange={(e) => handleCardInputChange('cvv', e.target.value)}
                   placeholder="123"
-                  maxLength="4"
+                  maxLength={4}
                   className="mt-1 block w-full rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />

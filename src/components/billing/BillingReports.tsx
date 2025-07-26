@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { billingService } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import {
-  ChartBarIcon,
-  ArrowDownTrayIcon,
-  CalendarIcon
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 
 const BillingReports: React.FC = () => {

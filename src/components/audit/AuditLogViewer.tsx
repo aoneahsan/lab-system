@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { auditService } from '../../services/audit';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  MagnifyingGlassIcon,
   FunnelIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -23,7 +22,11 @@ const AuditLogViewer: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['audit-logs', filters],
-    queryFn: () => auditService.search(filters)
+    queryFn: () => auditService.search({
+      ...filters,
+      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
+      endDate: filters.endDate ? new Date(filters.endDate) : undefined
+    })
   });
 
   const handleExport = async (format: 'csv' | 'pdf' | 'excel') => {

@@ -4,7 +4,6 @@ import { billingService } from '@/services/billing';
 import type { Bill } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
 import {
-  DocumentTextIcon,
   PrinterIcon,
   EnvelopeIcon,
   ArrowDownTrayIcon,

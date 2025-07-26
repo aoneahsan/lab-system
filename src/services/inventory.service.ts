@@ -558,7 +558,8 @@ class InventoryServiceWrapper extends InventoryService {
 	async getStockMovements(itemId: string) {
 		const tenantId = useTenantStore.getState().currentTenant?.id;
 		if (!tenantId) throw new Error('No tenant selected');
-		return this.getTransactions(tenantId, { itemId });
+		const result = await this.getTransactions(tenantId, itemId);
+		return result.transactions;
 	}
 
 	async getPurchaseOrders() {

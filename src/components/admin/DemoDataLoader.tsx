@@ -8,7 +8,7 @@ const DemoDataLoader: React.FC = () => {
   const user = useAuthStore((state) => state.currentUser);
 
   const loadDemoData = async () => {
-    if (!user || user.role !== 'admin') {
+    if (!user || (user.role !== 'super_admin' && user.role !== 'lab_admin')) {
       setStatus('Only administrators can load demo data');
       return;
     }

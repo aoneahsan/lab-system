@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Printer, Download } from 'lucide-react';
 import JsBarcode from 'jsbarcode';
 

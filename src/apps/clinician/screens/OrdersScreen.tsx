@@ -10,8 +10,7 @@ import {
   Clock, 
   CheckCircle, 
   AlertCircle,
-  ChevronRight,
-  Filter
+  ChevronRight
 } from 'lucide-react';
 import { useOrders } from '@/hooks/useOrders';
 import { format } from 'date-fns';

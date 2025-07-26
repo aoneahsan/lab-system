@@ -5,11 +5,9 @@ import { Badge } from '@/components/ui/Badge';
 import { 
   ArrowLeft, 
   User,
-  Calendar,
   Phone,
   Mail,
   MapPin,
-  Activity,
   FileText,
   ClipboardList,
   AlertCircle,
@@ -68,12 +66,12 @@ export function PatientDetailScreen() {
             <User className="h-8 w-8 text-gray-600" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">{patient.name}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{patient.firstName} {patient.lastName}</h1>
             <p className="text-gray-600">MRN: {patient.mrn}</p>
             <div className="flex flex-wrap gap-2 mt-2">
               <Badge variant="outline">{patient.gender}</Badge>
               <Badge variant="outline">{age} years</Badge>
-              <Badge variant="outline">{patient.bloodType || 'Unknown'}</Badge>
+              <Badge variant="outline">{patient.bloodGroup || 'Unknown'}</Badge>
             </div>
           </div>
         </div>
@@ -85,7 +83,7 @@ export function PatientDetailScreen() {
             <div className="space-y-2 text-sm">
               <div className="flex items-center space-x-2 text-gray-600">
                 <Phone className="h-4 w-4" />
-                <span>{patient.phone}</span>
+                <span>{patient.phoneNumbers?.[0]?.value || 'No phone'}</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-600">
                 <Mail className="h-4 w-4" />
@@ -93,7 +91,7 @@ export function PatientDetailScreen() {
               </div>
               <div className="flex items-start space-x-2 text-gray-600">
                 <MapPin className="h-4 w-4 mt-0.5" />
-                <span>{patient.address}</span>
+                <span>{patient.addresses?.[0] ? `${patient.addresses[0].line1}, ${patient.addresses[0].city}` : 'No address'}</span>
               </div>
             </div>
           </div>
@@ -109,24 +107,24 @@ export function PatientDetailScreen() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Insurance</span>
-                <span className="font-medium">{patient.insurance || 'Not provided'}</span>
+                <span className="font-medium">{patient.insurances?.[0]?.provider || 'Not provided'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Emergency Contact</span>
-                <span className="font-medium">{patient.emergencyContact || 'Not provided'}</span>
+                <span className="font-medium">{patient.emergencyContacts?.[0]?.name || 'Not provided'}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Medical Conditions */}
-        {patient.conditions && patient.conditions.length > 0 && (
+        {/* Medical History */}
+        {patient.medicalHistory && patient.medicalHistory.length > 0 && (
           <div className="border-t pt-4">
-            <h2 className="font-semibold text-gray-900 mb-3">Medical Conditions</h2>
+            <h2 className="font-semibold text-gray-900 mb-3">Medical History</h2>
             <div className="flex flex-wrap gap-2">
-              {patient.conditions.map((condition, index) => (
+              {patient.medicalHistory.map((history, index) => (
                 <Badge key={index} variant="outline">
-                  {condition}
+                  {history.condition}
                 </Badge>
               ))}
             </div>
@@ -143,7 +141,7 @@ export function PatientDetailScreen() {
             <div className="flex flex-wrap gap-2">
               {patient.allergies.map((allergy, index) => (
                 <Badge key={index} className="bg-red-100 text-red-800">
-                  {allergy}
+                  {allergy.allergen} - {allergy.severity}
                 </Badge>
               ))}
             </div>

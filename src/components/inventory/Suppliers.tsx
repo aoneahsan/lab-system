@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Building2, Mail, Phone, Globe, Edit, Trash2 } from 'lucide-react';
+import { Plus, Building2, Mail, Phone, Globe, Edit } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
 import type { Supplier } from '@/types/inventory';
 

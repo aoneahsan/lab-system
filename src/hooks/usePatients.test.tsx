@@ -6,6 +6,22 @@ import { patientService } from '@/services/patient.service';
 import { createMockPatient } from '@/test/utils';
 import React from 'react';
 
+// Mock performance monitoring
+vi.mock('@/utils/performance-monitoring', () => ({
+  performanceMonitor: {
+    trackApiCall: vi.fn(async (traceName, fn) => {
+      if (typeof fn === 'function') {
+        return await fn();
+      }
+      return fn;
+    }),
+    trackRender: vi.fn(),
+    startTrace: vi.fn(),
+    stopTrace: vi.fn(),
+    reportMetrics: vi.fn(),
+  },
+}));
+
 // Mock the patient service
 vi.mock('@/services/patient.service', () => ({
   patientService: {

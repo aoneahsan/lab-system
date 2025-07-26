@@ -33,9 +33,11 @@ function App() {
 	useEffect(() => {
 		// Track app initialization
 		performanceMonitor.startTrace('app_initialization');
-		initializeAuth().finally(() => {
+		initializeAuth();
+		// Stop trace after a short delay since initializeAuth is synchronous
+		setTimeout(() => {
 			performanceMonitor.stopTrace('app_initialization');
-		});
+		}, 100);
 	}, [initializeAuth]);
 
 	if (isLoading) {

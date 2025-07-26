@@ -7,10 +7,8 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-  ArrowTrendingUpIcon,
   CreditCardIcon,
   DocumentTextIcon,
-  BanknotesIcon
 } from '@heroicons/react/24/outline';
 import { Line } from 'react-chartjs-2';
 import {
@@ -35,7 +33,7 @@ ChartJS.register(
 );
 
 const BillingDashboard: React.FC = () => {
-  const [dateRange, setDateRange] = useState({
+  const [dateRange] = useState({
     startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
     endDate: new Date()
   });

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, FileText, CheckCircle, XCircle, Clock, Package } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
 import type { PurchaseOrder } from '@/types/inventory';
 
 export default function PurchaseOrders() {
-  const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const { purchaseOrders, suppliers, loading, fetchPurchaseOrders, fetchSuppliers } = useInventoryStore();
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const { purchaseOrders, suppliers, fetchPurchaseOrders, fetchSuppliers } = useInventoryStore();
 
   useEffect(() => {
     fetchPurchaseOrders({ status: filterStatus === 'all' ? undefined : filterStatus });

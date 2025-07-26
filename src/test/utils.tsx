@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import React, { type ReactElement } from 'react';
+import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -37,23 +37,41 @@ export { customRender as render };
 // Test data factories
 export const createMockPatient = (overrides = {}) => ({
   id: '1',
+  tenantId: 'test-tenant',
+  patientId: 'PAT123456',
   mrn: 'MRN123456',
   firstName: 'John',
   lastName: 'Doe',
-  dateOfBirth: '1990-01-01',
+  middleName: '',
+  dateOfBirth: new Date('1990-01-01'),
   gender: 'male',
   email: 'john.doe@example.com',
-  phone: '+1234567890',
-  address: {
-    street: '123 Main St',
+  phoneNumbers: [{
+    type: 'mobile',
+    value: '+1234567890',
+    isPrimary: true,
+    isVerified: true
+  }],
+  addresses: [{
+    type: 'home',
+    line1: '123 Main St',
+    line2: '',
     city: 'Anytown',
     state: 'CA',
-    zip: '12345',
     country: 'USA',
-  },
-  insuranceInfo: [],
+    postalCode: '12345',
+    isDefault: true
+  }],
+  insurances: [],
+  emergencyContacts: [],
+  allergies: [],
+  medications: [],
+  medicalHistory: [],
+  isActive: true,
   createdAt: new Date(),
+  createdBy: 'test-user',
   updatedAt: new Date(),
+  updatedBy: 'test-user',
   ...overrides,
 });
 

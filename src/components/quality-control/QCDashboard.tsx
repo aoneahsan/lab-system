@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity, AlertTriangle, CheckCircle, TrendingUp, FileText } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 import QCTestList from './QCTestList';
@@ -8,7 +8,7 @@ import QCStatistics from './QCStatistics';
 
 export default function QCDashboard() {
   const [activeTab, setActiveTab] = useState('tests');
-  const { qcTests, fetchQCTests } = useQualityControlStore();
+  const { fetchQCTests } = useQualityControlStore();
 
   useEffect(() => {
     fetchQCTests();

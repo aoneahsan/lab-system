@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, FileText, Search } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Timestamp } from 'firebase/firestore';
 import { useInvoices, useInsuranceProviders } from '@/hooks/useBilling';
 import { usePatients } from '@/hooks/usePatients';
 import { billingService } from '@/services/billing.service';
@@ -45,7 +46,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
   const createClaimMutation = useMutation({
     mutationFn: async (data: ClaimFormData) => {
       if (!tenant || !user) throw new Error('Missing tenant or user');
-      return billingService.createClaim(tenant.id, user.uid, data);
+      return billingService.createClaim(tenant.id, user.id, data);
     },
     onSuccess: () => {
       toast.success('Insurance Claim Created', 'The claim has been created successfully');
@@ -89,7 +90,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
         primaryDiagnosis: formData.primaryDiagnosis!,
         secondaryDiagnoses: formData.secondaryDiagnoses || [],
         services: selectedInvoice.items.map(item => ({
-          serviceDate: formData.serviceDate!,
+          serviceDate: Timestamp.fromDate(formData.serviceDate!),
           cptCode: item.cptCode || '',
           units: item.quantity,
           charge: item.total,
@@ -155,7 +156,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Patient Information</h4>
                   <div className="text-sm text-gray-600">
-                    <p><span className="font-medium">Name:</span> {selectedPatient.firstName} {selectedPatient.lastName}</p>
+                    <p><span className="font-medium">Name:</span> {selectedPatient.fullName}</p>
                     <p><span className="font-medium">DOB:</span> {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}</p>
                     <p><span className="font-medium">Patient ID:</span> {selectedPatient.patientId}</p>
                   </div>

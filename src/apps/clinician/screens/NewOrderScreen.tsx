@@ -12,14 +12,13 @@ import {
   X,
   AlertCircle,
   User,
-  Calendar,
   FileText,
   ChevronRight
 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
 import { useCreateOrder } from '@/hooks/useCreateOrder';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export function NewOrderScreen() {
@@ -33,12 +32,12 @@ export function NewOrderScreen() {
   const [testSearchQuery, setTestSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const { data: patients = [] } = usePatients({ search: searchQuery });
+  const { data: patients = [] } = usePatients({ searchTerm: searchQuery });
   const { data: tests = [] } = useTests({ 
-    search: testSearchQuery,
+    searchTerm: testSearchQuery,
     category: selectedCategory === 'all' ? undefined : selectedCategory 
   });
-  const { mutate: createOrder, isLoading: isCreating } = useCreateOrder();
+  const { mutate: createOrder, isPending: isCreating } = useCreateOrder();
 
   const testCategories = [
     { value: 'all', label: 'All Categories' },
@@ -78,7 +77,7 @@ export function NewOrderScreen() {
         name: t.name,
         category: t.category,
       })),
-      priority,
+      priority: priority as 'routine' | 'stat' | 'urgent',
       clinicalInfo,
       clinicianId: 'current', // Will be replaced with actual clinician ID
     };
@@ -128,12 +127,12 @@ export function NewOrderScreen() {
                 type="search"
                 placeholder="Search by name or MRN..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {patients.map((patient) => (
+              {(Array.isArray(patients) ? patients : patients.patients || []).map((patient: any) => (
                 <div
                   key={patient.id}
                   onClick={() => handleSelectPatient(patient)}
@@ -190,7 +189,7 @@ export function NewOrderScreen() {
                 type="search"
                 placeholder="Search tests..."
                 value={testSearchQuery}
-                onChange={(e) => setTestSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTestSearchQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -235,7 +234,7 @@ export function NewOrderScreen() {
                       <div>
                         <p className="font-medium text-sm">{test.name}</p>
                         <p className="text-xs text-gray-600">
-                          {test.code} • {test.category} • TAT: {test.turnaroundTime}
+                          {test.code} • {test.category}
                         </p>
                       </div>
                       {isSelected ? (

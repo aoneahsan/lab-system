@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { TrendingUp, Download } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 import {
   LineChart,
@@ -11,7 +11,7 @@ import {
   Legend,
   ReferenceLine,
   ResponsiveContainer,
-  Dot
+  ResponsiveContainer
 } from 'recharts';
 
 export default function LeveyJenningsChart() {
@@ -19,7 +19,7 @@ export default function LeveyJenningsChart() {
   const [selectedLevel, setSelectedLevel] = useState('');
   const [dateRange, setDateRange] = useState(30);
   
-  const { qcTests, leveyJenningsData, fetchQCTests, fetchLeveyJenningsData, loading } = useQualityControlStore();
+  const { qcTests, leveyJenningsData, fetchQCTests, fetchLeveyJenningsData } = useQualityControlStore();
 
   useEffect(() => {
     fetchQCTests({ status: 'active' });

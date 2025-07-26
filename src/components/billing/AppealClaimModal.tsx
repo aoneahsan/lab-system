@@ -70,9 +70,9 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
                   <dd className="font-medium">${claim.totalCharges.toFixed(2)}</dd>
                 </div>
                 <div>
-                  <dt className="text-gray-500">Denied Amount:</dt>
-                  <dd className="font-medium text-red-600">
-                    ${claim.deniedAmount?.toFixed(2) || claim.totalCharges.toFixed(2)}
+                  <dt className="text-gray-500">Paid Amount:</dt>
+                  <dd className="font-medium">
+                    ${claim.paidAmount?.toFixed(2) || '0.00'}
                   </dd>
                 </div>
                 <div>
@@ -80,10 +80,10 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
                   <dd className="font-medium">{claim.insuranceId}</dd>
                 </div>
               </dl>
-              {claim.rejectionReason && (
+              {claim.denialReason && (
                 <div className="mt-3 pt-3 border-t">
-                  <dt className="text-sm text-gray-500">Rejection Reason:</dt>
-                  <dd className="text-sm mt-1">{claim.rejectionReason}</dd>
+                  <dt className="text-sm text-gray-500">Denial Reason:</dt>
+                  <dd className="text-sm mt-1">{claim.denialReason}</dd>
                 </div>
               )}
             </div>

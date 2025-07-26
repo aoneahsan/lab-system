@@ -16,7 +16,7 @@ import {
 import { useOrder } from '@/hooks/useOrder';
 import { format } from 'date-fns';
 import { useCancelOrder } from '@/hooks/useCancelOrder';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function OrderDetailScreen() {
   const { orderId } = useParams<{ orderId: string }>();

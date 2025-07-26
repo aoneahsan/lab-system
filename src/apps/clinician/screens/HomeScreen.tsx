@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { 
@@ -8,9 +8,7 @@ import {
   FileText, 
   Users, 
   Activity,
-  Clock,
-  TrendingUp,
-  Calendar
+  Clock
 } from 'lucide-react';
 import { useCriticalResults } from '@/hooks/useCriticalResults';
 import { usePendingOrders } from '@/hooks/usePendingOrders';
@@ -18,7 +16,7 @@ import { useStats } from '@/hooks/useStats';
 import { format } from 'date-fns';
 
 export function HomeScreen() {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { data: criticalResults = [] } = useCriticalResults();
   const { data: pendingOrders = [] } = usePendingOrders();
   const { data: stats } = useStats();
@@ -35,7 +33,7 @@ export function HomeScreen() {
       {/* Welcome Section */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome, Dr. {user?.name}
+          Welcome, Dr. {currentUser?.displayName}
         </h1>
         <p className="text-gray-600 mt-1">
           {format(new Date(), 'EEEE, MMMM d, yyyy')}

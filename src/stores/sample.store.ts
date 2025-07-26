@@ -164,7 +164,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
   updateBatchStatus: async (tenantId, userId, sampleUpdates) => {
     set({ loading: true, error: null });
     try {
-      await sampleService.updateBatchStatus(tenantId, userId, sampleUpdates);
+      await sampleService.updateBatchStatus(tenantId, userId, sampleUpdates as any);
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {

@@ -16,13 +16,13 @@ import {
   Award,
   Clock
 } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 import { format } from 'date-fns';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function ProfileScreen() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { currentUser, logout } = useAuthStore();
 
   const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {
@@ -36,7 +36,7 @@ export function ProfileScreen() {
     toast.success('Biometric authentication enabled');
   };
 
-  if (!user) {
+  if (!currentUser) {
     return null;
   }
 
@@ -76,12 +76,12 @@ export function ProfileScreen() {
             <User className="h-10 w-10 text-gray-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dr. {user.name}</h1>
-            <p className="text-gray-600">{user.specialty || 'General Practitioner'}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Dr. {currentUser.displayName}</h1>
+            <p className="text-gray-600">{currentUser.metadata?.specialization || 'General Practitioner'}</p>
             <div className="flex items-center space-x-2 mt-2">
               <Badge variant="outline">
                 <Shield className="h-3 w-3 mr-1" />
-                {user.licenseNumber || 'LIC123456'}
+                {currentUser.metadata?.licenseNumber || 'LIC123456'}
               </Badge>
               <Badge variant="outline" className="bg-green-50 text-green-700">
                 Active
@@ -93,19 +93,19 @@ export function ProfileScreen() {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center space-x-2 text-gray-600">
             <Mail className="h-4 w-4" />
-            <span>{user.email}</span>
+            <span>{currentUser.email}</span>
           </div>
           <div className="flex items-center space-x-2 text-gray-600">
             <Phone className="h-4 w-4" />
-            <span>{user.phone || '+1 (555) 123-4567'}</span>
+            <span>{currentUser.phoneNumber || '+1 (555) 123-4567'}</span>
           </div>
           <div className="flex items-center space-x-2 text-gray-600">
             <Building className="h-4 w-4" />
-            <span>{user.department || 'Internal Medicine'}</span>
+            <span>{currentUser.metadata?.department || 'Internal Medicine'}</span>
           </div>
           <div className="flex items-center space-x-2 text-gray-600">
             <Calendar className="h-4 w-4" />
-            <span>Joined {format(new Date(user.createdAt || Date.now()), 'MMM yyyy')}</span>
+            <span>Joined {format(new Date(currentUser.createdAt || Date.now()), 'MMM yyyy')}</span>
           </div>
         </div>
       </Card>

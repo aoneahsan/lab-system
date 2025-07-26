@@ -1061,7 +1061,7 @@ export const billingService = {
     }
   ): Promise<string> {
     const installments = [];
-    let currentDate = new Date(planData.startDate);
+    const currentDate = new Date(planData.startDate);
 
     for (let i = 0; i < planData.numberOfInstallments; i++) {
       installments.push({

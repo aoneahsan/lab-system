@@ -7,6 +7,16 @@ interface WebhookHandlersProps {
   connectionId: string;
 }
 
+interface WebhookEndpointData {
+  id: string;
+  url: string;
+  events: string[];
+  isActive: boolean;
+  lastPingAt?: { toDate: () => Date };
+  lastPingStatus?: 'success' | 'failure';
+  secret?: string;
+}
+
 const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const { data: endpoints = [], isLoading } = useWebhookEndpoints(connectionId);
@@ -32,7 +42,7 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
 
   const handleCreateEndpoint = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createEndpointMutation.mutateAsync(formData);
+    await createEndpointMutation.mutateAsync({ connectionId, data: formData });
     setShowAddForm(false);
     setFormData({
       connectionId,
@@ -42,10 +52,10 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
     });
   };
 
-  const handleTestEndpoint = async (endpointId: string, eventType: WebhookEventType) => {
+  const handleTestEndpoint = async (endpointId: string) => {
     await testWebhookMutation.mutateAsync({
-      endpointId,
-      testPayload: { eventType },
+      connectionId,
+      webhookId: endpointId,
     });
   };
 
@@ -150,7 +160,7 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {endpoints.map((endpoint) => (
+          {(endpoints as WebhookEndpointData[]).map((endpoint) => (
             <div key={endpoint.id} className="bg-white border rounded-lg p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">

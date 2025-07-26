@@ -16,7 +16,7 @@ import {
 import { useCriticalResults } from '@/hooks/useCriticalResults';
 import { useAcknowledgeResult } from '@/hooks/useAcknowledgeResult';
 import { format, formatDistanceToNow } from 'date-fns';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export function CriticalResultsScreen() {
   const [filter, setFilter] = useState<'pending' | 'acknowledged' | 'all'>('pending');
@@ -39,7 +39,7 @@ export function CriticalResultsScreen() {
     window.location.href = `tel:${phoneNumber}`;
   };
 
-  const handleMessage = (patientId: string) => {
+  const handleMessage = () => {
     // Implement messaging functionality
     toast.success('Opening secure message...');
   };
@@ -207,7 +207,7 @@ export function CriticalResultsScreen() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleMessage(result.patientId)}
+                        onClick={() => handleMessage()}
                       >
                         <MessageSquare className="h-4 w-4" />
                       </Button>
@@ -215,7 +215,7 @@ export function CriticalResultsScreen() {
                   )}
 
                   {/* Acknowledgment Info */}
-                  {result.acknowledged && result.acknowledgedBy && (
+                  {result.acknowledged && result.acknowledgedBy && result.acknowledgedAt && (
                     <div className="bg-green-50 rounded-lg p-3 text-sm">
                       <p className="text-green-800">
                         Acknowledged by {result.acknowledgedBy} on{' '}

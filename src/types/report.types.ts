@@ -184,3 +184,20 @@ export interface ReportData {
     clia?: string;
   };
 }
+
+export interface TrendItem {
+  label: string;
+  value: number;
+}
+
+export interface AnalyticsMetrics {
+  totalTests: number;
+  totalPatients: number;
+  totalSamples: number;
+  totalRevenue: number;
+  averageTurnaroundTime: number;
+  testVolumeTrend: TrendItem[];
+  revenueTrend: TrendItem[];
+  topTests: Array<{ testCode: string; testName: string; count: number }>;
+  departmentStats: Array<{ department: string; tests: number; revenue: number }>;
+}

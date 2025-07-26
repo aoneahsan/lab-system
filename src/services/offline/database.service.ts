@@ -202,7 +202,7 @@ class OfflineDatabaseService {
     const tableName = `cached_${collection}`;
     const timestamp = Date.now();
 
-    let sql = `
+    const sql = `
       INSERT OR REPLACE INTO ${tableName} (id, data, last_synced${additionalFields ? ', ' + Object.keys(additionalFields).join(', ') : ''})
       VALUES (?, ?, ?${additionalFields ? ', ' + Object.keys(additionalFields).map(() => '?').join(', ') : ''})
     `;

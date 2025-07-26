@@ -17,10 +17,11 @@ import { format, differenceInYears } from 'date-fns';
 
 export function PatientsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: patients = [], isLoading } = usePatients({ 
-    clinicianId: 'current',
-    search: searchQuery 
+  const { data: patientsData, isLoading } = usePatients({ 
+    searchTerm: searchQuery 
   });
+  
+  const patients = Array.isArray(patientsData) ? patientsData : patientsData?.patients || [];
 
   const calculateAge = (dateOfBirth: string) => {
     return differenceInYears(new Date(), new Date(dateOfBirth));
@@ -70,7 +71,7 @@ export function PatientsScreen() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">
-                          {patient.name}
+                          {patient.fullName || `${patient.firstName} ${patient.lastName}`}
                         </h3>
                         <p className="text-sm text-gray-600">
                           MRN: {patient.mrn}
@@ -85,7 +86,7 @@ export function PatientsScreen() {
                       </div>
                       <div className="flex items-center space-x-2 text-gray-600">
                         <Phone className="h-4 w-4" />
-                        <span>{patient.phone}</span>
+                        <span>{patient.phoneNumber || 'No phone'}</span>
                       </div>
                     </div>
 
@@ -106,16 +107,16 @@ export function PatientsScreen() {
                       </div>
                     )}
 
-                    {patient.conditions && patient.conditions.length > 0 && (
+                    {patient.tags && patient.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
-                        {patient.conditions.slice(0, 3).map((condition, index) => (
+                        {patient.tags.slice(0, 3).map((tag: string, index: number) => (
                           <Badge key={index} variant="outline" size="sm">
-                            {condition}
+                            {tag}
                           </Badge>
                         ))}
-                        {patient.conditions.length > 3 && (
+                        {patient.tags.length > 3 && (
                           <Badge variant="outline" size="sm">
-                            +{patient.conditions.length - 3} more
+                            +{patient.tags.length - 3} more
                           </Badge>
                         )}
                       </div>

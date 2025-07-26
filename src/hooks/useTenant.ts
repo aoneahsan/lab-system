@@ -45,6 +45,6 @@ export const useTenant = () => {
 		isActive: currentTenant?.isActive ?? false,
 		subscription: currentTenant?.subscription,
 		settings: currentTenant?.settings,
-		features: currentTenant?.settings.features,
+		features: currentTenant?.settings?.features,
 	};
 };

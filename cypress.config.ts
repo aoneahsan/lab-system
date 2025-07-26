@@ -37,8 +37,8 @@ export default defineConfig({
         },
       });
 
-      // Code coverage
-      require('@cypress/code-coverage/task')(on, config);
+      // Code coverage - commented out for now due to ESM issues
+      // require('@cypress/code-coverage/task')(on, config);
 
       return config;
     },

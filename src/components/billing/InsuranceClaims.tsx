@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { billingService } from '@/services/billing';
 import type { InsuranceClaim } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
@@ -13,7 +13,6 @@ import {
 
 const InsuranceClaims: React.FC = () => {
   const [selectedClaim, setSelectedClaim] = useState<InsuranceClaim | null>(null);
-  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [filters, setFilters] = useState({
     status: '',
     provider: '',
@@ -21,19 +20,11 @@ const InsuranceClaims: React.FC = () => {
     endDate: new Date()
   });
 
-  const { data: claims, isLoading, refetch } = useQuery({
+  const { data: claims, isLoading } = useQuery({
     queryKey: ['insurance-claims', filters],
     queryFn: () => billingService.getInsuranceClaims(filters)
   });
 
-  const submitClaimMutation = useMutation({
-    mutationFn: (claim: Partial<InsuranceClaim>) => 
-      billingService.submitInsuranceClaim(claim),
-    onSuccess: () => {
-      setShowSubmitDialog(false);
-      refetch();
-    }
-  });
 
   const getStatusIcon = (status: InsuranceClaim['status']) => {
     switch (status) {

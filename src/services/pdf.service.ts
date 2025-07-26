@@ -853,7 +853,7 @@ export class PDFService {
   }
 
   private addAgingReportContent(doc: jsPDF, data: any, startY: number) {
-    let yPosition = startY;
+    const yPosition = startY;
 
     doc.setFontSize(10);
     const agingData = [
