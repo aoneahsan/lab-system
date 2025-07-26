@@ -201,4 +201,171 @@ export const resultService = {
       updatedAt: serverTimestamp(),
     });
   },
+
+  // Amendment/Correction workflow
+  async amendResult(
+    tenantId: string,
+    resultId: string,
+    amendment: {
+      newValue: string;
+      newUnit?: string;
+      newFlag?: ResultFlag;
+      reason: string;
+      amendedBy: string;
+      amendedByName: string;
+    }
+  ): Promise<void> {
+    const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    
+    // Create audit record
+    const auditRecord = {
+      tenantId,
+      entityType: 'result',
+      entityId: resultId,
+      action: 'amendment',
+      performedBy: amendment.amendedBy,
+      performedByName: amendment.amendedByName,
+      timestamp: Timestamp.now(),
+      changes: {
+        previousValue: null, // Will be populated from current result
+        newValue: amendment.newValue,
+        previousUnit: null,
+        newUnit: amendment.newUnit,
+        previousFlag: null,
+        newFlag: amendment.newFlag,
+        reason: amendment.reason,
+      },
+      ipAddress: null, // Would be captured in production
+      userAgent: navigator.userAgent,
+    };
+
+    // Get current result to store previous values
+    const currentResult = await getDocs(query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('__name__', '==', resultId)
+    ));
+    
+    if (!currentResult.empty) {
+      const currentData = currentResult.docs[0].data();
+      auditRecord.changes.previousValue = currentData.value;
+      auditRecord.changes.previousUnit = currentData.unit;
+      auditRecord.changes.previousFlag = currentData.flag;
+    }
+
+    // Save audit record
+    await addDoc(collection(db, COLLECTIONS.AUDIT_LOGS), auditRecord);
+
+    // Update result with amendment
+    await updateDoc(resultRef, {
+      value: amendment.newValue,
+      unit: amendment.newUnit || undefined,
+      flag: amendment.newFlag || undefined,
+      amendedAt: Timestamp.now(),
+      amendedBy: amendment.amendedBy,
+      amendedByName: amendment.amendedByName,
+      amendmentReason: amendment.reason,
+      status: 'amended' as ResultStatus,
+      updatedAt: serverTimestamp(),
+    });
+  },
+
+  // Get amendment history for a result
+  async getAmendmentHistory(tenantId: string, resultId: string): Promise<any[]> {
+    const q = query(
+      collection(db, COLLECTIONS.AUDIT_LOGS),
+      where('entityType', '==', 'result'),
+      where('entityId', '==', resultId),
+      where('action', '==', 'amendment'),
+      orderBy('timestamp', 'desc')
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  },
+
+  // Batch result entry
+  async enterBatchResults(
+    tenantId: string,
+    orderId: string,
+    results: Array<{
+      testId: string;
+      testCode: string;
+      testName: string;
+      value: string;
+      unit?: string;
+      referenceRange?: string;
+      flag?: ResultFlag;
+    }>,
+    enteredBy: string,
+    enteredByName: string
+  ): Promise<void> {
+    const batch = [];
+    const timestamp = Timestamp.now();
+
+    for (const result of results) {
+      const newResult: Partial<TestResult> = {
+        tenantId,
+        orderId,
+        testId: result.testId,
+        testCode: result.testCode,
+        testName: result.testName,
+        value: result.value,
+        unit: result.unit,
+        referenceRange: result.referenceRange,
+        flag: result.flag,
+        status: 'preliminary',
+        enteredBy,
+        enteredByName,
+        enteredAt: timestamp,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+
+      batch.push(addDoc(collection(db, COLLECTIONS.RESULTS), newResult));
+    }
+
+    await Promise.all(batch);
+  },
+
+  // Mark result as critical and notify
+  async markCritical(
+    tenantId: string,
+    resultId: string,
+    criticalInfo: {
+      markedBy: string;
+      markedByName: string;
+      notificationSent: boolean;
+      notifiedPersonnel?: string[];
+    }
+  ): Promise<void> {
+    const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    
+    await updateDoc(resultRef, {
+      isCritical: true,
+      criticalMarkedAt: Timestamp.now(),
+      criticalMarkedBy: criticalInfo.markedBy,
+      criticalMarkedByName: criticalInfo.markedByName,
+      criticalNotificationSent: criticalInfo.notificationSent,
+      criticalNotifiedPersonnel: criticalInfo.notifiedPersonnel || [],
+      updatedAt: serverTimestamp(),
+    });
+
+    // Create audit log
+    await addDoc(collection(db, COLLECTIONS.AUDIT_LOGS), {
+      tenantId,
+      entityType: 'result',
+      entityId: resultId,
+      action: 'marked_critical',
+      performedBy: criticalInfo.markedBy,
+      performedByName: criticalInfo.markedByName,
+      timestamp: Timestamp.now(),
+      details: {
+        notificationSent: criticalInfo.notificationSent,
+        notifiedPersonnel: criticalInfo.notifiedPersonnel,
+      },
+    });
+  },
 };

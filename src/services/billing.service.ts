@@ -690,4 +690,532 @@ export const billingService = {
       ...doc.data()
     } as InsuranceEligibility));
   },
+
+  // Process claim response from insurance
+  async processClaimResponse(
+    tenantId: string,
+    userId: string,
+    claimId: string,
+    response: {
+      status: 'approved' | 'denied' | 'partial' | 'pending';
+      approvedAmount?: number;
+      deniedAmount?: number;
+      allowedAmount?: number;
+      patientResponsibility?: number;
+      paymentAmount?: number;
+      paymentDate?: Date;
+      eobNumber?: string;
+      adjustmentReason?: string;
+      denialReason?: string;
+      notes?: string;
+    }
+  ): Promise<void> {
+    const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
+    const claimDoc = await getDoc(claimRef);
+    
+    if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
+      throw new Error('Claim not found');
+    }
+
+    const updateData: any = {
+      status: response.status,
+      processedDate: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    };
+
+    if (response.approvedAmount !== undefined) {
+      updateData.approvedAmount = response.approvedAmount;
+    }
+    if (response.deniedAmount !== undefined) {
+      updateData.deniedAmount = response.deniedAmount;
+    }
+    if (response.allowedAmount !== undefined) {
+      updateData.allowedAmount = response.allowedAmount;
+    }
+    if (response.patientResponsibility !== undefined) {
+      updateData.patientResponsibility = response.patientResponsibility;
+    }
+    if (response.paymentAmount !== undefined) {
+      updateData.paymentAmount = response.paymentAmount;
+    }
+    if (response.paymentDate) {
+      updateData.paymentDate = Timestamp.fromDate(response.paymentDate);
+    }
+    if (response.eobNumber) {
+      updateData.eobNumber = response.eobNumber;
+    }
+    if (response.adjustmentReason) {
+      updateData.adjustmentReason = response.adjustmentReason;
+    }
+    if (response.denialReason) {
+      updateData.denialReason = response.denialReason;
+    }
+    if (response.notes) {
+      updateData.responseNotes = response.notes;
+    }
+
+    await updateDoc(claimRef, updateData);
+
+    // If payment was received, create a payment record
+    if (response.paymentAmount && response.paymentAmount > 0) {
+      const claim = claimDoc.data() as InsuranceClaim;
+      await this.createPayment(tenantId, userId, {
+        invoiceId: claim.invoiceId,
+        amount: response.paymentAmount,
+        paymentDate: response.paymentDate || new Date(),
+        method: 'insurance',
+        referenceNumber: response.eobNumber,
+        insuranceClaimId: claimId,
+        notes: `Insurance payment for claim ${claim.claimNumber}`,
+      });
+    }
+
+    // Create audit log
+    await addDoc(collection(db, COLLECTIONS.AUDIT_LOGS), {
+      tenantId,
+      entityType: 'insurance_claim',
+      entityId: claimId,
+      action: 'claim_response_processed',
+      performedBy: userId,
+      timestamp: Timestamp.now(),
+      details: response,
+    });
+  },
+
+  // Appeal denied claim
+  async appealClaim(
+    tenantId: string,
+    userId: string,
+    claimId: string,
+    appealData: {
+      appealReason: string;
+      supportingDocuments?: string[];
+      additionalNotes?: string;
+    }
+  ): Promise<void> {
+    const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
+    const claimDoc = await getDoc(claimRef);
+    
+    if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
+      throw new Error('Claim not found');
+    }
+
+    const claim = claimDoc.data() as InsuranceClaim;
+    if (claim.status !== 'denied' && claim.status !== 'partial') {
+      throw new Error('Only denied or partial claims can be appealed');
+    }
+
+    await updateDoc(claimRef, {
+      status: 'appealed',
+      appealDate: serverTimestamp(),
+      appealReason: appealData.appealReason,
+      appealDocuments: appealData.supportingDocuments || [],
+      appealNotes: appealData.additionalNotes,
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    });
+
+    // Create audit log
+    await addDoc(collection(db, COLLECTIONS.AUDIT_LOGS), {
+      tenantId,
+      entityType: 'insurance_claim',
+      entityId: claimId,
+      action: 'claim_appealed',
+      performedBy: userId,
+      timestamp: Timestamp.now(),
+      details: appealData,
+    });
+  },
+
+  // Batch claim submission
+  async submitBatchClaims(
+    tenantId: string,
+    userId: string,
+    claimIds: string[]
+  ): Promise<{ submitted: string[]; failed: string[] }> {
+    const submitted: string[] = [];
+    const failed: string[] = [];
+
+    for (const claimId of claimIds) {
+      try {
+        await this.submitClaim(tenantId, userId, claimId);
+        submitted.push(claimId);
+      } catch (error) {
+        failed.push(claimId);
+      }
+    }
+
+    return { submitted, failed };
+  },
+
+  // Generate claim form (CMS-1500 or UB-04)
+  async generateClaimForm(
+    tenantId: string,
+    claimId: string,
+    formType: 'CMS1500' | 'UB04'
+  ): Promise<any> {
+    const claim = await this.getClaim(tenantId, claimId);
+    if (!claim) {
+      throw new Error('Claim not found');
+    }
+
+    // TODO: Implement actual form generation
+    // This would typically generate a PDF or EDI file
+    return {
+      formType,
+      claimId,
+      generatedAt: new Date(),
+      // Form data would be populated here
+    };
+  },
+
+  // Check claim status with insurance
+  async checkClaimStatus(
+    tenantId: string,
+    claimId: string
+  ): Promise<{
+    status: string;
+    lastChecked: Date;
+    message: string;
+  }> {
+    // TODO: Implement actual insurance API integration
+    // This is a mock implementation
+    return {
+      status: 'pending',
+      lastChecked: new Date(),
+      message: 'Claim is being processed by insurance',
+    };
+  },
+
+  // Payment tracking and reconciliation features
+  
+  // Get payment history for a patient
+  async getPaymentHistory(
+    tenantId: string,
+    patientId: string,
+    dateRange?: { start: Date; end: Date }
+  ): Promise<{
+    payments: Payment[];
+    totalPaid: number;
+    paymentMethods: Record<string, number>;
+  }> {
+    // Get all invoices for the patient
+    const invoicesQuery = query(
+      collection(db, COLLECTIONS.INVOICES),
+      where('tenantId', '==', tenantId),
+      where('patientId', '==', patientId)
+    );
+    const invoicesSnapshot = await getDocs(invoicesQuery);
+    const invoiceIds = invoicesSnapshot.docs.map(doc => doc.id);
+
+    if (invoiceIds.length === 0) {
+      return { payments: [], totalPaid: 0, paymentMethods: {} };
+    }
+
+    // Get payments for those invoices
+    let paymentsQuery = query(
+      collection(db, COLLECTIONS.PAYMENTS),
+      where('tenantId', '==', tenantId),
+      where('invoiceId', 'in', invoiceIds)
+    );
+
+    if (dateRange) {
+      paymentsQuery = query(
+        paymentsQuery,
+        where('paymentDate', '>=', Timestamp.fromDate(dateRange.start)),
+        where('paymentDate', '<=', Timestamp.fromDate(dateRange.end))
+      );
+    }
+
+    paymentsQuery = query(paymentsQuery, orderBy('paymentDate', 'desc'));
+
+    const paymentsSnapshot = await getDocs(paymentsQuery);
+    const payments = paymentsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Payment));
+
+    // Calculate totals
+    let totalPaid = 0;
+    const paymentMethods: Record<string, number> = {};
+
+    payments.forEach(payment => {
+      totalPaid += payment.amount;
+      paymentMethods[payment.method] = (paymentMethods[payment.method] || 0) + payment.amount;
+    });
+
+    return { payments, totalPaid, paymentMethods };
+  },
+
+  // Reconcile payments with bank deposits
+  async reconcileDeposit(
+    tenantId: string,
+    userId: string,
+    reconciliationData: {
+      depositDate: Date;
+      depositAmount: number;
+      bankReference: string;
+      paymentIds: string[];
+      notes?: string;
+    }
+  ): Promise<string> {
+    // Verify all payments exist and calculate total
+    let totalPaymentAmount = 0;
+    const payments = [];
+
+    for (const paymentId of reconciliationData.paymentIds) {
+      const paymentRef = doc(db, COLLECTIONS.PAYMENTS, paymentId);
+      const paymentDoc = await getDoc(paymentRef);
+      
+      if (!paymentDoc.exists() || paymentDoc.data()?.tenantId !== tenantId) {
+        throw new Error(`Payment ${paymentId} not found`);
+      }
+
+      const payment = paymentDoc.data() as Payment;
+      if (payment.reconciledDate) {
+        throw new Error(`Payment ${paymentId} is already reconciled`);
+      }
+
+      totalPaymentAmount += payment.amount;
+      payments.push({ id: paymentId, ...payment });
+    }
+
+    // Check if amounts match
+    const difference = Math.abs(totalPaymentAmount - reconciliationData.depositAmount);
+    if (difference > 0.01) {
+      throw new Error(`Payment total ($${totalPaymentAmount}) does not match deposit amount ($${reconciliationData.depositAmount})`);
+    }
+
+    // Create reconciliation record
+    const reconciliationRef = await addDoc(collection(db, COLLECTIONS.PAYMENT_RECONCILIATIONS), {
+      tenantId,
+      depositDate: Timestamp.fromDate(reconciliationData.depositDate),
+      depositAmount: reconciliationData.depositAmount,
+      bankReference: reconciliationData.bankReference,
+      paymentIds: reconciliationData.paymentIds,
+      paymentTotal: totalPaymentAmount,
+      difference: 0,
+      status: 'reconciled',
+      notes: reconciliationData.notes,
+      reconciledBy: userId,
+      reconciledAt: serverTimestamp(),
+      createdAt: serverTimestamp(),
+    });
+
+    // Update payments as reconciled
+    const updatePromises = reconciliationData.paymentIds.map(paymentId =>
+      updateDoc(doc(db, COLLECTIONS.PAYMENTS, paymentId), {
+        reconciledDate: serverTimestamp(),
+        reconciliationId: reconciliationRef.id,
+        updatedAt: serverTimestamp(),
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    return reconciliationRef.id;
+  },
+
+  // Get unreconciled payments
+  async getUnreconciledPayments(
+    tenantId: string,
+    dateRange?: { start: Date; end: Date }
+  ): Promise<Payment[]> {
+    let q = query(
+      collection(db, COLLECTIONS.PAYMENTS),
+      where('tenantId', '==', tenantId),
+      where('reconciledDate', '==', null)
+    );
+
+    if (dateRange) {
+      q = query(
+        q,
+        where('paymentDate', '>=', Timestamp.fromDate(dateRange.start)),
+        where('paymentDate', '<=', Timestamp.fromDate(dateRange.end))
+      );
+    }
+
+    q = query(q, orderBy('paymentDate', 'desc'));
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Payment));
+  },
+
+  // Payment plan management
+  async createPaymentPlan(
+    tenantId: string,
+    userId: string,
+    planData: {
+      patientId: string;
+      invoiceIds: string[];
+      totalAmount: number;
+      downPayment: number;
+      numberOfInstallments: number;
+      installmentAmount: number;
+      startDate: Date;
+      notes?: string;
+    }
+  ): Promise<string> {
+    const installments = [];
+    let currentDate = new Date(planData.startDate);
+
+    for (let i = 0; i < planData.numberOfInstallments; i++) {
+      installments.push({
+        installmentNumber: i + 1,
+        dueDate: Timestamp.fromDate(new Date(currentDate)),
+        amount: planData.installmentAmount,
+        status: 'pending',
+        paidAmount: 0,
+      });
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    const paymentPlanRef = await addDoc(collection(db, COLLECTIONS.PAYMENT_PLANS), {
+      tenantId,
+      patientId: planData.patientId,
+      invoiceIds: planData.invoiceIds,
+      totalAmount: planData.totalAmount,
+      downPayment: planData.downPayment,
+      remainingBalance: planData.totalAmount - planData.downPayment,
+      numberOfInstallments: planData.numberOfInstallments,
+      installmentAmount: planData.installmentAmount,
+      installments,
+      status: 'active',
+      startDate: Timestamp.fromDate(planData.startDate),
+      notes: planData.notes,
+      createdBy: userId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    // Update invoices to reference payment plan
+    const updatePromises = planData.invoiceIds.map(invoiceId =>
+      updateDoc(doc(db, COLLECTIONS.INVOICES, invoiceId), {
+        paymentPlanId: paymentPlanRef.id,
+        updatedAt: serverTimestamp(),
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    return paymentPlanRef.id;
+  },
+
+  // Record payment plan installment
+  async recordInstallmentPayment(
+    tenantId: string,
+    userId: string,
+    paymentPlanId: string,
+    installmentNumber: number,
+    paymentData: {
+      amount: number;
+      paymentDate: Date;
+      method: string;
+      referenceNumber?: string;
+    }
+  ): Promise<void> {
+    const planRef = doc(db, COLLECTIONS.PAYMENT_PLANS, paymentPlanId);
+    const planDoc = await getDoc(planRef);
+    
+    if (!planDoc.exists() || planDoc.data()?.tenantId !== tenantId) {
+      throw new Error('Payment plan not found');
+    }
+
+    const plan = planDoc.data();
+    const installments = [...plan.installments];
+    const installmentIndex = installmentNumber - 1;
+
+    if (installmentIndex < 0 || installmentIndex >= installments.length) {
+      throw new Error('Invalid installment number');
+    }
+
+    // Update installment
+    installments[installmentIndex].paidAmount += paymentData.amount;
+    installments[installmentIndex].paidDate = Timestamp.fromDate(paymentData.paymentDate);
+    installments[installmentIndex].status = 
+      installments[installmentIndex].paidAmount >= installments[installmentIndex].amount 
+        ? 'paid' 
+        : 'partial';
+
+    // Calculate new remaining balance
+    const totalPaid = installments.reduce((sum, inst) => sum + inst.paidAmount, 0) + plan.downPayment;
+    const remainingBalance = plan.totalAmount - totalPaid;
+
+    // Update plan status
+    const allPaid = installments.every(inst => inst.status === 'paid');
+    const planStatus = allPaid ? 'completed' : 'active';
+
+    await updateDoc(planRef, {
+      installments,
+      remainingBalance,
+      status: planStatus,
+      updatedAt: serverTimestamp(),
+      updatedBy: userId,
+    });
+
+    // Create payment record
+    // Note: This would typically also create a payment record linked to the invoices
+  },
+
+  // Get payment analytics
+  async getPaymentAnalytics(
+    tenantId: string,
+    dateRange: { start: Date; end: Date }
+  ): Promise<{
+    totalCollected: number;
+    averagePaymentTime: number;
+    paymentMethodBreakdown: Record<string, number>;
+    topPayingPatients: Array<{ patientId: string; totalPaid: number }>;
+    collectionRate: number;
+    monthlyTrend: Array<{ month: string; collected: number; billed: number }>;
+  }> {
+    // Get all payments in date range
+    const paymentsQuery = query(
+      collection(db, COLLECTIONS.PAYMENTS),
+      where('tenantId', '==', tenantId),
+      where('paymentDate', '>=', Timestamp.fromDate(dateRange.start)),
+      where('paymentDate', '<=', Timestamp.fromDate(dateRange.end))
+    );
+    
+    const paymentsSnapshot = await getDocs(paymentsQuery);
+    const payments = paymentsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Payment));
+
+    // Calculate analytics
+    let totalCollected = 0;
+    const paymentMethodBreakdown: Record<string, number> = {};
+    const patientPayments: Record<string, number> = {};
+
+    payments.forEach(payment => {
+      totalCollected += payment.amount;
+      paymentMethodBreakdown[payment.method] = 
+        (paymentMethodBreakdown[payment.method] || 0) + payment.amount;
+      patientPayments[payment.patientId] = 
+        (patientPayments[payment.patientId] || 0) + payment.amount;
+    });
+
+    // Get top paying patients
+    const topPayingPatients = Object.entries(patientPayments)
+      .map(([patientId, totalPaid]) => ({ patientId, totalPaid }))
+      .sort((a, b) => b.totalPaid - a.totalPaid)
+      .slice(0, 10);
+
+    // TODO: Calculate actual average payment time, collection rate, and monthly trends
+    // This would require correlating with invoice creation dates
+
+    return {
+      totalCollected,
+      averagePaymentTime: 15, // days - placeholder
+      paymentMethodBreakdown,
+      topPayingPatients,
+      collectionRate: 85, // percentage - placeholder
+      monthlyTrend: [], // placeholder
+    };
+  },
 };

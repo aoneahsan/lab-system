@@ -13,6 +13,7 @@ import { MobileAppSelector } from '@/mobile/MobileAppSelector';
 import { PerformanceProvider } from '@/providers/PerformanceProvider';
 import { performanceMonitor } from '@/utils/performance-monitoring';
 import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics';
+import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -53,6 +54,7 @@ function App() {
 						<RouterComponent />
 						<Toaster />
 						<PerformanceMetrics />
+						<OfflineIndicator />
 					</BrowserRouter>
 					<ReactQueryDevtools initialIsOpen={false} />
 				</PerformanceProvider>
