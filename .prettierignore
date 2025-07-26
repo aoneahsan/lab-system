@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+coverage/
+.nyc_output/
+
+# Firebase
+.firebase/
+functions/lib/
+
+# Mobile
+ios/
+android/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+
+# Misc
+*.min.js
+*.min.css
+vendor/
+public/assets/
+*.generated.*
+
+# Data files
+*.json
+*.csv
+*.xml
+
+# Documentation
+*.md
+
+# Config files that shouldn't be formatted
+.gitignore
+.eslintignore
+.prettierignore
+.env*
+
+# Generated files
+*.d.ts
+tsconfig.tsbuildinfo
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/

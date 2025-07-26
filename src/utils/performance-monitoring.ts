@@ -252,7 +252,7 @@ export function withPerformanceTracking<P extends object>(
 ) {
   return (props: P) => {
     usePerformanceTracking(componentName);
-    return <Component {...props} />;
+    return React.createElement(Component, props);
   };
 }
 

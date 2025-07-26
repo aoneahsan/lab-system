@@ -92,7 +92,14 @@ vi.mock('firebase/analytics', () => ({
 }));
 
 vi.mock('firebase/performance', () => ({
-  getPerformance: vi.fn(() => ({})),
+  getPerformance: vi.fn(() => ({
+    trace: vi.fn(() => ({
+      start: vi.fn(),
+      stop: vi.fn(),
+      putAttribute: vi.fn(),
+      putMetric: vi.fn(),
+    })),
+  })),
 }));
 
 vi.mock('firebase/remote-config', () => ({
@@ -125,6 +132,14 @@ vi.mock('@/config/firebase', () => ({
   firestore: {},
   storage: {},
   functions: {},
+  performance: {
+    trace: vi.fn(() => ({
+      start: vi.fn(),
+      stop: vi.fn(),
+      putAttribute: vi.fn(),
+      putMetric: vi.fn(),
+    })),
+  },
 }));
 
 // Mock Capacitor

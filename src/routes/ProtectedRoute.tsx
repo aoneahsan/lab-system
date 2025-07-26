@@ -3,12 +3,21 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
-export const ProtectedRoute = () => {
-	const { isAuthenticated } = useAuthStore();
+interface ProtectedRouteProps {
+	allowedRoles?: string[];
+}
+
+export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
+	const { isAuthenticated, user } = useAuthStore();
 	const { tenant, isLoading } = useTenant();
 
 	if (!isAuthenticated) {
 		return <Navigate to='/login' replace />;
+	}
+
+	// Check role-based access
+	if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+		return <Navigate to='/dashboard' replace />;
 	}
 
 	if (isLoading) {

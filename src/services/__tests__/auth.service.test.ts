@@ -1,190 +1,226 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
   signOut,
-  updateProfile
+  sendPasswordResetEmail,
+  updateProfile,
+  User
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { authService } from '../auth.service';
-import { UserRole } from '@/types/auth.types';
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import * as authService from '../auth.service';
+import { auth, db } from '@/lib/firebase';
 
 // Mock Firebase modules
 vi.mock('firebase/auth');
 vi.mock('firebase/firestore');
 
 describe('AuthService', () => {
+  const mockUser = {
+    uid: 'test-uid',
+    email: 'test@example.com',
+    displayName: 'Test User',
+  } as User;
+
+  const mockUserData = {
+    id: 'test-uid',
+    email: 'test@example.com',
+    displayName: 'Test User',
+    firstName: 'Test',
+    lastName: 'User',
+    role: 'lab_technician' as const,
+    tenantId: 'tenant-1',
+    permissions: [],
+    isActive: true,
+    isEmailVerified: true,
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('login', () => {
-    it('should successfully login a user', async () => {
-      const mockUser = {
-        uid: 'test-uid',
-        email: 'test@example.com',
-        displayName: 'Test User',
-      };
-      
-      const mockUserDoc = {
-        exists: () => true,
-        data: () => ({
-          email: 'test@example.com',
-          displayName: 'Test User',
-          role: UserRole.LAB_TECHNICIAN,
-          tenantId: 'tenant-123',
-          active: true,
-        }),
-      };
-
+    it('should login user successfully', async () => {
       vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
         user: mockUser,
       } as any);
-      
-      vi.mocked(getDoc).mockResolvedValue(mockUserDoc as any);
 
-      const result = await authService.login('test@example.com', 'password');
+      vi.mocked(getDoc).mockResolvedValue({
+        exists: () => true,
+        data: () => mockUserData,
+      } as any);
 
-      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
-        expect.anything(),
-        'test@example.com',
-        'password'
-      );
-      expect(result.user).toBeDefined();
-      expect(result.user.email).toBe('test@example.com');
+      const result = await authService.login('test@example.com', 'password123');
+
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, 'test@example.com', 'password123');
+      expect(getDoc).toHaveBeenCalled();
+      expect(result).toEqual(mockUserData);
     });
 
-    it('should throw error for invalid credentials', async () => {
-      vi.mocked(signInWithEmailAndPassword).mockRejectedValue(
-        new Error('Invalid credentials')
-      );
+    it('should throw error if user document not found', async () => {
+      vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+        user: mockUser,
+      } as any);
 
-      await expect(
-        authService.login('test@example.com', 'wrongpassword')
-      ).rejects.toThrow('Invalid credentials');
+      vi.mocked(getDoc).mockResolvedValue({
+        exists: () => false,
+      } as any);
+
+      await expect(authService.login('test@example.com', 'password123')).rejects.toThrow('User data not found');
+    });
+
+    it('should handle login errors', async () => {
+      vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error('Invalid credentials'));
+
+      await expect(authService.login('test@example.com', 'wrong-password')).rejects.toThrow('Invalid credentials');
     });
   });
 
   describe('register', () => {
-    it('should successfully register a new user', async () => {
-      const mockUser = {
-        uid: 'new-user-uid',
-        email: 'newuser@example.com',
-      };
-
+    it('should register user successfully', async () => {
       vi.mocked(createUserWithEmailAndPassword).mockResolvedValue({
         user: mockUser,
       } as any);
-      
+
       vi.mocked(updateProfile).mockResolvedValue(undefined);
       vi.mocked(setDoc).mockResolvedValue(undefined);
 
-      const result = await authService.register({
-        email: 'newuser@example.com',
+      const userData = {
+        email: 'test@example.com',
         password: 'password123',
-        displayName: 'New User',
-        role: UserRole.PATIENT,
-        tenantId: 'tenant-123',
-      });
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'patient' as const,
+        tenantId: 'tenant-1',
+      };
 
-      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
-        expect.anything(),
-        'newuser@example.com',
-        'password123'
-      );
-      expect(updateProfile).toHaveBeenCalledWith(mockUser, {
-        displayName: 'New User',
-      });
+      const result = await authService.register(userData);
+
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(auth, userData.email, userData.password);
+      expect(updateProfile).toHaveBeenCalledWith(mockUser, { displayName: 'Test User' });
       expect(setDoc).toHaveBeenCalled();
-      expect(result.user).toBeDefined();
+      expect(result).toMatchObject({
+        id: mockUser.uid,
+        email: userData.email,
+        displayName: 'Test User',
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role,
+        tenantId: userData.tenantId,
+      });
     });
 
-    it('should throw error for duplicate email', async () => {
-      vi.mocked(createUserWithEmailAndPassword).mockRejectedValue(
-        new Error('Email already in use')
-      );
+    it('should handle registration errors', async () => {
+      vi.mocked(createUserWithEmailAndPassword).mockRejectedValue(new Error('Email already in use'));
 
-      await expect(
-        authService.register({
-          email: 'existing@example.com',
-          password: 'password123',
-          displayName: 'User',
-          role: UserRole.PATIENT,
-          tenantId: 'tenant-123',
-        })
-      ).rejects.toThrow('Email already in use');
-    });
-  });
+      const userData = {
+        email: 'test@example.com',
+        password: 'password123',
+        firstName: 'Test',
+        lastName: 'User',
+        role: 'patient' as const,
+        tenantId: 'tenant-1',
+      };
 
-  describe('resetPassword', () => {
-    it('should send password reset email', async () => {
-      vi.mocked(sendPasswordResetEmail).mockResolvedValue(undefined);
-
-      await authService.resetPassword('test@example.com');
-
-      expect(sendPasswordResetEmail).toHaveBeenCalledWith(
-        expect.anything(),
-        'test@example.com'
-      );
-    });
-
-    it('should throw error for non-existent email', async () => {
-      vi.mocked(sendPasswordResetEmail).mockRejectedValue(
-        new Error('User not found')
-      );
-
-      await expect(
-        authService.resetPassword('nonexistent@example.com')
-      ).rejects.toThrow('User not found');
+      await expect(authService.register(userData)).rejects.toThrow('Email already in use');
     });
   });
 
   describe('logout', () => {
-    it('should successfully logout user', async () => {
+    it('should logout user successfully', async () => {
       vi.mocked(signOut).mockResolvedValue(undefined);
 
       await authService.logout();
 
-      expect(signOut).toHaveBeenCalledWith(expect.anything());
+      expect(signOut).toHaveBeenCalledWith(auth);
+    });
+
+    it('should handle logout errors', async () => {
+      vi.mocked(signOut).mockRejectedValue(new Error('Logout failed'));
+
+      await expect(authService.logout()).rejects.toThrow('Logout failed');
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should send password reset email successfully', async () => {
+      vi.mocked(sendPasswordResetEmail).mockResolvedValue(undefined);
+
+      await authService.resetPassword('test@example.com');
+
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith(auth, 'test@example.com');
+    });
+
+    it('should handle password reset errors', async () => {
+      vi.mocked(sendPasswordResetEmail).mockRejectedValue(new Error('User not found'));
+
+      await expect(authService.resetPassword('test@example.com')).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('updateUserProfile', () => {
+    it('should update user profile successfully', async () => {
+      vi.mocked(updateDoc).mockResolvedValue(undefined);
+
+      const updates = {
+        displayName: 'Updated User',
+        phoneNumber: '+1234567890',
+      };
+
+      await authService.updateUserProfile('test-uid', updates);
+
+      expect(updateDoc).toHaveBeenCalledWith(
+        doc(db, 'users', 'test-uid'),
+        {
+          ...updates,
+          updatedAt: serverTimestamp(),
+        }
+      );
+    });
+
+    it('should handle profile update errors', async () => {
+      vi.mocked(updateDoc).mockRejectedValue(new Error('Update failed'));
+
+      const updates = {
+        displayName: 'Updated User',
+      };
+
+      await expect(authService.updateUserProfile('test-uid', updates)).rejects.toThrow('Update failed');
     });
   });
 
   describe('getUserById', () => {
-    it('should return user data for valid user ID', async () => {
-      const mockUserDoc = {
+    it('should get user by id successfully', async () => {
+      vi.mocked(getDoc).mockResolvedValue({
         exists: () => true,
-        id: 'user-123',
-        data: () => ({
-          email: 'test@example.com',
-          displayName: 'Test User',
-          role: UserRole.CLINICIAN,
-          tenantId: 'tenant-123',
-          active: true,
-        }),
-      };
+        data: () => mockUserData,
+      } as any);
 
-      vi.mocked(getDoc).mockResolvedValue(mockUserDoc as any);
+      const result = await authService.getUserById('test-uid');
 
-      const user = await authService.getUserById('user-123');
-
-      expect(getDoc).toHaveBeenCalled();
-      expect(user).toBeDefined();
-      expect(user?.id).toBe('user-123');
-      expect(user?.email).toBe('test@example.com');
-      expect(user?.role).toBe(UserRole.CLINICIAN);
+      expect(getDoc).toHaveBeenCalledWith(doc(db, 'users', 'test-uid'));
+      expect(result).toEqual(mockUserData);
     });
 
-    it('should return null for non-existent user', async () => {
-      const mockUserDoc = {
+    it('should return null if user not found', async () => {
+      vi.mocked(getDoc).mockResolvedValue({
         exists: () => false,
-      };
+      } as any);
 
-      vi.mocked(getDoc).mockResolvedValue(mockUserDoc as any);
+      const result = await authService.getUserById('non-existent');
 
-      const user = await authService.getUserById('non-existent');
+      expect(result).toBeNull();
+    });
+  });
 
-      expect(user).toBeNull();
+  describe('changePassword', () => {
+    it('should handle change password request', async () => {
+      // This would typically require reauthentication
+      // For now, we'll test the basic flow
+      const result = await authService.changePassword('old-password', 'new-password');
+      expect(result).toBeUndefined();
     });
   });
 });

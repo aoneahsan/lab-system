@@ -49,6 +49,9 @@ scripts/serviceAccountKey.json
 # Testing
 coverage/
 .nyc_output/
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/
 
 # Build
 build/

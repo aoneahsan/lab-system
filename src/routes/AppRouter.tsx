@@ -63,6 +63,9 @@ const ValidationRulesPage = lazy(
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 
+// Clinician App
+const ClinicianApp = lazy(() => import('@/apps/clinician/ClinicianApp').then(module => ({ default: module.ClinicianApp })));
+
 export const AppRouter = () => {
 	const { isAuthenticated } = useAuthStore();
 
@@ -149,6 +152,11 @@ export const AppRouter = () => {
 						/>
 						<Route path='/profile' element={<ProfilePage />} />
 					</Route>
+				</Route>
+
+				{/* Clinician App Routes */}
+				<Route element={<ProtectedRoute allowedRoles={['clinician']} />}>
+					<Route path='/clinician/*' element={<ClinicianApp />} />
 				</Route>
 
 				{/* Default redirect */}
