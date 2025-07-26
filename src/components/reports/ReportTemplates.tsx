@@ -83,11 +83,12 @@ export default function ReportTemplates() {
     administrative: { label: 'Admin Reports', color: 'text-gray-600 bg-gray-50' },
   };
 
-  const formatConfig = {
+  const formatConfig: Record<string, { label: string; color: string }> = {
     pdf: { label: 'PDF', color: 'text-red-600' },
     excel: { label: 'Excel', color: 'text-green-600' },
     csv: { label: 'CSV', color: 'text-blue-600' },
     html: { label: 'HTML', color: 'text-orange-600' },
+    json: { label: 'JSON', color: 'text-purple-600' },
   };
 
   const filteredTemplates = templates.filter(template =>

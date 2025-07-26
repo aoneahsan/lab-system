@@ -3,7 +3,7 @@
  * Tracks web vitals, custom metrics, and user interactions
  */
 
-import { getPerformance, type PerformanceTrace, trace } from 'firebase/performance';
+import { type PerformanceTrace, trace } from 'firebase/performance';
 import { performance } from '@/config/firebase';
 
 // Web Vitals thresholds
@@ -190,8 +190,8 @@ class PerformanceMonitor {
       const duration = endTime - startTime;
       
       this.stopTrace(`api_${name}`, { 
-        duration,
-        status: 'success'
+        duration: Math.round(duration),
+        status: 1 // 1 for success
       });
       
       return result;
@@ -200,8 +200,8 @@ class PerformanceMonitor {
       const duration = endTime - startTime;
       
       this.stopTrace(`api_${name}`, { 
-        duration,
-        status: 'error'
+        duration: Math.round(duration),
+        status: 0 // 0 for error
       });
       
       throw error;

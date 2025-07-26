@@ -90,6 +90,9 @@ export interface TestPanel {
   updatedBy: string;
 }
 
+// Alias for backwards compatibility
+export type Test = TestDefinition;
+
 export interface TestOrder {
   id: string;
   tenantId: string;

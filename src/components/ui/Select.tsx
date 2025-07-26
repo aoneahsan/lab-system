@@ -23,3 +23,28 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 );
 
 Select.displayName = 'Select';
+
+// Additional Select components for compatibility
+export const SelectTrigger = React.forwardRef<
+  HTMLSelectElement,
+  SelectProps & { children?: React.ReactNode }
+>(({ children, ...props }, ref) => {
+  return <Select ref={ref} {...props} />;
+});
+
+SelectTrigger.displayName = 'SelectTrigger';
+
+export const SelectContent: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
+
+export const SelectItem: React.FC<React.OptionHTMLAttributes<HTMLOptionElement>> = (props) => {
+  return <option {...props} />;
+};
+
+export const SelectValue: React.FC<{ placeholder?: string }> = ({ placeholder }) => {
+  if (placeholder) {
+    return <option value="" disabled>{placeholder}</option>;
+  }
+  return null;
+};

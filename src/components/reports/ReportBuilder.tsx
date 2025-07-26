@@ -19,6 +19,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<ReportFormData>({
     defaultValues: {
       type: 'patient_results',
@@ -26,7 +27,8 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
     },
   });
 
-  const templateId = watch('templateId');
+  const watchedValues = watch();
+  const templateId = watchedValues.templateId;
   const selectedTemplate = templates.find(t => t.id === templateId);
 
   const reportTypes: { value: ReportType; label: string }[] = [

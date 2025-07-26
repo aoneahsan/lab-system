@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Play, Download, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import type { ReportFormat, GeneratedReport } from '@/types/report.types';
+import type { GeneratedReport, ReportFormat } from '@/types/report.types';
 import { format } from 'date-fns';
 
 const mockGeneratedReports: GeneratedReport[] = [
@@ -207,7 +207,7 @@ export default function ReportGeneration() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {format(report.generatedAt.toDate(), 'MMM d, yyyy h:mm a')}
+                      {format((report.generatedAt as any).toDate(), 'MMM d, yyyy h:mm a')}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {report.status === 'completed' && report.fileUrl && (

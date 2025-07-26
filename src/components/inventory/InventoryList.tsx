@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Package, AlertTriangle } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import type { InventoryItem } from '@/types/inventory';
+import type { InventoryItem } from '@/types/inventory.types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function InventoryList() {
@@ -16,7 +16,7 @@ export default function InventoryList() {
 
   const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
+    (item.catalogNumber && item.catalogNumber.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getLowStockItems = () => {
@@ -26,7 +26,7 @@ export default function InventoryList() {
   const getStockStatus = (item: InventoryItem) => {
     if (item.currentStock === 0) {
       return { color: 'text-red-600 bg-red-100', text: 'Out of Stock' };
-    } else if (item.currentStock <= item.minStockLevel) {
+    } else if (item.currentStock <= item.minimumStock) {
       return { color: 'text-red-600 bg-red-100', text: 'Critical' };
     } else if (item.currentStock <= item.reorderPoint) {
       return { color: 'text-yellow-600 bg-yellow-100', text: 'Low Stock' };
@@ -70,7 +70,7 @@ export default function InventoryList() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by name or SKU..."
+              placeholder="Search by name or catalog number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 input"
@@ -113,7 +113,7 @@ export default function InventoryList() {
                   Item Details
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  SKU
+                  Catalog Number
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
@@ -148,7 +148,7 @@ export default function InventoryList() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {item.sku}
+                      {item.catalogNumber || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">

@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Route, ArrowRight, Building2, Cpu, Package, CheckCircle, Loader2 } from 'lucide-react';
+import { Route, ArrowRight, Building2, Cpu, Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Label } from '@/components/ui/Label';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Badge } from '@/components/ui/Badge';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 import { useSampleStore } from '@/stores/sample.store';
-import { useTestStore } from '@/stores/test.store';
-import { useDepartmentStore } from '@/stores/department.store';
-import { useAnalyzerStore } from '@/stores/analyzer.store';
+import { useTests } from '@/hooks/useTests';
 import { toast } from 'sonner';
-import { Sample } from '@/types';
+import type { Sample } from '@/types/sample.types';
+import type { TestDefinition } from '@/types/test.types';
 
 interface RoutingRule {
   testId: string;

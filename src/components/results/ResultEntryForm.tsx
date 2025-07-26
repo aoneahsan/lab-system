@@ -43,19 +43,27 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     defaultValues: {
       orderId,
       sampleId,
-      testId,
-      value: '',
-      unit: test?.unit || '',
-      flag: 'normal',
+      tests: [{
+        testId,
+        testName: test?.name || '',
+        value: '',
+        unit: test?.unit || '',
+        flag: 'normal',
+      }],
     },
   });
 
-  const value = watch('value');
-  const flag = watch('flag');
+  const value = watch('tests.0.value');
+  const flag = watch('tests.0.flag');
 
   useEffect(() => {
-    if (test?.unit) {
-      setValue('unit', test.unit);
+    if (test) {
+      if (test.unit) {
+        setValue('tests.0.unit', test.unit);
+      }
+      if (test.name) {
+        setValue('tests.0.testName', test.name);
+      }
     }
   }, [test, setValue]);
 
@@ -83,8 +91,8 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         setValidationWarnings(result.warnings);
         
         // Auto-set flag based on validation
-        if (result.flags.length > 0 && !flag) {
-          setValue('flag', result.flags[0]);
+        if (result.flags.length > 0) {
+          setValue('tests.0.flag', result.flags[0] as ResultFlag);
         }
         
         setShowCriticalWarning(result.isCritical);
@@ -99,7 +107,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     if (test && patient) {
       const result = await validateResult.mutateAsync({
         testId,
-        value: data.value,
+        value: data.tests[0].value,
         patientId: patient.id,
         referenceRange: test.referenceRanges?.[0] ? { min: test.referenceRanges[0].normalMin, max: test.referenceRanges[0].normalMax } : undefined
       });
@@ -114,7 +122,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
 
   const resultFlags: { value: ResultFlag; label: string; color: string }[] = [
     { value: 'normal', label: 'Normal', color: 'text-green-600' },
-    { value: 'abnormal', label: 'Abnormal', color: 'text-yellow-600' },
+    { value: 'A', label: 'Abnormal', color: 'text-yellow-600' },
     { value: 'high', label: 'High', color: 'text-orange-600' },
     { value: 'low', label: 'Low', color: 'text-orange-600' },
     { value: 'critical_high', label: 'Critical High', color: 'text-red-600' },
@@ -165,12 +173,12 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
             </label>
             <input
               type="text"
-              {...register('value', { required: 'Result value is required' })}
+              {...register('tests.0.value', { required: 'Result value is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="Enter result"
             />
-            {errors.value && (
-              <p className="mt-1 text-sm text-red-600">{errors.value.message}</p>
+            {errors.tests?.[0]?.value && (
+              <p className="mt-1 text-sm text-red-600">{errors.tests[0].value.message}</p>
             )}
           </div>
 
@@ -180,7 +188,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
             </label>
             <input
               type="text"
-              {...register('unit')}
+              {...register('tests.0.unit')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="e.g., mg/dL"
             />
@@ -191,7 +199,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
               Flag *
             </label>
             <select
-              {...register('flag')}
+              {...register('tests.0.flag')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               {resultFlags.map(f => (
@@ -202,36 +210,12 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Method
-            </label>
-            <input
-              type="text"
-              {...register('method')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Test method"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Instrument ID
-            </label>
-            <input
-              type="text"
-              {...register('instrumentId')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="e.g., INST-001"
-            />
-          </div>
-
           <div className="md:col-span-3">
             <label className="block text-sm font-medium text-gray-700">
               Comments
             </label>
             <textarea
-              {...register('comments')}
+              {...register('tests.0.comments')}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="Additional comments or notes..."

@@ -1,28 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Plus, FileText, CheckCircle, XCircle, Clock, Package } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import type { PurchaseOrder } from '@/types/inventory';
+import type { PurchaseOrder, Vendor } from '@/types/inventory.types';
 
 export default function PurchaseOrders() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showCreateOrder, setShowCreateOrder] = useState(false);
-  const { purchaseOrders, suppliers, fetchPurchaseOrders, fetchSuppliers } = useInventoryStore();
+  const { purchaseOrders, vendors, fetchPurchaseOrders, fetchVendors } = useInventoryStore();
 
   useEffect(() => {
     fetchPurchaseOrders({ status: filterStatus === 'all' ? undefined : filterStatus });
-    fetchSuppliers();
-  }, [filterStatus, fetchPurchaseOrders, fetchSuppliers]);
+    fetchVendors();
+  }, [filterStatus, fetchPurchaseOrders, fetchVendors]);
 
   const getStatusIcon = (status: PurchaseOrder['status']) => {
     switch (status) {
       case 'draft':
         return <FileText className="h-4 w-4 text-gray-500" />;
-      case 'pending':
+      case 'submitted':
         return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'approved':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'ordered':
         return <Package className="h-4 w-4 text-blue-500" />;
+      case 'partial_received':
+        return <Clock className="h-4 w-4 text-purple-500" />;
       case 'received':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       case 'cancelled':
@@ -36,12 +38,14 @@ export default function PurchaseOrders() {
     switch (status) {
       case 'draft':
         return 'bg-gray-100 text-gray-800';
-      case 'pending':
+      case 'submitted':
         return 'bg-yellow-100 text-yellow-800';
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'ordered':
         return 'bg-blue-100 text-blue-800';
+      case 'partial_received':
+        return 'bg-purple-100 text-purple-800';
       case 'received':
         return 'bg-green-100 text-green-800';
       case 'cancelled':
@@ -75,7 +79,7 @@ export default function PurchaseOrders() {
           >
             <option value="all">All Orders</option>
             <option value="draft">Draft</option>
-            <option value="pending">Pending Approval</option>
+            <option value="submitted">Pending Approval</option>
             <option value="approved">Approved</option>
             <option value="ordered">Ordered</option>
             <option value="received">Received</option>
@@ -114,7 +118,7 @@ export default function PurchaseOrders() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {purchaseOrders.map((order) => {
-              const supplier = suppliers.find(s => s.id === order.supplierId);
+              const vendor = vendors.find((v: Vendor) => v.id === order.vendor.id);
               return (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -126,7 +130,7 @@ export default function PurchaseOrders() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {supplier?.name || 'Unknown Supplier'}
+                    {vendor?.name || 'Unknown Supplier'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {order.items.length} items

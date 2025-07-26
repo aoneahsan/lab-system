@@ -95,3 +95,13 @@ export interface ResultEntryTest {
   flag?: ResultFlag;
   comments?: string;
 }
+
+export interface ResultEntryFormData {
+  orderId: string;
+  sampleId: string;
+  tests: ResultEntryTest[];
+}
+
+export interface ResultValidationRule extends ResultValidation {
+  // Additional properties that might be needed
+}

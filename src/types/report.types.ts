@@ -43,7 +43,7 @@ export type ReportType =
   | 'workload'
   | 'custom';
 
-export type ReportFormat = 'pdf' | 'excel' | 'csv' | 'html';
+export type ReportFormat = 'pdf' | 'excel' | 'csv' | 'html' | 'json';
 
 export interface ReportSection {
   id: string;
@@ -137,8 +137,10 @@ export type DateRangePreset =
 
 export interface ReportFormData {
   name: string;
+  description?: string;
   type: ReportType;
-  format: ReportFormat;
+  templateId?: string;
+  formats: ReportFormat[];
   dateRange?: {
     start: Date;
     end: Date;

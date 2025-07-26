@@ -226,7 +226,9 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
                         </button>
                       )}
                       {result.comments && (
-                        <AlertCircle className="h-4 w-4 text-yellow-600" title={result.comments} />
+                        <span title={result.comments}>
+                          <AlertCircle className="h-4 w-4 text-yellow-600" />
+                        </span>
                       )}
                       <button
                         className="text-gray-600 hover:text-gray-700"

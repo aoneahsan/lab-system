@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Camera, FlashlightOn, FlashlightOff } from 'lucide-react';
+import { X, Camera, Flashlight, FlashlightOff } from 'lucide-react';
 import { BarcodeScanner as CapacitorBarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { toast } from '@/stores/toast.store';
@@ -50,7 +50,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
       } else {
         // Permission not asked yet
         const newStatus = await CapacitorBarcodeScanner.checkPermission({ force: true });
-        setHasPermission(newStatus.granted);
+        setHasPermission(newStatus.granted === true ? true : false);
         if (newStatus.granted) {
           startScan();
         }
@@ -70,7 +70,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
       setIsScanning(true);
 
       const result = await CapacitorBarcodeScanner.startScan({
-        targetedFormats: supportedFormats,
+        targetedFormats: supportedFormats as any,
       });
 
       if (result.hasContent) {
@@ -194,7 +194,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                   {torchEnabled ? (
                     <FlashlightOff className="h-6 w-6" />
                   ) : (
-                    <FlashlightOn className="h-6 w-6" />
+                    <Flashlight className="h-6 w-6" />
                   )}
                 </button>
               </div>

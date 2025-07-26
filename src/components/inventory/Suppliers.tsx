@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Building2, Mail, Phone, Globe, Edit } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import type { Supplier } from '@/types/inventory';
+import type { Vendor } from '@/types/inventory.types';
 
 export default function Suppliers() {
   const [showAddSupplier, setShowAddSupplier] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingSupplier, setEditingSupplier] = useState<Vendor | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     contactPerson: '',
@@ -13,24 +13,22 @@ export default function Suppliers() {
     phone: '',
     address: '',
     website: '',
-    accountNumber: '',
-    paymentTerms: '',
     notes: '',
   });
 
-  const { suppliers, loading, fetchSuppliers, createSupplier, updateSupplier } = useInventoryStore();
+  const { vendors, loading, fetchVendors, createVendor, updateVendor } = useInventoryStore();
 
   useEffect(() => {
-    fetchSuppliers();
-  }, [fetchSuppliers]);
+    fetchVendors();
+  }, [fetchVendors]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (editingSupplier) {
-      await updateSupplier(editingSupplier.id, formData);
+      await updateVendor(editingSupplier.id, formData);
     } else {
-      await createSupplier(formData);
+      await createVendor(formData);
     }
 
     // Reset form
@@ -41,15 +39,13 @@ export default function Suppliers() {
       phone: '',
       address: '',
       website: '',
-      accountNumber: '',
-      paymentTerms: '',
       notes: '',
     });
     setShowAddSupplier(false);
     setEditingSupplier(null);
   };
 
-  const handleEdit = (supplier: Supplier) => {
+  const handleEdit = (supplier: Vendor) => {
     setEditingSupplier(supplier);
     setFormData({
       name: supplier.name,
@@ -58,8 +54,6 @@ export default function Suppliers() {
       phone: supplier.phone || '',
       address: supplier.address || '',
       website: supplier.website || '',
-      accountNumber: supplier.accountNumber || '',
-      paymentTerms: supplier.paymentTerms || '',
       notes: supplier.notes || '',
     });
     setShowAddSupplier(true);
@@ -149,18 +143,6 @@ export default function Suppliers() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Account Number
-                </label>
-                <input
-                  type="text"
-                  value={formData.accountNumber}
-                  onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                  className="input"
-                />
-              </div>
-
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Address
@@ -170,19 +152,6 @@ export default function Suppliers() {
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="input"
                   rows={2}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Terms
-                </label>
-                <input
-                  type="text"
-                  value={formData.paymentTerms}
-                  onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
-                  className="input"
-                  placeholder="Net 30, etc."
                 />
               </div>
 
@@ -212,8 +181,6 @@ export default function Suppliers() {
                     phone: '',
                     address: '',
                     website: '',
-                    accountNumber: '',
-                    paymentTerms: '',
                     notes: '',
                   });
                 }}
@@ -235,7 +202,7 @@ export default function Suppliers() {
 
       {/* Suppliers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {suppliers.map((supplier) => (
+        {vendors.map((supplier: Vendor) => (
           <div key={supplier.id} className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
             <div className="flex justify-between items-start mb-3">
               <Building2 className="h-8 w-8 text-gray-400" />
@@ -283,26 +250,11 @@ export default function Suppliers() {
               )}
             </div>
 
-            {supplier.paymentTerms && (
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <span className="text-xs text-gray-500">Terms: {supplier.paymentTerms}</span>
-              </div>
-            )}
-
-            <div className="mt-3">
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                supplier.status === 'active' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
-                {supplier.status}
-              </span>
-            </div>
           </div>
         ))}
       </div>
 
-      {suppliers.length === 0 && !loading && (
+      {vendors.length === 0 && !loading && (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500">No suppliers added yet</p>

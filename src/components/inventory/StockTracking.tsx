@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
 import { Package, TrendingUp, TrendingDown, RotateCcw, Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import type { StockMovement } from '@/types/inventory';
+import type { TransactionType } from '@/types/inventory.types';
 
 export default function StockTracking() {
   const [showAddMovement, setShowAddMovement] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string>('');
-  const [movementType, setMovementType] = useState<StockMovement['type']>('in');
+  const [movementType, setMovementType] = useState<TransactionType>('purchase');
   const [quantity, setQuantity] = useState('');
   const [reason, setReason] = useState('');
-  const [referenceNumber, setReferenceNumber] = useState('');
   const [notes, setNotes] = useState('');
 
-  const { items, stockMovements, recordStockMovement, fetchStockMovements, loading } = useInventoryStore();
+  const { items, stockTransactions, recordStockTransaction, fetchStockTransactions, loading } = useInventoryStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem || !quantity) return;
 
-    await recordStockMovement({
+    await recordStockTransaction({
       itemId: selectedItem,
       type: movementType,
       quantity: parseInt(quantity),
       reason,
-      referenceNumber,
       notes,
     });
 
@@ -32,35 +30,38 @@ export default function StockTracking() {
     setSelectedItem('');
     setQuantity('');
     setReason('');
-    setReferenceNumber('');
     setNotes('');
   };
 
-  const getMovementIcon = (type: StockMovement['type']) => {
+  const getMovementIcon = (type: TransactionType) => {
     switch (type) {
-      case 'in':
+      case 'purchase':
         return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'out':
+      case 'usage':
         return <TrendingDown className="h-4 w-4 text-red-600" />;
       case 'adjustment':
         return <RotateCcw className="h-4 w-4 text-blue-600" />;
       case 'disposal':
         return <Trash2 className="h-4 w-4 text-orange-600" />;
+      case 'return':
+        return <RotateCcw className="h-4 w-4 text-purple-600" />;
       default:
         return <Package className="h-4 w-4 text-gray-600" />;
     }
   };
 
-  const getMovementColor = (type: StockMovement['type']) => {
+  const getMovementColor = (type: TransactionType) => {
     switch (type) {
-      case 'in':
+      case 'purchase':
         return 'text-green-600 bg-green-100';
-      case 'out':
+      case 'usage':
         return 'text-red-600 bg-red-100';
       case 'adjustment':
         return 'text-blue-600 bg-blue-100';
       case 'disposal':
         return 'text-orange-600 bg-orange-100';
+      case 'return':
+        return 'text-purple-600 bg-purple-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -94,7 +95,7 @@ export default function StockTracking() {
                   onChange={(e) => {
                     setSelectedItem(e.target.value);
                     if (e.target.value) {
-                      fetchStockMovements(e.target.value);
+                      fetchStockTransactions(e.target.value);
                     }
                   }}
                   className="input"
@@ -115,12 +116,12 @@ export default function StockTracking() {
                 </label>
                 <select
                   value={movementType}
-                  onChange={(e) => setMovementType(e.target.value as StockMovement['type'])}
+                  onChange={(e) => setMovementType(e.target.value as TransactionType)}
                   className="input"
                   required
                 >
-                  <option value="in">Stock In (Receipt)</option>
-                  <option value="out">Stock Out (Usage)</option>
+                  <option value="purchase">Stock In (Receipt)</option>
+                  <option value="usage">Stock Out (Usage)</option>
                   <option value="adjustment">Adjustment</option>
                   <option value="return">Return</option>
                   <option value="disposal">Disposal</option>
@@ -138,19 +139,6 @@ export default function StockTracking() {
                   className="input"
                   min="1"
                   required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reference Number
-                </label>
-                <input
-                  type="text"
-                  value={referenceNumber}
-                  onChange={(e) => setReferenceNumber(e.target.value)}
-                  className="input"
-                  placeholder="PO number, invoice, etc."
                 />
               </div>
 
@@ -207,12 +195,12 @@ export default function StockTracking() {
           <h3 className="text-lg font-medium text-gray-900">Recent Movements</h3>
         </div>
         <div className="divide-y divide-gray-200">
-          {stockMovements.length === 0 ? (
+          {stockTransactions.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
               {selectedItem ? 'No movements found for this item' : 'Select an item to view movements'}
             </div>
           ) : (
-            stockMovements.map((movement) => {
+            stockTransactions.map((movement: any) => {
               const item = items.find(i => i.id === movement.itemId);
               return (
                 <div key={movement.id} className="p-4 hover:bg-gray-50">
@@ -230,11 +218,6 @@ export default function StockTracking() {
                           <span className="ml-2">
                             Quantity: {movement.quantity > 0 ? '+' : ''}{movement.quantity}
                           </span>
-                          {movement.referenceNumber && (
-                            <span className="ml-2">
-                              Ref: {movement.referenceNumber}
-                            </span>
-                          )}
                         </div>
                         {movement.reason && (
                           <div className="text-sm text-gray-500 mt-1">

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Edit2, Trash2, Shield, AlertTriangle, Ban } from 'lucide-react';
-import { ValidationRuleType, ValidationAction } from '@/types/result.types';
+import type { ValidationRuleType, ValidationAction } from '@/types/result.types';
 
 interface ValidationRule {
   id: string;

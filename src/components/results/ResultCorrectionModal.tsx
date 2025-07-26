@@ -30,7 +30,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
 
   const [formData, setFormData] = useState({
     value: result.value,
-    notes: result.notes || '',
+    notes: result.comments || '',
   });
 
   const [validationResult, setValidationResult] = useState<any>(null);
@@ -45,7 +45,10 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
         test.id,
         formData.value,
         result.patientId,
-        test.referenceRange
+        test.referenceRanges?.[0] ? { 
+          min: test.referenceRanges[0].normalMin, 
+          max: test.referenceRanges[0].normalMax 
+        } : undefined
       );
 
       if (!validation.isValid && validation.errors.length > 0) {
@@ -83,7 +86,10 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
           test.id,
           value,
           result.patientId,
-          test.referenceRange
+          test.referenceRanges?.[0] ? { 
+            min: test.referenceRanges[0].normalMin, 
+            max: test.referenceRanges[0].normalMax 
+          } : undefined
         );
         setValidationResult(validation);
       } catch (error) {
@@ -137,8 +143,8 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
               <h4 className="text-sm font-medium text-gray-700 mb-2">Result Information</h4>
               <div className="space-y-1 text-sm">
                 <p><span className="font-medium">Test:</span> {test.name} ({test.code})</p>
-                <p><span className="font-medium">Patient:</span> {result.patientName}</p>
-                <p><span className="font-medium">Sample:</span> {result.sampleNumber}</p>
+                <p><span className="font-medium">Patient ID:</span> {result.patientId}</p>
+                <p><span className="font-medium">Sample ID:</span> {result.sampleId}</p>
                 <p><span className="font-medium">Current Status:</span> {result.status}</p>
               </div>
             </div>
@@ -170,9 +176,12 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
                 )}
                 
                 {/* Reference Range */}
-                {test.referenceRange && (
+                {test.referenceRanges?.[0] && (
                   <p className="text-xs text-gray-600 mt-1">
-                    Reference: {test.referenceRange}
+                    Reference: {test.referenceRanges[0].textRange || 
+                      (test.referenceRanges[0].normalMin !== undefined && test.referenceRanges[0].normalMax !== undefined
+                        ? `${test.referenceRanges[0].normalMin} - ${test.referenceRanges[0].normalMax}${test.unit ? ` ${test.unit}` : ''}`
+                        : 'Not specified')}
                   </p>
                 )}
               </div>
