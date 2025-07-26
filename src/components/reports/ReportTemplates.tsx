@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { FileText, Edit2, Copy, Trash2, Download, Plus } from 'lucide-react';
-import { ReportTemplate, ReportCategory, ReportFormat } from '@/types/report.types';
+import { useState } from 'react';
+import { FileText, Edit2, Copy, Trash2, Plus } from 'lucide-react';
+import type { ReportTemplate, ReportCategory } from '@/types/report.types';
 
 const mockTemplates: ReportTemplate[] = [
   {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle, Clock, FileText } from 'lucide-react';
+import { X, AlertCircle, Clock } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doc, updateDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
@@ -29,7 +29,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
   onClose,
   result,
 }) => {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { tenant } = useTenant();
   const queryClient = useQueryClient();
 
@@ -43,13 +43,13 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
 
   const amendResultMutation = useMutation({
     mutationFn: async () => {
-      if (!tenant || !user) throw new Error('Missing tenant or user');
+      if (!tenant || !currentUser) throw new Error('Missing tenant or user');
 
       const amendment: Amendment = {
         timestamp: new Date(),
-        amendedBy: user.displayName || user.email || 'Unknown',
-        previousValue: result.value,
-        newValue: formData.newValue,
+        amendedBy: currentUser.displayName || currentUser.email || 'Unknown',
+        previousValue: String(result.value),
+        newValue: String(formData.newValue),
         reason: formData.reason,
         notes: formData.notes || undefined,
       };
@@ -58,7 +58,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
         value: formData.newValue,
         amendments: arrayUnion(amendment),
         amendedAt: serverTimestamp(),
-        amendedBy: user.displayName || user.email,
+        amendedBy: currentUser.displayName || currentUser.email,
         updatedAt: serverTimestamp(),
       });
     },
@@ -136,7 +136,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
               <h4 className="text-sm font-medium text-gray-700 mb-2">Current Result</h4>
               <div className="space-y-1 text-sm">
                 <p><span className="font-medium">Test:</span> {result.testName}</p>
-                <p><span className="font-medium">Patient:</span> {result.patientName}</p>
+                <p><span className="font-medium">Patient ID:</span> {result.patientId}</p>
                 <p><span className="font-medium">Current Value:</span> {result.value} {result.unit}</p>
                 <p><span className="font-medium">Status:</span> {result.status}</p>
               </div>
@@ -210,6 +210,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
             </div>
 
             {/* Amendment History */}
+            {/* TODO: Enable when amendments are added to TestResult type
             {result.amendments && result.amendments.length > 0 && (
               <div className="mt-6">
                 <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -230,7 +231,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">

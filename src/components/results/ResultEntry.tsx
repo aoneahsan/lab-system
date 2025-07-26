@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { useResultStore } from '@/stores/result.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { ResultEntryTest } from '@/types/result.types';
+import type { ResultEntryTest } from '@/types/result.types';
 
 interface ResultEntryProps {
   orderId: string;
@@ -49,13 +49,13 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
   };
 
   const handleSubmit = async () => {
-    if (!currentUser?.tenantId || !currentUser?.uid) return;
+    if (!currentUser?.tenantId || !currentUser?.id) return;
 
     const testResults = Object.values(results).filter(r => r.value !== '');
     if (testResults.length === 0) return;
 
     try {
-      await enterResults(currentUser.tenantId, currentUser.uid, {
+      await enterResults(currentUser.tenantId, currentUser.id, {
         orderId,
         sampleId,
         tests: testResults,

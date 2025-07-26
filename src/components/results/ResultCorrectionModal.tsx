@@ -8,7 +8,8 @@ import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { toast } from '@/stores/toast.store';
 import { resultValidationService } from '@/services/result-validation.service';
-import type { TestResult, Test } from '@/types';
+import type { TestResult } from '@/types/result.types';
+import type { Test } from '@/types/test.types';
 
 interface ResultCorrectionModalProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
   result,
   test,
 }) => {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { tenant } = useTenant();
   const queryClient = useQueryClient();
 
@@ -37,7 +38,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
 
   const correctResultMutation = useMutation({
     mutationFn: async () => {
-      if (!tenant || !user) throw new Error('Missing tenant or user');
+      if (!tenant || !currentUser) throw new Error('Missing tenant or user');
 
       // Validate the new value
       const validation = await resultValidationService.validateResult(
@@ -57,7 +58,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
         flag: validation.flags[0] || 'normal',
         status: validation.requiresReview ? 'pending_review' : result.status,
         correctedAt: serverTimestamp(),
-        correctedBy: user.displayName || user.email,
+        correctedBy: currentUser.displayName || currentUser.email,
         updatedAt: serverTimestamp(),
       });
     },

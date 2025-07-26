@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
-import type { QCResult } from '@/types/quality-control';
+import { Timestamp } from 'firebase/firestore';
 
 export default function QCResultEntry() {
   const [selectedTest, setSelectedTest] = useState('');
@@ -29,7 +29,7 @@ export default function QCResultEntry() {
         qcTestId: selectedTest,
         levelId: selectedLevel,
         value: parseFloat(value),
-        runDate: new Date(),
+        runDate: Timestamp.fromDate(new Date()),
         comments,
       });
 

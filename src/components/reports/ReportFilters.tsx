@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon } from '@heroicons/react/24/outline';
 
 interface ReportFiltersProps {
   filters: any;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Percent, Activity } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 
@@ -8,7 +8,7 @@ export default function QCStatistics() {
   const [selectedLevel, setSelectedLevel] = useState('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('monthly');
   
-  const { qcTests, statistics, fetchQCTests, calculateStatistics, loading } = useQualityControlStore();
+  const { qcTests, statistics, fetchQCTests, calculateStatistics } = useQualityControlStore();
 
   useEffect(() => {
     fetchQCTests({ status: 'active' });
@@ -29,7 +29,6 @@ export default function QCStatistics() {
     { name: 'Within ±3SD', value: (statistics.withinSDCount.threeSD / statistics.n) * 100, expected: 99.73 },
   ] : [];
 
-  const COLORS = ['#10B981', '#3B82F6', '#8B5CF6'];
 
   return (
     <div className="space-y-6">

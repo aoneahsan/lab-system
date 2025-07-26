@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Play, Download, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { ReportFormat, GeneratedReport, ReportStatus } from '@/types/report.types';
+import type { ReportFormat, GeneratedReport } from '@/types/report.types';
 import { format } from 'date-fns';
 
 const mockGeneratedReports: GeneratedReport[] = [

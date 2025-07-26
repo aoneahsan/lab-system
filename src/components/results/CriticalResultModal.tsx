@@ -28,8 +28,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
   onClose,
   result,
 }) => {
-  const { user } = useAuthStore();
-  const { tenant } = useTenant();
+  const { currentUser } = useAuthStore();
   const [notificationMethod, setNotificationMethod] = useState<'phone' | 'email' | 'sms'>('phone');
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +52,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
         physicianName: result.physicianName,
         notificationMethod,
         notes,
-        notifiedBy: user?.displayName || user?.email,
+        notifiedBy: currentUser?.displayName || currentUser?.email,
         notifiedAt: serverTimestamp(),
         acknowledged: false,
       });
@@ -63,7 +62,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
         criticalNotification: {
           notified: true,
           notifiedAt: serverTimestamp(),
-          notifiedBy: user?.displayName || user?.email,
+          notifiedBy: currentUser?.displayName || currentUser?.email,
           method: notificationMethod,
           notes,
         },

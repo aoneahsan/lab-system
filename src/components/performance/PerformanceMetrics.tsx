@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { performanceMonitor } from '@/utils/performance-monitoring';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/cn';
 
 export function PerformanceMetrics() {
   const [metrics, setMetrics] = useState<Record<string, number>>({});

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText, Save } from 'lucide-react';
 import { useReportTemplates } from '@/hooks/useReports';
@@ -68,7 +68,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
               placeholder="Monthly Lab Report"
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+              <p className="mt-1 text-sm text-red-600">{errors.name?.message}</p>
             )}
           </div>
 
@@ -143,7 +143,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
             </label>
           ))}
           {errors.formats && (
-            <p className="text-sm text-red-600">{errors.formats.message}</p>
+            <p className="text-sm text-red-600">{errors.formats?.message}</p>
           )}
         </div>
       </div>

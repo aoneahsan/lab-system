@@ -209,7 +209,7 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
 
                 <div className="flex flex-col gap-2">
                   <select
-                    onChange={(e) => handleTestEndpoint(endpoint.id, e.target.value as WebhookEventType)}
+                    onChange={() => handleTestEndpoint(endpoint.id)}
                     className="text-sm border border-gray-300 rounded px-2 py-1"
                     defaultValue=""
                   >

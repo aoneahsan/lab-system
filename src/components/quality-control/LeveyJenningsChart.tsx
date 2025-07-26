@@ -10,7 +10,6 @@ import {
   Tooltip,
   Legend,
   ReferenceLine,
-  ResponsiveContainer,
   ResponsiveContainer
 } from 'recharts';
 

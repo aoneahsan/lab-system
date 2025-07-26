@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, History, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Check, AlertCircle, History, User } from 'lucide-react';
 import { useResultStore } from '@/stores/result.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { TestResult } from '@/types/result.types';
 import { format } from 'date-fns';
 
 interface ResultReviewProps {
@@ -40,10 +39,10 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
   };
 
   const handleVerifySelected = async () => {
-    if (!currentUser?.tenantId || !currentUser?.uid) return;
+    if (!currentUser?.tenantId || !currentUser?.id) return;
 
     for (const resultId of selectedResults) {
-      await verifyResult(currentUser.tenantId, currentUser.uid, resultId);
+      await verifyResult(currentUser.tenantId, currentUser.id, resultId);
     }
     
     setSelectedResults(new Set());
@@ -216,8 +215,8 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
                       {result.status !== 'verified' && (
                         <button
                           onClick={() => {
-                            if (currentUser?.tenantId && currentUser?.uid) {
-                              verifyResult(currentUser.tenantId, currentUser.uid, result.id);
+                            if (currentUser?.tenantId && currentUser?.id) {
+                              verifyResult(currentUser.tenantId, currentUser.id, result.id);
                             }
                           }}
                           className="text-green-600 hover:text-green-700"
