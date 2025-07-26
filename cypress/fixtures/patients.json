@@ -1,0 +1,63 @@
+{
+  "patients": [
+    {
+      "id": "patient-001",
+      "mrn": "MRN-123456",
+      "firstName": "John",
+      "lastName": "Doe",
+      "dateOfBirth": "1980-05-15",
+      "gender": "male",
+      "email": "john.doe@example.com",
+      "phone": "(555) 123-4567",
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zipCode": "12345"
+      },
+      "insuranceInfo": {
+        "provider": "Blue Cross",
+        "policyNumber": "BC123456789",
+        "groupNumber": "GRP001"
+      },
+      "emergencyContact": {
+        "name": "Jane Doe",
+        "relationship": "Spouse",
+        "phone": "(555) 987-6543"
+      },
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "patient-002",
+      "mrn": "MRN-123457",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "dateOfBirth": "1975-09-22",
+      "gender": "female",
+      "email": "jane.smith@example.com",
+      "phone": "(555) 234-5678",
+      "address": {
+        "street": "456 Oak Ave",
+        "city": "Somewhere",
+        "state": "CA",
+        "zipCode": "54321"
+      },
+      "insuranceInfo": {
+        "provider": "Aetna",
+        "policyNumber": "AET987654321",
+        "groupNumber": "GRP002"
+      },
+      "emergencyContact": {
+        "name": "Bob Smith",
+        "relationship": "Spouse",
+        "phone": "(555) 876-5432"
+      },
+      "createdAt": "2024-01-16T14:45:00Z",
+      "updatedAt": "2024-01-16T14:45:00Z"
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "pageSize": 10
+}

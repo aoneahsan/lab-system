@@ -1,0 +1,45 @@
+{
+  "samples": [
+    {
+      "id": "sample-001",
+      "sampleId": "LAB-2024-001",
+      "patientId": "patient-001",
+      "patientName": "John Doe",
+      "testId": "test-001",
+      "testName": "Complete Blood Count",
+      "sampleType": "Blood",
+      "collectionDate": "2024-01-20T09:00:00Z",
+      "collectedBy": "tech-001",
+      "status": "pending",
+      "priority": "routine",
+      "barcode": "1234567890123",
+      "volume": "5ml",
+      "container": "EDTA Tube",
+      "notes": "Fasting sample",
+      "createdAt": "2024-01-20T09:15:00Z",
+      "updatedAt": "2024-01-20T09:15:00Z"
+    },
+    {
+      "id": "sample-002",
+      "sampleId": "LAB-2024-002",
+      "patientId": "patient-002",
+      "patientName": "Jane Smith",
+      "testId": "test-002",
+      "testName": "Lipid Panel",
+      "sampleType": "Blood",
+      "collectionDate": "2024-01-20T10:30:00Z",
+      "collectedBy": "tech-002",
+      "status": "processing",
+      "priority": "stat",
+      "barcode": "1234567890124",
+      "volume": "3ml",
+      "container": "SST Tube",
+      "notes": "12-hour fasting confirmed",
+      "createdAt": "2024-01-20T10:45:00Z",
+      "updatedAt": "2024-01-20T11:00:00Z"
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "pageSize": 10
+}

@@ -1,0 +1,53 @@
+{
+  "testUser": {
+    "id": "user-test-001",
+    "email": "test@labflow.com",
+    "displayName": "Test User",
+    "role": "LAB_TECHNICIAN",
+    "tenantId": "demo-lab",
+    "permissions": [
+      "patients:read",
+      "patients:write",
+      "samples:read",
+      "samples:write",
+      "results:read",
+      "results:write"
+    ],
+    "active": true
+  },
+  "adminUser": {
+    "id": "user-admin-001",
+    "email": "admin@labflow.com",
+    "displayName": "Admin User",
+    "role": "ADMIN",
+    "tenantId": "demo-lab",
+    "permissions": ["*"],
+    "active": true
+  },
+  "clinicianUser": {
+    "id": "user-clinician-001",
+    "email": "doctor@labflow.com",
+    "displayName": "Dr. Smith",
+    "role": "CLINICIAN",
+    "tenantId": "demo-lab",
+    "permissions": [
+      "patients:read",
+      "orders:read",
+      "orders:write",
+      "results:read"
+    ],
+    "active": true
+  },
+  "patientUser": {
+    "id": "user-patient-001",
+    "email": "patient@example.com",
+    "displayName": "John Doe",
+    "role": "PATIENT",
+    "tenantId": "demo-lab",
+    "permissions": [
+      "own-records:read",
+      "own-results:read"
+    ],
+    "active": true
+  }
+}
