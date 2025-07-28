@@ -28,7 +28,9 @@ export function PerformanceProvider({ children }: { children: ReactNode }) {
 
     // Track route changes
     const handleRouteChange = () => {
-      performanceMonitor.trackInteraction('route_change', 'navigation');
+      performanceMonitor.trackInteraction('route_change', {
+        category: 'navigation',
+      });
     };
 
     window.addEventListener('popstate', handleRouteChange);
@@ -42,11 +44,7 @@ export function PerformanceProvider({ children }: { children: ReactNode }) {
     },
   };
 
-  return (
-    <PerformanceContext.Provider value={value}>
-      {children}
-    </PerformanceContext.Provider>
-  );
+  return <PerformanceContext.Provider value={value}>{children}</PerformanceContext.Provider>;
 }
 
 export function usePerformance() {

@@ -7,7 +7,9 @@ import { Preferences } from '@capacitor/preferences';
 import { useAuthStore } from '@/stores/auth.store';
 
 export const MobileAppSelector: React.FC = () => {
-  const [appType, setAppType] = React.useState<'patient' | 'phlebotomist' | 'labstaff' | 'clinician' | null>(null);
+  const [appType, setAppType] = React.useState<
+    'patient' | 'phlebotomist' | 'labstaff' | 'clinician' | null
+  >(null);
   const { currentUser } = useAuthStore();
 
   React.useEffect(() => {
@@ -41,7 +43,7 @@ export const MobileAppSelector: React.FC = () => {
         }
       }
     };
-    
+
     checkAppType();
   }, [currentUser]);
 
@@ -57,6 +59,6 @@ export const MobileAppSelector: React.FC = () => {
     case 'clinician':
       return <ClinicianApp />;
     default:
-      return <div className="flex items-center justify-center h-screen">Loading...</div>;
+      return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 };

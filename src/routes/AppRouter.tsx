@@ -10,27 +10,19 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
-const ForgotPasswordPage = lazy(
-	() => import('@/pages/auth/ForgotPasswordPage')
-);
+const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));
-const PatientDetailPage = lazy(
-	() => import('@/pages/patients/PatientDetailPage')
-);
+const PatientDetailPage = lazy(() => import('@/pages/patients/PatientDetailPage'));
 const TestsPage = lazy(() => import('@/pages/tests/TestsPage'));
 const TestDetailPage = lazy(() => import('@/pages/tests/TestDetailPage'));
 const TestPanelsPage = lazy(() => import('@/pages/tests/TestPanelsPage'));
 const TestOrdersPage = lazy(() => import('@/pages/tests/TestOrdersPage'));
-const TestOrderDetailPage = lazy(
-	() => import('@/pages/tests/TestOrderDetailPage')
-);
+const TestOrderDetailPage = lazy(() => import('@/pages/tests/TestOrderDetailPage'));
 const OrderDashboardPage = lazy(() => import('@/pages/orders/OrderDashboard'));
 const SamplesPage = lazy(() => import('@/pages/samples/SampleDashboard'));
 const SampleDetailPage = lazy(() => import('@/pages/samples/SampleDetailPage'));
-const SampleCollectionsPage = lazy(
-	() => import('@/pages/samples/SampleCollectionsPage')
-);
+const SampleCollectionsPage = lazy(() => import('@/pages/samples/SampleCollectionsPage'));
 const SampleScanPage = lazy(() => import('@/pages/samples/SampleScanPage'));
 const SampleRegistrationPage = lazy(() => import('@/components/samples/SampleRegistration'));
 const ResultsPage = lazy(() => import('@/pages/results/ResultDashboard'));
@@ -43,148 +35,110 @@ const InvoiceDetailPage = lazy(() => import('@/pages/billing/InvoiceDetailPage')
 const PaymentsPage = lazy(() => import('@/pages/billing/PaymentsPage'));
 const FinancialReportsPage = lazy(() => import('@/pages/billing/FinancialReportsPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryDashboard'));
-const QualityControlPage = lazy(
-	() => import('@/pages/quality-control/QualityControlPage')
-);
+const QualityControlPage = lazy(() => import('@/pages/quality-control/QualityControlPage'));
 const ReportsPage = lazy(() => import('@/pages/reports/ReportDashboard'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 const EMRConnectionsPage = lazy(() => import('@/pages/emr/EMRConnectionsPage'));
-const EMRConnectionDetailPage = lazy(
-	() => import('@/pages/emr/EMRConnectionDetailPage')
-);
+const EMRConnectionDetailPage = lazy(() => import('@/pages/emr/EMRConnectionDetailPage'));
 const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
-const BiometricSettingsPage = lazy(
-	() => import('@/pages/settings/BiometricSettingsPage')
-);
-const ValidationRulesPage = lazy(
-	() => import('@/pages/settings/ValidationRulesPage')
-);
+const BiometricSettingsPage = lazy(() => import('@/pages/settings/BiometricSettingsPage'));
+const ValidationRulesPage = lazy(() => import('@/pages/settings/ValidationRulesPage'));
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 
 // Clinician App
-const ClinicianApp = lazy(() => import('@/apps/clinician/ClinicianApp').then(module => ({ default: module.ClinicianApp })));
+const ClinicianApp = lazy(() =>
+  import('@/apps/clinician/ClinicianApp').then((module) => ({ default: module.ClinicianApp }))
+);
 
 export const AppRouter = () => {
-	const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
-	return (
-		<Suspense fallback={<LoadingScreen />}>
-			<Routes>
-				{/* Public routes */}
-				<Route element={<AuthLayout />}>
-					<Route
-						path='/login'
-						element={
-							isAuthenticated ? <Navigate to='/dashboard' /> : <LoginPage />
-						}
-					/>
-					<Route
-						path='/register'
-						element={
-							isAuthenticated ? <Navigate to='/dashboard' /> : <RegisterPage />
-						}
-					/>
-					<Route
-						path='/forgot-password'
-						element={
-							isAuthenticated ? (
-								<Navigate to='/dashboard' />
-							) : (
-								<ForgotPasswordPage />
-							)
-						}
-					/>
-					<Route path='/setup-demo' element={<SetupDemoPage />} />
-				</Route>
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes>
+        {/* Public routes */}
+        <Route element={<AuthLayout />}>
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+          />
+          <Route
+            path="/register"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />}
+          />
+          <Route
+            path="/forgot-password"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPasswordPage />}
+          />
+          <Route path="/setup-demo" element={<SetupDemoPage />} />
+        </Route>
 
-				{/* Protected routes */}
-				<Route element={<ProtectedRoute />}>
-					<Route element={<DashboardLayout />}>
-						<Route path='/dashboard' element={<DashboardPage />} />
-						<Route path='/patients' element={<PatientsPage />} />
-						<Route
-							path='/patients/:patientId'
-							element={<PatientDetailPage />}
-						/>
-						<Route path='/tests' element={<TestsPage />} />
-						<Route path='/tests/panels' element={<TestPanelsPage />} />
-						<Route path='/tests/orders' element={<TestOrdersPage />} />
-						<Route
-							path='/tests/orders/:orderId'
-							element={<TestOrderDetailPage />}
-						/>
-						<Route path='/tests/:testId' element={<TestDetailPage />} />
-						<Route path='/orders' element={<OrderDashboardPage />} />
-						<Route path='/samples' element={<SamplesPage />} />
-						<Route path='/samples/register' element={<SampleRegistrationPage />} />
-						<Route path='/samples/collections' element={<SampleCollectionsPage />} />
-						<Route path='/samples/scan' element={<SampleScanPage />} />
-						<Route path='/samples/:sampleId' element={<SampleDetailPage />} />
-						<Route path='/results' element={<ResultsPage />} />
-						<Route path='/results/entry' element={<ResultEntryPage />} />
-						<Route path='/results/review' element={<ResultReviewPage />} />
-						<Route path='/billing' element={<BillingPage />} />
-						<Route path='/billing/invoices/:invoiceId' element={<InvoiceDetailPage />} />
-						<Route path='/billing/payments' element={<PaymentsPage />} />
-						<Route path='/billing/claims' element={<InsuranceClaimsPage />} />
-						<Route path='/billing/claims/:claimId' element={<ClaimDetailPage />} />
-						<Route path='/billing/reports' element={<FinancialReportsPage />} />
-						<Route path='/inventory' element={<InventoryPage />} />
-						<Route path='/quality-control' element={<QualityControlPage />} />
-						<Route path='/reports' element={<ReportsPage />} />
-						<Route path='/analytics' element={<AnalyticsPage />} />
-						<Route path='/equipment' element={<EquipmentPage />} />
-						<Route path='/emr/connections' element={<EMRConnectionsPage />} />
-						<Route
-							path='/emr/connections/:connectionId'
-							element={<EMRConnectionDetailPage />}
-						/>
-						<Route path='/settings' element={<SettingsPage />} />
-						<Route
-							path='/settings/biometric'
-							element={<BiometricSettingsPage />}
-						/>
-						<Route
-							path='/settings/validation-rules'
-							element={<ValidationRulesPage />}
-						/>
-						<Route path='/profile' element={<ProfilePage />} />
-					</Route>
-				</Route>
+        {/* Protected routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/patients/:patientId" element={<PatientDetailPage />} />
+            <Route path="/tests" element={<TestsPage />} />
+            <Route path="/tests/panels" element={<TestPanelsPage />} />
+            <Route path="/tests/orders" element={<TestOrdersPage />} />
+            <Route path="/tests/orders/:orderId" element={<TestOrderDetailPage />} />
+            <Route path="/tests/:testId" element={<TestDetailPage />} />
+            <Route path="/orders" element={<OrderDashboardPage />} />
+            <Route path="/samples" element={<SamplesPage />} />
+            <Route path="/samples/register" element={<SampleRegistrationPage />} />
+            <Route path="/samples/collections" element={<SampleCollectionsPage />} />
+            <Route path="/samples/scan" element={<SampleScanPage />} />
+            <Route path="/samples/:sampleId" element={<SampleDetailPage />} />
+            <Route path="/results" element={<ResultsPage />} />
+            <Route path="/results/entry" element={<ResultEntryPage />} />
+            <Route path="/results/review" element={<ResultReviewPage />} />
+            <Route path="/billing" element={<BillingPage />} />
+            <Route path="/billing/invoices/:invoiceId" element={<InvoiceDetailPage />} />
+            <Route path="/billing/payments" element={<PaymentsPage />} />
+            <Route path="/billing/claims" element={<InsuranceClaimsPage />} />
+            <Route path="/billing/claims/:claimId" element={<ClaimDetailPage />} />
+            <Route path="/billing/reports" element={<FinancialReportsPage />} />
+            <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/quality-control" element={<QualityControlPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/equipment" element={<EquipmentPage />} />
+            <Route path="/emr/connections" element={<EMRConnectionsPage />} />
+            <Route path="/emr/connections/:connectionId" element={<EMRConnectionDetailPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/biometric" element={<BiometricSettingsPage />} />
+            <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
 
-				{/* Clinician App Routes */}
-				<Route element={<ProtectedRoute allowedRoles={['clinician']} />}>
-					<Route path='/clinician/*' element={<ClinicianApp />} />
-				</Route>
+        {/* Clinician App Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['clinician']} />}>
+          <Route path="/clinician/*" element={<ClinicianApp />} />
+        </Route>
 
-				{/* Default redirect */}
-				<Route
-					path='/'
-					element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />}
-				/>
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
 
-				{/* 404 page */}
-				<Route
-					path='*'
-					element={
-						<div className='min-h-screen flex items-center justify-center'>
-							<div className='text-center'>
-								<h1 className='text-6xl font-bold text-gray-300 dark:text-gray-700'>
-									404
-								</h1>
-								<p className='text-xl text-gray-600 dark:text-gray-400 mt-4'>
-									Page not found
-								</p>
-								<a href='/' className='btn btn-primary mt-6'>
-									Go to Home
-								</a>
-							</div>
-						</div>
-					}
-				/>
-			</Routes>
-		</Suspense>
-	);
+        {/* 404 page */}
+        <Route
+          path="*"
+          element={
+            <div className="flex justify-center items-center min-h-screen">
+              <div className="text-center">
+                <h1 className="text-6xl font-bold text-gray-300 dark:text-gray-700">404</h1>
+                <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">Page not found</p>
+                <a href="/" className="mt-6 btn btn-primary">
+                  Go to Home
+                </a>
+              </div>
+            </div>
+          }
+        />
+      </Routes>
+    </Suspense>
+  );
 };

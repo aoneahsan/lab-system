@@ -10,8 +10,7 @@ import {
   ClipboardCheck,
   BarChart3,
   AlertTriangle,
-  ChevronRight,
-  Beaker
+  Beaker,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +55,7 @@ export const HomeScreen: React.FC = () => {
     criticalResults: 3,
     qcPending: 2,
     tat: 45,
-    efficiency: 92
+    efficiency: 92,
   });
 
   const [criticalResults] = useState<CriticalResult[]>([
@@ -66,7 +65,7 @@ export const HomeScreen: React.FC = () => {
       testName: 'Glucose',
       result: '320 mg/dL (H)',
       criticality: 'high',
-      time: '10 min ago'
+      time: '10 min ago',
     },
     {
       id: '2',
@@ -74,7 +73,7 @@ export const HomeScreen: React.FC = () => {
       testName: 'Potassium',
       result: '6.2 mEq/L (H)',
       criticality: 'urgent',
-      time: '25 min ago'
+      time: '25 min ago',
     },
     {
       id: '3',
@@ -82,8 +81,8 @@ export const HomeScreen: React.FC = () => {
       testName: 'Hemoglobin',
       result: '6.5 g/dL (L)',
       criticality: 'high',
-      time: '45 min ago'
-    }
+      time: '45 min ago',
+    },
   ]);
 
   const [pendingSamples] = useState<PendingSample[]>([
@@ -93,7 +92,7 @@ export const HomeScreen: React.FC = () => {
       patientName: 'John Doe',
       tests: ['CBC', 'Chemistry Panel'],
       priority: 'stat',
-      receivedTime: new Date(Date.now() - 15 * 60 * 1000)
+      receivedTime: new Date(Date.now() - 15 * 60 * 1000),
     },
     {
       id: '2',
@@ -101,8 +100,8 @@ export const HomeScreen: React.FC = () => {
       patientName: 'Mary Johnson',
       tests: ['Lipid Panel', 'HbA1c'],
       priority: 'routine',
-      receivedTime: new Date(Date.now() - 30 * 60 * 1000)
-    }
+      receivedTime: new Date(Date.now() - 30 * 60 * 1000),
+    },
   ]);
 
   const getTimeElapsed = (time: Date) => {
@@ -124,33 +123,31 @@ export const HomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50">
+    <div className="overflow-y-auto flex-1 bg-gray-50">
       <div className="p-4 space-y-4">
         {/* Welcome Card */}
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-4 text-white">
+        <div className="p-4 text-white bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl">
           <h2 className="text-xl font-semibold">
             Welcome back, {currentUser?.displayName?.split(' ')[0] || 'Technician'}!
           </h2>
-          <p className="text-blue-100 mt-1">
-            {format(new Date(), 'EEEE, MMMM d, yyyy')}
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="bg-white/10 rounded-lg p-3">
-              <div className="flex items-center justify-between">
+          <p className="mt-1 text-blue-100">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="p-3 rounded-lg bg-white/10">
+              <div className="flex justify-between items-center">
                 <div>
                   <p className="text-2xl font-bold">{stats.pendingSamples}</p>
                   <p className="text-sm text-blue-100">Pending</p>
                 </div>
-                <TestTube className="h-8 w-8 text-blue-200" />
+                <TestTube className="w-8 h-8 text-blue-200" />
               </div>
             </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <div className="flex items-center justify-between">
+            <div className="p-3 rounded-lg bg-white/10">
+              <div className="flex justify-between items-center">
                 <div>
                   <p className="text-2xl font-bold">{stats.tat}m</p>
                   <p className="text-sm text-blue-100">Avg TAT</p>
                 </div>
-                <Clock className="h-8 w-8 text-blue-200" />
+                <Clock className="w-8 h-8 text-blue-200" />
               </div>
             </div>
           </div>
@@ -158,10 +155,10 @@ export const HomeScreen: React.FC = () => {
 
         {/* Critical Results Alert */}
         {criticalResults.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+            <div className="flex justify-between items-center mb-3">
               <div className="flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <AlertTriangle className="w-5 h-5 text-red-600" />
                 <h3 className="font-semibold text-red-900">Critical Results</h3>
                 <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
                   {criticalResults.length}
@@ -169,22 +166,20 @@ export const HomeScreen: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/lab-staff/critical-results')}
-                className="text-sm text-red-600 font-medium"
+                className="text-sm font-medium text-red-600"
               >
                 View all
               </button>
             </div>
             <div className="space-y-2">
               {criticalResults.slice(0, 2).map((result) => (
-                <div
-                  key={result.id}
-                  className="bg-white rounded p-3 border border-red-100"
-                >
-                  <div className="flex items-start justify-between">
+                <div key={result.id} className="p-3 bg-white rounded border border-red-100">
+                  <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-gray-900">{result.patientName}</p>
                       <p className="text-sm text-gray-600">
-                        {result.testName}: <span className="font-semibold text-red-600">{result.result}</span>
+                        {result.testName}:{' '}
+                        <span className="font-semibold text-red-600">{result.result}</span>
                       </p>
                     </div>
                     <span className="text-xs text-gray-500">{result.time}</span>
@@ -197,40 +192,40 @@ export const HomeScreen: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
+          <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-600">In Progress</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
               </div>
-              <Activity className="h-8 w-8 text-blue-500" />
+              <Activity className="w-8 h-8 text-blue-500" />
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
+          <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-600">Completed</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.completedToday}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
+          <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-600">QC Pending</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.qcPending}</p>
               </div>
-              <ClipboardCheck className="h-8 w-8 text-yellow-500" />
+              <ClipboardCheck className="w-8 h-8 text-yellow-500" />
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
+          <div className="p-4 bg-white rounded-lg shadow-sm">
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-600">Efficiency</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.efficiency}%</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-indigo-500" />
+              <TrendingUp className="w-8 h-8 text-indigo-500" />
             </div>
           </div>
         </div>
@@ -238,11 +233,11 @@ export const HomeScreen: React.FC = () => {
         {/* Pending Samples */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
               <h3 className="font-semibold text-gray-900">Pending Samples</h3>
               <button
                 onClick={() => navigate('/lab-staff/samples')}
-                className="text-sm text-indigo-600 font-medium"
+                className="text-sm font-medium text-indigo-600"
               >
                 View all
               </button>
@@ -253,20 +248,22 @@ export const HomeScreen: React.FC = () => {
               <div
                 key={sample.id}
                 onClick={() => navigate(`/lab-staff/sample/${sample.sampleId}`)}
-                className="p-4 hover:bg-gray-50 cursor-pointer"
+                className="p-4 cursor-pointer hover:bg-gray-50"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <p className="font-medium text-gray-900">{sample.sampleId}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(sample.priority)}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(
+                          sample.priority
+                        )}`}
+                      >
                         {sample.priority.toUpperCase()}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">{sample.patientName}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {sample.tests.join(', ')}
-                    </p>
+                    <p className="mt-1 text-xs text-gray-500">{sample.tests.join(', ')}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-900">
@@ -284,30 +281,30 @@ export const HomeScreen: React.FC = () => {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate('/lab-staff/scan-sample')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+            className="flex flex-col items-center p-4 space-y-2 bg-white rounded-lg shadow-sm hover:bg-gray-50"
           >
-            <Package className="h-8 w-8 text-indigo-600" />
+            <Package className="w-8 h-8 text-indigo-600" />
             <span className="text-sm font-medium text-gray-900">Scan Sample</span>
           </button>
           <button
             onClick={() => navigate('/lab-staff/qc')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+            className="flex flex-col items-center p-4 space-y-2 bg-white rounded-lg shadow-sm hover:bg-gray-50"
           >
-            <Beaker className="h-8 w-8 text-green-600" />
+            <Beaker className="w-8 h-8 text-green-600" />
             <span className="text-sm font-medium text-gray-900">Run QC</span>
           </button>
           <button
             onClick={() => navigate('/lab-staff/reports')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+            className="flex flex-col items-center p-4 space-y-2 bg-white rounded-lg shadow-sm hover:bg-gray-50"
           >
-            <BarChart3 className="h-8 w-8 text-purple-600" />
+            <BarChart3 className="w-8 h-8 text-purple-600" />
             <span className="text-sm font-medium text-gray-900">Reports</span>
           </button>
           <button
             onClick={() => navigate('/lab-staff/critical')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+            className="flex flex-col items-center p-4 space-y-2 bg-white rounded-lg shadow-sm hover:bg-gray-50"
           >
-            <AlertCircle className="h-8 w-8 text-red-600" />
+            <AlertCircle className="w-8 h-8 text-red-600" />
             <span className="text-sm font-medium text-gray-900">Critical</span>
           </button>
         </div>
