@@ -1,16 +1,11 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type {
-  TestResult,
-  Sample,
-  Patient,
-  Test,
-  Invoice,
-  Payment,
-  QCRun,
-  QCMaterial,
-  QCStatistics,
-} from '@/types';
+import type { TestResult } from '@/types/result.types';
+import type { Sample } from '@/types/sample.types';
+import type { Patient } from '@/types/patient.types';
+import type { Test } from '@/types/test.types';
+import type { Invoice, Payment } from '@/types/billing.types';
+import type { QCRun, QCMaterial, QCStatistics } from '@/types/qc.types';
 
 interface ReportData {
   result: TestResult;
@@ -82,11 +77,11 @@ export class PDFService {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     const patientInfo = [
-      ['Name:', data.patient.fullName],
+      ['Name:', `${data.patient.firstName} ${data.patient.middleName || ''} ${data.patient.lastName}`.trim()],
       ['Patient ID:', data.patient.patientId],
       ['Date of Birth:', new Date(data.patient.dateOfBirth).toLocaleDateString()],
       ['Gender:', data.patient.gender],
-      ['Phone:', data.patient.phone || 'N/A'],
+      ['Phone:', data.patient.phoneNumbers[0]?.value || 'N/A'],
     ];
 
     patientInfo.forEach(([label, value]) => {
@@ -136,7 +131,10 @@ export class PDFService {
         data.test.name,
         data.result.value,
         data.result.unit || '-',
-        data.test.referenceRange || '-',
+        data.test.referenceRanges?.[0]?.textRange || 
+        (data.test.referenceRanges?.[0]?.normalMin && data.test.referenceRanges?.[0]?.normalMax 
+          ? `${data.test.referenceRanges[0].normalMin} - ${data.test.referenceRanges[0].normalMax}`
+          : '-'),
         data.result.status,
       ],
     ];
@@ -163,10 +161,10 @@ export class PDFService {
       },
     });
 
-    yPosition = doc.lastAutoTable.finalY + 10;
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
 
     // Notes section if present
-    if (data.result.notes) {
+    if (data.result.comments) {
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text('Notes', 20, yPosition);
@@ -174,7 +172,7 @@ export class PDFService {
 
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      const splitNotes = doc.splitTextToSize(data.result.notes, pageWidth - 40);
+      const splitNotes = doc.splitTextToSize(data.result.comments, pageWidth - 40);
       doc.text(splitNotes, 20, yPosition);
       yPosition += splitNotes.length * 5 + 10;
     }
@@ -222,16 +220,16 @@ export class PDFService {
     // Implementation would be same as above but extracted into this method
   }
 
-  private getStatusColor(status: string): number[] {
+  private getStatusColor(status: string): [number, number, number] {
     switch (status) {
       case 'normal':
-        return [0, 128, 0]; // Green
+        return [0, 128, 0] as [number, number, number]; // Green
       case 'abnormal':
-        return [255, 0, 0]; // Red
+        return [255, 0, 0] as [number, number, number]; // Red
       case 'critical':
-        return [139, 0, 0]; // Dark Red
+        return [139, 0, 0] as [number, number, number]; // Dark Red
       default:
-        return [0, 0, 0]; // Black
+        return [0, 0, 0] as [number, number, number]; // Black
     }
   }
 
@@ -337,13 +335,14 @@ export class PDFService {
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(patient.fullName, 20, yPosition);
+    doc.text(`${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`.trim(), 20, yPosition);
     yPosition += 5;
-    if (patient.address) {
-      doc.text(patient.address.street, 20, yPosition);
+    if (patient.addresses?.[0]) {
+      const address = patient.addresses[0];
+      doc.text(address.line1, 20, yPosition);
       yPosition += 5;
       doc.text(
-        `${patient.address.city}, ${patient.address.state} ${patient.address.zipCode}`,
+        `${address.city}, ${address.state} ${address.postalCode}`,
         20,
         yPosition
       );
@@ -384,7 +383,7 @@ export class PDFService {
       },
     });
 
-    yPosition = doc.lastAutoTable.finalY + 10;
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
 
     // Totals
     const totalsX = pageWidth - 80;
@@ -445,7 +444,7 @@ export class PDFService {
   generateQCReportPDF(
     qcRun: QCRun,
     material: QCMaterial,
-    statistics?: QCStatistics,
+    statistics: QCStatistics | undefined,
     tenant: {
       name: string;
       address: {
@@ -590,7 +589,7 @@ export class PDFService {
       },
     });
 
-    yPosition = doc.lastAutoTable.finalY + 10;
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
 
     // Westgard Rule Violations
     const violations = qcRun.results.filter((r) => r.violatedRules && r.violatedRules.length > 0);

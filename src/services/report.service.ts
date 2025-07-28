@@ -129,7 +129,6 @@ export const reportService = {
       createdAt: now,
       createdBy: userId,
       updatedAt: now,
-      updatedBy: userId,
     };
 
     const docRef = await addDoc(collection(db, COLLECTIONS.REPORT_TEMPLATES), templateData as any);
@@ -178,8 +177,8 @@ export const reportService = {
     if (filter?.status) {
       q = query(q, where('status', '==', filter.status));
     }
-    if (filter?.createdBy) {
-      q = query(q, where('createdBy', '==', filter.createdBy));
+    if (filter?.generatedBy) {
+      q = query(q, where('generatedBy', '==', filter.generatedBy));
     }
 
     q = query(q, orderBy('createdAt', 'desc'), limit(100));
@@ -213,18 +212,13 @@ export const reportService = {
 
     const reportData: Omit<Report, 'id'> = {
       tenantId,
-      templateId: data.templateId,
-      name: data.name,
-      description: data.description,
-      type: data.type,
-      status: data.schedule ? 'scheduled' : 'draft',
-      config: config as any,
-      parameters: data.parameters,
-      schedule: data.schedule,
-      createdAt: now,
-      createdBy: userId,
-      updatedAt: now,
-      updatedBy: userId,
+      templateId: data.templateId || '',
+      templateName: data.name,
+      format: data.formats?.[0] || 'pdf',
+      parameters: data.filters || {},
+      status: 'pending',
+      generatedBy: userId,
+      generatedAt: now,
     };
 
     const docRef = await addDoc(collection(db, COLLECTIONS.REPORTS), reportData);
@@ -301,7 +295,6 @@ export const reportService = {
       createdAt: now,
       createdBy: userId,
       updatedAt: now,
-      updatedBy: userId,
     };
 
     const docRef = await addDoc(collection(db, COLLECTIONS.ANALYTICS_DASHBOARDS), dashboardData);

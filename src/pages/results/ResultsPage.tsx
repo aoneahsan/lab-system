@@ -21,7 +21,7 @@ import CriticalResultsDashboard from '@/components/results/CriticalResultsDashbo
 import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
 import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
 import type { ResultFilter, TestResult } from '@/types/result.types';
-import type { Test } from '@/types';
+import type { TestDefinition } from '@/types/test.types';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,10 +34,11 @@ const ResultsPage: React.FC = () => {
   const [correctionModal, setCorrectionModal] = useState<{
     isOpen: boolean;
     result: TestResult | null;
-    test: Test | null;
+    test: TestDefinition | null;
   }>({ isOpen: false, result: null, test: null });
 
-  const { data: results = [], isLoading } = useResults(filters);
+  const { data: resultsData, isLoading } = useResults(filters);
+  const results = resultsData?.items || [];
   const { data: statistics } = useResultStatistics();
   const { tenant } = useTenant();
   const { data: patientsData } = usePatients();
@@ -46,15 +47,15 @@ const ResultsPage: React.FC = () => {
 
   const patients = patientsData?.patients || [];
   const samples = samplesData || [];
-  const tests = testsData?.tests || [];
+  const tests = testsData || [];
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-800',
       in_progress: 'bg-blue-100 text-blue-800',
       preliminary: 'bg-purple-100 text-purple-800',
-      final: 'bg-green-100 text-green-800',
-      corrected: 'bg-orange-100 text-orange-800',
+      verified: 'bg-green-100 text-green-800',
+      amended: 'bg-orange-100 text-orange-800',
       cancelled: 'bg-red-100 text-red-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
@@ -93,8 +94,8 @@ const ResultsPage: React.FC = () => {
         test,
         tenant: {
           name: tenant.name,
-          address: tenant.address,
-          contact: tenant.contact,
+          address: tenant.settings.branding.companyAddress || '',
+          contact: tenant.settings.branding.companyPhone || '',
         },
       });
 
@@ -126,8 +127,8 @@ const ResultsPage: React.FC = () => {
         test,
         tenant: {
           name: tenant.name,
-          address: tenant.address,
-          contact: tenant.contact,
+          address: tenant.settings.branding.companyAddress || '',
+          contact: tenant.settings.branding.companyPhone || '',
         },
       });
 
@@ -148,7 +149,7 @@ const ResultsPage: React.FC = () => {
   };
 
   const handleAmendResult = (result: TestResult) => {
-    if (result.status !== 'final') {
+    if (result.status !== 'verified') {
       toast.error(
         'Cannot Amend',
         'Only finalized results can be amended. Use correction for non-final results.'
@@ -159,7 +160,7 @@ const ResultsPage: React.FC = () => {
   };
 
   const handleCorrectResult = (result: TestResult) => {
-    if (result.status === 'final') {
+    if (result.status === 'verified') {
       toast.error(
         'Cannot Correct',
         'Finalized results cannot be corrected. Use amendment instead.'
@@ -329,7 +330,7 @@ const ResultsPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{result.testName}</div>
-                        <div className="text-sm text-gray-500">{result.testCode}</div>
+                        <div className="text-sm text-gray-500">{result.testId}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -352,7 +353,7 @@ const ResultsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {result.performedAt.toDate().toLocaleDateString()}
+                      {result.enteredAt.toDate().toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-3">
@@ -362,7 +363,7 @@ const ResultsPage: React.FC = () => {
                         >
                           View
                         </button>
-                        {result.status === 'final' ? (
+                        {result.status === 'verified' ? (
                           <button
                             onClick={() => handleAmendResult(result)}
                             className="text-purple-600 hover:text-purple-900"

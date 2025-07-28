@@ -58,9 +58,10 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
         item.testName = test.name;
         item.unitPrice = test.price || test.cost || 0;
       }
-    } else {
-      // @ts-expect-error - Dynamic field assignment
-      item[field] = value;
+    } else if (field === 'quantity' || field === 'unitPrice' || field === 'discount' || field === 'tax') {
+      item[field] = Number(value);
+    } else if (field === 'testName') {
+      item[field] = value as string;
     }
 
     // Recalculate totals

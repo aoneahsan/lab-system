@@ -130,14 +130,27 @@ export class ValidationService {
       }
 
       // Simple reference range parsing if no rules
-      if (!rule && test.referenceRanges?.[0]?.normal) {
-        const refRange = test.referenceRanges?.[0]?.normal;
-        const rangeMatch = refRange.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+      if (!rule && test.referenceRanges?.[0]) {
+        const refRange = test.referenceRanges[0];
+        let min: number | undefined;
+        let max: number | undefined;
+        
+        // Use normalMin and normalMax if available
+        if (refRange.normalMin !== undefined && refRange.normalMax !== undefined) {
+          min = refRange.normalMin;
+          max = refRange.normalMax;
+        } 
+        // Otherwise try to parse textRange
+        else if (refRange.textRange) {
+          const rangeMatch = refRange.textRange.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+          if (rangeMatch) {
+            const [, minStr, maxStr] = rangeMatch;
+            min = parseFloat(minStr);
+            max = parseFloat(maxStr);
+          }
+        }
 
-        if (rangeMatch) {
-          const [, minStr, maxStr] = rangeMatch;
-          const min = parseFloat(minStr);
-          const max = parseFloat(maxStr);
+        if (min !== undefined && max !== undefined) {
 
           // Assume critical values are 20% beyond normal range
           const criticalLow = min - (max - min) * 0.2;
@@ -191,7 +204,7 @@ export class ValidationService {
       errors,
       warnings,
       flag,
-      status: errors.length > 0 ? 'entered' : 'final',
+      status: errors.length > 0 ? 'entered' : 'verified',
       isCritical,
       criticalType,
     };

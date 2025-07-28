@@ -14,7 +14,7 @@ export function usePerformanceObserver(componentName: string) {
     mountTime.current = performance.now();
     renderCount.current++;
 
-    performanceMonitor.trackInteraction('component_mount', componentName);
+    performanceMonitor.trackInteraction('component_mount', { component: componentName });
 
     return () => {
       // Track component unmount and lifetime
@@ -28,7 +28,8 @@ export function usePerformanceObserver(componentName: string) {
     // Track renders after mount
     if (renderCount.current > 0) {
       renderCount.current++;
-      performanceMonitor.trackComponentRender(componentName, performance.now() - mountTime.current);
+      const cleanup = performanceMonitor.trackComponentRender(componentName);
+      cleanup();
     }
   });
 }

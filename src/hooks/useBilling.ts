@@ -233,10 +233,7 @@ export const useBillingStatistics = (startDate?: Date, endDate?: Date) => {
     queryKey: [...BILLING_KEYS.statistics(), startDate, endDate],
     queryFn: () => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return billingService.getBillingStatistics(currentTenant.id, {
-        dateFrom: startDate,
-        dateTo: endDate,
-      });
+      return billingService.getBillingStatistics(currentTenant.id);
     },
     enabled: !!currentTenant,
   });

@@ -38,7 +38,7 @@ const ProfileScreen: React.FC = () => {
         {
           icon: Calendar,
           label: 'Employee ID',
-          value: currentUser?.employeeId || 'Not set',
+          value: currentUser?.metadata?.employeeId || 'Not set',
         },
       ],
     },

@@ -11,12 +11,12 @@ import {
   AlertCircle,
   Clock,
 } from 'lucide-react';
-import { useTestResults } from '@/hooks/useTestResults';
+import { useResults } from '@/hooks/useResults';
 import { useAuthStore } from '@/stores/auth.store';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { toast } from '@/hooks/useToast';
-import type { TestTestResult } from '@/types/result.types';
+import type { TestResult } from '@/types/result.types';
 
 const MobileTestResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const MobileTestResultsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // In real app, would filter by patient ID
-  const { data: results = [], isLoading } = useTestResults();
+  const { data: results = { items: [], total: 0 }, isLoading } = useResults();
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -77,7 +77,7 @@ const MobileTestResultsPage: React.FC = () => {
     try {
       await Share.share({
         title: `Lab Report - ${result.testName}`,
-        text: `Here is my lab report from ${new Date(result.resultedAt).toLocaleDateString()}`,
+        text: `Here is my lab report from ${new Date(result.createdAt.toDate()).toLocaleDateString()}`,
         url: `https://labflow.com/reports/${result.id}`,
         dialogTitle: 'Share your lab report',
       });
@@ -86,7 +86,7 @@ const MobileTestResultsPage: React.FC = () => {
     }
   };
 
-  const filteredTestResults = results.filter((result) => {
+  const filteredTestResults = results.items.filter((result) => {
     const matchesSearch = result.testName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || result.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -94,7 +94,7 @@ const MobileTestResultsPage: React.FC = () => {
 
   const groupedTestResults = filteredTestResults.reduce(
     (groups, result) => {
-      const date = new Date(result.resultedAt).toLocaleDateString();
+      const date = new Date(result.createdAt.toDate()).toLocaleDateString();
       if (!groups[date]) {
         groups[date] = [];
       }
@@ -108,7 +108,7 @@ const MobileTestResultsPage: React.FC = () => {
     <div className="flex flex-col bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Test TestResults</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Test Results</h1>
 
         {/* Search and Filter */}
         <div className="space-y-3">
@@ -139,7 +139,7 @@ const MobileTestResultsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* TestResults List */}
+      {/* Results List */}
       <div className="flex-1 px-6 py-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -164,7 +164,7 @@ const MobileTestResultsPage: React.FC = () => {
                           <div className="flex-1">
                             <h4 className="font-medium text-gray-900">{result.testName}</h4>
                             <p className="text-sm text-gray-500 mt-1">
-                              Ordered by Dr. {result.orderingProvider || 'Smith'}
+                              Ordered by Dr. Smith
                             </p>
                           </div>
                         </div>
@@ -183,13 +183,13 @@ const MobileTestResultsPage: React.FC = () => {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">TestResult</span>
                             <span className="font-medium text-gray-900">
-                              {result.value.numeric} {result.value.unit}
+                              {result.value} {result.unit}
                             </span>
                           </div>
                           {result.referenceRange && (
                             <div className="text-xs text-gray-500 mt-1">
-                              Normal: {result.referenceRange.low} - {result.referenceRange.high}{' '}
-                              {result.value.unit}
+                              Normal: {result.referenceRange.min} - {result.referenceRange.max}{' '}
+                              {result.unit}
                             </div>
                           )}
                         </div>

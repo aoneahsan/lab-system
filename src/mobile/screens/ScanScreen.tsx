@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, X, AlertCircle } from 'lucide-react';
-import { QRCodeScanner } from 'qrcode-studio';
-const BarcodeScanner = QRCodeScanner;
+import { QRCodeStudio } from 'qrcode-studio';
 
 const ScanScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -15,20 +14,47 @@ const ScanScreen: React.FC = () => {
       setScanError(null);
       setIsScanning(true);
 
-      const permission = await BarcodeScanner.requestPermission();
-      if (!permission.granted) {
-        throw new Error('Camera permission denied');
+      // Check permissions
+      const permStatus = await QRCodeStudio.checkPermissions();
+      if (permStatus.camera !== 'granted') {
+        const requestStatus = await QRCodeStudio.requestPermissions();
+        if (requestStatus.camera !== 'granted') {
+          throw new Error('Camera permission denied');
+        }
       }
 
-      const result = await BarcodeScanner.startScan();
-      if (result.hasContent) {
+      // Add listener for scan results
+      const listener = await QRCodeStudio.addListener('scanResult', (result) => {
         handleScanResult(result.content);
-      }
+        stopScan();
+      });
+
+      // Add error listener
+      const errorListener = await QRCodeStudio.addListener('scanError', (error) => {
+        setScanError(error.message);
+        stopScan();
+      });
+
+      // Start scanning
+      await QRCodeStudio.startScan({
+        showTorchButton: true,
+        showFlipCameraButton: false,
+        camera: 'back'
+      });
     } catch (error) {
       setScanError(error instanceof Error ? error.message : 'Failed to start scanner');
+      stopScan();
+    }
+  };
+
+  const stopScan = async () => {
+    try {
+      await QRCodeStudio.stopScan();
+      await QRCodeStudio.removeAllListeners();
+    } catch (error) {
+      console.error('Failed to stop scan:', error);
     } finally {
       setIsScanning(false);
-      BarcodeScanner.stopScan();
     }
   };
 
@@ -125,7 +151,7 @@ const ScanScreen: React.FC = () => {
             </div>
             <p className="text-lg font-medium text-gray-900">Scanning...</p>
             <button
-              onClick={() => setIsScanning(false)}
+              onClick={stopScan}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
               Cancel

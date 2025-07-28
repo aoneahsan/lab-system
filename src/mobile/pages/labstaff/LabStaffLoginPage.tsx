@@ -29,7 +29,7 @@ const LabStaffLoginPage: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {
@@ -38,8 +38,8 @@ const LabStaffLoginPage: React.FC = () => {
 
   const checkBiometricAvailability = async () => {
     try {
-      const { available } = await BiometricAuth.available();
-      setBiometricAvailable(available);
+      const result = await BiometricAuth.isAvailable();
+      setBiometricAvailable(result.available);
     } catch (error) {
       console.error('Biometric check failed:', error);
     }
@@ -47,7 +47,7 @@ const LabStaffLoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
+      await login({ email: data.email, password: data.password });
       navigate('/home');
     } catch (error) {
       toast.error('Invalid email or password');
@@ -57,13 +57,13 @@ const LabStaffLoginPage: React.FC = () => {
   const handleBiometricLogin = async () => {
     try {
       const verified = await BiometricAuth.authenticate({
-        reason: 'Authenticate to access LabFlow Lab Staff',
         title: 'Biometric Authentication',
         subtitle: 'Use your fingerprint or face ID',
         description: 'Access lab systems securely',
+        fallbackButtonTitle: 'Use Password',
       });
 
-      if (verified.verified) {
+      if (verified.success) {
         // In real app, would use stored credentials or token
         const storedEmail = localStorage.getItem('labStaffEmail');
         if (storedEmail) {

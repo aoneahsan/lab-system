@@ -26,6 +26,7 @@ export type ClaimStatus =
   | 'pending'
   | 'approved'
   | 'denied'
+  | 'rejected'
   | 'partial'
   | 'paid'
   | 'appealed';
@@ -44,16 +45,23 @@ export interface Invoice {
   // Financial
   subtotal: number;
   taxAmount: number;
+  taxRate?: number;
   discountAmount: number;
+  discount?: number;
   totalAmount: number;
   balanceDue: number;
+  paidAmount?: number;
 
   // Status
   status: InvoiceStatus;
   paymentStatus: PaymentStatus;
 
+  // Terms
+  paymentTerms?: number;
+
   // Line Items
   items: InvoiceItem[];
+  lineItems?: InvoiceItem[];
 
   // Payment Information
   payments: string[]; // Array of payment IDs
@@ -79,6 +87,8 @@ export interface InvoiceItem {
   testId?: string;
   testCode: string;
   testName: string;
+  description?: string;
+  code?: string;
   quantity: number;
   unitPrice: number;
   amount: number;
@@ -223,6 +233,7 @@ export interface InsuranceClaim {
   id: string;
   tenantId: string;
   invoiceId: string;
+  invoiceNumber?: string;
   patientId: string;
   insuranceId: string;
 
@@ -246,6 +257,8 @@ export interface InsuranceClaim {
   // Financial
   totalCharges: number;
   allowedAmount?: number;
+  approvedAmount?: number;
+  deniedAmount?: number;
   paidAmount?: number;
   patientResponsibility?: number;
   writeOffAmount?: number;
@@ -259,6 +272,7 @@ export interface InsuranceClaim {
   payerClaimNumber?: string;
   denialReason?: string;
   denialCode?: string;
+  rejectionReason?: string;
   eobReceived?: boolean;
 
   // Appeal
@@ -278,6 +292,7 @@ export interface ClaimService {
   id: string;
   serviceDate: Timestamp;
   cptCode: string;
+  description?: string;
   modifiers?: string[];
   units: number;
   charge: number;

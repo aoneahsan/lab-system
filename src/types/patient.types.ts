@@ -158,6 +158,7 @@ export interface PatientSearchFilters {
   tags?: string[];
   dateFrom?: Date;
   dateTo?: Date;
+  limit?: number;
 }
 
 export interface CreatePatientData {

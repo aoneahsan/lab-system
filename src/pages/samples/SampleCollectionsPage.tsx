@@ -31,7 +31,7 @@ const SampleCollectionsPage: React.FC = () => {
   const [batchSamples, setBatchSamples] = useState<Sample[]>([]);
   const createSampleMutation = useCreateSample();
   const { tenant } = useTenant();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   // Mock data for now - will be replaced with actual hooks
   const mockBatches: CollectionBatch[] = [
@@ -68,7 +68,7 @@ const SampleCollectionsPage: React.FC = () => {
         totalSamples: samples.length,
         completedSamples: 0,
         status: 'in_progress',
-        createdBy: user?.displayName || user?.email,
+        createdBy: currentUser?.displayName || currentUser?.email,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -85,8 +85,7 @@ const SampleCollectionsPage: React.FC = () => {
             priority: sampleData.priority,
             collectionDate: new Date(),
             collectionTime: new Date().toLocaleTimeString('en-US', { hour12: false }),
-            collectedBy: user?.displayName || user?.email || 'Unknown',
-            batchId: batchRef.id,
+            collectedBy: currentUser?.displayName || currentUser?.email || 'Unknown',
           };
 
           const newSample = await createSampleMutation.mutateAsync(formData);

@@ -177,14 +177,14 @@ export const orderService = {
   },
 
   // Search orders
-  async searchOrders(query: string): Promise<TestOrder[]> {
+  async searchOrders(searchQuery: string): Promise<TestOrder[]> {
     // This would ideally use a full-text search solution
     // For now, we'll search by order number and patient name
     const ordersByNumber = await getDocs(
       query(
         collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
-        where('orderNumber', '>=', query),
-        where('orderNumber', '<=', query + '\uf8ff'),
+        where('orderNumber', '>=', searchQuery),
+        where('orderNumber', '<=', searchQuery + '\uf8ff'),
         limit(10)
       )
     );
@@ -192,8 +192,8 @@ export const orderService = {
     const ordersByPatient = await getDocs(
       query(
         collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
-        where('patientName', '>=', query),
-        where('patientName', '<=', query + '\uf8ff'),
+        where('patientName', '>=', searchQuery),
+        where('patientName', '<=', searchQuery + '\uf8ff'),
         limit(10)
       )
     );

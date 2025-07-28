@@ -96,3 +96,12 @@ export async function changePassword(oldPassword: string, newPassword: string): 
   await reauthenticateWithCredential(user, credential);
   await updatePassword(user, newPassword);
 }
+
+export async function getCurrentUser(): Promise<User | null> {
+  const user = auth.currentUser;
+  if (!user) {
+    return null;
+  }
+
+  return getUserById(user.uid);
+}

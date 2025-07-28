@@ -19,14 +19,14 @@ import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
 
 interface ReviewResult extends TestResult {
-  patientName: string;
-  testName: string;
-  enteredByName: string;
+  patientName?: string;
+  enteredByName?: string;
+  performedAt?: Date;
 }
 
 const ResultReviewPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { tenant } = useTenant();
   const queryClient = useQueryClient();
 
@@ -42,28 +42,36 @@ const ResultReviewPage: React.FC = () => {
       const resultsQuery = query(
         collection(firestore, COLLECTIONS.RESULTS),
         where('status', 'in', ['preliminary', 'pending_review']),
-        where('enteredBy', '!=', user?.email)
+        where('enteredBy', '!=', currentUser?.email)
       );
 
       const snapshot = await getDocs(resultsQuery);
-      return snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        performedAt: doc.data().performedAt?.toDate() || new Date(),
-      })) as ReviewResult[];
+      return snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          enteredAt: data.enteredAt,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+          verifiedAt: data.verifiedAt,
+          criticalNotifiedAt: data.criticalNotifiedAt,
+          performedAt: data.enteredAt?.toDate() || new Date(),
+        } as ReviewResult;
+      });
     },
-    enabled: !!tenant && !!user,
+    enabled: !!tenant && !!currentUser,
   });
 
   // Approve results mutation
   const approveResultsMutation = useMutation({
     mutationFn: async (resultIds: string[]) => {
-      if (!tenant || !user) throw new Error('Missing tenant or user');
+      if (!tenant || !currentUser) throw new Error('Missing tenant or user');
 
       const updatePromises = resultIds.map((resultId) =>
         updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'final',
-          verifiedBy: user.displayName || user.email,
+          verifiedBy: currentUser.displayName || currentUser.email,
           verifiedAt: serverTimestamp(),
           reviewNotes: reviewNotes[resultId] || '',
           updatedAt: serverTimestamp(),
@@ -87,12 +95,12 @@ const ResultReviewPage: React.FC = () => {
   // Reject results mutation
   const rejectResultsMutation = useMutation({
     mutationFn: async (data: { resultIds: string[]; reason: string }) => {
-      if (!tenant || !user) throw new Error('Missing tenant or user');
+      if (!tenant || !currentUser) throw new Error('Missing tenant or user');
 
       const updatePromises = data.resultIds.map((resultId) =>
         updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'rejected',
-          rejectedBy: user.displayName || user.email,
+          rejectedBy: currentUser.displayName || currentUser.email,
           rejectedAt: serverTimestamp(),
           rejectionReason: data.reason,
           reviewNotes: reviewNotes[resultId] || '',
@@ -271,17 +279,17 @@ const ResultReviewPage: React.FC = () => {
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{result.patientName}</div>
+                      <div className="text-sm font-medium text-gray-900">{result.patientName || `Patient ${result.patientId}`}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{result.testName}</div>
-                        <div className="text-sm text-gray-500">{result.testCode}</div>
+                        <div className="text-sm text-gray-500">{result.testId}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {result.value} {result.unit}
+                        {result.value} {result.unit || ''}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -299,7 +307,7 @@ const ResultReviewPage: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
                         <div>{result.enteredByName || result.enteredBy}</div>
-                        <div className="text-xs">{result.performedAt.toLocaleString()}</div>
+                        <div className="text-xs">{result.performedAt?.toLocaleString() || 'N/A'}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">

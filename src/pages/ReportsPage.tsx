@@ -44,8 +44,6 @@ const ReportsPage: React.FC = () => {
         return <Clock className="h-5 w-5 text-blue-500 animate-spin" />;
       case 'failed':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'scheduled':
-        return <Calendar className="h-5 w-5 text-purple-500" />;
       default:
         return <FileText className="h-5 w-5 text-gray-500" />;
     }
@@ -59,8 +57,6 @@ const ReportsPage: React.FC = () => {
         return 'bg-blue-100 text-blue-800';
       case 'failed':
         return 'bg-red-100 text-red-800';
-      case 'scheduled':
-        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -187,16 +183,13 @@ const ReportsPage: React.FC = () => {
                       <div className="flex items-center">
                         {getStatusIcon(report.status)}
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">{report.name}</div>
-                          {report.description && (
-                            <div className="text-sm text-gray-500">{report.description}</div>
-                          )}
+                          <div className="text-sm font-medium text-gray-900">{report.templateName}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-gray-900 capitalize">
-                        {report.type.replace('_', ' ')}
+                        {report.templateId || 'Custom'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -210,10 +203,10 @@ const ReportsPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {report.createdAt.toDate().toLocaleDateString()}
+                        {report.generatedAt.toDate().toLocaleDateString()}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {report.createdAt.toDate().toLocaleTimeString()}
+                        {report.generatedAt.toDate().toLocaleTimeString()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -223,7 +216,7 @@ const ReportsPage: React.FC = () => {
                       >
                         View
                       </button>
-                      {report.status === 'draft' && (
+                      {report.status === 'pending' && (
                         <button
                           onClick={() => handleGenerateReport(report.id)}
                           className="text-green-600 hover:text-green-900 mr-3"
@@ -233,7 +226,7 @@ const ReportsPage: React.FC = () => {
                           Generate
                         </button>
                       )}
-                      {report.status === 'completed' && report.output?.fileUrls && (
+                      {report.status === 'completed' && report.fileUrl && (
                         <button className="text-purple-600 hover:text-purple-900">
                           <Download className="inline h-4 w-4 mr-1" />
                           Download

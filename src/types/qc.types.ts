@@ -1,5 +1,45 @@
 import { Timestamp } from 'firebase/firestore';
 
+// QC Test types
+export interface QCTest {
+  id: string;
+  tenantId: string;
+  testName: string;
+  testCode: string;
+  analyte?: string;
+  unit?: string;
+  method?: string;
+  instrument?: string;
+  manufacturer?: string;
+  lotNumber?: string;
+  expirationDate?: Timestamp;
+  levels: QCTestLevel[];
+  frequency?: string;
+  status: 'active' | 'inactive' | 'expired' | 'discontinued';
+  createdAt: Timestamp;
+  createdBy: string;
+  updatedAt: Timestamp;
+  updatedBy: string;
+}
+
+export interface QCTestLevel {
+  id: string;
+  name: string;
+  type: 'low' | 'normal' | 'high' | 'abnormal';
+  targetMean: number;
+  targetSD: number;
+  targetCV?: number;
+  targetValue?: number;
+  unit?: string;
+  acceptableRange?: {
+    min: number;
+    max: number;
+  };
+  westgardRules?: string[];
+  lotNumber?: string;
+  expirationDate?: Timestamp;
+}
+
 // QC Material types
 export interface QCMaterial {
   id: string;
@@ -104,6 +144,9 @@ export interface QCRun {
 
 export interface QCResult {
   id: string;
+  qcTestId?: string;
+  levelId?: string;
+  runDate: Timestamp;
 
   // Test identification
   testCode: string;
@@ -115,6 +158,7 @@ export interface QCResult {
 
   // QC evaluation
   status: QCResultStatus;
+  acceptanceStatus?: 'accepted' | 'rejected' | 'warning';
   zscore?: number;
   violatedRules: WestgardViolation[];
 
@@ -127,24 +171,37 @@ export interface QCResult {
   correctiveAction?: string;
   actionTaken?: string;
 
+  // Operator info
+  operatorId?: string;
+  operatorName?: string;
+
   // Timestamps
   resultTime: Timestamp;
   enteredBy: string;
+  createdAt?: Timestamp;
+  
+  // Additional fields
+  comments?: string;
 }
 
 // QC Statistics
 export interface QCStatistics {
-  id: string;
-  tenantId: string;
+  id?: string;
+  tenantId?: string;
+  testId?: string;
+  levelId?: string;
+  period?: 'daily' | 'weekly' | 'monthly' | 'quarterly';
 
   // Identification
-  materialId: string;
-  testCode: string;
-  level: QCLevel;
+  materialId?: string;
+  testCode?: string;
+  level?: QCLevel;
 
   // Time period
-  periodStart: Timestamp;
-  periodEnd: Timestamp;
+  periodStart?: Timestamp;
+  periodEnd?: Timestamp;
+  startDate?: Timestamp;
+  endDate?: Timestamp;
 
   // Statistical values
   n: number; // Number of data points
@@ -161,6 +218,11 @@ export interface QCStatistics {
   bias: number; // % difference from target
   totalError: number;
   sigma: number; // Six Sigma metric
+  withinSDCount?: {
+    oneSD: number;
+    twoSD: number;
+    threeSD: number;
+  };
 
   // Data points for charts
   dataPoints: QCDataPoint[];
@@ -180,6 +242,15 @@ export interface QCDataPoint {
 }
 
 // Westgard Rules
+export interface QCRule {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+  type: 'warning' | 'rejection';
+  enabled: boolean;
+}
+
 export interface WestgardViolation {
   rule: WestgardRule;
   description: string;

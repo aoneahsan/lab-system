@@ -354,21 +354,18 @@ export const resultService = {
         tenantId,
         orderId,
         testId: result.testId,
-        testCode: result.testCode,
+        patientId: result.patientId || '',
         testName: result.testName,
-        value: result.value,
+        testCode: result.testCode || '',
+        result: result.value,
         unit: result.unit,
-        referenceRange:
-          typeof result.referenceRange === 'string'
-            ? { normal: result.referenceRange }
-            : result.referenceRange,
+        referenceRange: result.referenceRange,
         flag: result.flag,
-        status: 'entered' as ResultStatus,
-        enteredBy,
-        enteredByName,
-        enteredAt: timestamp,
+        status: 'preliminary',
         createdAt: timestamp,
         updatedAt: timestamp,
+        createdBy: enteredBy,
+        updatedBy: enteredBy,
       };
 
       batch.push(addDoc(collection(db, COLLECTIONS.RESULTS), newResult));
@@ -492,7 +489,7 @@ export const resultService = {
     const results = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    }));
+    } as any));
 
     // Group results by panel/category
     const groups: any[] = [];

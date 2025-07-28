@@ -259,7 +259,7 @@ export const ResultDetailScreen: React.FC = () => {
                     <span className={`font-semibold ${getFlagColor(param.flag)}`}>
                       {param.value} {param.unit}
                     </span>
-                    {getFlagIcon(param.flag)}
+                    {param.flag && getFlagIcon(param.flag)}
                   </div>
                 </div>
 

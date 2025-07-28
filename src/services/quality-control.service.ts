@@ -11,7 +11,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import type { QCTest, QCResult, QCRule, QCStatistics } from '@/types/quality-control';
+import type { QCTest, QCResult, QCRule, QCStatistics } from '@/types/qc.types';
 import { getCurrentUser } from './auth.service';
 import { generateId } from '@/utils/helpers';
 
@@ -175,7 +175,7 @@ export const qualityControlService = {
     qcTestId: string,
     levelId: string,
     currentValue: number,
-    level: QCLevel
+    analyte: { targetMean: number; targetSD: number }
   ): Promise<string[]> {
     const violations: string[] = [];
 
@@ -184,8 +184,8 @@ export const qualityControlService = {
     const values = recentResults.map((r) => r.value);
     values.unshift(currentValue); // Add current value at the beginning
 
-    const mean = level.targetMean;
-    const sd = level.targetSD;
+    const mean = analyte.targetMean;
+    const sd = analyte.targetSD;
 
     // 1-2s rule
     if (Math.abs(currentValue - mean) > 2 * sd) {

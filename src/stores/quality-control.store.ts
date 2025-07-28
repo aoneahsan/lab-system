@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { qualityControlService } from '@/services/quality-control.service';
-import type { QCTest, QCResult, QCStatistics } from '@/types/quality-control';
+import type { QCTest, QCResult, QCStatistics } from '@/types/qc.types';
 
 interface QualityControlStore {
   qcTests: QCTest[];

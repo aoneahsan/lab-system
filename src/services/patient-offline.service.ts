@@ -43,7 +43,7 @@ class PatientOfflineService {
       ...data,
       patientId,
       tenantId,
-      active: true,
+      isActive: true,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -55,12 +55,25 @@ class PatientOfflineService {
       data: patientData,
       onlineHandler: async () => {
         const docRef = await addDoc(collection(firestore, collectionName), patientData);
-        return {
+        const createdPatient = {
           id: docRef.id,
-          ...patientData,
+          ...data,
+          patientId,
+          tenantId,
+          isActive: true,
+          phoneNumbers: data.phoneNumbers || [],
+          addresses: data.addresses || [],
+          emergencyContacts: data.emergencyContacts || [],
+          allergies: data.allergies || [],
+          medications: data.medications || [],
+          medicalHistory: data.medicalHistory || [],
+          insurances: data.insurances || [],
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
+          createdBy: data.createdBy || 'system',
+          updatedBy: data.updatedBy || 'system',
         } as Patient;
+        return createdPatient;
       },
     });
   }
@@ -111,8 +124,8 @@ class PatientOfflineService {
           constraints.push(where('gender', '==', filters.gender));
         }
 
-        if (filters.active !== undefined) {
-          constraints.push(where('active', '==', filters.active));
+        if (filters.isActive !== undefined) {
+          constraints.push(where('isActive', '==', filters.isActive));
         }
 
         constraints.push(orderBy('createdAt', 'desc'));
@@ -141,7 +154,7 @@ class PatientOfflineService {
               p.lastName.toLowerCase().includes(searchLower) ||
               p.patientId.toLowerCase().includes(searchLower) ||
               p.email?.toLowerCase().includes(searchLower) ||
-              p.phone?.includes(filters.searchTerm)
+              p.phoneNumbers?.some(phone => phone.value.includes(filters.searchTerm))
           );
         }
 
@@ -190,7 +203,7 @@ class PatientOfflineService {
 
   // Soft delete (deactivate) patient with offline support
   async deactivatePatient(tenantId: string, patientId: string): Promise<void> {
-    return this.updatePatient(tenantId, patientId, { active: false });
+    return this.updatePatient(tenantId, patientId, { isActive: false });
   }
 
   // Get patient statistics with offline support
@@ -210,7 +223,7 @@ class PatientOfflineService {
     };
 
     patients.forEach((patient) => {
-      if (patient.active) {
+      if (patient.isActive) {
         stats.active++;
       } else {
         stats.inactive++;
@@ -236,7 +249,7 @@ class PatientOfflineService {
         ...data,
         patientId: this.generatePatientId(),
         tenantId,
-        active: true,
+        isActive: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },
@@ -245,7 +258,7 @@ class PatientOfflineService {
           ...data,
           patientId: this.generatePatientId(),
           tenantId,
-          active: true,
+          isActive: true,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         };
@@ -255,12 +268,25 @@ class PatientOfflineService {
           patientData
         );
 
-        return {
+        const createdPatient = {
           id: docRef.id,
-          ...patientData,
+          ...data,
+          patientId: patientData.patientId,
+          tenantId,
+          isActive: true,
+          phoneNumbers: data.phoneNumbers || [],
+          addresses: data.addresses || [],
+          emergencyContacts: data.emergencyContacts || [],
+          allergies: data.allergies || [],
+          medications: data.medications || [],
+          medicalHistory: data.medicalHistory || [],
+          insurances: data.insurances || [],
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
+          createdBy: data.createdBy || 'system',
+          updatedBy: data.updatedBy || 'system',
         } as Patient;
+        return createdPatient;
       },
     }));
 

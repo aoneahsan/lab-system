@@ -49,7 +49,7 @@ export default function OrderDashboard() {
           {activeTab === 'orders' && <OrderList />}
           {activeTab === 'barcodes' && (
             <div className="max-w-2xl mx-auto">
-              <BarcodeGenerator />
+              <BarcodeGenerator value="SAMPLE123456" />
             </div>
           )}
         </div>

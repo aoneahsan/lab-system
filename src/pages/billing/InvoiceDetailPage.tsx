@@ -155,12 +155,12 @@ const InvoiceDetailPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {invoice.lineItems.map((item, index) => (
+                  {(invoice.lineItems || invoice.items).map((item, index) => (
                     <tr key={index}>
                       <td className="py-4">
                         <div>
-                          <p className="font-medium">{item.description}</p>
-                          {item.code && <p className="text-sm text-gray-500">Code: {item.code}</p>}
+                          <p className="font-medium">{item.description || item.testName}</p>
+                          {(item.code || item.testCode) && <p className="text-sm text-gray-500">Code: {item.code || item.testCode}</p>}
                         </div>
                       </td>
                       <td className="text-right py-4">{item.quantity}</td>
@@ -291,10 +291,9 @@ const InvoiceDetailPage: React.FC = () => {
       {/* Payment Modal */}
       {showPaymentModal && invoice && (
         <PaymentModal
+          isOpen={showPaymentModal}
           invoice={invoice}
-          onSubmit={handleRecordPayment}
           onClose={() => setShowPaymentModal(false)}
-          isLoading={recordPaymentMutation.isPending}
         />
       )}
     </div>

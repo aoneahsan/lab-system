@@ -19,7 +19,10 @@ const schema = yup.object({
     .required('Password is required'),
 });
 
-type LoginFormData = yup.InferType<typeof schema>;
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 const MobileLoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +46,7 @@ const MobileLoginPage: React.FC = () => {
   const checkBiometricAvailability = async () => {
     try {
       const result = await BiometricAuth.isAvailable();
-      setBiometricAvailable(result.isAvailable);
+      setBiometricAvailable(result.available || false);
     } catch (error) {
       console.error('Biometric check failed:', error);
     }
@@ -62,21 +65,21 @@ const MobileLoginPage: React.FC = () => {
 
   const handleBiometricLogin = async () => {
     try {
-      const verified = await BiometricAuth.verify({
-        reason: 'Authenticate to access LabFlow',
+      const verified = await BiometricAuth.authenticate({
         title: 'Biometric Authentication',
         subtitle: 'Use your fingerprint or face ID',
         description: 'Access your lab results securely',
+        fallbackButtonTitle: 'Use Password',
       });
 
-      if (verified.verified) {
+      if (verified.success) {
         // Get saved credentials
         const { value: email } = await Preferences.get({ key: 'user_email' });
         const { value: token } = await Preferences.get({ key: 'auth_token' });
 
         if (email && token) {
           // Restore session
-          await login(email, ''); // Token-based auth
+          await login({ email, password: '' }); // Token-based auth
           navigate('/home');
         }
       }
@@ -88,7 +91,7 @@ const MobileLoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
+      await login({ email: data.email, password: data.password });
 
       // Save credentials for biometric login
       await Preferences.set({ key: 'user_email', value: data.email });

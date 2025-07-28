@@ -134,3 +134,20 @@ export interface BatchResultEntryData {
     comments?: string;
   }>;
 }
+
+export interface DetailedTestResult extends TestResult {
+  patientName?: string;
+  patientMRN?: string;
+  orderNumber?: string;
+  testCode?: string;
+  collectionDate?: Timestamp;
+  resultDate?: Timestamp;
+  performedBy?: string;
+  notes?: string;
+  isCritical?: boolean;
+  history?: Array<{
+    date: Date;
+    value: string | number;
+    abnormal: boolean;
+  }>;
+}

@@ -2,7 +2,16 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
-import { CapacitorSQLite } from '@capacitor-community/sqlite';
+import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { Capacitor } from '@capacitor/core';
+
+let sqlite: typeof CapacitorSQLite;
+let db: SQLiteDBConnection | null = null;
+
+// Initialize SQLite plugin
+if (Capacitor.isNativePlatform()) {
+  sqlite = CapacitorSQLite;
+}
 
 interface OfflineCollection {
   id: string;
@@ -42,12 +51,31 @@ interface OfflineState {
 // SQLite database initialization
 const initializeOfflineDB = async () => {
   try {
-    await sqlite.openStore({
-      database: 'labflow_offline',
-      table: 'collections',
-      encrypted: false,
-      mode: 'no-encryption',
-    });
+    // Check if platform supports SQLite
+    if (!Capacitor.isNativePlatform() || !sqlite) {
+      console.warn('SQLite not available on this platform');
+      return;
+    }
+
+    try {
+      // Check if connection exists
+      const checkConnection = await sqlite.isConnection('labflow_offline');
+      
+      if (checkConnection.result) {
+        // Connection exists, retrieve it
+        const retrieveConnection = await sqlite.retrieveConnection('labflow_offline');
+        db = retrieveConnection;
+      } else {
+        // Create new connection
+        const newConnection = await sqlite.createConnection('labflow_offline');
+        db = newConnection;
+      }
+    } catch (error) {
+      console.error('Error setting up SQLite connection:', error);
+      return;
+    }
+
+    await db.open();
 
     // Create tables
     const createTableQuery = `
@@ -69,11 +97,7 @@ const initializeOfflineDB = async () => {
       );
     `;
 
-    await sqlite.query({
-      database: 'labflow_offline',
-      statement: createTableQuery,
-      values: [],
-    });
+    await db.execute(createTableQuery);
   } catch (error) {
     console.error('Failed to initialize offline database:', error);
   }
@@ -206,10 +230,11 @@ const saveCollectionToDB = async (collection: OfflineCollection) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
-    await sqlite.query({
-      database: 'labflow_offline',
-      statement: query,
-      values: [
+    if (!db) {
+      await initializeOfflineDB();
+    }
+    
+    await db!.run(query, [
         collection.id,
         collection.patientId,
         collection.patientName,
@@ -222,8 +247,7 @@ const saveCollectionToDB = async (collection: OfflineCollection) => {
         collection.notes || null,
         JSON.stringify(collection.photos || []),
         collection.syncStatus,
-      ],
-    });
+      ]);
   } catch (error) {
     console.error('Failed to save collection to database:', error);
   }

@@ -32,7 +32,7 @@ export const resultValidationService = {
     if (!tenantId) throw new Error('No tenant selected');
 
     let q = query(
-      collection(db, COLLECTIONS.VALIDATION_RULES),
+      collection(db, COLLECTIONS.RESULT_VALIDATIONS),
       where('tenantId', '==', tenantId),
       where('active', '==', true)
     );
@@ -67,7 +67,7 @@ export const resultValidationService = {
       updatedBy: user.id,
     };
 
-    const docRef = await addDoc(collection(db, COLLECTIONS.VALIDATION_RULES), ruleData);
+    const docRef = await addDoc(collection(db, COLLECTIONS.RESULT_VALIDATIONS), ruleData);
 
     return docRef.id;
   },
@@ -82,11 +82,11 @@ export const resultValidationService = {
       updatedBy: user.id,
     };
 
-    await updateDoc(doc(db, COLLECTIONS.VALIDATION_RULES, id), updateData);
+    await updateDoc(doc(db, COLLECTIONS.RESULT_VALIDATIONS, id), updateData);
   },
 
   async deleteValidationRule(id: string): Promise<void> {
-    await deleteDoc(doc(db, COLLECTIONS.VALIDATION_RULES, id));
+    await deleteDoc(doc(db, COLLECTIONS.RESULT_VALIDATIONS, id));
   },
 
   async validateResult(
@@ -231,12 +231,13 @@ export const resultValidationService = {
         result.errors.push(message);
         result.isValid = false;
         break;
-      case 'flag':
+      case 'warn':
         result.warnings.push(message);
         break;
     }
 
-    if (rule.requiresReview) {
+    // Mark as requiring review for critical or blocked results
+    if (rule.action === 'block' || rule.ruleType === 'critical') {
       result.requiresReview = true;
     }
   },

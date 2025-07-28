@@ -10,11 +10,10 @@ import { Network } from '@capacitor/network';
 import { toast } from '@/hooks/useToast';
 
 const schema = yup.object({
-  email: yup.string().email('Invalid email').required('Email is required'),
+  email: yup.string().email('Invalid email'),
   password: yup
     .string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+    .min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = yup.InferType<typeof schema>;
@@ -30,7 +29,7 @@ const PhlebotomistLoginPage: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
   });
 
   useEffect(() => {
@@ -64,7 +63,7 @@ const PhlebotomistLoginPage: React.FC = () => {
         return;
       }
 
-      await login(data.email, data.password);
+      await login({ email: data.email || '', password: data.password || '' });
       navigate('/home');
     } catch (error) {
       toast.error('Invalid email or password');

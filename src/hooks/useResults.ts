@@ -3,6 +3,7 @@ import { resultService } from '@/services/result.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
+import { Timestamp } from 'firebase/firestore';
 import type {
   TestResult,
   ResultFilter,
@@ -58,9 +59,31 @@ export const useCreateResult = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: ResultEntryFormData) => {
+    mutationFn: async (data: ResultEntryFormData) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
-      return resultService.createResult(currentTenant.id, currentUser.id, data);
+      
+      // Transform ResultEntryFormData to TestResult format
+      const results = await Promise.all(
+        data.tests.map(test => 
+          resultService.createResult(currentTenant.id, currentUser.id, {
+            orderId: data.orderId,
+            sampleId: data.sampleId,
+            patientId: '', // This should be fetched from the order
+            testId: test.testId,
+            testName: test.testName,
+            category: '', // This should be fetched from the test
+            value: test.value,
+            unit: test.unit,
+            flag: test.flag,
+            status: 'entered' as const,
+            enteredBy: currentUser.id,
+            enteredAt: Timestamp.now(),
+            comments: test.comments,
+          })
+        )
+      );
+      
+      return results;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });
@@ -129,7 +152,7 @@ export const useVerifyResult = () => {
   return useMutation({
     mutationFn: ({ resultId, comments }: { resultId: string; comments?: string }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
-      return resultService.verifyResult(currentTenant.id, currentUser.id, resultId, comments);
+      return resultService.verifyResult(currentTenant.id, currentUser.id, resultId);
     },
     onSuccess: (_, { resultId }) => {
       queryClient.invalidateQueries({ queryKey: RESULT_KEYS.lists() });

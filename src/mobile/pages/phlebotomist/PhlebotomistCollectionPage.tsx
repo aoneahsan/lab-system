@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Thermometer, MapPin, Save, X, CheckCircle, FileText, User } from 'lucide-react';
-import { QRCodeScanner } from 'qrcode-studio';
+import { QRCodeStudio } from 'qrcode-studio';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
@@ -39,24 +39,49 @@ const PhlebotomistCollectionPage: React.FC = () => {
 
   const startBarcodeScan = async () => {
     try {
-      await BarcodeScanner.checkPermission({ force: true });
+      // Check permissions
+      const permStatus = await QRCodeStudio.checkPermissions();
+      if (permStatus.camera !== 'granted') {
+        const requestStatus = await QRCodeStudio.requestPermissions();
+        if (requestStatus.camera !== 'granted') {
+          toast.error('Camera permission denied');
+          return;
+        }
+      }
 
       setIsScanning(true);
       document.querySelector('body')?.classList.add('barcode-scanner-active');
 
-      const result = await BarcodeScanner.startScan();
-
-      if (result.hasContent) {
+      // Add listener for scan results
+      const listener = await QRCodeStudio.addListener('scanResult', (result) => {
         setCollectionData({ ...collectionData, barcode: result.content });
         toast.success('Barcode scanned successfully');
-      }
+        stopBarcodeScan();
+      });
+
+      // Start scanning
+      await QRCodeStudio.startScan({
+        showTorchButton: true,
+        showFlipCameraButton: false,
+        camera: 'back'
+      });
     } catch (error) {
       console.error('Barcode scan failed:', error);
       toast.error('Failed to scan barcode');
+      setIsScanning(false);
+      document.querySelector('body')?.classList.remove('barcode-scanner-active');
+    }
+  };
+
+  const stopBarcodeScan = async () => {
+    try {
+      await QRCodeStudio.stopScan();
+      await QRCodeStudio.removeAllListeners();
+    } catch (error) {
+      console.error('Failed to stop scan:', error);
     } finally {
       setIsScanning(false);
       document.querySelector('body')?.classList.remove('barcode-scanner-active');
-      BarcodeScanner.stopScan();
     }
   };
 
@@ -373,10 +398,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
           <div className="text-white text-center">
             <p className="mb-4">Position barcode in the frame</p>
             <button
-              onClick={() => {
-                setIsScanning(false);
-                BarcodeScanner.stopScan();
-              }}
+              onClick={stopBarcodeScan}
               className="px-6 py-2 bg-white text-black rounded-lg"
             >
               Cancel

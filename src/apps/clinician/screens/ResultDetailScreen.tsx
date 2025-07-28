@@ -19,11 +19,12 @@ import { useResult } from '@/hooks/useResult';
 import { useApproveResult } from '@/hooks/useApproveResult';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import type { DetailedTestResult } from '@/types/result.types';
 
 export function ResultDetailScreen() {
   const { resultId } = useParams<{ resultId: string }>();
   const navigate = useNavigate();
-  const { data: result, isLoading } = useResult(resultId!);
+  const { data: result, isLoading } = useResult(resultId!) as { data: DetailedTestResult | undefined; isLoading: boolean };
   const { mutate: approveResult } = useApproveResult();
 
   const handleApprove = () => {
@@ -71,7 +72,7 @@ export function ResultDetailScreen() {
 
   // Determine if value is abnormal
   const isAbnormal =
-    result.flag && (result.flag === 'H' || result.flag === 'L' || result.flag === 'C');
+    result.flag && (result.flag === 'H' || result.flag === 'L' || result.flag === 'high' || result.flag === 'low' || result.flag === 'critical_high' || result.flag === 'critical_low');
   const TrendIcon = result.flag === 'H' ? TrendingUp : TrendingDown;
 
   return (
@@ -100,7 +101,7 @@ export function ResultDetailScreen() {
       </div>
 
       {/* Critical Alert */}
-      {result.isCritical && (
+      {(result.flag === 'critical_high' || result.flag === 'critical_low' || result.flag === 'HH' || result.flag === 'LL') && (
         <Card className="p-4 border-red-200 bg-red-50">
           <div className="flex items-start space-x-2">
             <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -120,7 +121,7 @@ export function ResultDetailScreen() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{result.testName}</h1>
             <p className="text-sm text-gray-600 mt-1">
-              {result.testCode} • {result.category}
+              {result.testCode || result.testId} • {result.category}
             </p>
           </div>
           <Badge className={`${status.bg} ${status.text}`}>
@@ -148,7 +149,7 @@ export function ResultDetailScreen() {
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mt-2">Reference Range: {result.referenceRange}</p>
+              <p className="text-sm text-gray-600 mt-2">Reference Range: {result.referenceRange ? `${result.referenceRange.min || ''} - ${result.referenceRange.max || ''} ${result.referenceRange.unit || ''}` : 'N/A'}</p>
             </div>
           </div>
         </div>
@@ -162,20 +163,20 @@ export function ResultDetailScreen() {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-600">Name</p>
-              <p className="font-medium">{result.patientName}</p>
+              <p className="font-medium">{result.patientName || 'N/A'}</p>
             </div>
             <div>
               <p className="text-gray-600">MRN</p>
-              <p className="font-medium">{result.patientMRN}</p>
+              <p className="font-medium">{result.patientMRN || 'N/A'}</p>
             </div>
             <div>
               <p className="text-gray-600">Order #</p>
-              <p className="font-medium">{result.orderNumber}</p>
+              <p className="font-medium">{result.orderNumber || result.orderId}</p>
             </div>
             <div>
               <p className="text-gray-600">Collection Date</p>
               <p className="font-medium">
-                {format(new Date(result.collectionDate), 'MMM d, yyyy h:mm a')}
+                {result.collectionDate ? format(result.collectionDate.toDate(), 'MMM d, yyyy h:mm a') : 'N/A'}
               </p>
             </div>
           </div>
@@ -189,10 +190,10 @@ export function ResultDetailScreen() {
           </div>
         )}
 
-        {result.notes && (
+        {result.comments && (
           <div className="border-t pt-4 mt-4">
             <h2 className="font-semibold text-gray-900 mb-2">Laboratory Notes</h2>
-            <p className="text-sm text-gray-700">{result.notes}</p>
+            <p className="text-sm text-gray-700">{result.comments}</p>
           </div>
         )}
 
@@ -231,7 +232,7 @@ export function ResultDetailScreen() {
               <div className="flex-1">
                 <p className="text-sm text-gray-900">Sample collected</p>
                 <p className="text-xs text-gray-500">
-                  {format(new Date(result.collectionDate), 'MMM d, h:mm a')}
+                  {result.collectionDate ? format(result.collectionDate.toDate(), 'MMM d, h:mm a') : 'N/A'}
                 </p>
               </div>
             </div>
@@ -242,11 +243,11 @@ export function ResultDetailScreen() {
               <div className="flex-1">
                 <p className="text-sm text-gray-900">Result entered</p>
                 <p className="text-xs text-gray-500">
-                  {format(new Date(result.resultDate), 'MMM d, h:mm a')} • {result.performedBy}
+                  {format(result.enteredAt.toDate(), 'MMM d, h:mm a')} • {result.enteredBy}
                 </p>
               </div>
             </div>
-            {result.verifiedDate && (
+            {result.verifiedAt && (
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0">
                   <div className="h-2 w-2 rounded-full bg-purple-600 mt-1.5"></div>
@@ -254,7 +255,7 @@ export function ResultDetailScreen() {
                 <div className="flex-1">
                   <p className="text-sm text-gray-900">Result verified</p>
                   <p className="text-xs text-gray-500">
-                    {format(new Date(result.verifiedDate), 'MMM d, h:mm a')} • {result.verifiedBy}
+                    {format(result.verifiedAt.toDate(), 'MMM d, h:mm a')} • {result.verifiedBy}
                   </p>
                 </div>
               </div>
