@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="#0ea5e9"/>
+  
+  <!-- Flask Outline -->
+  <path d="M320 160h-128v80l-64 160c-8 20 8 40 32 40h256c24 0 40-20 32-40l-64-160v-80z" 
+        fill="#ffffff" 
+        stroke="#0891b2" 
+        stroke-width="8"/>
+  
+  <!-- Flask Liquid -->
+  <path d="M192 240l-48 120h224l-48-120v-80h-128v80z" 
+        fill="#67e8f9" 
+        opacity="0.6"/>
+  
+  <!-- Liquid Level Lines -->
+  <line x1="160" y1="320" x2="352" y2="320" stroke="#0891b2" stroke-width="4" opacity="0.4"/>
+  <line x1="176" y1="280" x2="336" y2="280" stroke="#0891b2" stroke-width="4" opacity="0.4"/>
+  
+  <!-- Flask Top -->
+  <rect x="176" y="140" width="160" height="20" rx="10" fill="#ffffff" stroke="#0891b2" stroke-width="8"/>
+  
+  <!-- Bubbles -->
+  <circle cx="240" cy="340" r="8" fill="#ffffff" opacity="0.8"/>
+  <circle cx="280" cy="320" r="6" fill="#ffffff" opacity="0.8"/>
+  <circle cx="260" cy="300" r="10" fill="#ffffff" opacity="0.8"/>
+</svg>

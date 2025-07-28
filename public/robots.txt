@@ -1,0 +1,52 @@
+# LabFlow Robots.txt
+# https://labflow.app
+
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://labflow.app/sitemap.xml
+
+# Crawl-delay (optional, in seconds)
+Crawl-delay: 1
+
+# Disallow access to sensitive areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.well-known/
+Disallow: /functions/
+Disallow: /config/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /private/
+Disallow: /tmp/
+Disallow: /cache/
+
+# Allow specific files
+Allow: /manifest.json
+Allow: /browserconfig.xml
+Allow: /sitemap.xml
+
+# Block bad bots (optional)
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SEMrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0

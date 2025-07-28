@@ -1,0 +1,125 @@
+{
+  "name": "LabFlow - Comprehensive Laboratory Management System",
+  "short_name": "LabFlow",
+  "description": "LabFlow is a comprehensive multi-tenant laboratory management system designed for clinical laboratories. Features include patient management, test tracking, results reporting, billing, inventory management, quality control, and EMR integration with mobile apps for all stakeholders.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#0ea5e9",
+  "background_color": "#ffffff",
+  "categories": ["medical", "health", "productivity", "business"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/labflow-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "label": "LabFlow Dashboard"
+    },
+    {
+      "src": "/screenshots/patient-management.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "label": "Patient Management"
+    },
+    {
+      "src": "/screenshots/test-results.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "label": "Test Results"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Patient",
+      "short_name": "Add Patient",
+      "description": "Register a new patient",
+      "url": "/patients/new",
+      "icons": [
+        {
+          "src": "/shortcuts/new-patient.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "New Test",
+      "short_name": "Add Test",
+      "description": "Create a new test order",
+      "url": "/tests/new",
+      "icons": [
+        {
+          "src": "/shortcuts/new-test.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Results",
+      "short_name": "Results",
+      "description": "View test results",
+      "url": "/results",
+      "icons": [
+        {
+          "src": "/shortcuts/results.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.labflow.app",
+      "id": "com.labflow.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/labflow/id123456789"
+    }
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "developer": {
+    "name": "Ahsan Mahmood",
+    "email": "aoneahsan@gmail.com",
+    "url": "https://aoneahsan.com"
+  }
+}

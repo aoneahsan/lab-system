@@ -5,22 +5,28 @@ const config: CapacitorConfig = {
   appName: 'LabFlow',
   webDir: 'dist',
   bundledWebRuntime: false,
+  backgroundColor: '#ffffff',
   server: {
-    url: 'https://labflow.example.com',
+    url: 'https://labflow.app',
     cleartext: false,
+    androidScheme: 'https'
   },
   ios: {
     contentInset: 'automatic',
     limitsNavigationsToAppBoundDomains: true,
+    backgroundColor: '#ffffff',
+    overrideUserAgent: 'LabFlow/1.0.0'
   },
   android: {
     allowMixedContent: false,
+    backgroundColor: '#ffffff',
+    overrideUserAgent: 'LabFlow/1.0.0'
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#1f2937',
+      backgroundColor: '#0ea5e9',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
@@ -32,7 +38,7 @@ const config: CapacitorConfig = {
     },
     LocalNotifications: {
       smallIcon: 'ic_stat_icon_config_sample',
-      iconColor: '#488AFF',
+      iconColor: '#0ea5e9',
       sound: 'beep.wav',
     },
     Camera: {

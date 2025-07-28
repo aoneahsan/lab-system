@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square70x70logo src="/favicon-70x70.png"/>
+      <square150x150logo src="/favicon-150x150.png"/>
+      <square310x310logo src="/favicon-310x310.png"/>
+      <wide310x150logo src="/favicon-310x150.png"/>
+      <TileColor>#0ea5e9</TileColor>
+    </tile>
+    <notification>
+      <polling-uri src="https://labflow.app/notifications/badge"/>
+      <polling-uri2 src="https://labflow.app/notifications/badge2"/>
+      <polling-uri3 src="https://labflow.app/notifications/badge3"/>
+      <polling-uri4 src="https://labflow.app/notifications/badge4"/>
+      <polling-uri5 src="https://labflow.app/notifications/badge5"/>
+      <frequency>30</frequency>
+      <cycle>1</cycle>
+    </notification>
+  </msapplication>
+</browserconfig>

@@ -1,8 +1,45 @@
 {
   "name": "labflow",
+  "displayName": "LabFlow",
+  "description": "Comprehensive multi-tenant laboratory management system for clinical laboratories with patient management, test tracking, results reporting, billing, inventory management, quality control, and EMR integration.",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "author": {
+    "name": "Ahsan Mahmood",
+    "email": "aoneahsan@gmail.com",
+    "url": "https://aoneahsan.com"
+  },
+  "license": "MIT",
+  "homepage": "https://labflow.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aoneahsan/labflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aoneahsan/labflow/issues"
+  },
+  "keywords": [
+    "laboratory",
+    "management",
+    "LIMS",
+    "clinical",
+    "medical",
+    "healthcare",
+    "EMR",
+    "patient-management",
+    "test-tracking",
+    "lab-automation",
+    "multi-tenant",
+    "react",
+    "capacitor",
+    "firebase"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -126,6 +163,7 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^7.0.6",
+    "vite-plugin-pwa": "^1.0.2",
     "vitest": "^3.2.4"
   }
 }
