@@ -24,11 +24,7 @@ interface Amendment {
   notes?: string;
 }
 
-const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
-  isOpen,
-  onClose,
-  result,
-}) => {
+const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({ isOpen, onClose, result }) => {
   const { currentUser } = useAuthStore();
   const { tenant } = useTenant();
   const queryClient = useQueryClient();
@@ -107,10 +103,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium text-gray-900">Amend Result</h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-500"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -124,8 +117,8 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
                 <div className="text-sm text-yellow-800">
                   <p className="font-medium mb-1">Important Notice</p>
                   <p>
-                    Amending a result will create a permanent record of the change. 
-                    All amendments are tracked and cannot be deleted.
+                    Amending a result will create a permanent record of the change. All amendments
+                    are tracked and cannot be deleted.
                   </p>
                 </div>
               </div>
@@ -135,10 +128,18 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
             <div className="mb-6 bg-gray-50 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Current Result</h4>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Test:</span> {result.testName}</p>
-                <p><span className="font-medium">Patient ID:</span> {result.patientId}</p>
-                <p><span className="font-medium">Current Value:</span> {result.value} {result.unit}</p>
-                <p><span className="font-medium">Status:</span> {result.status}</p>
+                <p>
+                  <span className="font-medium">Test:</span> {result.testName}
+                </p>
+                <p>
+                  <span className="font-medium">Patient ID:</span> {result.patientId}
+                </p>
+                <p>
+                  <span className="font-medium">Current Value:</span> {result.value} {result.unit}
+                </p>
+                <p>
+                  <span className="font-medium">Status:</span> {result.status}
+                </p>
               </div>
             </div>
 
@@ -164,9 +165,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
                     </span>
                   )}
                 </div>
-                {errors.newValue && (
-                  <p className="text-sm text-red-600 mt-1">{errors.newValue}</p>
-                )}
+                {errors.newValue && <p className="text-sm text-red-600 mt-1">{errors.newValue}</p>}
               </div>
 
               <div>
@@ -190,9 +189,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({
                   <option value="quality_control">Quality Control Issue</option>
                   <option value="other">Other</option>
                 </select>
-                {errors.reason && (
-                  <p className="text-sm text-red-600 mt-1">{errors.reason}</p>
-                )}
+                {errors.reason && <p className="text-sm text-red-600 mt-1">{errors.reason}</p>}
               </div>
 
               <div>

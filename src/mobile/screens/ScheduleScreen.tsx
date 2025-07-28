@@ -11,7 +11,7 @@ const ScheduleScreen: React.FC = () => {
       patientName: 'John Doe',
       address: '123 Main St, Apt 4B',
       tests: ['CBC', 'Lipid Panel'],
-      status: 'pending'
+      status: 'pending',
     },
     {
       id: '2',
@@ -19,7 +19,7 @@ const ScheduleScreen: React.FC = () => {
       patientName: 'Jane Smith',
       address: '456 Oak Ave',
       tests: ['Glucose', 'HbA1c'],
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '3',
@@ -27,17 +27,15 @@ const ScheduleScreen: React.FC = () => {
       patientName: 'Robert Johnson',
       address: '789 Pine Rd',
       tests: ['TSH', 'T3', 'T4'],
-      status: 'pending'
-    }
+      status: 'pending',
+    },
   ];
 
   return (
     <div className="space-y-6">
       {/* Date Selector */}
       <div className="bg-white rounded-lg shadow p-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select Date
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
         <input
           type="date"
           value={selectedDate}
@@ -51,7 +49,7 @@ const ScheduleScreen: React.FC = () => {
         <h2 className="text-lg font-semibold text-gray-900">
           Today's Schedule ({appointments.length} appointments)
         </h2>
-        
+
         {appointments.map((appointment) => (
           <div
             key={appointment.id}

@@ -13,7 +13,7 @@ interface ReportBuilderProps {
 const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoading = false }) => {
   const [selectedType, setSelectedType] = useState<ReportType>('patient_results');
   const { data: templates = [] } = useReportTemplates();
-  
+
   const {
     register,
     handleSubmit,
@@ -29,7 +29,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
 
   const watchedValues = watch();
   const templateId = watchedValues.templateId;
-  const selectedTemplate = templates.find(t => t.id === templateId);
+  const selectedTemplate = templates.find((t) => t.id === templateId);
 
   const reportTypes: { value: ReportType; label: string }[] = [
     { value: 'patient_results', label: 'Patient Results' },
@@ -57,27 +57,21 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
           <FileText className="h-5 w-5" />
           Report Information
         </h3>
-        
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Report Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Report Name *</label>
             <input
               type="text"
               {...register('name', { required: 'Report name is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               placeholder="Monthly Lab Report"
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name?.message}</p>
-            )}
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name?.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Description</label>
             <textarea
               {...register('description')}
               rows={3}
@@ -88,15 +82,13 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Report Type *
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Report Type *</label>
               <select
                 {...register('type', { required: 'Report type is required' })}
                 onChange={(e) => setSelectedType(e.target.value as ReportType)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                {reportTypes.map(type => (
+                {reportTypes.map((type) => (
                   <option key={type.value} value={type.value}>
                     {type.label}
                   </option>
@@ -105,17 +97,15 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Use Template
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Use Template</label>
               <select
                 {...register('templateId')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">None - Custom Report</option>
                 {templates
-                  .filter(t => t.type === selectedType)
-                  .map(template => (
+                  .filter((t) => t.type === selectedType)
+                  .map((template) => (
                     <option key={template.id} value={template.id}>
                       {template.name}
                     </option>
@@ -128,12 +118,10 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
 
       {/* Output Formats */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Output Formats
-        </h3>
-        
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Output Formats</h3>
+
         <div className="space-y-2">
-          {reportFormats.map(format => (
+          {reportFormats.map((format) => (
             <label key={format.value} className="flex items-center">
               <input
                 type="checkbox"
@@ -144,9 +132,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
               <span className="ml-2 text-sm text-gray-700">{format.label}</span>
             </label>
           ))}
-          {errors.formats && (
-            <p className="text-sm text-red-600">{errors.formats?.message}</p>
-          )}
+          {errors.formats && <p className="text-sm text-red-600">{errors.formats?.message}</p>}
         </div>
       </div>
 

@@ -11,7 +11,7 @@ import {
   Bell,
   CheckCircle,
   XCircle,
-  Zap
+  Zap,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -53,7 +53,7 @@ export const HomeScreen: React.FC = () => {
     criticalResults: 3,
     todayAppointments: 12,
     avgResponseTime: 2.5,
-    patientSatisfaction: 94
+    patientSatisfaction: 94,
   });
 
   const [criticalResults] = useState<CriticalResult[]>([
@@ -63,7 +63,7 @@ export const HomeScreen: React.FC = () => {
       testName: 'Troponin I',
       result: '2.5 ng/mL (H)',
       timeAgo: '15 min',
-      acknowledged: false
+      acknowledged: false,
     },
     {
       id: '2',
@@ -71,7 +71,7 @@ export const HomeScreen: React.FC = () => {
       testName: 'Glucose',
       result: '42 mg/dL (L)',
       timeAgo: '1 hour',
-      acknowledged: false
+      acknowledged: false,
     },
     {
       id: '3',
@@ -79,8 +79,8 @@ export const HomeScreen: React.FC = () => {
       testName: 'INR',
       result: '5.2 (H)',
       timeAgo: '2 hours',
-      acknowledged: true
-    }
+      acknowledged: true,
+    },
   ]);
 
   const [appointments] = useState<Appointment[]>([
@@ -89,22 +89,22 @@ export const HomeScreen: React.FC = () => {
       time: '09:00 AM',
       patientName: 'Michael Brown',
       type: 'Follow-up',
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '2',
       time: '10:30 AM',
       patientName: 'Lisa Davis',
       type: 'Consultation',
-      status: 'in-progress'
+      status: 'in-progress',
     },
     {
       id: '3',
       time: '11:00 AM',
       patientName: 'Robert Wilson',
       type: 'Test Review',
-      status: 'scheduled'
-    }
+      status: 'scheduled',
+    },
   ]);
 
   const handleAcknowledge = (resultId: string) => {
@@ -128,11 +128,10 @@ export const HomeScreen: React.FC = () => {
         {/* Welcome Card */}
         <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-4 text-white">
           <h2 className="text-xl font-semibold">
-            Good {format(new Date(), 'a')}, Dr. {currentUser?.displayName?.split(' ').pop() || 'Smith'}
+            Good {format(new Date(), 'a')}, Dr.{' '}
+            {currentUser?.displayName?.split(' ').pop() || 'Smith'}
           </h2>
-          <p className="text-indigo-100 mt-1">
-            {format(new Date(), 'EEEE, MMMM d, yyyy')}
-          </p>
+          <p className="text-indigo-100 mt-1">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="bg-white/10 rounded-lg p-3">
               <div className="flex items-center justify-between">
@@ -156,14 +155,14 @@ export const HomeScreen: React.FC = () => {
         </div>
 
         {/* Critical Results Alert */}
-        {criticalResults.filter(r => !r.acknowledged).length > 0 && (
+        {criticalResults.filter((r) => !r.acknowledged).length > 0 && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <AlertCircle className="h-5 w-5 text-red-600" />
                 <h3 className="font-semibold text-red-900">Critical Results</h3>
                 <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {criticalResults.filter(r => !r.acknowledged).length} new
+                  {criticalResults.filter((r) => !r.acknowledged).length} new
                 </span>
               </div>
               <button
@@ -174,28 +173,29 @@ export const HomeScreen: React.FC = () => {
               </button>
             </div>
             <div className="space-y-2">
-              {criticalResults.filter(r => !r.acknowledged).slice(0, 2).map((result) => (
-                <div
-                  key={result.id}
-                  className="bg-white rounded p-3 border border-red-100"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{result.patientName}</p>
-                      <p className="text-sm text-gray-600">
-                        {result.testName}: <span className="font-semibold text-red-600">{result.result}</span>
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">{result.timeAgo} ago</p>
+              {criticalResults
+                .filter((r) => !r.acknowledged)
+                .slice(0, 2)
+                .map((result) => (
+                  <div key={result.id} className="bg-white rounded p-3 border border-red-100">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{result.patientName}</p>
+                        <p className="text-sm text-gray-600">
+                          {result.testName}:{' '}
+                          <span className="font-semibold text-red-600">{result.result}</span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">{result.timeAgo} ago</p>
+                      </div>
+                      <button
+                        onClick={() => handleAcknowledge(result.id)}
+                        className="px-3 py-1 bg-red-600 text-white text-xs rounded-full"
+                      >
+                        Acknowledge
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleAcknowledge(result.id)}
-                      className="px-3 py-1 bg-red-600 text-white text-xs rounded-full"
-                    >
-                      Acknowledge
-                    </button>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         )}

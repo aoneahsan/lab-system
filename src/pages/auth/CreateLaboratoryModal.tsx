@@ -53,7 +53,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
 
     try {
       const docRef = await getDoc(doc(firestore, 'tenants', code.toLowerCase()));
-      
+
       if (docRef.exists()) {
         setCodeValidation({
           isChecking: false,
@@ -79,7 +79,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const code = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     setFormData({ ...formData, code });
-    
+
     if (code.length >= 3) {
       checkCodeAvailability(code);
     }
@@ -136,7 +136,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
       };
 
       await setDoc(doc(firestore, 'tenants', formData.code.toLowerCase()), tenantData);
-      
+
       toast.success('Laboratory created!', `Your laboratory code is: ${formData.code}`);
       onSuccess(formData.code);
     } catch (error) {
@@ -152,15 +152,15 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose} />
-        
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          onClick={onClose}
+        />
+
         <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
           <div className="flex items-center justify-between p-4 border-b">
             <h3 className="text-lg font-semibold text-gray-900">Create New Laboratory</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -198,9 +198,11 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
                 )}
               </div>
               {codeValidation.message && (
-                <p className={`mt-1 text-sm ${
-                  codeValidation.isAvailable ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <p
+                  className={`mt-1 text-sm ${
+                    codeValidation.isAvailable ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {codeValidation.message}
                 </p>
               )}
@@ -250,7 +252,9 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
                   maxLength={2}
                   className="input"
                   value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, state: e.target.value.toUpperCase() })
+                  }
                   placeholder="e.g., NY"
                 />
               </div>

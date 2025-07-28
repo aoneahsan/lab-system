@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  Search, 
-  FileText, 
+import {
+  Search,
+  FileText,
   AlertCircle,
   CheckCircle,
   Clock,
   ChevronRight,
-  Download
+  Download,
 } from 'lucide-react';
 import { useClinicianResults } from '@/hooks/useClinicianResults';
 import { format } from 'date-fns';
@@ -18,15 +18,16 @@ import { format } from 'date-fns';
 export function ResultsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { data: results = [], isLoading } = useClinicianResults({ 
+  const { data: results = [], isLoading } = useClinicianResults({
     clinicianId: 'current',
-    status: statusFilter === 'all' ? undefined : statusFilter 
+    status: statusFilter === 'all' ? undefined : statusFilter,
   });
 
-  const filteredResults = results.filter(result => 
-    result.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    result.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    result.testName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredResults = results.filter(
+    (result) =>
+      result.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      result.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      result.testName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const statusColors = {
@@ -39,9 +40,9 @@ export function ResultsScreen() {
 
   const resultStats = {
     total: results.length,
-    pending: results.filter(r => r.status === 'pending').length,
-    final: results.filter(r => r.status === 'final').length,
-    critical: results.filter(r => r.isCritical).length,
+    pending: results.filter((r) => r.status === 'pending').length,
+    final: results.filter((r) => r.status === 'final').length,
+    critical: results.filter((r) => r.isCritical).length,
   };
 
   return (
@@ -56,29 +57,37 @@ export function ResultsScreen() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-2">
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'all' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'all' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('all')}
         >
           <p className="text-xs text-gray-600">Total</p>
           <p className="text-lg font-bold">{resultStats.total}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'pending' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'pending' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('pending')}
         >
           <p className="text-xs text-gray-600">Pending</p>
           <p className="text-lg font-bold text-yellow-600">{resultStats.pending}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'final' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'final' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('final')}
         >
           <p className="text-xs text-gray-600">Final</p>
           <p className="text-lg font-bold text-green-600">{resultStats.final}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'critical' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'critical' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('critical')}
         >
           <p className="text-xs text-gray-600">Critical</p>
@@ -119,9 +128,7 @@ export function ResultsScreen() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {result.testName}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900">{result.testName}</h3>
                         <Badge className={`${status.bg} ${status.text}`}>
                           <StatusIcon className="h-3 w-3 mr-1" />
                           {result.status}
@@ -137,10 +144,10 @@ export function ResultsScreen() {
                         {result.patientName} • Order #{result.orderNumber}
                       </p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span>Result: {result.value} {result.unit}</span>
-                        {result.referenceRange && (
-                          <span>Ref: {result.referenceRange}</span>
-                        )}
+                        <span>
+                          Result: {result.value} {result.unit}
+                        </span>
+                        {result.referenceRange && <span>Ref: {result.referenceRange}</span>}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
                         {format(new Date(result.resultDate), 'MMM d, h:mm a')}

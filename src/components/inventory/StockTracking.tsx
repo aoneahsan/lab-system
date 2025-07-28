@@ -11,7 +11,8 @@ export default function StockTracking() {
   const [reason, setReason] = useState('');
   const [notes, setNotes] = useState('');
 
-  const { items, stockTransactions, recordStockTransaction, fetchStockTransactions, loading } = useInventoryStore();
+  const { items, stockTransactions, recordStockTransaction, fetchStockTransactions, loading } =
+    useInventoryStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,10 +73,7 @@ export default function StockTracking() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Stock Movements</h2>
-        <button 
-          onClick={() => setShowAddMovement(!showAddMovement)}
-          className="btn btn-primary"
-        >
+        <button onClick={() => setShowAddMovement(!showAddMovement)} className="btn btn-primary">
           Record Movement
         </button>
       </div>
@@ -87,9 +85,7 @@ export default function StockTracking() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Item
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Item</label>
                 <select
                   value={selectedItem}
                   onChange={(e) => {
@@ -129,9 +125,7 @@ export default function StockTracking() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                 <input
                   type="number"
                   value={quantity}
@@ -143,9 +137,7 @@ export default function StockTracking() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reason
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
                 <input
                   type="text"
                   value={reason}
@@ -156,9 +148,7 @@ export default function StockTracking() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <input
                   type="text"
                   value={notes}
@@ -177,11 +167,7 @@ export default function StockTracking() {
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 Record Movement
               </button>
             </div>
@@ -197,11 +183,13 @@ export default function StockTracking() {
         <div className="divide-y divide-gray-200">
           {stockTransactions.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
-              {selectedItem ? 'No movements found for this item' : 'Select an item to view movements'}
+              {selectedItem
+                ? 'No movements found for this item'
+                : 'Select an item to view movements'}
             </div>
           ) : (
             stockTransactions.map((movement: any) => {
-              const item = items.find(i => i.id === movement.itemId);
+              const item = items.find((i) => i.id === movement.itemId);
               return (
                 <div key={movement.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
@@ -212,11 +200,16 @@ export default function StockTracking() {
                           {item?.name || 'Unknown Item'}
                         </div>
                         <div className="text-sm text-gray-500 mt-1">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getMovementColor(movement.type)}`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getMovementColor(
+                              movement.type
+                            )}`}
+                          >
                             {movement.type.toUpperCase()}
                           </span>
                           <span className="ml-2">
-                            Quantity: {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+                            Quantity: {movement.quantity > 0 ? '+' : ''}
+                            {movement.quantity}
                           </span>
                         </div>
                         {movement.reason && (

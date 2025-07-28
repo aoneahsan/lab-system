@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  FileText, 
-  Download, 
-  Share2, 
+import {
+  FileText,
+  Download,
+  Share2,
   Filter,
   Calendar,
   Search,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -38,7 +38,7 @@ export const ResultsScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Mock data - replace with actual API call
   const results: TestResult[] = [
     {
@@ -55,7 +55,7 @@ export const ResultsScreen: React.FC = () => {
         { name: 'Hemoglobin', value: '14.5', unit: 'g/dL', referenceRange: '13.5-17.5' },
         { name: 'WBC', value: '7.2', unit: 'K/µL', referenceRange: '4.5-11.0' },
         { name: 'Platelets', value: '250', unit: 'K/µL', referenceRange: '150-400' },
-      ]
+      ],
     },
     {
       id: '2',
@@ -68,11 +68,17 @@ export const ResultsScreen: React.FC = () => {
       labLocation: 'Downtown Lab',
       criticalValues: true,
       parameters: [
-        { name: 'Total Cholesterol', value: '240', unit: 'mg/dL', referenceRange: '<200', flag: 'H' },
+        {
+          name: 'Total Cholesterol',
+          value: '240',
+          unit: 'mg/dL',
+          referenceRange: '<200',
+          flag: 'H',
+        },
         { name: 'LDL', value: '160', unit: 'mg/dL', referenceRange: '<100', flag: 'H' },
         { name: 'HDL', value: '45', unit: 'mg/dL', referenceRange: '>40' },
         { name: 'Triglycerides', value: '180', unit: 'mg/dL', referenceRange: '<150', flag: 'H' },
-      ]
+      ],
     },
     {
       id: '3',
@@ -83,14 +89,14 @@ export const ResultsScreen: React.FC = () => {
       status: 'processing',
       doctorName: 'Dr. Smith',
       labLocation: 'Main Lab',
-      parameters: []
+      parameters: [],
     },
   ];
 
-  const filteredResults = results.filter(result => {
+  const filteredResults = results.filter((result) => {
     if (activeFilter === 'recent' && result.status !== 'ready') return false;
     if (activeFilter === 'pending' && result.status !== 'processing') return false;
-    
+
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       return (
@@ -99,13 +105,13 @@ export const ResultsScreen: React.FC = () => {
         result.doctorName.toLowerCase().includes(search)
       );
     }
-    
+
     return true;
   });
 
   const getFlagIcon = (flag?: string) => {
     if (!flag) return null;
-    
+
     switch (flag) {
       case 'H':
       case 'HH':
@@ -134,7 +140,7 @@ export const ResultsScreen: React.FC = () => {
       <div className="bg-white shadow-sm">
         <div className="p-4">
           <h1 className="text-xl font-semibold text-gray-900">Test Results</h1>
-          
+
           {/* Search Bar */}
           <div className="mt-3 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -160,9 +166,7 @@ export const ResultsScreen: React.FC = () => {
             <button
               onClick={() => setActiveFilter('all')}
               className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                activeFilter === 'all' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600'
+                activeFilter === 'all' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
               All Results
@@ -170,9 +174,7 @@ export const ResultsScreen: React.FC = () => {
             <button
               onClick={() => setActiveFilter('recent')}
               className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                activeFilter === 'recent' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600'
+                activeFilter === 'recent' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
               Recent
@@ -180,9 +182,7 @@ export const ResultsScreen: React.FC = () => {
             <button
               onClick={() => setActiveFilter('pending')}
               className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                activeFilter === 'pending' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600'
+                activeFilter === 'pending' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
               Processing
@@ -195,10 +195,7 @@ export const ResultsScreen: React.FC = () => {
       <div className="p-4 space-y-3">
         {filteredResults.length > 0 ? (
           filteredResults.map((result) => (
-            <div
-              key={result.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden"
-            >
+            <div key={result.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div
                 onClick={() => navigate(`/patient/results/${result.id}`)}
                 className="p-4 cursor-pointer"
@@ -215,18 +212,20 @@ export const ResultsScreen: React.FC = () => {
                     </h3>
                     <p className="text-sm text-gray-500">Code: {result.testCode}</p>
                   </div>
-                  <span className={`text-sm font-medium ${
-                    result.status === 'ready' 
-                      ? 'text-green-600' 
+                  <span
+                    className={`text-sm font-medium ${
+                      result.status === 'ready'
+                        ? 'text-green-600'
+                        : result.status === 'processing'
+                          ? 'text-yellow-600'
+                          : 'text-gray-500'
+                    }`}
+                  >
+                    {result.status === 'ready'
+                      ? 'Ready'
                       : result.status === 'processing'
-                      ? 'text-yellow-600'
-                      : 'text-gray-500'
-                  }`}>
-                    {result.status === 'ready' 
-                      ? 'Ready' 
-                      : result.status === 'processing'
-                      ? 'Processing'
-                      : 'Pending'}
+                        ? 'Processing'
+                        : 'Pending'}
                   </span>
                 </div>
 
@@ -247,7 +246,9 @@ export const ResultsScreen: React.FC = () => {
                         <div key={index} className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">{param.name}</span>
                           <div className="flex items-center gap-1">
-                            <span className="font-medium">{param.value} {param.unit}</span>
+                            <span className="font-medium">
+                              {param.value} {param.unit}
+                            </span>
                             {getFlagIcon(param.flag)}
                           </div>
                         </div>
@@ -294,7 +295,7 @@ export const ResultsScreen: React.FC = () => {
             <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">No results found</p>
             <p className="text-sm text-gray-400 mt-1">
-              {searchTerm 
+              {searchTerm
                 ? 'Try adjusting your search terms'
                 : 'Your test results will appear here'}
             </p>

@@ -18,7 +18,11 @@ interface PatientListTableProps {
 
 const columnHelper = createColumnHelper<PatientListItem>();
 
-export const PatientListTable = ({ patients, onPatientSelect, isLoading }: PatientListTableProps) => {
+export const PatientListTable = ({
+  patients,
+  onPatientSelect,
+  isLoading,
+}: PatientListTableProps) => {
   const columns = useMemo(
     () => [
       columnHelper.accessor('patientId', {
@@ -36,9 +40,7 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
         header: 'Name',
         cell: (info) => (
           <div>
-            <div className="font-medium text-gray-900 dark:text-white">
-              {info.getValue()}
-            </div>
+            <div className="font-medium text-gray-900 dark:text-white">{info.getValue()}</div>
             {info.row.original.isVip && (
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-800">
                 VIP
@@ -60,9 +62,7 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
       }),
       columnHelper.accessor('gender', {
         header: 'Gender',
-        cell: (info) => (
-          <span className="capitalize">{info.getValue()}</span>
-        ),
+        cell: (info) => <span className="capitalize">{info.getValue()}</span>,
       }),
       columnHelper.accessor('phoneNumber', {
         header: 'Phone',
@@ -84,9 +84,7 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
         cell: (info) => (
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              info.getValue()
-                ? 'bg-success-100 text-success-800'
-                : 'bg-gray-100 text-gray-800'
+              info.getValue() ? 'bg-success-100 text-success-800' : 'bg-gray-100 text-gray-800'
             }`}
           >
             {info.getValue() ? 'Active' : 'Inactive'}
@@ -116,14 +114,14 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
     ],
     []
   );
-  
+
   const table = useReactTable({
     data: patients,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
-  
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -134,7 +132,7 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
       </div>
     );
   }
-  
+
   if (patients.length === 0) {
     return (
       <div className="text-center py-12">
@@ -160,7 +158,7 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
       </div>
     );
   }
-  
+
   return (
     <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
       <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
@@ -174,14 +172,9 @@ export const PatientListTable = ({ patients, onPatientSelect, isLoading }: Patie
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center gap-2">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
+                    {flexRender(header.column.columnDef.header, header.getContext())}
                     {header.column.getIsSorted() && (
-                      <span>
-                        {header.column.getIsSorted() === 'asc' ? '↑' : '↓'}
-                      </span>
+                      <span>{header.column.getIsSorted() === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </div>
                 </th>

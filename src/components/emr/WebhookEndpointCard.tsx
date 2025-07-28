@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  CheckCircle, 
-  XCircle, 
+import {
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Edit,
   Trash2,
@@ -9,9 +9,13 @@ import {
   Send,
   ChevronDown,
   ChevronUp,
-  Clock
+  Clock,
 } from 'lucide-react';
-import { useTestWebhookEndpoint, useWebhookMetrics, useWebhookEventHistory } from '@/hooks/useWebhooks';
+import {
+  useTestWebhookEndpoint,
+  useWebhookMetrics,
+  useWebhookEventHistory,
+} from '@/hooks/useWebhooks';
 import type { WebhookEndpoint, WebhookEventType } from '@/types/webhook.types';
 
 interface WebhookEndpointCardProps {
@@ -23,11 +27,11 @@ interface WebhookEndpointCardProps {
 export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
   endpoint,
   onEdit,
-  onDelete
+  onDelete,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedEventType, setSelectedEventType] = useState<WebhookEventType>('patient.created');
-  
+
   const testWebhook = useTestWebhookEndpoint();
   const { data: metrics } = useWebhookMetrics(endpoint.id);
   const { data: eventHistory = [] } = useWebhookEventHistory(endpoint.id, 10);
@@ -36,24 +40,27 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
     if (!endpoint.lastPingAt) {
       return <AlertCircle className="h-5 w-5 text-gray-400" />;
     }
-    return endpoint.lastPingStatus === 'success' 
-      ? <CheckCircle className="h-5 w-5 text-green-500" />
-      : <XCircle className="h-5 w-5 text-red-500" />;
+    return endpoint.lastPingStatus === 'success' ? (
+      <CheckCircle className="h-5 w-5 text-green-500" />
+    ) : (
+      <XCircle className="h-5 w-5 text-red-500" />
+    );
   };
 
   const handleTest = () => {
     testWebhook.mutate({
       endpointId: endpoint.id,
       testPayload: {
-        eventType: selectedEventType
-      }
+        eventType: selectedEventType,
+      },
     });
   };
 
   const formatEventType = (eventType: string) => {
-    return eventType.split('.').map(part => 
-      part.charAt(0).toUpperCase() + part.slice(1)
-    ).join(' ');
+    return eventType
+      .split('.')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
   };
 
   return (
@@ -65,8 +72,8 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
             <div>
               <h3 className="text-lg font-medium text-gray-900">{endpoint.url}</h3>
               <p className="text-sm text-gray-500 mt-1">
-                {endpoint.isActive ? 'Active' : 'Inactive'} • 
-                {endpoint.events.length} event{endpoint.events.length !== 1 ? 's' : ''} subscribed
+                {endpoint.isActive ? 'Active' : 'Inactive'} •{endpoint.events.length} event
+                {endpoint.events.length !== 1 ? 's' : ''} subscribed
               </p>
               {endpoint.lastPingAt && (
                 <p className="text-xs text-gray-500 mt-1">
@@ -77,11 +84,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={onEdit}
-              className="p-2 text-gray-400 hover:text-gray-600"
-              title="Edit"
-            >
+            <button onClick={onEdit} className="p-2 text-gray-400 hover:text-gray-600" title="Edit">
               <Edit className="h-4 w-4" />
             </button>
             <button
@@ -101,7 +104,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
             onChange={(e) => setSelectedEventType(e.target.value as WebhookEventType)}
             className="text-sm rounded-md border-gray-300"
           >
-            {endpoint.events.map(event => (
+            {endpoint.events.map((event) => (
               <option key={event} value={event}>
                 {formatEventType(event)}
               </option>
@@ -161,7 +164,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
           <div className="mb-6">
             <h4 className="text-sm font-medium text-gray-900 mb-2">Subscribed Events</h4>
             <div className="flex flex-wrap gap-2">
-              {endpoint.events.map(event => (
+              {endpoint.events.map((event) => (
                 <span
                   key={event}
                   className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded"
@@ -177,7 +180,7 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-900 mb-2">Recent Events</h4>
               <div className="space-y-2">
-                {eventHistory.slice(0, 5).map(event => (
+                {eventHistory.slice(0, 5).map((event) => (
                   <div key={event.id} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       {event.status === 'delivered' ? (
@@ -208,7 +211,8 @@ export const WebhookEndpointCard: React.FC<WebhookEndpointCardProps> = ({
             <h4 className="text-sm font-medium text-gray-900 mb-2">Webhook Secret</h4>
             <div className="flex items-center gap-2">
               <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
-                {endpoint.secret.substring(0, 8)}...{endpoint.secret.substring(endpoint.secret.length - 4)}
+                {endpoint.secret.substring(0, 8)}...
+                {endpoint.secret.substring(endpoint.secret.length - 4)}
               </code>
               <button
                 onClick={() => navigator.clipboard.writeText(endpoint.secret)}

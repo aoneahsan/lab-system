@@ -15,9 +15,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
         Something went wrong
       </h3>
-      <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-4">
-        {errorMessage}
-      </p>
+      <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-4">{errorMessage}</p>
       {onRetry && (
         <button
           onClick={onRetry}

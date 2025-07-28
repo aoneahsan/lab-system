@@ -72,7 +72,7 @@ export function useOrders(params?: UseOrdersParams) {
       const q = query(ordersRef, ...constraints);
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt.toDate(),

@@ -6,7 +6,7 @@ import { firestore } from '../config/firebase.config';
 
 export const createDemoTenant = async () => {
   const demoCode = 'DEMO';
-  
+
   try {
     await setDoc(doc(firestore, 'tenants', demoCode.toLowerCase()), {
       id: demoCode.toLowerCase(),
@@ -18,33 +18,33 @@ export const createDemoTenant = async () => {
         city: 'Demo City',
         state: 'DC',
         zipCode: '12345',
-        country: 'USA'
+        country: 'USA',
       },
       contact: {
         email: 'demo@labflow.com',
         phone: '(555) 123-4567',
-        fax: '(555) 123-4568'
+        fax: '(555) 123-4568',
       },
       settings: {
         timezone: 'America/New_York',
         currency: 'USD',
         resultFormat: 'standard',
-        criticalValueNotification: true
+        criticalValueNotification: true,
       },
       features: {
         billing: true,
         inventory: true,
         qualityControl: true,
         emrIntegration: true,
-        mobileApps: true
+        mobileApps: true,
       },
       subscription: {
         plan: 'demo',
         status: 'active',
-        validUntil: new Date('2025-12-31') // Valid for a long time
+        validUntil: new Date('2025-12-31'), // Valid for a long time
       },
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
 
     console.log('Demo tenant created successfully with code: DEMO');

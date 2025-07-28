@@ -14,7 +14,7 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -45,29 +45,29 @@ export const ReportsScreen: React.FC = () => {
       value: 156,
       unit: 'samples',
       trend: 'up',
-      change: 12
+      change: 12,
     },
     {
       label: 'Average TAT',
       value: 42,
       unit: 'minutes',
       trend: 'down',
-      change: -8
+      change: -8,
     },
     {
       label: 'QC Pass Rate',
       value: 98.5,
       unit: '%',
       trend: 'stable',
-      change: 0.5
+      change: 0.5,
     },
     {
       label: 'Critical Results',
       value: 7,
       unit: 'alerts',
       trend: 'up',
-      change: 3
-    }
+      change: 3,
+    },
   ]);
 
   const [departmentStats] = useState<DepartmentStats[]>([
@@ -75,33 +75,33 @@ export const ReportsScreen: React.FC = () => {
       department: 'Chemistry',
       samplesProcessed: 78,
       tat: 35,
-      criticalResults: 3
+      criticalResults: 3,
     },
     {
       department: 'Hematology',
       samplesProcessed: 45,
       tat: 25,
-      criticalResults: 2
+      criticalResults: 2,
     },
     {
       department: 'Immunology',
       samplesProcessed: 23,
       tat: 55,
-      criticalResults: 1
+      criticalResults: 1,
     },
     {
       department: 'Microbiology',
       samplesProcessed: 10,
       tat: 120,
-      criticalResults: 1
-    }
+      criticalResults: 1,
+    },
   ]);
 
   const reportTypes = [
     { id: 'performance', label: 'Performance', icon: TrendingUp },
     { id: 'tat', label: 'TAT Analysis', icon: Clock },
     { id: 'workload', label: 'Workload', icon: Activity },
-    { id: 'quality', label: 'Quality', icon: BarChart3 }
+    { id: 'quality', label: 'Quality', icon: BarChart3 },
   ];
 
   const getTrendIcon = (trend: string, change: number) => {
@@ -117,7 +117,7 @@ export const ReportsScreen: React.FC = () => {
     // For TAT, negative change is good
     if (label.includes('TAT') && change < 0) return 'text-green-600';
     if (label.includes('TAT') && change > 0) return 'text-red-600';
-    
+
     // For most metrics, positive change is good
     if (change > 0) return 'text-green-600';
     if (change < 0) return 'text-red-600';
@@ -143,9 +143,7 @@ export const ReportsScreen: React.FC = () => {
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
                 className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium capitalize transition-colors ${
-                  selectedPeriod === period
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600'
+                  selectedPeriod === period ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 {period}
@@ -191,7 +189,9 @@ export const ReportsScreen: React.FC = () => {
                 <span className="text-sm font-normal text-gray-500 ml-1">{metric.unit}</span>
               </p>
               <p className={`text-xs mt-1 ${getChangeColor(metric.label, metric.change)}`}>
-                {metric.change > 0 ? '+' : ''}{metric.change}{metric.unit === '%' ? '%' : ''} from yesterday
+                {metric.change > 0 ? '+' : ''}
+                {metric.change}
+                {metric.unit === '%' ? '%' : ''} from yesterday
               </p>
             </div>
           ))}
@@ -206,7 +206,9 @@ export const ReportsScreen: React.FC = () => {
             {departmentStats.map((dept, index) => (
               <div
                 key={index}
-                onClick={() => navigate(`/lab-staff/reports/department/${dept.department.toLowerCase()}`)}
+                onClick={() =>
+                  navigate(`/lab-staff/reports/department/${dept.department.toLowerCase()}`)
+                }
                 className="p-4 hover:bg-gray-50 cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-2">
@@ -248,7 +250,7 @@ export const ReportsScreen: React.FC = () => {
               </div>
               <span className="text-lg font-semibold text-green-600">94%</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -261,7 +263,7 @@ export const ReportsScreen: React.FC = () => {
               </div>
               <span className="text-lg font-semibold text-gray-900">28</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="h-10 w-10 bg-yellow-100 rounded-lg flex items-center justify-center">

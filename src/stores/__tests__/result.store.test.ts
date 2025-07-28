@@ -25,7 +25,7 @@ describe('Result Store', () => {
       validationWarnings: [],
       validationErrors: [],
     });
-    
+
     // Reset all mocks
     vi.clearAllMocks();
   });
@@ -43,14 +43,14 @@ describe('Result Store', () => {
         enteredAt: new Date(),
       },
     ];
-    
+
     vi.mocked(resultService.getResultsByOrder).mockResolvedValue(mockResults);
 
     const { fetchResultsByOrder } = useResultStore.getState();
     await fetchResultsByOrder('tenant-123', 'order-123');
 
     expect(resultService.getResultsByOrder).toHaveBeenCalledWith('tenant-123', 'order-123');
-    
+
     const state = useResultStore.getState();
     expect(state.results).toEqual(mockResults);
     expect(state.loading).toBe(false);
@@ -79,14 +79,14 @@ describe('Result Store', () => {
         enteredAt: new Date(),
       },
     ];
-    
+
     vi.mocked(resultService.getResultsByPatient).mockResolvedValue(mockResults);
 
     const { fetchResultsByPatient } = useResultStore.getState();
     await fetchResultsByPatient('tenant-123', 'patient-123');
 
     expect(resultService.getResultsByPatient).toHaveBeenCalledWith('tenant-123', 'patient-123');
-    
+
     const state = useResultStore.getState();
     expect(state.results).toEqual(mockResults);
     expect(state.loading).toBe(false);
@@ -105,7 +105,7 @@ describe('Result Store', () => {
         enteredAt: new Date(),
       },
     ];
-    
+
     vi.mocked(resultService.createResult).mockResolvedValue(undefined);
     vi.mocked(resultService.getResultsByOrder).mockResolvedValue(mockResults);
 
@@ -125,15 +125,19 @@ describe('Result Store', () => {
       ],
     });
 
-    expect(resultService.createResult).toHaveBeenCalledWith('tenant-123', 'user-123', expect.objectContaining({
-      orderId: 'order-123',
-      sampleId: 'sample-123',
-      testId: 'test-1',
-      testName: 'Glucose',
-      value: 102,
-      unit: 'mg/dL',
-    }));
-    
+    expect(resultService.createResult).toHaveBeenCalledWith(
+      'tenant-123',
+      'user-123',
+      expect.objectContaining({
+        orderId: 'order-123',
+        sampleId: 'sample-123',
+        testId: 'test-1',
+        testName: 'Glucose',
+        value: 102,
+        unit: 'mg/dL',
+      })
+    );
+
     const state = useResultStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -145,7 +149,7 @@ describe('Result Store', () => {
     await verifyResult('tenant-123', 'user-123', 'result-123');
 
     expect(resultService.verifyResult).toHaveBeenCalledWith('tenant-123', 'user-123', 'result-123');
-    
+
     const state = useResultStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -155,14 +159,14 @@ describe('Result Store', () => {
       warnings: ['Value is slightly above normal range'],
       errors: [],
     };
-    
+
     vi.mocked(resultService.validateResult).mockResolvedValue(mockValidation);
 
     const { validateResult } = useResultStore.getState();
     await validateResult('tenant-123', 'test-1', 110);
 
     expect(resultService.validateResult).toHaveBeenCalledWith('tenant-123', 'test-1', 110);
-    
+
     const state = useResultStore.getState();
     expect(state.validationWarnings).toEqual(['Value is slightly above normal range']);
     expect(state.validationErrors).toEqual([]);
@@ -174,14 +178,14 @@ describe('Result Store', () => {
       warnings: [],
       errors: ['Value is critically high'],
     };
-    
+
     vi.mocked(resultService.validateResult).mockResolvedValue(mockValidation);
 
     const { validateResult } = useResultStore.getState();
     await validateResult('tenant-123', 'test-1', 500);
 
     expect(resultService.validateResult).toHaveBeenCalledWith('tenant-123', 'test-1', 500);
-    
+
     const state = useResultStore.getState();
     expect(state.validationWarnings).toEqual([]);
     expect(state.validationErrors).toEqual(['Value is critically high']);
@@ -194,7 +198,7 @@ describe('Result Store', () => {
 
     const { fetchResultsByOrder } = useResultStore.getState();
     await fetchResultsByOrder('tenant-123', 'order-123');
-    
+
     const state = useResultStore.getState();
     expect(state.error).toBe('Failed to fetch results');
     expect(state.loading).toBe(false);

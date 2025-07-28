@@ -13,10 +13,25 @@ interface StorageLocationProps {
 }
 
 const temperatureConfig = {
-  room_temp: { label: 'Room Temp', color: 'text-green-600', bgColor: 'bg-green-100', temp: '20-25°C' },
-  refrigerated: { label: 'Refrigerated', color: 'text-blue-600', bgColor: 'bg-blue-100', temp: '2-8°C' },
+  room_temp: {
+    label: 'Room Temp',
+    color: 'text-green-600',
+    bgColor: 'bg-green-100',
+    temp: '20-25°C',
+  },
+  refrigerated: {
+    label: 'Refrigerated',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100',
+    temp: '2-8°C',
+  },
   frozen: { label: 'Frozen', color: 'text-indigo-600', bgColor: 'bg-indigo-100', temp: '-20°C' },
-  ultra_frozen: { label: 'Ultra Frozen', color: 'text-purple-600', bgColor: 'bg-purple-100', temp: '-80°C' },
+  ultra_frozen: {
+    label: 'Ultra Frozen',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-100',
+    temp: '-80°C',
+  },
 };
 
 export default function SampleStorage() {
@@ -45,9 +60,11 @@ export default function SampleStorage() {
     },
   ];
 
-  const filteredLocations = storageLocations.filter(location => {
-    const matchesTemp = selectedTemperature === 'all' || location.temperature === selectedTemperature;
-    const matchesSearch = searchTerm === '' || 
+  const filteredLocations = storageLocations.filter((location) => {
+    const matchesTemp =
+      selectedTemperature === 'all' || location.temperature === selectedTemperature;
+    const matchesSearch =
+      searchTerm === '' ||
       location.locationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.rack.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesTemp && matchesSearch;
@@ -74,7 +91,7 @@ export default function SampleStorage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="input"
           />
-          
+
           <select
             value={selectedTemperature}
             onChange={(e) => setSelectedTemperature(e.target.value as StorageTemperature | 'all')}
@@ -101,7 +118,7 @@ export default function SampleStorage() {
               <Thermometer className={`h-8 w-8 ${config.color}`} />
             </div>
             <p className="text-2xl font-bold text-gray-900 mt-2">
-              {storageLocations.filter(loc => loc.temperature === key).length}
+              {storageLocations.filter((loc) => loc.temperature === key).length}
             </p>
             <p className="text-xs text-gray-600">locations</p>
           </div>
@@ -113,9 +130,12 @@ export default function SampleStorage() {
         {filteredLocations.map((location) => {
           const tempConfig = temperatureConfig[location.temperature];
           const occupancy = (location.samples.length / location.capacity) * 100;
-          
+
           return (
-            <div key={location.locationId} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div
+              key={location.locationId}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
+            >
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="font-medium text-gray-900">Location {location.locationId}</h3>
@@ -123,7 +143,9 @@ export default function SampleStorage() {
                     Rack {location.rack} - Shelf {location.shelf}
                   </p>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tempConfig.bgColor} ${tempConfig.color}`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tempConfig.bgColor} ${tempConfig.color}`}
+                >
                   {tempConfig.label}
                 </span>
               </div>
@@ -132,12 +154,18 @@ export default function SampleStorage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-gray-600">Occupancy</span>
-                    <span className="font-medium">{location.samples.length}/{location.capacity}</span>
+                    <span className="font-medium">
+                      {location.samples.length}/{location.capacity}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${
-                        occupancy > 80 ? 'bg-red-500' : occupancy > 60 ? 'bg-yellow-500' : 'bg-green-500'
+                        occupancy > 80
+                          ? 'bg-red-500'
+                          : occupancy > 60
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
                       }`}
                       style={{ width: `${occupancy}%` }}
                     />
@@ -156,9 +184,7 @@ export default function SampleStorage() {
                   </div>
                 )}
 
-                <button className="w-full btn btn-outline btn-sm">
-                  View Details
-                </button>
+                <button className="w-full btn btn-outline btn-sm">View Details</button>
               </div>
             </div>
           );
@@ -166,9 +192,7 @@ export default function SampleStorage() {
       </div>
 
       {filteredLocations.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          No storage locations found
-        </div>
+        <div className="text-center py-12 text-gray-500">No storage locations found</div>
       )}
     </div>
   );

@@ -35,13 +35,13 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
   testOptions,
   onSubmit,
   onCancel,
-  isLoading
+  isLoading,
 }) => {
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm<ValidationRuleFormData>({
     defaultValues: {
       active: true,
@@ -50,8 +50,8 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
       action: 'warn',
       ruleType: 'range',
       deltaType: 'absolute',
-      ...initialData
-    }
+      ...initialData,
+    },
   });
 
   const ruleType = watch('ruleType');
@@ -64,29 +64,23 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
         <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Test *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Test *</label>
             <select
               {...register('testId', { required: 'Test is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Select a test</option>
-              {testOptions.map(test => (
+              {testOptions.map((test) => (
                 <option key={test.id} value={test.id}>
                   {test.code} - {test.name}
                 </option>
               ))}
             </select>
-            {errors.testId && (
-              <p className="mt-1 text-sm text-red-600">{errors.testId.message}</p>
-            )}
+            {errors.testId && <p className="mt-1 text-sm text-red-600">{errors.testId.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Rule Type *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Rule Type *</label>
             <select
               {...register('ruleType', { required: 'Rule type is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -104,13 +98,11 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
       {/* Rule Configuration */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Rule Configuration</h3>
-        
+
         {ruleType === 'range' && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Minimum Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Minimum Value</label>
               <input
                 type="number"
                 step="any"
@@ -119,9 +111,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Maximum Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Maximum Value</label>
               <input
                 type="number"
                 step="any"
@@ -136,9 +126,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Delta Threshold
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Delta Threshold</label>
                 <input
                   type="number"
                   step="any"
@@ -147,9 +135,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Delta Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Delta Type</label>
                 <select
                   {...register('deltaType')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -160,9 +146,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Timeframe (days)
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Timeframe (days)</label>
               <input
                 type="number"
                 {...register('deltaTimeframe', { valueAsNumber: true })}
@@ -176,9 +160,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
         {ruleType === 'absurd' && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Absurd Low Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Absurd Low Value</label>
               <input
                 type="number"
                 step="any"
@@ -187,9 +169,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Absurd High Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Absurd High Value</label>
               <input
                 type="number"
                 step="any"
@@ -203,9 +183,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
         {ruleType === 'critical' && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Critical Low Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Critical Low Value</label>
               <input
                 type="number"
                 step="any"
@@ -214,9 +192,7 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Critical High Value
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Critical High Value</label>
               <input
                 type="number"
                 step="any"
@@ -257,12 +233,10 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
       {/* Actions */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Actions</h3>
-        
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Validation Action *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Validation Action *</label>
             <select
               {...register('action', { required: 'Action is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -292,7 +266,8 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
                 <AlertTriangle className="h-5 w-5 text-red-400" />
                 <div className="ml-3">
                   <p className="text-sm text-red-800">
-                    Block action will prevent the result from being saved until the issue is resolved.
+                    Block action will prevent the result from being saved until the issue is
+                    resolved.
                   </p>
                 </div>
               </div>
@@ -310,7 +285,9 @@ const ValidationRuleForm: React.FC<ValidationRuleFormProps> = ({
               </div>
               <div className="ml-3 text-sm">
                 <label className="font-medium text-gray-700">Requires Review</label>
-                <p className="text-gray-500">Mark results for mandatory review when this rule is triggered</p>
+                <p className="text-gray-500">
+                  Mark results for mandatory review when this rule is triggered
+                </p>
               </div>
             </div>
 

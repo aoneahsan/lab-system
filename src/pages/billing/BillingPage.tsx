@@ -9,7 +9,7 @@ const BillingPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<BillingFilter>({});
   const [showCreateForm, setShowCreateForm] = useState(false);
-  
+
   const { data: invoices = [], isLoading } = useInvoices(filters);
   const { data: statistics } = useBillingStatistics();
   const createInvoiceMutation = useCreateInvoice();
@@ -51,7 +51,7 @@ const BillingPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Create Invoice</h1>
           <p className="text-gray-600 mt-2">Generate a new invoice for services</p>
         </div>
-        
+
         <InvoiceForm
           onSubmit={handleCreateInvoice}
           onCancel={() => setShowCreateForm(false)}
@@ -107,7 +107,9 @@ const BillingPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">${statistics.totalRevenue.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${statistics.totalRevenue.toFixed(2)}
+                </p>
               </div>
               <DollarSign className="h-8 w-8 text-green-500" />
             </div>
@@ -116,7 +118,9 @@ const BillingPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending Payments</p>
-                <p className="text-2xl font-bold text-gray-900">${statistics.pendingPayments.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${statistics.pendingPayments.toFixed(2)}
+                </p>
               </div>
               <CreditCard className="h-8 w-8 text-yellow-500" />
             </div>
@@ -125,7 +129,9 @@ const BillingPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Today's Charges</p>
-                <p className="text-2xl font-bold text-gray-900">${statistics.todaysCharges.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${statistics.todaysCharges.toFixed(2)}
+                </p>
               </div>
               <FileText className="h-8 w-8 text-blue-500" />
             </div>
@@ -134,7 +140,9 @@ const BillingPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Collection Rate</p>
-                <p className="text-2xl font-bold text-gray-900">{statistics.collectionRate.toFixed(1)}%</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {statistics.collectionRate.toFixed(1)}%
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-purple-500" />
             </div>
@@ -147,7 +155,7 @@ const BillingPage: React.FC = () => {
         <div className="px-6 py-4 border-b">
           <h2 className="text-lg font-medium text-gray-900">Recent Invoices</h2>
         </div>
-        
+
         {isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -196,7 +204,9 @@ const BillingPage: React.FC = () => {
                 {invoices.map((invoice) => (
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{invoice.invoiceNumber}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {invoice.invoiceNumber}
+                      </div>
                       <div className="text-sm text-gray-500">
                         {invoice.invoiceDate.toDate().toLocaleDateString()}
                       </div>
@@ -210,12 +220,20 @@ const BillingPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-medium ${getPaymentStatusColor(invoice.paymentStatus)}`}>
+                      <div
+                        className={`text-sm font-medium ${getPaymentStatusColor(
+                          invoice.paymentStatus
+                        )}`}
+                      >
                         ${invoice.balanceDue.toFixed(2)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(invoice.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(
+                          invoice.status
+                        )}`}
+                      >
                         {invoice.status}
                       </span>
                     </td>

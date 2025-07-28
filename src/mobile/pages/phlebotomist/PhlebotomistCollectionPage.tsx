@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Camera, 
-  Thermometer, 
-  MapPin, 
-  Save,
-  X,
-  CheckCircle,
-  FileText,
-  User
-} from 'lucide-react';
+import { Camera, Thermometer, MapPin, Save, X, CheckCircle, FileText, User } from 'lucide-react';
 import { QRCodeScanner } from 'qrcode-studio';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
@@ -33,7 +24,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
   const { addCollection } = useOfflineStore();
   const [step, setStep] = useState(1); // 1: Patient, 2: Sample, 3: Review
   const [isScanning, setIsScanning] = useState(false);
-  
+
   const [collectionData, setCollectionData] = useState<CollectionData>({
     patientId: '',
     patientName: '',
@@ -49,12 +40,12 @@ const PhlebotomistCollectionPage: React.FC = () => {
   const startBarcodeScan = async () => {
     try {
       await BarcodeScanner.checkPermission({ force: true });
-      
+
       setIsScanning(true);
       document.querySelector('body')?.classList.add('barcode-scanner-active');
-      
+
       const result = await BarcodeScanner.startScan();
-      
+
       if (result.hasContent) {
         setCollectionData({ ...collectionData, barcode: result.content });
         toast.success('Barcode scanned successfully');
@@ -94,7 +85,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
     try {
       // Get current location
       const position = await Geolocation.getCurrentPosition();
-      
+
       // Save to offline store
       await addCollection({
         ...collectionData,
@@ -120,37 +111,35 @@ const PhlebotomistCollectionPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Patient Information</h2>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Patient ID
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Patient ID</label>
               <input
                 type="text"
                 value={collectionData.patientId}
-                onChange={(e) => setCollectionData({ ...collectionData, patientId: e.target.value })}
+                onChange={(e) =>
+                  setCollectionData({ ...collectionData, patientId: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 placeholder="Enter patient ID"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Patient Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Patient Name</label>
               <input
                 type="text"
                 value={collectionData.patientName}
-                onChange={(e) => setCollectionData({ ...collectionData, patientName: e.target.value })}
+                onChange={(e) =>
+                  setCollectionData({ ...collectionData, patientName: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                 placeholder="Enter patient name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Order ID
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Order ID</label>
               <input
                 type="text"
                 value={collectionData.orderId}
@@ -165,7 +154,9 @@ const PhlebotomistCollectionPage: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={collectionData.consent}
-                  onChange={(e) => setCollectionData({ ...collectionData, consent: e.target.checked })}
+                  onChange={(e) =>
+                    setCollectionData({ ...collectionData, consent: e.target.checked })
+                  }
                   className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                 />
                 <span className="ml-2 text-sm text-gray-700">Patient consent obtained</span>
@@ -178,16 +169,16 @@ const PhlebotomistCollectionPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Sample Collection</h2>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sample Barcode
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sample Barcode</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={collectionData.barcode}
-                  onChange={(e) => setCollectionData({ ...collectionData, barcode: e.target.value })}
+                  onChange={(e) =>
+                    setCollectionData({ ...collectionData, barcode: e.target.value })
+                  }
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
                   placeholder="Scan or enter barcode"
                 />
@@ -209,10 +200,12 @@ const PhlebotomistCollectionPage: React.FC = () => {
                 <input
                   type="number"
                   value={collectionData.temperature || ''}
-                  onChange={(e) => setCollectionData({ 
-                    ...collectionData, 
-                    temperature: parseFloat(e.target.value) || undefined 
-                  })}
+                  onChange={(e) =>
+                    setCollectionData({
+                      ...collectionData,
+                      temperature: parseFloat(e.target.value) || undefined,
+                    })
+                  }
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
                   placeholder="Enter temperature"
                 />
@@ -220,9 +213,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Notes
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
               <textarea
                 value={collectionData.notes}
                 onChange={(e) => setCollectionData({ ...collectionData, notes: e.target.value })}
@@ -251,13 +242,15 @@ const PhlebotomistCollectionPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-gray-900">Review & Confirm</h2>
-            
+
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-gray-400" />
                 <div>
                   <p className="text-sm font-medium">Patient</p>
-                  <p className="text-sm text-gray-600">{collectionData.patientName} (ID: {collectionData.patientId})</p>
+                  <p className="text-sm text-gray-600">
+                    {collectionData.patientName} (ID: {collectionData.patientId})
+                  </p>
                 </div>
               </div>
 
@@ -309,10 +302,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-gray-900">Sample Collection</h1>
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 text-gray-500"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 text-gray-500">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -320,10 +310,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
         {/* Progress Steps */}
         <div className="flex items-center justify-between mb-4">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className={`flex items-center ${i < 3 ? 'flex-1' : ''}`}
-            >
+            <div key={i} className={`flex items-center ${i < 3 ? 'flex-1' : ''}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   i <= step ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-500'
@@ -332,11 +319,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
                 {i}
               </div>
               {i < 3 && (
-                <div
-                  className={`flex-1 h-1 mx-2 ${
-                    i < step ? 'bg-purple-600' : 'bg-gray-200'
-                  }`}
-                />
+                <div className={`flex-1 h-1 mx-2 ${i < step ? 'bg-purple-600' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -344,9 +327,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
       </div>
 
       {/* Form Content */}
-      <div className="flex-1 px-6 py-4">
-        {renderStep()}
-      </div>
+      <div className="flex-1 px-6 py-4">{renderStep()}</div>
 
       {/* Bottom Actions */}
       <div className="px-6 py-4 bg-white border-t border-gray-200">
@@ -359,12 +340,15 @@ const PhlebotomistCollectionPage: React.FC = () => {
               Back
             </button>
           )}
-          
+
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
               disabled={
-                (step === 1 && (!collectionData.patientId || !collectionData.patientName || !collectionData.consent)) ||
+                (step === 1 &&
+                  (!collectionData.patientId ||
+                    !collectionData.patientName ||
+                    !collectionData.consent)) ||
                 (step === 2 && !collectionData.barcode)
               }
               className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"

@@ -18,7 +18,7 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!appealReason.trim()) {
       return;
     }
@@ -44,14 +44,11 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-30" onClick={onClose} />
-        
+
         <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Appeal Insurance Claim</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -71,9 +68,7 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
                 </div>
                 <div>
                   <dt className="text-gray-500">Paid Amount:</dt>
-                  <dd className="font-medium">
-                    ${claim.paidAmount?.toFixed(2) || '0.00'}
-                  </dd>
+                  <dd className="font-medium">${claim.paidAmount?.toFixed(2) || '0.00'}</dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Insurance Provider:</dt>

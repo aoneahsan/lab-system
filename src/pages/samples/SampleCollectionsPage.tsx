@@ -42,7 +42,7 @@ const SampleCollectionsPage: React.FC = () => {
       completedSamples: 15,
       status: 'in_progress',
       createdBy: 'John Doe',
-      createdAt: new Date()
+      createdAt: new Date(),
     },
     {
       id: '2',
@@ -51,8 +51,8 @@ const SampleCollectionsPage: React.FC = () => {
       completedSamples: 30,
       status: 'completed',
       createdBy: 'Jane Smith',
-      createdAt: new Date(Date.now() - 86400000)
-    }
+      createdAt: new Date(Date.now() - 86400000),
+    },
   ];
 
   const handleCreateBatch = () => {
@@ -70,7 +70,7 @@ const SampleCollectionsPage: React.FC = () => {
         status: 'in_progress',
         createdBy: user?.displayName || user?.email,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       // Create samples and collect created samples
@@ -86,9 +86,9 @@ const SampleCollectionsPage: React.FC = () => {
             collectionDate: new Date(),
             collectionTime: new Date().toLocaleTimeString('en-US', { hour12: false }),
             collectedBy: user?.displayName || user?.email || 'Unknown',
-            batchId: batchRef.id
+            batchId: batchRef.id,
           };
-          
+
           const newSample = await createSampleMutation.mutateAsync(formData);
           if (newSample) {
             createdSamples.push(newSample as unknown as Sample);
@@ -99,9 +99,12 @@ const SampleCollectionsPage: React.FC = () => {
         }
       }
 
-      toast.success('Batch Created', `Successfully created ${created} of ${samples.length} samples`);
+      toast.success(
+        'Batch Created',
+        `Successfully created ${created} of ${samples.length} samples`
+      );
       setShowBatchModal(false);
-      
+
       // Show print dialog for barcode labels
       if (createdSamples.length > 0) {
         setBatchSamples(createdSamples);
@@ -116,7 +119,7 @@ const SampleCollectionsPage: React.FC = () => {
 
   const handlePrintBarcodes = async (batchId: string) => {
     if (!tenant) return;
-    
+
     try {
       // Fetch samples for this batch
       const samplesQuery = query(
@@ -124,11 +127,11 @@ const SampleCollectionsPage: React.FC = () => {
         where('batchId', '==', batchId)
       );
       const snapshot = await getDocs(samplesQuery);
-      const samples = snapshot.docs.map(doc => ({
+      const samples = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       })) as Sample[];
-      
+
       if (samples.length > 0) {
         setBatchSamples(samples);
         setShowPrintModal(true);
@@ -227,12 +230,9 @@ const SampleCollectionsPage: React.FC = () => {
         </div>
         <div className="divide-y divide-gray-200">
           {mockBatches.map((batch) => (
-            <div
-              key={batch.id}
-              className="px-6 py-4 hover:bg-gray-50"
-            >
+            <div key={batch.id} className="px-6 py-4 hover:bg-gray-50">
               <div className="flex items-center justify-between">
-                <div 
+                <div
                   className="flex items-center space-x-4 flex-1 cursor-pointer"
                   onClick={() => setSelectedBatch(batch)}
                 >
@@ -241,9 +241,7 @@ const SampleCollectionsPage: React.FC = () => {
                     <p className="text-sm font-medium text-gray-900">
                       Batch #{batch.id} - {batch.date.toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      Created by {batch.createdBy}
-                    </p>
+                    <p className="text-sm text-gray-500">Created by {batch.createdBy}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -255,7 +253,7 @@ const SampleCollectionsPage: React.FC = () => {
                       <div
                         className="bg-blue-600 h-2 rounded-full"
                         style={{
-                          width: `${(batch.completedSamples / batch.totalSamples) * 100}%`
+                          width: `${(batch.completedSamples / batch.totalSamples) * 100}%`,
                         }}
                       />
                     </div>
@@ -270,7 +268,11 @@ const SampleCollectionsPage: React.FC = () => {
                   >
                     <Printer className="h-4 w-4" />
                   </button>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(batch.status)}`}>
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                      batch.status
+                    )}`}
+                  >
                     {batch.status.replace('_', ' ')}
                   </span>
                 </div>

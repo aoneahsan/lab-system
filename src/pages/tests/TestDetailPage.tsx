@@ -106,9 +106,11 @@ const TestDetailPage: React.FC = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    test.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      test.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {test.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </dd>
@@ -155,7 +157,9 @@ const TestDetailPage: React.FC = () => {
               {test.specimen.specialInstructions && (
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Special Instructions</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{test.specimen.specialInstructions}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">
+                    {test.specimen.specialInstructions}
+                  </dd>
                 </div>
               )}
             </dl>

@@ -31,7 +31,7 @@ const ValidationRulesPage: React.FC = () => {
       delta: 'Delta Check',
       absurd: 'Absurd Values',
       critical: 'Critical Values',
-      custom: 'Custom Rule'
+      custom: 'Custom Rule',
     };
     return labels[type] || type;
   };
@@ -40,13 +40,13 @@ const ValidationRulesPage: React.FC = () => {
     const colors: Record<string, string> = {
       warn: 'bg-yellow-100 text-yellow-800',
       block: 'bg-red-100 text-red-800',
-      flag: 'bg-blue-100 text-blue-800'
+      flag: 'bg-blue-100 text-blue-800',
     };
     return colors[action] || 'bg-gray-100 text-gray-800';
   };
 
   const getTestName = (testId: string) => {
-    const test = tests?.find(t => t.id === testId);
+    const test = tests?.find((t) => t.id === testId);
     return test ? `${test.code} - ${test.name}` : testId;
   };
 
@@ -90,7 +90,7 @@ const ValidationRulesPage: React.FC = () => {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Active Rules</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {rules?.filter(r => r.active).length || 0}
+                {rules?.filter((r) => r.active).length || 0}
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@ const ValidationRulesPage: React.FC = () => {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Critical Rules</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {rules?.filter(r => r.ruleType === 'critical').length || 0}
+                {rules?.filter((r) => r.ruleType === 'critical').length || 0}
               </p>
             </div>
           </div>
@@ -112,7 +112,7 @@ const ValidationRulesPage: React.FC = () => {
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Review Required</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {rules?.filter(r => r.requiresReview).length || 0}
+                {rules?.filter((r) => r.requiresReview).length || 0}
               </p>
             </div>
           </div>
@@ -158,30 +158,44 @@ const ValidationRulesPage: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {rule.ruleType === 'range' && (
-                    <span>{rule.minValue} - {rule.maxValue}</span>
+                    <span>
+                      {rule.minValue} - {rule.maxValue}
+                    </span>
                   )}
                   {rule.ruleType === 'delta' && (
-                    <span>{rule.deltaThreshold} {rule.deltaType}</span>
+                    <span>
+                      {rule.deltaThreshold} {rule.deltaType}
+                    </span>
                   )}
                   {rule.ruleType === 'critical' && (
-                    <span>Low: {rule.criticalLow}, High: {rule.criticalHigh}</span>
+                    <span>
+                      Low: {rule.criticalLow}, High: {rule.criticalHigh}
+                    </span>
                   )}
                   {rule.ruleType === 'absurd' && (
-                    <span>Low: {rule.absurdLow}, High: {rule.absurdHigh}</span>
+                    <span>
+                      Low: {rule.absurdLow}, High: {rule.absurdHigh}
+                    </span>
                   )}
                   {rule.ruleType === 'custom' && (
                     <span className="text-gray-400">Custom logic</span>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getActionColor(rule.action)}`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getActionColor(
+                      rule.action
+                    )}`}
+                  >
                     {rule.action.toUpperCase()}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    rule.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      rule.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {rule.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>

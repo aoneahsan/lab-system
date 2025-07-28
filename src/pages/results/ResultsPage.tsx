@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, AlertCircle, FileText, BarChart3, Download, Printer, Edit, History } from 'lucide-react';
+import {
+  Plus,
+  AlertCircle,
+  FileText,
+  BarChart3,
+  Download,
+  Printer,
+  Edit,
+  History,
+} from 'lucide-react';
 import { useResults, useResultStatistics } from '@/hooks/useResults';
 import { useTenant } from '@/hooks/useTenant';
 import { usePatients } from '@/hooks/usePatients';
@@ -18,16 +27,23 @@ const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ResultFilter>({});
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
-  const [amendmentModal, setAmendmentModal] = useState<{ isOpen: boolean; result: TestResult | null }>({ isOpen: false, result: null });
-  const [correctionModal, setCorrectionModal] = useState<{ isOpen: boolean; result: TestResult | null; test: Test | null }>({ isOpen: false, result: null, test: null });
-  
+  const [amendmentModal, setAmendmentModal] = useState<{
+    isOpen: boolean;
+    result: TestResult | null;
+  }>({ isOpen: false, result: null });
+  const [correctionModal, setCorrectionModal] = useState<{
+    isOpen: boolean;
+    result: TestResult | null;
+    test: Test | null;
+  }>({ isOpen: false, result: null, test: null });
+
   const { data: results = [], isLoading } = useResults(filters);
   const { data: statistics } = useResultStatistics();
   const { tenant } = useTenant();
   const { data: patientsData } = usePatients();
   const { data: samplesData } = useSamples();
   const { data: testsData } = useTests();
-  
+
   const patients = patientsData?.patients || [];
   const samples = samplesData || [];
   const tests = testsData?.tests || [];
@@ -57,12 +73,12 @@ const ResultsPage: React.FC = () => {
   };
 
   const handleGeneratePDF = async (resultId: string) => {
-    const result = results.find(r => r.id === resultId);
+    const result = results.find((r) => r.id === resultId);
     if (!result || !tenant) return;
 
-    const sample = samples.find(s => s.id === result.sampleId);
-    const patient = patients.find(p => p.id === result.patientId);
-    const test = tests.find(t => t.id === result.testId);
+    const sample = samples.find((s) => s.id === result.sampleId);
+    const patient = patients.find((p) => p.id === result.patientId);
+    const test = tests.find((t) => t.id === result.testId);
 
     if (!sample || !patient || !test) {
       toast.error('Missing Data', 'Unable to find complete data for this result');
@@ -81,7 +97,7 @@ const ResultsPage: React.FC = () => {
           contact: tenant.contact,
         },
       });
-      
+
       pdfService.downloadReport(doc, `result_${result.id}_${patient.patientId}`);
       toast.success('PDF Generated', 'Result report has been downloaded');
     } catch {
@@ -90,12 +106,12 @@ const ResultsPage: React.FC = () => {
   };
 
   const handlePrintResult = async (resultId: string) => {
-    const result = results.find(r => r.id === resultId);
+    const result = results.find((r) => r.id === resultId);
     if (!result || !tenant) return;
 
-    const sample = samples.find(s => s.id === result.sampleId);
-    const patient = patients.find(p => p.id === result.patientId);
-    const test = tests.find(t => t.id === result.testId);
+    const sample = samples.find((s) => s.id === result.sampleId);
+    const patient = patients.find((p) => p.id === result.patientId);
+    const test = tests.find((t) => t.id === result.testId);
 
     if (!sample || !patient || !test) {
       toast.error('Missing Data', 'Unable to find complete data for this result');
@@ -114,7 +130,7 @@ const ResultsPage: React.FC = () => {
           contact: tenant.contact,
         },
       });
-      
+
       pdfService.printReport(doc);
     } catch {
       toast.error('Print Failed', 'Failed to print result report');
@@ -133,7 +149,10 @@ const ResultsPage: React.FC = () => {
 
   const handleAmendResult = (result: TestResult) => {
     if (result.status !== 'final') {
-      toast.error('Cannot Amend', 'Only finalized results can be amended. Use correction for non-final results.');
+      toast.error(
+        'Cannot Amend',
+        'Only finalized results can be amended. Use correction for non-final results.'
+      );
       return;
     }
     setAmendmentModal({ isOpen: true, result });
@@ -141,10 +160,13 @@ const ResultsPage: React.FC = () => {
 
   const handleCorrectResult = (result: TestResult) => {
     if (result.status === 'final') {
-      toast.error('Cannot Correct', 'Finalized results cannot be corrected. Use amendment instead.');
+      toast.error(
+        'Cannot Correct',
+        'Finalized results cannot be corrected. Use amendment instead.'
+      );
       return;
     }
-    const test = tests.find(t => t.id === result.testId);
+    const test = tests.find((t) => t.id === result.testId);
     if (!test) {
       toast.error('Test Not Found', 'Unable to find test information');
       return;
@@ -260,7 +282,7 @@ const ResultsPage: React.FC = () => {
                       checked={selectedResults.length === results.length && results.length > 0}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedResults(results.map(r => r.id));
+                          setSelectedResults(results.map((r) => r.id));
                         } else {
                           setSelectedResults([]);
                         }
@@ -299,7 +321,7 @@ const ResultsPage: React.FC = () => {
                           if (e.target.checked) {
                             setSelectedResults([...selectedResults, result.id]);
                           } else {
-                            setSelectedResults(selectedResults.filter(id => id !== result.id));
+                            setSelectedResults(selectedResults.filter((id) => id !== result.id));
                           }
                         }}
                       />
@@ -321,7 +343,11 @@ const ResultsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(result.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(
+                          result.status
+                        )}`}
+                      >
                         {result.status}
                       </span>
                     </td>
@@ -344,14 +370,16 @@ const ResultsPage: React.FC = () => {
                           >
                             <History className="h-4 w-4" />
                           </button>
-                        ) : result.status !== 'cancelled' && (
-                          <button
-                            onClick={() => handleCorrectResult(result)}
-                            className="text-orange-600 hover:text-orange-900"
-                            title="Correct Result"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
+                        ) : (
+                          result.status !== 'cancelled' && (
+                            <button
+                              onClick={() => handleCorrectResult(result)}
+                              className="text-orange-600 hover:text-orange-900"
+                              title="Correct Result"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                          )
                         )}
                         <button
                           onClick={() => handleGeneratePDF(result.id)}

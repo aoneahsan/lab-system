@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import type { 
-  StockTransactionFormData, 
+import type {
+  StockTransactionFormData,
   TransactionType,
-  InventoryItem 
+  InventoryItem,
 } from '@/types/inventory.types';
 
 interface StockTransactionFormProps {
@@ -19,56 +19,56 @@ interface StockTransactionFormProps {
 }
 
 const transactionTypes: { value: TransactionType; label: string; description: string }[] = [
-  { 
-    value: 'purchase', 
-    label: 'Purchase/Receipt', 
-    description: 'Receive new stock from vendor' 
+  {
+    value: 'purchase',
+    label: 'Purchase/Receipt',
+    description: 'Receive new stock from vendor',
   },
-  { 
-    value: 'usage', 
-    label: 'Usage', 
-    description: 'Use stock for testing or procedures' 
+  {
+    value: 'usage',
+    label: 'Usage',
+    description: 'Use stock for testing or procedures',
   },
-  { 
-    value: 'adjustment', 
-    label: 'Adjustment', 
-    description: 'Adjust stock count (inventory reconciliation)' 
+  {
+    value: 'adjustment',
+    label: 'Adjustment',
+    description: 'Adjust stock count (inventory reconciliation)',
   },
-  { 
-    value: 'disposal', 
-    label: 'Disposal', 
-    description: 'Dispose of expired or damaged stock' 
+  {
+    value: 'disposal',
+    label: 'Disposal',
+    description: 'Dispose of expired or damaged stock',
   },
-  { 
-    value: 'transfer', 
-    label: 'Transfer', 
-    description: 'Transfer stock to another location' 
+  {
+    value: 'transfer',
+    label: 'Transfer',
+    description: 'Transfer stock to another location',
   },
-  { 
-    value: 'return', 
-    label: 'Return to Vendor', 
-    description: 'Return stock to vendor' 
-  }
+  {
+    value: 'return',
+    label: 'Return to Vendor',
+    description: 'Return stock to vendor',
+  },
 ];
 
 export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
   item,
   onSubmit,
   onCancel,
-  isLoading = false
+  isLoading = false,
 }) => {
   const {
     register,
     handleSubmit,
     watch,
     // setValue,
-    formState: { errors }
+    formState: { errors },
   } = useForm<StockTransactionFormData>({
     defaultValues: {
       itemId: item.id,
       type: 'usage',
-      quantity: 1
-    }
+      quantity: 1,
+    },
   });
 
   const transactionType = watch('type');
@@ -87,22 +87,29 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
       <div className="bg-gray-50 rounded-lg p-4">
         <h4 className="font-medium text-gray-900 mb-2">Item Information</h4>
         <div className="text-sm text-gray-600">
-          <p><span className="font-medium">Name:</span> {item.name}</p>
-          <p><span className="font-medium">Current Stock:</span> {item.currentStock} {item.unit}</p>
+          <p>
+            <span className="font-medium">Name:</span> {item.name}
+          </p>
+          <p>
+            <span className="font-medium">Current Stock:</span> {item.currentStock} {item.unit}
+          </p>
           {item.catalogNumber && (
-            <p><span className="font-medium">Catalog #:</span> {item.catalogNumber}</p>
+            <p>
+              <span className="font-medium">Catalog #:</span> {item.catalogNumber}
+            </p>
           )}
         </div>
       </div>
 
       {/* Transaction Type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Transaction Type *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Transaction Type *</label>
         <div className="space-y-2">
           {transactionTypes.map(({ value, label, description }) => (
-            <label key={value} className="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+            <label
+              key={value}
+              className="flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+            >
               <input
                 type="radio"
                 value={value}
@@ -116,20 +123,16 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
             </label>
           ))}
         </div>
-        {errors.type && (
-          <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
-        )}
+        {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>}
       </div>
 
       {/* Quantity */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Quantity *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
         <div className="flex items-center space-x-2">
           <input
             type="number"
-            {...register('quantity', { 
+            {...register('quantity', {
               required: 'Quantity is required',
               valueAsNumber: true,
               min: { value: 1, message: 'Quantity must be at least 1' },
@@ -138,15 +141,13 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
                   return `Insufficient stock. Available: ${item.currentStock} ${item.unit}`;
                 }
                 return true;
-              }
+              },
             })}
             className="w-32 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <span className="text-gray-600">{item.unit}</span>
         </div>
-        {errors.quantity && (
-          <p className="text-red-500 text-sm mt-1">{errors.quantity.message}</p>
-        )}
+        {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity.message}</p>}
         {isOutgoing && (
           <p className="text-sm text-gray-500 mt-1">
             Available stock: {item.currentStock} {item.unit}
@@ -157,13 +158,11 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
       {/* Lot Number (for lot-tracked items) */}
       {showLotFields && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Lot Number *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Lot Number *</label>
           <input
             type="text"
-            {...register('lotNumber', { 
-              required: showLotFields ? 'Lot number is required for this item' : false 
+            {...register('lotNumber', {
+              required: showLotFields ? 'Lot number is required for this item' : false,
             })}
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="Enter lot number"
@@ -177,14 +176,12 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
       {/* Expiration Date (for expiration-tracked items) */}
       {showExpirationFields && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Expiration Date *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Date *</label>
           <input
             type="date"
-            {...register('expirationDate', { 
+            {...register('expirationDate', {
               required: showExpirationFields ? 'Expiration date is required for this item' : false,
-              valueAsDate: true
+              valueAsDate: true,
             })}
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
@@ -198,11 +195,9 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
       {showVendorFields && (
         <div className="space-y-4">
           <h4 className="font-medium text-gray-900">Vendor Information</h4>
-          
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Vendor Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Vendor Name</label>
             <input
               type="text"
               {...register('vendor.name')}
@@ -212,9 +207,7 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unit Cost
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost</label>
             <div className="flex items-center space-x-2">
               <span className="text-gray-600">$</span>
               <input
@@ -233,12 +226,10 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
       {/* Reason (for adjustments and disposals) */}
       {showReasonField && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Reason *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Reason *</label>
           <select
-            {...register('reason', { 
-              required: showReasonField ? 'Reason is required' : false 
+            {...register('reason', {
+              required: showReasonField ? 'Reason is required' : false,
             })}
             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           >
@@ -261,17 +252,13 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
               </>
             )}
           </select>
-          {errors.reason && (
-            <p className="text-red-500 text-sm mt-1">{errors.reason.message}</p>
-          )}
+          {errors.reason && <p className="text-red-500 text-sm mt-1">{errors.reason.message}</p>}
         </div>
       )}
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Notes
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
         <textarea
           {...register('notes')}
           rows={3}
@@ -285,16 +272,14 @@ export const StockTransactionForm: React.FC<StockTransactionFormProps> = ({
         <h4 className="font-medium text-blue-900 mb-2">Transaction Summary</h4>
         <div className="text-sm text-blue-700">
           <p>
-            <span className="font-medium">Action:</span>{' '}
-            {isOutgoing ? 'Remove' : 'Add'} {quantity || 0} {item.unit} 
+            <span className="font-medium">Action:</span> {isOutgoing ? 'Remove' : 'Add'}{' '}
+            {quantity || 0} {item.unit}
             {isOutgoing ? ' from' : ' to'} inventory
           </p>
           <p>
             <span className="font-medium">New Stock Level:</span>{' '}
-            {isOutgoing 
-              ? item.currentStock - (quantity || 0)
-              : item.currentStock + (quantity || 0)
-            } {item.unit}
+            {isOutgoing ? item.currentStock - (quantity || 0) : item.currentStock + (quantity || 0)}{' '}
+            {item.unit}
           </p>
         </div>
       </div>

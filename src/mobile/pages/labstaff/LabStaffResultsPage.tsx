@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   AlertTriangle,
   Clock,
   CheckCircle,
   FileText,
   Edit3,
   Send,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -70,14 +70,14 @@ const LabStaffResultsPage: React.FC = () => {
     },
   ]);
 
-  const filteredResults = results.filter(result => {
-    const matchesSearch = 
+  const filteredResults = results.filter((result) => {
+    const matchesSearch =
       result.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       result.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       result.testName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       result.orderId.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesFilter = 
+    const matchesFilter =
       selectedFilter === 'all' ||
       (selectedFilter === 'pending' && result.status === 'pending') ||
       (selectedFilter === 'critical' && result.criticalFlag);
@@ -115,8 +115,12 @@ const LabStaffResultsPage: React.FC = () => {
 
   const filterOptions = [
     { value: 'all', label: 'All Results', count: results.length },
-    { value: 'pending', label: 'Pending', count: results.filter(r => r.status === 'pending').length },
-    { value: 'critical', label: 'Critical', count: results.filter(r => r.criticalFlag).length },
+    {
+      value: 'pending',
+      label: 'Pending',
+      count: results.filter((r) => r.status === 'pending').length,
+    },
+    { value: 'critical', label: 'Critical', count: results.filter((r) => r.criticalFlag).length },
   ];
 
   return (
@@ -124,7 +128,7 @@ const LabStaffResultsPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Test Results</h1>
-        
+
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -150,9 +154,11 @@ const LabStaffResultsPage: React.FC = () => {
               }`}
             >
               {option.label}
-              <span className={`text-xs ${
-                selectedFilter === option.value ? 'text-purple-200' : 'text-gray-500'
-              }`}>
+              <span
+                className={`text-xs ${
+                  selectedFilter === option.value ? 'text-purple-200' : 'text-gray-500'
+                }`}
+              >
                 ({option.count})
               </span>
             </button>
@@ -172,9 +178,7 @@ const LabStaffResultsPage: React.FC = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-medium text-gray-900">{result.patientName}</h3>
-                  {result.criticalFlag && (
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                  )}
+                  {result.criticalFlag && <AlertTriangle className="h-4 w-4 text-red-500" />}
                 </div>
                 <p className="text-sm text-gray-600">ID: {result.patientId}</p>
               </div>
@@ -184,7 +188,11 @@ const LabStaffResultsPage: React.FC = () => {
             <div className="space-y-1">
               <p className="text-sm font-medium text-gray-900">{result.testName}</p>
               <div className="flex items-center gap-4 text-xs">
-                <span className={`px-2 py-1 rounded-full font-medium ${getPriorityColor(result.priority)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full font-medium ${getPriorityColor(
+                    result.priority
+                  )}`}
+                >
                   {result.priority.toUpperCase()}
                 </span>
                 <span className="text-gray-500">Order: {result.orderId}</span>
@@ -211,9 +219,7 @@ const LabStaffResultsPage: React.FC = () => {
           <div className="text-center">
             <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-            <p className="text-sm text-gray-600">
-              Try adjusting your search or filters
-            </p>
+            <p className="text-sm text-gray-600">Try adjusting your search or filters</p>
           </div>
         </div>
       )}

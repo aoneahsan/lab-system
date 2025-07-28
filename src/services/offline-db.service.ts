@@ -16,10 +16,13 @@ export interface OfflineQueueItem {
 export interface OfflineMetadata {
   lastSyncTime: number;
   pendingChanges: number;
-  collections: Record<string, {
-    lastFetch: number;
-    recordCount: number;
-  }>;
+  collections: Record<
+    string,
+    {
+      lastFetch: number;
+      recordCount: number;
+    }
+  >;
 }
 
 class OfflineDbService {
@@ -45,17 +48,11 @@ class OfflineDbService {
       // Create connection
       const ret = await this.sqlite.checkConnectionsConsistency();
       const isConn = (await this.sqlite.isConnection(this.dbName, false)).result;
-      
+
       if (ret.result && isConn) {
         this.db = await this.sqlite.retrieveConnection(this.dbName, false);
       } else {
-        this.db = await this.sqlite.createConnection(
-          this.dbName,
-          false,
-          'no-encryption',
-          1,
-          false
-        );
+        this.db = await this.sqlite.createConnection(this.dbName, false, 'no-encryption', 1, false);
       }
 
       await this.db.open();
@@ -127,7 +124,7 @@ class OfflineDbService {
       `CREATE INDEX IF NOT EXISTS idx_orders_tenant ON cached_orders(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_orders_patient ON cached_orders(patient_id)`,
       `CREATE INDEX IF NOT EXISTS idx_results_order ON cached_results(order_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_results_patient ON cached_results(patient_id)`
+      `CREATE INDEX IF NOT EXISTS idx_results_patient ON cached_results(patient_id)`,
     ];
 
     for (const query of tables) {
@@ -149,13 +146,7 @@ class OfflineDbService {
       VALUES (?, ?, ?, ?, ?, 0, 0)
     `;
 
-    await this.db.run(query, [
-      id,
-      collection,
-      operation,
-      JSON.stringify(data),
-      Date.now()
-    ]);
+    await this.db.run(query, [id, collection, operation, JSON.stringify(data), Date.now()]);
 
     await this.updatePendingCount();
   }
@@ -171,17 +162,19 @@ class OfflineDbService {
     `;
 
     const result = await this.db.query(query);
-    
-    return result.values?.map(row => ({
-      id: row.id,
-      collection: row.collection,
-      operation: row.operation as 'create' | 'update' | 'delete',
-      data: JSON.parse(row.data),
-      timestamp: row.timestamp,
-      synced: row.synced === 1,
-      retryCount: row.retry_count,
-      lastError: row.last_error
-    })) || [];
+
+    return (
+      result.values?.map((row) => ({
+        id: row.id,
+        collection: row.collection,
+        operation: row.operation as 'create' | 'update' | 'delete',
+        data: JSON.parse(row.data),
+        timestamp: row.timestamp,
+        synced: row.synced === 1,
+        retryCount: row.retry_count,
+        lastError: row.last_error,
+      })) || []
+    );
   }
 
   // Mark operation as synced
@@ -206,11 +199,7 @@ class OfflineDbService {
   }
 
   // Cache data locally
-  async cacheData(
-    collection: string,
-    tenantId: string,
-    data: any[]
-  ): Promise<void> {
+  async cacheData(collection: string, tenantId: string, data: any[]): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = this.getTableName(collection);
@@ -225,7 +214,7 @@ class OfflineDbService {
         INSERT INTO ${tableName} (id, tenant_id, data, last_updated)
         VALUES (?, ?, ?, ?)
       `;
-      
+
       let additionalParams = [];
       if (collection === COLLECTIONS.ORDERS && item.patientId) {
         additionalParams = [item.patientId];
@@ -238,7 +227,7 @@ class OfflineDbService {
         tenantId,
         JSON.stringify(item),
         Date.now(),
-        ...additionalParams
+        ...additionalParams,
       ]);
     }
 
@@ -246,11 +235,7 @@ class OfflineDbService {
   }
 
   // Get cached data
-  async getCachedData(
-    collection: string,
-    tenantId: string,
-    filters?: any
-  ): Promise<any[]> {
+  async getCachedData(collection: string, tenantId: string, filters?: any): Promise<any[]> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = this.getTableName(collection);
@@ -274,15 +259,12 @@ class OfflineDbService {
     query += ` ORDER BY last_updated DESC`;
 
     const result = await this.db.query(query, params);
-    
-    return result.values?.map(row => JSON.parse(row.data)) || [];
+
+    return result.values?.map((row) => JSON.parse(row.data)) || [];
   }
 
   // Get specific cached record
-  async getCachedRecord(
-    collection: string,
-    id: string
-  ): Promise<any | null> {
+  async getCachedRecord(collection: string, id: string): Promise<any | null> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = this.getTableName(collection);
@@ -290,20 +272,16 @@ class OfflineDbService {
 
     const query = `SELECT data FROM ${tableName} WHERE id = ?`;
     const result = await this.db.query(query, [id]);
-    
+
     if (result.values && result.values.length > 0) {
       return JSON.parse(result.values[0].data);
     }
-    
+
     return null;
   }
 
   // Update cached record
-  async updateCachedRecord(
-    collection: string,
-    id: string,
-    updates: any
-  ): Promise<void> {
+  async updateCachedRecord(collection: string, id: string, updates: any): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = this.getTableName(collection);
@@ -321,12 +299,8 @@ class OfflineDbService {
       SET data = ?, last_updated = ? 
       WHERE id = ?
     `;
-    
-    await this.db.run(query, [
-      JSON.stringify(updatedRecord),
-      Date.now(),
-      id
-    ]);
+
+    await this.db.run(query, [JSON.stringify(updatedRecord), Date.now(), id]);
   }
 
   // Get offline metadata
@@ -335,14 +309,14 @@ class OfflineDbService {
 
     const query = `SELECT key, value FROM offline_metadata`;
     const result = await this.db.query(query);
-    
+
     const metadata: any = {
       lastSyncTime: 0,
       pendingChanges: 0,
-      collections: {}
+      collections: {},
     };
 
-    result.values?.forEach(row => {
+    result.values?.forEach((row) => {
       if (row.key === 'metadata') {
         Object.assign(metadata, JSON.parse(row.value));
       }
@@ -362,7 +336,7 @@ class OfflineDbService {
       INSERT OR REPLACE INTO offline_metadata (key, value)
       VALUES ('metadata', ?)
     `;
-    
+
     await this.db.run(query, [JSON.stringify(updated)]);
   }
 
@@ -372,23 +346,20 @@ class OfflineDbService {
 
     const query = `SELECT COUNT(*) as count FROM offline_queue WHERE synced = 0`;
     const result = await this.db.query(query);
-    
+
     const count = result.values?.[0]?.count || 0;
     await this.updateMetadata({ pendingChanges: count });
   }
 
   // Update collection metadata
-  private async updateCollectionMetadata(
-    collection: string,
-    recordCount: number
-  ): Promise<void> {
+  private async updateCollectionMetadata(collection: string, recordCount: number): Promise<void> {
     const metadata = await this.getMetadata();
-    
+
     metadata.collections[collection] = {
       lastFetch: Date.now(),
-      recordCount
+      recordCount,
     };
-    
+
     await this.updateMetadata({ collections: metadata.collections });
   }
 
@@ -398,9 +369,9 @@ class OfflineDbService {
       [COLLECTIONS.PATIENTS]: 'cached_patients',
       [COLLECTIONS.ORDERS]: 'cached_orders',
       [COLLECTIONS.RESULTS]: 'cached_results',
-      [COLLECTIONS.TESTS]: 'cached_tests'
+      [COLLECTIONS.TESTS]: 'cached_tests',
     };
-    
+
     return mapping[collection] || null;
   }
 
@@ -411,9 +382,9 @@ class OfflineDbService {
     const tables = [
       'offline_queue',
       'cached_patients',
-      'cached_orders', 
+      'cached_orders',
       'cached_results',
-      'cached_tests'
+      'cached_tests',
     ];
 
     for (const table of tables) {
@@ -423,7 +394,7 @@ class OfflineDbService {
     await this.updateMetadata({
       lastSyncTime: 0,
       pendingChanges: 0,
-      collections: {}
+      collections: {},
     });
   }
 

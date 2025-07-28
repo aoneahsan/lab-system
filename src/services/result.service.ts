@@ -13,18 +13,14 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import type {
-  TestResult,
-  ResultStatus,
-  ResultFlag,
-} from '@/types/result.types';
+import type { TestResult, ResultStatus, ResultFlag } from '@/types/result.types';
 
 export const resultService = {
   // Get single result
   async getResult(tenantId: string, resultId: string): Promise<TestResult | null> {
     const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
       return {
         id: docSnap.id,
@@ -35,9 +31,12 @@ export const resultService = {
   },
 
   // Get results with filters
-  async getResults(tenantId: string, filter?: any): Promise<{ items: TestResult[]; total: number }> {
+  async getResults(
+    tenantId: string,
+    filter?: any
+  ): Promise<{ items: TestResult[]; total: number }> {
     let q = query(collection(db, COLLECTIONS.RESULTS));
-    
+
     if (filter?.status) {
       q = query(q, where('status', '==', filter.status));
     }
@@ -47,18 +46,21 @@ export const resultService = {
     if (filter?.orderId) {
       q = query(q, where('orderId', '==', filter.orderId));
     }
-    
+
     q = query(q, orderBy('createdAt', 'desc'));
-    
+
     const snapshot = await getDocs(q);
-    const items = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as TestResult));
-    
+    const items = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as TestResult
+    );
+
     return {
       items,
-      total: items.length
+      total: items.length,
     };
   },
   // Get results for an order
@@ -68,12 +70,15 @@ export const resultService = {
       where('orderId', '==', orderId),
       orderBy('testName')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as TestResult));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as TestResult
+    );
   },
 
   // Get results for a patient
@@ -83,25 +88,28 @@ export const resultService = {
       where('patientId', '==', patientId),
       orderBy('createdAt', 'desc')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as TestResult));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as TestResult
+    );
   },
 
   // Calculate result flag based on reference range
   calculateFlag(value: number, min?: number, max?: number): ResultFlag | undefined {
     if (!min && !max) return undefined;
-    
+
     if (min !== undefined && value < min) {
       return value < min * 0.5 ? 'LL' : 'L';
     }
     if (max !== undefined && value > max) {
       return value > max * 1.5 ? 'HH' : 'H';
     }
-    
+
     return undefined;
   },
 
@@ -156,7 +164,7 @@ export const resultService = {
           if (previousValue !== undefined) {
             const delta = Math.abs(value - previousValue);
             const deltaPercent = (delta / previousValue) * 100;
-            
+
             if (params.deltaPercent && deltaPercent > params.deltaPercent) {
               warnings.push(`Value changed by ${deltaPercent.toFixed(1)}%`);
             }
@@ -179,9 +187,9 @@ export const resultService = {
       where('testId', '==', testId),
       where('enabled', '==', true)
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -193,7 +201,6 @@ export const resultService = {
     userId: string,
     data: Omit<TestResult, 'id' | 'tenantId' | 'createdAt' | 'updatedAt'>
   ): Promise<TestResult> {
-    
     const resultData = {
       ...data,
       tenantId,
@@ -221,7 +228,7 @@ export const resultService = {
     data: Partial<TestResult>
   ): Promise<void> {
     const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
-    
+
     await updateDoc(docRef, {
       ...data,
       updatedAt: serverTimestamp(),
@@ -229,13 +236,9 @@ export const resultService = {
   },
 
   // Verify result
-  async verifyResult(
-    tenantId: string,
-    userId: string,
-    resultId: string
-  ): Promise<void> {
+  async verifyResult(tenantId: string, userId: string, resultId: string): Promise<void> {
     const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
-    
+
     await updateDoc(docRef, {
       status: 'verified',
       verifiedBy: userId,
@@ -258,7 +261,7 @@ export const resultService = {
     }
   ): Promise<void> {
     const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
-    
+
     // Create audit record
     const auditRecord = {
       tenantId,
@@ -282,11 +285,10 @@ export const resultService = {
     };
 
     // Get current result to store previous values
-    const currentResult = await getDocs(query(
-      collection(db, COLLECTIONS.RESULTS),
-      where('__name__', '==', resultId)
-    ));
-    
+    const currentResult = await getDocs(
+      query(collection(db, COLLECTIONS.RESULTS), where('__name__', '==', resultId))
+    );
+
     if (!currentResult.empty) {
       const currentData = currentResult.docs[0].data();
       auditRecord.changes.previousValue = currentData.value;
@@ -320,9 +322,9 @@ export const resultService = {
       where('action', '==', 'amendment'),
       orderBy('timestamp', 'desc')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -356,7 +358,10 @@ export const resultService = {
         testName: result.testName,
         value: result.value,
         unit: result.unit,
-        referenceRange: typeof result.referenceRange === 'string' ? { normal: result.referenceRange } : result.referenceRange,
+        referenceRange:
+          typeof result.referenceRange === 'string'
+            ? { normal: result.referenceRange }
+            : result.referenceRange,
         flag: result.flag,
         status: 'entered' as ResultStatus,
         enteredBy,
@@ -384,7 +389,7 @@ export const resultService = {
     }
   ): Promise<void> {
     const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
-    
+
     await updateDoc(resultRef, {
       isCritical: true,
       criticalMarkedAt: Timestamp.now(),
@@ -412,24 +417,22 @@ export const resultService = {
   },
 
   // Create batch results
-  async createBatchResults(
-    tenantId: string,
-    userId: string,
-    data: any
-  ): Promise<void> {
+  async createBatchResults(tenantId: string, userId: string, data: any): Promise<void> {
     const batch = [];
     const timestamp = Timestamp.now();
-    
+
     for (const result of data.results || []) {
-      batch.push(addDoc(collection(db, COLLECTIONS.RESULTS), {
-        ...result,
-        tenantId,
-        createdBy: userId,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      }));
+      batch.push(
+        addDoc(collection(db, COLLECTIONS.RESULTS), {
+          ...result,
+          tenantId,
+          createdBy: userId,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        })
+      );
     }
-    
+
     await Promise.all(batch);
   },
 
@@ -460,7 +463,7 @@ export const resultService = {
     });
   },
 
-  // Reject result  
+  // Reject result
   async rejectResult(
     tenantId: string,
     userId: string,
@@ -478,34 +481,31 @@ export const resultService = {
   },
 
   // Get result groups
-  async getResultGroups(
-    tenantId: string,
-    orderId: string
-  ): Promise<any[]> {
+  async getResultGroups(tenantId: string, orderId: string): Promise<any[]> {
     const q = query(
       collection(db, COLLECTIONS.RESULTS),
       where('orderId', '==', orderId),
       orderBy('testName')
     );
-    
+
     const snapshot = await getDocs(q);
-    const results = snapshot.docs.map(doc => ({
+    const results = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    
+
     // Group results by panel/category
     const groups: any[] = [];
     const ungrouped: any[] = [];
-    
-    results.forEach(result => {
+
+    results.forEach((result) => {
       if (result.panelId) {
-        let group = groups.find(g => g.panelId === result.panelId);
+        let group = groups.find((g) => g.panelId === result.panelId);
         if (!group) {
           group = {
             panelId: result.panelId,
             panelName: result.panelName || 'Panel',
-            results: []
+            results: [],
           };
           groups.push(group);
         }
@@ -514,15 +514,15 @@ export const resultService = {
         ungrouped.push(result);
       }
     });
-    
+
     if (ungrouped.length > 0) {
       groups.push({
         panelId: 'ungrouped',
         panelName: 'Individual Tests',
-        results: ungrouped
+        results: ungrouped,
       });
     }
-    
+
     return groups;
   },
 
@@ -544,7 +544,7 @@ export const resultService = {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    
+
     return reportRef.id;
   },
 
@@ -552,21 +552,21 @@ export const resultService = {
   async getResultStatistics(tenantId: string): Promise<any> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const q = query(
       collection(db, COLLECTIONS.RESULTS),
       where('tenantId', '==', tenantId),
       where('createdAt', '>=', Timestamp.fromDate(today))
     );
-    
+
     const snapshot = await getDocs(q);
-    const results = snapshot.docs.map(doc => doc.data());
-    
+    const results = snapshot.docs.map((doc) => doc.data());
+
     return {
       total: results.length,
-      pending: results.filter(r => r.status === 'pending').length,
-      verified: results.filter(r => r.status === 'verified').length,
-      critical: results.filter(r => r.isCritical).length,
+      pending: results.filter((r) => r.status === 'pending').length,
+      verified: results.filter((r) => r.status === 'verified').length,
+      critical: results.filter((r) => r.isCritical).length,
       todayCount: results.length,
     };
   },

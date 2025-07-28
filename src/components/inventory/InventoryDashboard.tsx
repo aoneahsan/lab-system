@@ -8,7 +8,7 @@ import {
   ClockIcon,
   ChartBarIcon,
   PlusIcon,
-  ShoppingCartIcon
+  ShoppingCartIcon,
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,25 +17,26 @@ const InventoryDashboard: React.FC = () => {
 
   const { data: summary } = useQuery({
     queryKey: ['inventory-summary'],
-    queryFn: () => inventoryService.getStockSummary()
+    queryFn: () => inventoryService.getStockSummary(),
   });
 
   const { data: alerts } = useQuery({
     queryKey: ['stock-alerts'],
-    queryFn: () => inventoryService.getStockAlerts({ acknowledged: false })
+    queryFn: () => inventoryService.getStockAlerts({ acknowledged: false }),
   });
 
   const { data: expiringItems } = useQuery({
     queryKey: ['expiring-items'],
-    queryFn: () => inventoryService.getExpiryReport(30)
+    queryFn: () => inventoryService.getExpiryReport(30),
   });
 
   const { data: lowStockItems } = useQuery({
     queryKey: ['low-stock'],
-    queryFn: () => inventoryService.getInventoryItems({ lowStock: true, limit: 5 })
+    queryFn: () => inventoryService.getInventoryItems({ lowStock: true, limit: 5 }),
   });
 
-  const criticalAlerts = alerts?.filter(a => a.severity === 'critical' || a.severity === 'high') || [];
+  const criticalAlerts =
+    alerts?.filter((a) => a.severity === 'critical' || a.severity === 'high') || [];
 
   return (
     <div className="space-y-6">
@@ -95,9 +96,7 @@ const InventoryDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Items</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {summary?.totalItems || 0}
-              </p>
+              <p className="text-2xl font-semibold text-gray-900">{summary?.totalItems || 0}</p>
             </div>
             <CubeIcon className="h-12 w-12 text-blue-500" />
           </div>
@@ -134,9 +133,7 @@ const InventoryDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Expiring Soon</p>
-              <p className="text-2xl font-semibold text-red-600">
-                {summary?.expiringCount || 0}
-              </p>
+              <p className="text-2xl font-semibold text-red-600">{summary?.expiringCount || 0}</p>
             </div>
             <ClockIcon className="h-12 w-12 text-red-500" />
           </div>
@@ -164,7 +161,10 @@ const InventoryDashboard: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {lowStockItems?.items.map((item) => (
-                  <div key={item.itemId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={item.itemId}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div>
                       <p className="text-sm font-medium text-gray-900">{item.name}</p>
                       <p className="text-xs text-gray-500">SKU: {item.sku}</p>
@@ -203,20 +203,24 @@ const InventoryDashboard: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {expiringItems?.slice(0, 5).map((item) => {
-                  const daysUntilExpiry = item.expiryDate 
-                    ? Math.ceil((new Date(item.expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                  const daysUntilExpiry = item.expiryDate
+                    ? Math.ceil(
+                        (new Date(item.expiryDate).getTime() - new Date().getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      )
                     : 0;
-                  
+
                   return (
-                    <div key={item.itemId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div
+                      key={item.itemId}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    >
                       <div>
                         <p className="text-sm font-medium text-gray-900">{item.name}</p>
                         <p className="text-xs text-gray-500">Lot: {item.lot || 'N/A'}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-red-600">
-                          {daysUntilExpiry} days
-                        </p>
+                        <p className="text-sm font-semibold text-red-600">{daysUntilExpiry} days</p>
                         <p className="text-xs text-gray-500">
                           {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : 'N/A'}
                         </p>

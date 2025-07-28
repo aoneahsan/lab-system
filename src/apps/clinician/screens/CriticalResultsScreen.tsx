@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { 
+import {
   AlertCircle,
   Phone,
   MessageSquare,
@@ -11,7 +11,7 @@ import {
   Clock,
   User,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import { useCriticalResults } from '@/hooks/useCriticalResults';
 import { useAcknowledgeResult } from '@/hooks/useAcknowledgeResult';
@@ -24,15 +24,18 @@ export function CriticalResultsScreen() {
   const { mutate: acknowledgeResult } = useAcknowledgeResult();
 
   const handleAcknowledge = (resultId: string) => {
-    acknowledgeResult({ resultId }, {
-      onSuccess: () => {
-        toast.success('Critical result acknowledged');
-        refetch();
-      },
-      onError: () => {
-        toast.error('Failed to acknowledge result');
+    acknowledgeResult(
+      { resultId },
+      {
+        onSuccess: () => {
+          toast.success('Critical result acknowledged');
+          refetch();
+        },
+        onError: () => {
+          toast.error('Failed to acknowledge result');
+        },
       }
-    });
+    );
   };
 
   const handleCall = (phoneNumber: string) => {
@@ -70,7 +73,7 @@ export function CriticalResultsScreen() {
           size="sm"
           onClick={() => setFilter('pending')}
         >
-          Pending ({results.filter(r => !r.acknowledged).length})
+          Pending ({results.filter((r) => !r.acknowledged).length})
         </Button>
         <Button
           variant={filter === 'acknowledged' ? 'primary' : 'outline'}
@@ -89,13 +92,14 @@ export function CriticalResultsScreen() {
       </div>
 
       {/* Alert Message */}
-      {filter === 'pending' && results.filter(r => !r.acknowledged).length > 0 && (
+      {filter === 'pending' && results.filter((r) => !r.acknowledged).length > 0 && (
         <Card className="p-4 bg-red-50 border-red-200">
           <div className="flex items-start space-x-2">
             <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-medium text-red-900">
-                You have {results.filter(r => !r.acknowledged).length} critical results pending acknowledgment
+                You have {results.filter((r) => !r.acknowledged).length} critical results pending
+                acknowledgment
               </p>
               <p className="text-sm text-red-700 mt-1">
                 Please review and contact patients immediately as required by protocol.
@@ -118,11 +122,12 @@ export function CriticalResultsScreen() {
           </Card>
         ) : (
           results.map((result) => {
-            const criticalityClass = criticalityColors[result.criticality as keyof typeof criticalityColors];
-            
+            const criticalityClass =
+              criticalityColors[result.criticality as keyof typeof criticalityColors];
+
             return (
-              <Card 
-                key={result.id} 
+              <Card
+                key={result.id}
                 className={`p-4 ${result.acknowledged ? 'opacity-75' : ''} ${
                   !result.acknowledged ? 'border-red-300' : ''
                 }`}
@@ -132,9 +137,7 @@ export function CriticalResultsScreen() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {result.testName}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900">{result.testName}</h3>
                         <Badge className={criticalityClass}>
                           <AlertCircle className="h-3 w-3 mr-1" />
                           {result.criticality.toUpperCase()}
@@ -163,13 +166,9 @@ export function CriticalResultsScreen() {
                       <span className="text-lg font-bold text-red-600">
                         {result.value} {result.unit}
                       </span>
-                      <span className="text-sm text-gray-600">
-                        (Ref: {result.referenceRange})
-                      </span>
+                      <span className="text-sm text-gray-600">(Ref: {result.referenceRange})</span>
                     </div>
-                    <p className="text-sm text-red-700 mt-1">
-                      {result.criticalMessage}
-                    </p>
+                    <p className="text-sm text-red-700 mt-1">{result.criticalMessage}</p>
                   </div>
 
                   {/* Timeline */}
@@ -178,9 +177,7 @@ export function CriticalResultsScreen() {
                       <Clock className="h-4 w-4 mr-1" />
                       {formatDistanceToNow(new Date(result.resultDate), { addSuffix: true })}
                     </span>
-                    <span>
-                      Reported: {format(new Date(result.resultDate), 'MMM d, h:mm a')}
-                    </span>
+                    <span>Reported: {format(new Date(result.resultDate), 'MMM d, h:mm a')}</span>
                   </div>
 
                   {/* Actions */}
@@ -204,11 +201,7 @@ export function CriticalResultsScreen() {
                         <Phone className="h-4 w-4 mr-1" />
                         Call Patient
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleMessage()}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => handleMessage()}>
                         <MessageSquare className="h-4 w-4" />
                       </Button>
                     </div>
@@ -222,9 +215,7 @@ export function CriticalResultsScreen() {
                         {format(new Date(result.acknowledgedAt), 'MMM d, yyyy h:mm a')}
                       </p>
                       {result.acknowledgedNote && (
-                        <p className="text-green-700 mt-1">
-                          Note: {result.acknowledgedNote}
-                        </p>
+                        <p className="text-green-700 mt-1">Note: {result.acknowledgedNote}</p>
                       )}
                     </div>
                   )}

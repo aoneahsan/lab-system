@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FileText, 
-  Activity, 
-  Cpu, 
+import {
+  FileText,
+  Activity,
+  Cpu,
   AlertCircle,
   CheckCircle,
   Clock,
   TrendingUp,
   Package,
-  BarChart
+  BarChart,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -28,7 +28,7 @@ interface DashboardStats {
 const LabStaffHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
-  
+
   // Mock stats - in real app would fetch from API
   const [stats] = useState<DashboardStats>({
     pendingResults: 45,
@@ -38,8 +38,8 @@ const LabStaffHomePage: React.FC = () => {
     criticalResults: 5,
     tat: {
       average: '2.3 hrs',
-      onTime: 92
-    }
+      onTime: 92,
+    },
   });
 
   const quickActions = [
@@ -49,7 +49,7 @@ const LabStaffHomePage: React.FC = () => {
       subtitle: `${stats.pendingResults} pending`,
       color: 'bg-blue-500',
       path: '/results',
-      priority: 'high'
+      priority: 'high',
     },
     {
       icon: Activity,
@@ -57,7 +57,7 @@ const LabStaffHomePage: React.FC = () => {
       subtitle: `${stats.qcDue} due today`,
       color: 'bg-green-500',
       path: '/qc',
-      priority: stats.qcDue > 0 ? 'medium' : 'low'
+      priority: stats.qcDue > 0 ? 'medium' : 'low',
     },
     {
       icon: Cpu,
@@ -65,7 +65,7 @@ const LabStaffHomePage: React.FC = () => {
       subtitle: `${stats.equipmentAlerts} alerts`,
       color: stats.equipmentAlerts > 0 ? 'bg-orange-500' : 'bg-gray-500',
       path: '/equipment',
-      priority: stats.equipmentAlerts > 0 ? 'high' : 'low'
+      priority: stats.equipmentAlerts > 0 ? 'high' : 'low',
     },
   ];
 
@@ -75,29 +75,29 @@ const LabStaffHomePage: React.FC = () => {
       type: 'result',
       message: 'CBC completed for John Doe',
       time: '5 min ago',
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '2',
       type: 'qc',
       message: 'Chemistry QC Level 2 passed',
       time: '15 min ago',
-      status: 'passed'
+      status: 'passed',
     },
     {
       id: '3',
       type: 'critical',
       message: 'Critical glucose value - Jane Smith',
       time: '30 min ago',
-      status: 'critical'
+      status: 'critical',
     },
     {
       id: '4',
       type: 'equipment',
       message: 'Analyzer A1 maintenance due',
       time: '1 hour ago',
-      status: 'warning'
-    }
+      status: 'warning',
+    },
   ];
 
   const getActivityIcon = (type: string) => {
@@ -139,7 +139,11 @@ const LabStaffHomePage: React.FC = () => {
               Welcome, {currentUser?.displayName?.split(' ')[0] || 'Lab Tech'}
             </h1>
             <p className="text-purple-100 mt-1">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })}
             </p>
           </div>
         </div>
@@ -176,12 +180,15 @@ const LabStaffHomePage: React.FC = () => {
                 onClick={() => navigate(action.path)}
                 className="bg-white rounded-xl p-4 shadow-sm relative"
               >
-                {action.priority === 'high' && stats[action.path === '/results' ? 'pendingResults' : 'equipmentAlerts'] > 0 && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                    {action.path === '/results' ? stats.pendingResults : stats.equipmentAlerts}
-                  </div>
-                )}
-                <div className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}>
+                {action.priority === 'high' &&
+                  stats[action.path === '/results' ? 'pendingResults' : 'equipmentAlerts'] > 0 && (
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                      {action.path === '/results' ? stats.pendingResults : stats.equipmentAlerts}
+                    </div>
+                  )}
+                <div
+                  className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}
+                >
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <p className="text-sm font-medium text-gray-900">{action.title}</p>

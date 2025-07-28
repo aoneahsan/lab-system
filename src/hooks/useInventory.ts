@@ -7,10 +7,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { inventoryService } from '@/services/inventory.service';
 import { useTenant } from '@/hooks/useTenant';
 import { useAuthStore } from '@/stores/auth.store';
-import type { 
-  InventoryItemFormData, 
+import type {
+  InventoryItemFormData,
   StockTransactionFormData,
-  PurchaseOrder
+  PurchaseOrder,
 } from '@/types/inventory.types';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { toast } from '@/hooks/useToast';
@@ -19,12 +19,17 @@ import { toast } from '@/hooks/useToast';
 const QUERY_KEYS = {
   items: (tenantId: string) => ['inventory', 'items', tenantId],
   item: (tenantId: string, itemId: string) => ['inventory', 'item', tenantId, itemId],
-  transactions: (tenantId: string, itemId: string) => ['inventory', 'transactions', tenantId, itemId],
+  transactions: (tenantId: string, itemId: string) => [
+    'inventory',
+    'transactions',
+    tenantId,
+    itemId,
+  ],
   lots: (tenantId: string, itemId: string) => ['inventory', 'lots', tenantId, itemId],
   reorderItems: (tenantId: string) => ['inventory', 'reorder', tenantId],
   expiringItems: (tenantId: string) => ['inventory', 'expiring', tenantId],
   alerts: (tenantId: string) => ['inventory', 'alerts', tenantId],
-  value: (tenantId: string) => ['inventory', 'value', tenantId]
+  value: (tenantId: string) => ['inventory', 'value', tenantId],
 };
 
 /**
@@ -41,7 +46,9 @@ export function useInventoryItems(
   const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: tenant?.id ? [...QUERY_KEYS.items(tenant.id), filters, pageSize] : ['inventory-no-tenant'],
+    queryKey: tenant?.id
+      ? [...QUERY_KEYS.items(tenant.id), filters, pageSize]
+      : ['inventory-no-tenant'],
     queryFn: async ({ pageParam }) => {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getItems(
@@ -51,7 +58,7 @@ export function useInventoryItems(
         pageParam as DocumentSnapshot | undefined
       );
     },
-    enabled: !!tenant?.id
+    enabled: !!tenant?.id,
   });
 }
 
@@ -67,7 +74,7 @@ export function useInventoryItem(itemId: string) {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getItem(tenant.id, itemId);
     },
-    enabled: !!tenant?.id && !!itemId
+    enabled: !!tenant?.id && !!itemId,
   });
 }
 
@@ -93,7 +100,7 @@ export function useCreateInventoryItem() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create inventory item');
-    }
+    },
   });
 }
 
@@ -120,7 +127,7 @@ export function useUpdateInventoryItem(itemId: string) {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update inventory item');
-    }
+    },
   });
 }
 
@@ -141,20 +148,22 @@ export function useRecordTransaction() {
     onSuccess: (_, variables) => {
       if (tenant?.id) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.item(tenant.id, variables.itemId) });
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.transactions(tenant.id, variables.itemId) });
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.transactions(tenant.id, variables.itemId),
+        });
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.items(tenant.id) });
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.alerts(tenant.id) });
-        
+
         if (variables.lotNumber) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.lots(tenant.id, variables.itemId) });
         }
       }
-      
+
       toast.success('Stock transaction recorded successfully');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to record transaction');
-    }
+    },
   });
 }
 
@@ -165,7 +174,9 @@ export function useStockTransactions(itemId: string, pageSize: number = 50) {
   const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: tenant?.id ? [...QUERY_KEYS.transactions(tenant.id, itemId), pageSize] : ['transactions-no-tenant'],
+    queryKey: tenant?.id
+      ? [...QUERY_KEYS.transactions(tenant.id, itemId), pageSize]
+      : ['transactions-no-tenant'],
     queryFn: async ({ pageParam }) => {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getTransactions(
@@ -175,7 +186,7 @@ export function useStockTransactions(itemId: string, pageSize: number = 50) {
         pageParam as DocumentSnapshot | undefined
       );
     },
-    enabled: !!tenant?.id && !!itemId
+    enabled: !!tenant?.id && !!itemId,
   });
 }
 
@@ -191,7 +202,7 @@ export function useActiveLots(itemId: string) {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getActiveLots(tenant.id, itemId);
     },
-    enabled: !!tenant?.id && !!itemId
+    enabled: !!tenant?.id && !!itemId,
   });
 }
 
@@ -207,7 +218,7 @@ export function useReorderItems() {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getReorderItems(tenant.id);
     },
-    enabled: !!tenant?.id
+    enabled: !!tenant?.id,
   });
 }
 
@@ -218,12 +229,14 @@ export function useExpiringItems(daysAhead: number = 30) {
   const { tenant } = useTenant();
 
   return useQuery({
-    queryKey: tenant?.id ? [...QUERY_KEYS.expiringItems(tenant.id), daysAhead] : ['expiring-no-tenant'],
+    queryKey: tenant?.id
+      ? [...QUERY_KEYS.expiringItems(tenant.id), daysAhead]
+      : ['expiring-no-tenant'],
     queryFn: () => {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getExpiringItems(tenant.id, daysAhead);
     },
-    enabled: !!tenant?.id
+    enabled: !!tenant?.id,
   });
 }
 
@@ -240,7 +253,7 @@ export function useInventoryAlerts() {
       return inventoryService.getActiveAlerts(tenant.id);
     },
     enabled: !!tenant?.id,
-    refetchInterval: 60000 // Refresh every minute
+    refetchInterval: 60000, // Refresh every minute
   });
 }
 
@@ -266,7 +279,7 @@ export function useAcknowledgeAlert() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to acknowledge alert');
-    }
+    },
   });
 }
 
@@ -282,7 +295,7 @@ export function useInventoryValue() {
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.getInventoryValue(tenant.id);
     },
-    enabled: !!tenant?.id
+    enabled: !!tenant?.id,
   });
 }
 
@@ -295,7 +308,9 @@ export function useCreatePurchaseOrder() {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: Omit<PurchaseOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: (
+      data: Omit<PurchaseOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'updatedAt'>
+    ) => {
       if (!currentUser) throw new Error('User not authenticated');
       if (!tenant?.id) throw new Error('No tenant');
       return inventoryService.createPurchaseOrder(tenant.id, data, currentUser.id);
@@ -308,7 +323,7 @@ export function useCreatePurchaseOrder() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create purchase order');
-    }
+    },
   });
 }
 
@@ -334,6 +349,6 @@ export function useUpdatePurchaseOrderStatus() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update purchase order status');
-    }
+    },
   });
 }

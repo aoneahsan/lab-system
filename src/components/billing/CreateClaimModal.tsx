@@ -24,7 +24,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
   const { tenant } = useTenant();
   const { currentUser: user } = useAuthStore();
   const queryClient = useQueryClient();
-  
+
   const { data: invoices = [] } = useInvoices();
   const { data: insuranceProviders = [] } = useInsuranceProviders();
   const { data: patientsData } = usePatients();
@@ -54,12 +54,17 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
       onClose();
     },
     onError: (error) => {
-      toast.error('Failed to Create Claim', error instanceof Error ? error.message : 'An error occurred');
+      toast.error(
+        'Failed to Create Claim',
+        error instanceof Error ? error.message : 'An error occurred'
+      );
     },
   });
 
-  const selectedInvoice = invoices.find(inv => inv.id === formData.invoiceId);
-  const selectedPatient = selectedInvoice ? patients.find(p => p.id === selectedInvoice.patientId) : null;
+  const selectedInvoice = invoices.find((inv) => inv.id === formData.invoiceId);
+  const selectedPatient = selectedInvoice
+    ? patients.find((p) => p.id === selectedInvoice.patientId)
+    : null;
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -89,7 +94,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
         serviceDate: formData.serviceDate!,
         primaryDiagnosis: formData.primaryDiagnosis!,
         secondaryDiagnoses: formData.secondaryDiagnoses || [],
-        services: selectedInvoice.items.map(item => ({
+        services: selectedInvoice.items.map((item) => ({
           serviceDate: Timestamp.fromDate(formData.serviceDate!),
           cptCode: item.cptCode || '',
           units: item.quantity,
@@ -116,10 +121,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
                 <FileText className="h-5 w-5" />
                 Create Insurance Claim
               </h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-500"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -140,11 +142,14 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
                   }`}
                 >
                   <option value="">Select invoice</option>
-                  {invoices.filter(inv => inv.status !== 'cancelled').map((invoice) => (
-                    <option key={invoice.id} value={invoice.id}>
-                      #{invoice.invoiceNumber} - ${invoice.totalAmount.toFixed(2)} - {invoice.status}
-                    </option>
-                  ))}
+                  {invoices
+                    .filter((inv) => inv.status !== 'cancelled')
+                    .map((invoice) => (
+                      <option key={invoice.id} value={invoice.id}>
+                        #{invoice.invoiceNumber} - ${invoice.totalAmount.toFixed(2)} -{' '}
+                        {invoice.status}
+                      </option>
+                    ))}
                 </select>
                 {errors.invoiceId && (
                   <p className="text-sm text-red-600 mt-1">{errors.invoiceId}</p>
@@ -156,9 +161,16 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Patient Information</h4>
                   <div className="text-sm text-gray-600">
-                    <p><span className="font-medium">Name:</span> {selectedPatient.fullName}</p>
-                    <p><span className="font-medium">DOB:</span> {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}</p>
-                    <p><span className="font-medium">Patient ID:</span> {selectedPatient.patientId}</p>
+                    <p>
+                      <span className="font-medium">Name:</span> {selectedPatient.fullName}
+                    </p>
+                    <p>
+                      <span className="font-medium">DOB:</span>{' '}
+                      {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <span className="font-medium">Patient ID:</span> {selectedPatient.patientId}
+                    </p>
                   </div>
                 </div>
               )}
@@ -194,8 +206,14 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
                 </label>
                 <input
                   type="date"
-                  value={formData.serviceDate ? new Date(formData.serviceDate).toISOString().split('T')[0] : ''}
-                  onChange={(e) => setFormData({ ...formData, serviceDate: new Date(e.target.value) })}
+                  value={
+                    formData.serviceDate
+                      ? new Date(formData.serviceDate).toISOString().split('T')[0]
+                      : ''
+                  }
+                  onChange={(e) =>
+                    setFormData({ ...formData, serviceDate: new Date(e.target.value) })
+                  }
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.serviceDate ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -247,9 +265,7 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

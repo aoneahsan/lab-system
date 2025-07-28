@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  Activity, 
-  Plus, 
-  AlertTriangle, 
-  CheckCircle, 
+import {
+  Activity,
+  Plus,
+  AlertTriangle,
+  CheckCircle,
   Clock,
   TrendingUp,
-  Package
+  Package,
 } from 'lucide-react';
 import { useQCDashboard, useQCRuns, useCreateQCRun } from '@/hooks/useQC';
 import QCRunForm from '@/components/qc/QCRunForm';
@@ -15,7 +15,7 @@ import type { QCRunFormData, QCFilter } from '@/types/qc.types';
 const QualityControlPage: React.FC = () => {
   const [showRunForm, setShowRunForm] = useState(false);
   const [filter] = useState<QCFilter>({});
-  
+
   const { data: dashboard } = useQCDashboard();
   const { data: runs = [], isLoading: runsLoading } = useQCRuns(filter);
   // const { data: materials = [] } = useQCMaterials();
@@ -49,7 +49,7 @@ const QualityControlPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">New QC Run</h1>
           <p className="text-gray-600 mt-2">Enter quality control results</p>
         </div>
-        
+
         <QCRunForm
           onSubmit={handleCreateRun}
           onCancel={() => setShowRunForm(false)}
@@ -69,7 +69,7 @@ const QualityControlPage: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={() => window.location.href = '/quality-control/materials'}
+              onClick={() => (window.location.href = '/quality-control/materials')}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
               <Package className="inline h-4 w-4 mr-1" />
@@ -98,27 +98,31 @@ const QualityControlPage: React.FC = () => {
               <Activity className="h-8 w-8 text-blue-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pass Rate</p>
-                <p className="text-2xl font-bold text-green-600">{dashboard.passRate.toFixed(1)}%</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {dashboard.passRate.toFixed(1)}%
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Failure Rate</p>
-                <p className="text-2xl font-bold text-red-600">{dashboard.failureRate.toFixed(1)}%</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {dashboard.failureRate.toFixed(1)}%
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -139,10 +143,10 @@ const QualityControlPage: React.FC = () => {
             <div>
               <h3 className="font-medium text-yellow-900">Expiring Materials</h3>
               <ul className="mt-1 text-sm text-yellow-800">
-                {dashboard.expiringMaterials.slice(0, 3).map(material => (
+                {dashboard.expiringMaterials.slice(0, 3).map((material) => (
                   <li key={material.id}>
-                    {material.name} (Lot: {material.lotNumber}) - 
-                    Expires in {material.daysUntilExpiration} days
+                    {material.name} (Lot: {material.lotNumber}) - Expires in{' '}
+                    {material.daysUntilExpiration} days
                   </li>
                 ))}
               </ul>
@@ -156,7 +160,7 @@ const QualityControlPage: React.FC = () => {
         <div className="px-6 py-4 border-b">
           <h2 className="text-lg font-medium text-gray-900">Recent QC Runs</h2>
         </div>
-        
+
         {runsLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -232,20 +236,19 @@ const QualityControlPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {run.results.filter(r => r.status === 'pass').length}/{run.results.length} passed
+                        {run.results.filter((r) => r.status === 'pass').length}/{run.results.length}{' '}
+                        passed
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => window.location.href = `/quality-control/runs/${run.id}`}
+                        onClick={() => (window.location.href = `/quality-control/runs/${run.id}`)}
                         className="text-blue-600 hover:text-blue-900 mr-3"
                       >
                         View
                       </button>
                       {run.status === 'completed' && !run.reviewedBy && (
-                        <button className="text-purple-600 hover:text-purple-900">
-                          Review
-                        </button>
+                        <button className="text-purple-600 hover:text-purple-900">Review</button>
                       )}
                     </td>
                   </tr>
@@ -267,17 +270,21 @@ const QualityControlPage: React.FC = () => {
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {dashboard.byTest.slice(0, 6).map(test => (
+              {dashboard.byTest.slice(0, 6).map((test) => (
                 <div key={test.testCode} className="border rounded-lg p-4">
                   <h4 className="font-medium text-gray-900">{test.testName}</h4>
                   <div className="mt-2 space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Pass Rate:</span>
-                      <span className={`font-medium ${
-                        test.passRate >= 95 ? 'text-green-600' : 
-                        test.passRate >= 90 ? 'text-yellow-600' : 
-                        'text-red-600'
-                      }`}>
+                      <span
+                        className={`font-medium ${
+                          test.passRate >= 95
+                            ? 'text-green-600'
+                            : test.passRate >= 90
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
+                        }`}
+                      >
                         {test.passRate.toFixed(1)}%
                       </span>
                     </div>

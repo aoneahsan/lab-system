@@ -8,7 +8,7 @@ export default function OrderList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
-  
+
   const { orders, loading, fetchTestOrders, searchOrders } = useOrderStore();
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function OrderList() {
     } else {
       fetchTestOrders({
         status: filterStatus === 'all' ? undefined : filterStatus,
-        priority: filterPriority === 'all' ? undefined : filterPriority
+        priority: filterPriority === 'all' ? undefined : filterPriority,
       });
     }
   }, [filterStatus, filterPriority, searchTerm, fetchTestOrders, searchOrders]);
@@ -93,7 +93,7 @@ export default function OrderList() {
               className="pl-10 input"
             />
           </div>
-          
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -165,9 +165,7 @@ export default function OrderList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {order.patientName}
-                      </div>
+                      <div className="text-sm font-medium text-gray-900">{order.patientName}</div>
                       <div className="text-sm text-gray-500">
                         DOB: {new Date(order.patientDOB).toLocaleDateString()}
                       </div>
@@ -181,17 +179,28 @@ export default function OrderList() {
                       {order.tests.length} test{order.tests.length !== 1 ? 's' : ''}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {order.tests.slice(0, 2).map(t => t.testCode).join(', ')}
+                      {order.tests
+                        .slice(0, 2)
+                        .map((t) => t.testCode)
+                        .join(', ')}
                       {order.tests.length > 2 && '...'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(order.priority)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
+                        order.priority
+                      )}`}
+                    >
                       {order.priority.toUpperCase()}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
                       {order.status.replace('_', ' ')}
                     </span>
                   </td>
@@ -199,13 +208,9 @@ export default function OrderList() {
                     {order.orderDate.toDate().toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                      View
-                    </button>
+                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
                     {order.status === 'pending' && (
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        Collect
-                      </button>
+                      <button className="text-indigo-600 hover:text-indigo-900">Collect</button>
                     )}
                   </td>
                 </tr>
@@ -215,9 +220,7 @@ export default function OrderList() {
         </div>
 
         {orders.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            No orders found
-          </div>
+          <div className="text-center py-12 text-gray-500">No orders found</div>
         )}
       </div>
     </div>

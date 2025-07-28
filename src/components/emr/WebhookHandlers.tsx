@@ -81,9 +81,7 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
         <div className="bg-gray-50 rounded-lg p-6">
           <form onSubmit={handleCreateEndpoint} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Webhook URL
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Webhook URL</label>
               <input
                 type="url"
                 value={formData.url}
@@ -154,9 +152,7 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
         <div className="text-center py-8 bg-gray-50 rounded-lg">
           <Webhook className="h-12 w-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500">No webhook endpoints configured</p>
-          <p className="text-sm text-gray-400 mt-1">
-            Add an endpoint to receive real-time updates
-          </p>
+          <p className="text-sm text-gray-400 mt-1">Add an endpoint to receive real-time updates</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -213,7 +209,9 @@ const WebhookHandlers: React.FC<WebhookHandlersProps> = ({ connectionId }) => {
                     className="text-sm border border-gray-300 rounded px-2 py-1"
                     defaultValue=""
                   >
-                    <option value="" disabled>Test webhook...</option>
+                    <option value="" disabled>
+                      Test webhook...
+                    </option>
                     {endpoint.events.map((event) => (
                       <option key={event} value={event}>
                         Test {event}

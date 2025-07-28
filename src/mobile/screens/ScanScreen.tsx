@@ -35,7 +35,7 @@ const ScanScreen: React.FC = () => {
   const handleScanResult = (content: string) => {
     // Parse the barcode content and navigate to appropriate screen
     console.log('Scanned:', content);
-    
+
     // Example: Navigate to collection detail if it's an order barcode
     if (content.startsWith('ORD-')) {
       navigate(`/phlebotomist/collection/${content}`);
@@ -81,9 +81,7 @@ const ScanScreen: React.FC = () => {
 
             {/* Manual Entry */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-sm font-medium text-gray-700 mb-3">
-                Or enter code manually
-              </h2>
+              <h2 className="text-sm font-medium text-gray-700 mb-3">Or enter code manually</h2>
               <form onSubmit={handleManualSubmit} className="space-y-3">
                 <input
                   type="text"
@@ -114,9 +112,7 @@ const ScanScreen: React.FC = () => {
 
             {/* Instructions */}
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
-                Position the barcode within the scanner frame
-              </p>
+              <p className="text-sm text-gray-600">Position the barcode within the scanner frame</p>
               <p className="text-xs text-gray-500">
                 Supported formats: Order barcodes, Sample barcodes
               </p>

@@ -13,7 +13,7 @@ const LAST_AUTH_KEY = 'labflow_last_biometric_auth';
 
 class BiometricService {
   private config: BiometricAuthConfig = DEFAULT_BIOMETRIC_CONFIG;
-  
+
   /**
    * Check if biometric authentication is available and enrolled
    */
@@ -23,7 +23,7 @@ class BiometricService {
       const isAvailable = result.available || false;
       const biometryType = (result as any).biometryType || 'unknown';
       const errorMessage = (result as any).error;
-      
+
       if (!isAvailable) {
         return {
           isAvailable: false,
@@ -31,12 +31,12 @@ class BiometricService {
           errorMessage: errorMessage || 'Biometric authentication not available',
         };
       }
-      
+
       // Check if user has enrolled biometrics
       // Note: capacitor-biometric-authentication doesn't have a separate isEnrolled method
       // If biometrics are available, we assume they are enrolled
       const isEnrolled = true;
-      
+
       return {
         isAvailable: true,
         isEnrolled,
@@ -51,14 +51,14 @@ class BiometricService {
       };
     }
   }
-  
+
   /**
    * Authenticate using biometrics
    */
   async authenticate(config?: Partial<BiometricAuthConfig>): Promise<BiometricAuthResult> {
     try {
       const authConfig = { ...this.config, ...config };
-      
+
       const result = await BiometricAuth.authenticate({
         message: authConfig.reason || DEFAULT_BIOMETRIC_CONFIG.reason || '',
         fallbackTitle: authConfig.fallbackTitle,
@@ -68,15 +68,19 @@ class BiometricService {
         androidBiometryDescription: authConfig.androidBiometryDescription,
         androidBiometryNegativeButtonText: authConfig.androidBiometryNegativeButtonText,
       } as any);
-      
+
       if (result.success) {
         // Update last auth timestamp
         await this.updateLastAuthTime();
       }
-      
+
       return {
         success: result.success,
-        error: result.error ? (typeof result.error === 'string' ? result.error : result.error.message) : undefined,
+        error: result.error
+          ? typeof result.error === 'string'
+            ? result.error
+            : result.error.message
+          : undefined,
         errorCode: result.error && typeof result.error === 'object' ? result.error.code : undefined,
       };
     } catch (error) {
@@ -88,7 +92,7 @@ class BiometricService {
       };
     }
   }
-  
+
   /**
    * Get user's biometric preferences
    */
@@ -103,7 +107,7 @@ class BiometricService {
     }
     return DEFAULT_BIOMETRIC_PREFERENCES;
   }
-  
+
   /**
    * Save user's biometric preferences
    */
@@ -118,7 +122,7 @@ class BiometricService {
       throw error;
     }
   }
-  
+
   /**
    * Check if recent authentication is required
    */
@@ -128,23 +132,23 @@ class BiometricService {
       if (!prefs.requireRecentAuth) {
         return false;
       }
-      
+
       const { value } = await Preferences.get({ key: LAST_AUTH_KEY });
       if (!value) {
         return true;
       }
-      
+
       const lastAuthTime = parseInt(value, 10);
       const now = Date.now();
       const thresholdMs = prefs.recentAuthThresholdMinutes * 60 * 1000;
-      
-      return (now - lastAuthTime) > thresholdMs;
+
+      return now - lastAuthTime > thresholdMs;
     } catch (error) {
       console.error('Error checking recent auth:', error);
       return true; // Require auth on error
     }
   }
-  
+
   /**
    * Update last authentication time
    */
@@ -158,7 +162,7 @@ class BiometricService {
       console.error('Error updating last auth time:', error);
     }
   }
-  
+
   /**
    * Clear biometric data (used on logout)
    */
@@ -172,7 +176,7 @@ class BiometricService {
       console.error('Error clearing biometric data:', error);
     }
   }
-  
+
   /**
    * Configure default settings
    */

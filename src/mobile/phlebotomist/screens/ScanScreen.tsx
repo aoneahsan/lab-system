@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  QrCode, 
-  Camera, 
-  Flashlight, 
-  X, 
+import {
+  QrCode,
+  Camera,
+  Flashlight,
+  X,
   CheckCircle,
   AlertCircle,
   Package,
   User,
   FileText,
-  Clipboard
+  Clipboard,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { barcodeScannerService } from '@/services/barcode-scanner.service';
@@ -60,7 +60,7 @@ export const ScanScreen: React.FC = () => {
 
     try {
       const result = await barcodeScannerService.startScan();
-      
+
       if (result && result.hasContent) {
         handleScanResult(result);
       } else {
@@ -76,11 +76,11 @@ export const ScanScreen: React.FC = () => {
 
   const handleScanResult = (result: ScanResult) => {
     const parsedData = barcodeScannerService.parseBarcode(result.content);
-    
+
     if (parsedData) {
       setScanResult(parsedData);
       addToHistory(parsedData, result.content, true);
-      
+
       // Navigate based on scan type
       setTimeout(() => {
         switch (parsedData.type) {
@@ -107,7 +107,7 @@ export const ScanScreen: React.FC = () => {
       type: data?.type || 'sample',
       content,
       timestamp: new Date(),
-      success
+      success,
     };
 
     const updatedHistory = [newEntry, ...scanHistory].slice(0, 20); // Keep last 20 scans
@@ -117,7 +117,7 @@ export const ScanScreen: React.FC = () => {
 
   const toggleTorch = async () => {
     if (!isScanning) return;
-    
+
     await barcodeScannerService.toggleTorch();
     const newState = await barcodeScannerService.getTorchState();
     setTorchEnabled(newState);
@@ -129,7 +129,7 @@ export const ScanScreen: React.FC = () => {
   };
 
   const getScanTypeInfo = (type: BarcodeData['type']) => {
-    return scanTypes.find(t => t.id === type) || scanTypes[0];
+    return scanTypes.find((t) => t.id === type) || scanTypes[0];
   };
 
   if (!barcodeScannerService.isSupported()) {
@@ -141,8 +141,8 @@ export const ScanScreen: React.FC = () => {
             <div>
               <p className="font-medium text-yellow-800">Scanner Not Available</p>
               <p className="text-sm text-yellow-700 mt-1">
-                Barcode scanning is only available on mobile devices. 
-                Please use the LabFlow mobile app for scanning functionality.
+                Barcode scanning is only available on mobile devices. Please use the LabFlow mobile
+                app for scanning functionality.
               </p>
             </div>
           </div>
@@ -169,9 +169,7 @@ export const ScanScreen: React.FC = () => {
           {/* Header */}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Barcode Scanner</h1>
-            <p className="text-gray-600 mt-1">
-              Scan sample tubes, patient IDs, or test orders
-            </p>
+            <p className="text-gray-600 mt-1">Scan sample tubes, patient IDs, or test orders</p>
           </div>
 
           {/* Scan Types */}
@@ -267,18 +265,13 @@ export const ScanScreen: React.FC = () => {
                       ))}
                     </div>
                     <div className="p-3 border-t border-gray-200">
-                      <button
-                        onClick={clearHistory}
-                        className="text-sm text-red-600 font-medium"
-                      >
+                      <button onClick={clearHistory} className="text-sm text-red-600 font-medium">
                         Clear History
                       </button>
                     </div>
                   </>
                 ) : (
-                  <p className="p-4 text-sm text-gray-500 text-center">
-                    No scan history
-                  </p>
+                  <p className="p-4 text-sm text-gray-500 text-center">No scan history</p>
                 )}
               </div>
             )}
@@ -288,15 +281,12 @@ export const ScanScreen: React.FC = () => {
         /* Scanner View */
         <div className="fixed inset-0 bg-black z-50">
           <div className="absolute inset-0 scanner-viewport" />
-          
+
           {/* Scanner UI Overlay */}
           <div className="absolute inset-0 flex flex-col">
             {/* Header */}
             <div className="bg-black/50 p-4 flex items-center justify-between">
-              <button
-                onClick={() => barcodeScannerService.stopScan()}
-                className="text-white p-2"
-              >
+              <button onClick={() => barcodeScannerService.stopScan()} className="text-white p-2">
                 <X className="h-6 w-6" />
               </button>
               <p className="text-white font-medium">Scanning...</p>

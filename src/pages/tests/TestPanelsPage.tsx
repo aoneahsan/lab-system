@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Package } from 'lucide-react';
-import { useTestPanels, useCreateTestPanel, useUpdateTestPanel, useDeleteTestPanel } from '@/hooks/useTests';
+import {
+  useTestPanels,
+  useCreateTestPanel,
+  useUpdateTestPanel,
+  useDeleteTestPanel,
+} from '@/hooks/useTests';
 import TestPanelForm from '@/components/tests/TestPanelForm';
 import type { TestPanel } from '@/types/test.types';
 
@@ -70,7 +75,9 @@ const TestPanelsPage: React.FC = () => {
             {editingPanel ? 'Edit Test Panel' : 'Create Test Panel'}
           </h1>
           <p className="text-gray-600 mt-2">
-            {editingPanel ? 'Update panel information' : 'Create a new test panel with multiple tests'}
+            {editingPanel
+              ? 'Update panel information'
+              : 'Create a new test panel with multiple tests'}
           </p>
         </div>
 
@@ -113,7 +120,9 @@ const TestPanelsPage: React.FC = () => {
       ) : panels.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No test panels found. Create your first panel to get started.</p>
+          <p className="text-gray-500">
+            No test panels found. Create your first panel to get started.
+          </p>
           <button
             onClick={() => setShowAddForm(true)}
             className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -132,9 +141,7 @@ const TestPanelsPage: React.FC = () => {
                 </div>
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    panel.isActive
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
+                    panel.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {panel.isActive ? 'Active' : 'Inactive'}
@@ -145,13 +152,9 @@ const TestPanelsPage: React.FC = () => {
                 <p className="text-sm text-gray-600">
                   Category: <span className="capitalize">{panel.category}</span>
                 </p>
-                <p className="text-sm text-gray-600">
-                  Tests: {panel.testIds.length}
-                </p>
+                <p className="text-sm text-gray-600">Tests: {panel.testIds.length}</p>
                 {panel.totalCost && (
-                  <p className="text-sm text-gray-600">
-                    Total Cost: ${panel.totalCost.toFixed(2)}
-                  </p>
+                  <p className="text-sm text-gray-600">Total Cost: ${panel.totalCost.toFixed(2)}</p>
                 )}
               </div>
 

@@ -58,7 +58,7 @@ const SamplesPage: React.FC = () => {
   };
 
   const handleShowQR = async (sample: Sample) => {
-    const patient = patients.find(p => p.id === sample.patientId);
+    const patient = patients.find((p) => p.id === sample.patientId);
     if (!patient) return;
 
     const sampleLabel: SampleLabel = {
@@ -83,7 +83,7 @@ const SamplesPage: React.FC = () => {
   };
 
   const handlePrintLabel = async (sample: Sample) => {
-    const patient = patients.find(p => p.id === sample.patientId);
+    const patient = patients.find((p) => p.id === sample.patientId);
     if (!patient) return;
 
     const sampleLabel: SampleLabel = {
@@ -207,12 +207,14 @@ const SamplesPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow p-6 md:col-span-2">
             <p className="text-sm text-gray-600 mb-2">By Status</p>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              {Object.entries(statistics.samplesByStatus || {}).slice(0, 4).map(([status, count]) => (
-                <div key={status} className="flex justify-between">
-                  <span className="capitalize">{status.replace('_', ' ')}:</span>
-                  <span className={`font-medium ${getStatusColor(status, count)}`}>{count}</span>
-                </div>
-              ))}
+              {Object.entries(statistics.samplesByStatus || {})
+                .slice(0, 4)
+                .map(([status, count]) => (
+                  <div key={status} className="flex justify-between">
+                    <span className="capitalize">{status.replace('_', ' ')}:</span>
+                    <span className={`font-medium ${getStatusColor(status, count)}`}>{count}</span>
+                  </div>
+                ))}
             </div>
           </div>
         </div>
@@ -231,7 +233,9 @@ const SamplesPage: React.FC = () => {
         ) : samples.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No samples found. Start collecting samples to track them.</p>
+            <p className="text-gray-500">
+              No samples found. Start collecting samples to track them.
+            </p>
             <button
               onClick={() => setShowAddForm(true)}
               className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -255,7 +259,10 @@ const SamplesPage: React.FC = () => {
       {showQRModal && selectedSample && qrCodeData && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={() => setShowQRModal(false)} />
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75"
+              onClick={() => setShowQRModal(false)}
+            />
             <div className="relative bg-white rounded-lg max-w-md w-full p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
                 Sample {selectedSample.sampleNumber}

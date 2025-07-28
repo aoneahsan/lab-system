@@ -2,14 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { 
-  AlertCircle, 
-  ClipboardList, 
-  FileText, 
-  Users, 
-  Activity,
-  Clock
-} from 'lucide-react';
+import { AlertCircle, ClipboardList, FileText, Users, Activity, Clock } from 'lucide-react';
 import { useCriticalResults } from '@/hooks/useCriticalResults';
 import { usePendingOrders } from '@/hooks/usePendingOrders';
 import { useStats } from '@/hooks/useStats';
@@ -25,7 +18,12 @@ export function HomeScreen() {
     { icon: ClipboardList, label: 'New Order', path: '/clinician/orders/new', color: 'blue' },
     { icon: FileText, label: 'Test Catalog', path: '/clinician/test-catalog', color: 'green' },
     { icon: Users, label: 'My Patients', path: '/clinician/patients', color: 'purple' },
-    { icon: AlertCircle, label: 'Critical Results', path: '/clinician/critical-results', color: 'red' },
+    {
+      icon: AlertCircle,
+      label: 'Critical Results',
+      path: '/clinician/critical-results',
+      color: 'red',
+    },
   ];
 
   return (
@@ -35,9 +33,7 @@ export function HomeScreen() {
         <h1 className="text-2xl font-bold text-gray-900">
           Welcome, Dr. {currentUser?.displayName}
         </h1>
-        <p className="text-gray-600 mt-1">
-          {format(new Date(), 'EEEE, MMMM d, yyyy')}
-        </p>
+        <p className="text-gray-600 mt-1">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
       </div>
 
       {/* Critical Alerts */}
@@ -47,9 +43,7 @@ export function HomeScreen() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <AlertCircle className="h-5 w-5 text-red-600" />
-                <h2 className="text-lg font-semibold text-red-900">
-                  Critical Results Pending
-                </h2>
+                <h2 className="text-lg font-semibold text-red-900">Critical Results Pending</h2>
               </div>
               <span className="bg-red-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
                 {criticalResults.length}
@@ -78,9 +72,7 @@ export function HomeScreen() {
                   <div className={`p-3 rounded-full bg-${action.color}-100`}>
                     <action.icon className={`h-6 w-6 text-${action.color}-600`} />
                   </div>
-                  <span className="text-sm font-medium text-gray-900">
-                    {action.label}
-                  </span>
+                  <span className="text-sm font-medium text-gray-900">{action.label}</span>
                 </div>
               </Card>
             </Link>
@@ -96,9 +88,7 @@ export function HomeScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending Orders</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {pendingOrders.length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{pendingOrders.length}</p>
               </div>
               <Clock className="h-8 w-8 text-blue-600 opacity-20" />
             </div>
@@ -108,9 +98,7 @@ export function HomeScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Results Ready</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats?.resultsReady || 0}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.resultsReady || 0}</p>
               </div>
               <FileText className="h-8 w-8 text-green-600 opacity-20" />
             </div>
@@ -120,9 +108,7 @@ export function HomeScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Patients</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats?.activePatients || 0}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.activePatients || 0}</p>
               </div>
               <Users className="h-8 w-8 text-purple-600 opacity-20" />
             </div>
@@ -132,9 +118,7 @@ export function HomeScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Tests Today</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats?.testsToday || 0}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.testsToday || 0}</p>
               </div>
               <Activity className="h-8 w-8 text-orange-600 opacity-20" />
             </div>

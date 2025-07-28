@@ -27,7 +27,9 @@ const CriticalResultsDashboard: React.FC = () => {
   const { tenant } = useTenant();
   const [selectedResult, setSelectedResult] = useState<CriticalResult | null>(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'notified' | 'acknowledged'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'notified' | 'acknowledged'>(
+    'all'
+  );
 
   // Fetch critical results
   const { data: criticalResults = [], isLoading } = useQuery({
@@ -43,24 +45,24 @@ const CriticalResultsDashboard: React.FC = () => {
       );
 
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         notifiedAt: doc.data().criticalNotification?.notifiedAt?.toDate(),
         acknowledgedAt: doc.data().criticalNotification?.acknowledgedAt?.toDate(),
-        notificationStatus: doc.data().criticalNotification?.notified 
-          ? doc.data().criticalNotification?.acknowledged 
-            ? 'acknowledged' 
+        notificationStatus: doc.data().criticalNotification?.notified
+          ? doc.data().criticalNotification?.acknowledged
+            ? 'acknowledged'
             : 'notified'
           : 'pending',
-        criticalType: doc.data().flag === 'critical_high' ? 'high' : 'low'
+        criticalType: doc.data().flag === 'critical_high' ? 'high' : 'low',
       })) as CriticalResult[];
     },
     enabled: !!tenant,
   });
 
-  const filteredResults = criticalResults.filter(result => {
+  const filteredResults = criticalResults.filter((result) => {
     if (filterStatus === 'all') return true;
     return result.notificationStatus === filterStatus;
   });
@@ -103,7 +105,7 @@ const CriticalResultsDashboard: React.FC = () => {
             <AlertTriangle className="h-6 w-6 text-red-500" />
             <h2 className="text-lg font-medium text-gray-900">Critical Results</h2>
           </div>
-          
+
           {/* Filter Tabs */}
           <div className="flex gap-2">
             {(['all', 'pending', 'notified', 'acknowledged'] as const).map((status) => (
@@ -119,7 +121,7 @@ const CriticalResultsDashboard: React.FC = () => {
                 {status.charAt(0).toUpperCase() + status.slice(1)}
                 {status !== 'all' && (
                   <span className="ml-1 text-xs">
-                    ({criticalResults.filter(r => r.notificationStatus === status).length})
+                    ({criticalResults.filter((r) => r.notificationStatus === status).length})
                   </span>
                 )}
               </button>
@@ -181,14 +183,20 @@ const CriticalResultsDashboard: React.FC = () => {
                     <div className="text-sm text-gray-900">{result.testName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${
-                      result.criticalType === 'high' ? 'text-red-600' : 'text-orange-600'
-                    }`}>
+                    <div
+                      className={`text-sm font-medium ${
+                        result.criticalType === 'high' ? 'text-red-600' : 'text-orange-600'
+                      }`}
+                    >
                       {result.criticalType === 'high' ? '↑↑' : '↓↓'} {result.value} {result.unit}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(result.notificationStatus)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                        result.notificationStatus
+                      )}`}
+                    >
                       {result.notificationStatus}
                     </span>
                   </td>
@@ -202,9 +210,7 @@ const CriticalResultsDashboard: React.FC = () => {
                         Notify
                       </button>
                     ) : result.notificationStatus === 'notified' ? (
-                      <button
-                        className="inline-flex items-center gap-1 text-green-600 hover:text-green-900"
-                      >
+                      <button className="inline-flex items-center gap-1 text-green-600 hover:text-green-900">
                         <CheckCircle className="h-4 w-4" />
                         Acknowledge
                       </button>

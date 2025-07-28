@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Activity, 
-  TrendingUp, 
+import {
+  Activity,
+  TrendingUp,
   TrendingDown,
   AlertCircle,
   CheckCircle,
@@ -10,7 +10,7 @@ import {
   Clock,
   BarChart,
   Plus,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -42,7 +42,7 @@ interface QCSchedule {
 const LabStaffQCPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'today' | 'history' | 'schedule'>('today');
-  
+
   // Mock data - in real app would fetch from API
   const [todayQC] = useState<QCResult[]>([
     {
@@ -78,7 +78,7 @@ const LabStaffQCPage: React.FC = () => {
       testName: 'Creatinine',
       level: 'Level 1',
       value: 0.75,
-      mean: 0.80,
+      mean: 0.8,
       sd: 0.05,
       cv: 6.25,
       status: 'fail',
@@ -157,9 +157,9 @@ const LabStaffQCPage: React.FC = () => {
 
   const qcStats = {
     total: todayQC.length,
-    passed: todayQC.filter(qc => qc.status === 'pass').length,
-    failed: todayQC.filter(qc => qc.status === 'fail').length,
-    warning: todayQC.filter(qc => qc.status === 'warning').length,
+    passed: todayQC.filter((qc) => qc.status === 'pass').length,
+    failed: todayQC.filter((qc) => qc.status === 'fail').length,
+    warning: todayQC.filter((qc) => qc.status === 'warning').length,
   };
 
   return (
@@ -205,9 +205,7 @@ const LabStaffQCPage: React.FC = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600'
+                  activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -227,7 +225,9 @@ const LabStaffQCPage: React.FC = () => {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900">{qc.instrumentName}</h3>
-                    <p className="text-sm text-gray-600">{qc.testName} - {qc.level}</p>
+                    <p className="text-sm text-gray-600">
+                      {qc.testName} - {qc.level}
+                    </p>
                   </div>
                   {getStatusIcon(qc.status)}
                 </div>
@@ -239,7 +239,9 @@ const LabStaffQCPage: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-gray-500">Mean ± SD</p>
-                    <p className="font-medium">{qc.mean} ± {qc.sd}</p>
+                    <p className="font-medium">
+                      {qc.mean} ± {qc.sd}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-500">CV%</p>
@@ -249,14 +251,14 @@ const LabStaffQCPage: React.FC = () => {
 
                 {qc.rule && (
                   <div className="mb-3 p-2 bg-yellow-50 rounded text-sm">
-                    <p className="text-yellow-800">
-                      Westgard Rule Violation: {qc.rule}
-                    </p>
+                    <p className="text-yellow-800">Westgard Rule Violation: {qc.rule}</p>
                   </div>
                 )}
 
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <p>By {qc.performedBy} • {qc.performedAt.toLocaleTimeString()}</p>
+                  <p>
+                    By {qc.performedBy} • {qc.performedAt.toLocaleTimeString()}
+                  </p>
                   <button
                     onClick={() => handleViewChart(qc.id)}
                     className="flex items-center gap-1 text-purple-600"
@@ -279,7 +281,11 @@ const LabStaffQCPage: React.FC = () => {
                     <h3 className="font-medium text-gray-900">{schedule.instrumentName}</h3>
                     <p className="text-sm text-gray-600">{schedule.testName}</p>
                   </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getScheduleStatusColor(schedule.status)}`}>
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${getScheduleStatusColor(
+                      schedule.status
+                    )}`}
+                  >
                     {schedule.status.toUpperCase()}
                   </span>
                 </div>
@@ -292,7 +298,10 @@ const LabStaffQCPage: React.FC = () => {
                   <div>
                     <p className="text-gray-500">Next Due</p>
                     <p className="font-medium">
-                      {schedule.nextDue.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {schedule.nextDue.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>

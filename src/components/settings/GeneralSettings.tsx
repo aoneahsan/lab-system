@@ -7,11 +7,7 @@ interface GeneralSettingsProps {
   isSaving: boolean;
 }
 
-const GeneralSettings: React.FC<GeneralSettingsProps> = ({
-  settings,
-  onSave,
-  isSaving
-}) => {
+const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, onSave, isSaving }) => {
   const [formData, setFormData] = useState<GeneralSettingsType>(settings);
 
   useEffect(() => {
@@ -22,14 +18,14 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     const keys = path.split('.');
     const newData = { ...formData };
     let current: any = newData;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       if (!current[keys[i]]) {
         current[keys[i]] = {};
       }
       current = current[keys[i]];
     }
-    
+
     current[keys[keys.length - 1]] = value;
     setFormData(newData);
   };
@@ -43,12 +39,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Laboratory Information</h3>
-        
+
         <div className="grid grid-cols-1 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Laboratory Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Laboratory Name</label>
             <input
               type="text"
               value={formData.labName}
@@ -59,9 +53,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Logo URL
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Logo URL</label>
             <input
               type="url"
               value={formData.labLogo}
@@ -74,12 +66,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Address</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Street Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Street Address</label>
             <input
               type="text"
               value={formData.address.street}
@@ -89,9 +79,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              City
-            </label>
+            <label className="block text-sm font-medium text-gray-700">City</label>
             <input
               type="text"
               value={formData.address.city}
@@ -101,9 +89,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              State
-            </label>
+            <label className="block text-sm font-medium text-gray-700">State</label>
             <input
               type="text"
               value={formData.address.state}
@@ -113,9 +99,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              ZIP Code
-            </label>
+            <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
             <input
               type="text"
               value={formData.address.zipCode}
@@ -125,9 +109,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Country
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Country</label>
             <input
               type="text"
               value={formData.address.country}
@@ -140,12 +122,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Phone
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
             <input
               type="tel"
               value={formData.contact.phone}
@@ -155,9 +135,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={formData.contact.email}
@@ -167,9 +145,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Website
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Website</label>
             <input
               type="url"
               value={formData.contact.website}
@@ -182,12 +158,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Regional Settings</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Timezone
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Timezone</label>
             <select
               value={formData.timezone}
               onChange={(e) => handleChange('timezone', e.target.value)}
@@ -205,9 +179,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Currency
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Currency</label>
             <select
               value={formData.currency}
               onChange={(e) => handleChange('currency', e.target.value)}
@@ -223,9 +195,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Date Format
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Date Format</label>
             <select
               value={formData.dateFormat}
               onChange={(e) => handleChange('dateFormat', e.target.value)}
@@ -238,9 +208,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Time Format
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Time Format</label>
             <select
               value={formData.timeFormat}
               onChange={(e) => handleChange('timeFormat', e.target.value)}

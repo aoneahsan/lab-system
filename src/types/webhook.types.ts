@@ -17,7 +17,7 @@ export interface WebhookEndpoint {
   metadata?: Record<string, unknown>;
 }
 
-export type WebhookEventType = 
+export type WebhookEventType =
   | 'patient.created'
   | 'patient.updated'
   | 'patient.merged'
@@ -51,12 +51,7 @@ export interface WebhookEvent {
   error?: string;
 }
 
-export type WebhookEventStatus = 
-  | 'pending'
-  | 'processing'
-  | 'delivered'
-  | 'failed'
-  | 'expired';
+export type WebhookEventStatus = 'pending' | 'processing' | 'delivered' | 'failed' | 'expired';
 
 export interface WebhookDeliveryAttempt {
   id: string;

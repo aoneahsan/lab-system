@@ -4,19 +4,19 @@ vi.mock('firebase/firestore', () => {
   // Create a mock Timestamp class inside the factory
   class MockTimestamp {
     private _date: Date;
-    
+
     constructor(date: Date) {
       this._date = date;
     }
-    
+
     toDate() {
       return this._date;
     }
-    
+
     static now() {
       return new MockTimestamp(new Date());
     }
-    
+
     static fromDate(date: Date) {
       return new MockTimestamp(date);
     }
@@ -83,7 +83,7 @@ const {
 describe('PatientService', () => {
   const tenantId = 'test-tenant';
   const createdBy = 'test-user';
-  
+
   const mockCreatePatientData = {
     mrn: 'MRN001',
     firstName: 'John',
@@ -186,11 +186,7 @@ describe('PatientService', () => {
         id: 'generated-id',
       } as any);
 
-      const result = await patientService.createPatient(
-        tenantId,
-        mockCreatePatientData,
-        createdBy
-      );
+      const result = await patientService.createPatient(tenantId, mockCreatePatientData, createdBy);
 
       expect(addDoc).toHaveBeenCalled();
       expect(result).toMatchObject({
@@ -266,9 +262,9 @@ describe('PatientService', () => {
     it('should handle deletion errors', async () => {
       vi.mocked(deleteDoc).mockRejectedValue(new Error('Delete failed'));
 
-      await expect(
-        patientService.deletePatient(tenantId, 'patient-1')
-      ).rejects.toThrow('Delete failed');
+      await expect(patientService.deletePatient(tenantId, 'patient-1')).rejects.toThrow(
+        'Delete failed'
+      );
     });
   });
 
@@ -374,12 +370,7 @@ describe('PatientService', () => {
       } as any);
       vi.mocked(updateDoc).mockResolvedValue(undefined);
 
-      await patientService.addDocument(
-        tenantId,
-        'patient-1',
-        mockDocument,
-        'uploader-id'
-      );
+      await patientService.addDocument(tenantId, 'patient-1', mockDocument, 'uploader-id');
 
       expect(updateDoc).toHaveBeenCalled();
     });

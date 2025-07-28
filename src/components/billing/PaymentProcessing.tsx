@@ -9,7 +9,7 @@ import {
   DocumentTextIcon,
   DevicePhoneMobileIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
 
 interface PaymentProcessingProps {
@@ -21,7 +21,7 @@ interface PaymentProcessingProps {
 const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
   billId,
   defaultAmount = 0,
-  onSuccess
+  onSuccess,
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<Payment['method']>('card');
   const [amount, setAmount] = useState(defaultAmount);
@@ -29,7 +29,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
     number: '',
     expiry: '',
     cvv: '',
-    name: ''
+    name: '',
   });
   const [reference, setReference] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -37,7 +37,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
   const { data: bill } = useQuery({
     queryKey: ['bill', billId],
     queryFn: () => billingService.getBillById(billId!),
-    enabled: !!billId
+    enabled: !!billId,
   });
 
   const processMutation = useMutation({
@@ -51,12 +51,12 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
       setTimeout(() => {
         resetForm();
       }, 3000);
-    }
+    },
   });
 
   const handleCardInputChange = (field: keyof typeof cardDetails, value: string) => {
     let formattedValue = value;
-    
+
     if (field === 'number') {
       // Format card number with spaces
       formattedValue = value.replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -67,24 +67,24 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
       // Limit CVV to 4 digits
       formattedValue = value.replace(/\D/g, '').slice(0, 4);
     }
-    
+
     setCardDetails({ ...cardDetails, [field]: formattedValue });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const paymentData: any = {
       billId,
       amount,
       method: paymentMethod,
-      reference
+      reference,
     };
 
     if (paymentMethod === 'card') {
       paymentData.cardDetails = {
         ...cardDetails,
-        number: cardDetails.number.replace(/\s/g, '')
+        number: cardDetails.number.replace(/\s/g, ''),
       };
     }
 
@@ -100,7 +100,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
 
   const validateForm = () => {
     if (amount <= 0) return false;
-    
+
     if (paymentMethod === 'card') {
       const cardNumber = cardDetails.number.replace(/\s/g, '');
       if (cardNumber.length < 13 || cardNumber.length > 19) return false;
@@ -110,7 +110,7 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
     } else if (paymentMethod === 'check') {
       if (!reference.trim()) return false;
     }
-    
+
     return true;
   };
 
@@ -140,10 +140,14 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
                 Bill Number: <span className="font-medium">{bill.billNumber}</span>
               </p>
               <p className="text-sm text-gray-600">
-                Total Amount: <span className="font-medium">{formatCurrency(bill.totals.total)}</span>
+                Total Amount:{' '}
+                <span className="font-medium">{formatCurrency(bill.totals.total)}</span>
               </p>
               <p className="text-sm text-gray-600">
-                Balance Due: <span className="font-medium text-red-600">{formatCurrency(bill.totals.balance)}</span>
+                Balance Due:{' '}
+                <span className="font-medium text-red-600">
+                  {formatCurrency(bill.totals.balance)}
+                </span>
               </p>
             </div>
           </div>
@@ -327,7 +331,8 @@ const PaymentProcessing: React.FC<PaymentProcessingProps> = ({
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">Payment Failed</h3>
                 <p className="mt-1 text-sm text-red-700">
-                  {processMutation.error?.message || 'An error occurred while processing the payment.'}
+                  {processMutation.error?.message ||
+                    'An error occurred while processing the payment.'}
                 </p>
               </div>
             </div>

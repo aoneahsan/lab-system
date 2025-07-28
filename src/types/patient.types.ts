@@ -1,6 +1,12 @@
 export type PatientGender = 'male' | 'female' | 'other' | 'unknown';
 export type PatientBloodGroup = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-' | 'unknown';
-export type PatientMaritalStatus = 'single' | 'married' | 'divorced' | 'widowed' | 'separated' | 'unknown';
+export type PatientMaritalStatus =
+  | 'single'
+  | 'married'
+  | 'divorced'
+  | 'widowed'
+  | 'separated'
+  | 'unknown';
 export type PatientIdType = 'national_id' | 'passport' | 'driver_license' | 'health_card' | 'other';
 
 export interface PatientAddress {
@@ -83,7 +89,7 @@ export interface PatientDocument {
 export interface Patient {
   id: string;
   tenantId: string;
-  
+
   // Basic Information
   patientId: string; // Unique patient ID for the lab
   mrn?: string; // Medical Record Number
@@ -94,7 +100,7 @@ export interface Patient {
   gender: PatientGender;
   bloodGroup?: PatientBloodGroup;
   maritalStatus?: PatientMaritalStatus;
-  
+
   // Identification
   identifications?: Array<{
     type: PatientIdType;
@@ -102,22 +108,22 @@ export interface Patient {
     issuedBy?: string;
     expiryDate?: Date;
   }>;
-  
+
   // Contact Information
   email?: string;
   phoneNumbers: PatientContact[];
   addresses: PatientAddress[];
   emergencyContacts: PatientEmergencyContact[];
-  
+
   // Medical Information
   allergies: PatientAllergy[];
   medications: PatientMedication[];
   medicalHistory: PatientMedicalHistory[];
   familyHistory?: string;
-  
+
   // Insurance Information
   insurances: PatientInsurance[];
-  
+
   // Additional Information
   occupation?: string;
   employer?: string;
@@ -125,13 +131,13 @@ export interface Patient {
   language?: string;
   religion?: string;
   notes?: string;
-  
+
   // System Information
   isActive: boolean;
   isVip?: boolean;
   tags?: string[];
   documents?: PatientDocument[];
-  
+
   // Audit
   createdAt: Date;
   createdBy: string;
@@ -171,7 +177,8 @@ export interface CreatePatientData {
   notes?: string;
 }
 
-export interface UpdatePatientData extends Partial<Omit<Patient, 'id' | 'tenantId' | 'patientId' | 'createdAt' | 'createdBy'>> {
+export interface UpdatePatientData
+  extends Partial<Omit<Patient, 'id' | 'tenantId' | 'patientId' | 'createdAt' | 'createdBy'>> {
   updatedBy: string;
 }
 

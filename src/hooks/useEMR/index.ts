@@ -1,6 +1,6 @@
 // Export all EMR-related hooks
 export * from '../useEMR';
-export { 
+export {
   useWebhookEndpoints as useEMRWebhookEndpoints,
   useCreateWebhookEndpoint as useCreateEMRWebhookEndpoint,
   useUpdateWebhookEndpoint as useUpdateEMRWebhookEndpoint,
@@ -10,5 +10,5 @@ export {
   useResendWebhookEvent as useResendEMRWebhookEvent,
   useWebhookMetrics as useEMRWebhookMetrics,
   useProcessWebhookBatch as useProcessEMRWebhookBatch,
-  useVerifyWebhookSignature as useVerifyEMRWebhookSignature
+  useVerifyWebhookSignature as useVerifyEMRWebhookSignature,
 } from '../useWebhookEndpoints';

@@ -2,8 +2,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   User,
   Phone,
   Mail,
@@ -11,7 +11,7 @@ import {
   FileText,
   ClipboardList,
   AlertCircle,
-  Download
+  Download,
 } from 'lucide-react';
 import { usePatient } from '@/hooks/usePatient';
 import { usePatientOrders } from '@/hooks/usePatientOrders';
@@ -66,7 +66,9 @@ export function PatientDetailScreen() {
             <User className="h-8 w-8 text-gray-600" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">{patient.firstName} {patient.lastName}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {patient.firstName} {patient.lastName}
+            </h1>
             <p className="text-gray-600">MRN: {patient.mrn}</p>
             <div className="flex flex-wrap gap-2 mt-2">
               <Badge variant="outline">{patient.gender}</Badge>
@@ -91,7 +93,11 @@ export function PatientDetailScreen() {
               </div>
               <div className="flex items-start space-x-2 text-gray-600">
                 <MapPin className="h-4 w-4 mt-0.5" />
-                <span>{patient.addresses?.[0] ? `${patient.addresses[0].line1}, ${patient.addresses[0].city}` : 'No address'}</span>
+                <span>
+                  {patient.addresses?.[0]
+                    ? `${patient.addresses[0].line1}, ${patient.addresses[0].city}`
+                    : 'No address'}
+                </span>
               </div>
             </div>
           </div>
@@ -107,11 +113,15 @@ export function PatientDetailScreen() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Insurance</span>
-                <span className="font-medium">{patient.insurances?.[0]?.provider || 'Not provided'}</span>
+                <span className="font-medium">
+                  {patient.insurances?.[0]?.provider || 'Not provided'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Emergency Contact</span>
-                <span className="font-medium">{patient.emergencyContacts?.[0]?.name || 'Not provided'}</span>
+                <span className="font-medium">
+                  {patient.emergencyContacts?.[0]?.name || 'Not provided'}
+                </span>
               </div>
             </div>
           </div>
@@ -176,7 +186,7 @@ export function PatientDetailScreen() {
             <ClipboardList className="h-5 w-5 mr-2" />
             Recent Orders
           </h2>
-          <Link 
+          <Link
             to={`/clinician/orders?patientId=${patient.id}`}
             className="text-sm text-blue-600 hover:text-blue-700"
           >
@@ -197,7 +207,8 @@ export function PatientDetailScreen() {
                   <div>
                     <p className="font-medium text-sm">Order #{order.orderNumber}</p>
                     <p className="text-xs text-gray-600">
-                      {order.tests.length} tests • {format(new Date(order.createdAt), 'MMM d, yyyy')}
+                      {order.tests.length} tests •{' '}
+                      {format(new Date(order.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
                   <Badge variant="outline" size="sm">
@@ -217,7 +228,7 @@ export function PatientDetailScreen() {
             <FileText className="h-5 w-5 mr-2" />
             Recent Results
           </h2>
-          <Link 
+          <Link
             to={`/clinician/results?patientId=${patient.id}`}
             className="text-sm text-blue-600 hover:text-blue-700"
           >
@@ -238,7 +249,8 @@ export function PatientDetailScreen() {
                   <div>
                     <p className="font-medium text-sm">{result.testName}</p>
                     <p className="text-xs text-gray-600">
-                      {result.value} {result.unit} • {format(new Date(result.resultDate), 'MMM d, yyyy')}
+                      {result.value} {result.unit} •{' '}
+                      {format(new Date(result.resultDate), 'MMM d, yyyy')}
                     </p>
                   </div>
                   {result.isCritical && (

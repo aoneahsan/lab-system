@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  ArrowLeft, 
-  Search, 
-  Plus, 
+import {
+  ArrowLeft,
+  Search,
+  Plus,
   X,
   AlertCircle,
   User,
   FileText,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
@@ -33,9 +33,9 @@ export function NewOrderScreen() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const { data: patients = [] } = usePatients({ searchTerm: searchQuery });
-  const { data: tests = [] } = useTests({ 
+  const { data: tests = [] } = useTests({
     searchTerm: testSearchQuery,
-    category: selectedCategory === 'all' ? undefined : selectedCategory 
+    category: selectedCategory === 'all' ? undefined : selectedCategory,
   });
   const { mutate: createOrder, isPending: isCreating } = useCreateOrder();
 
@@ -54,13 +54,13 @@ export function NewOrderScreen() {
   };
 
   const handleAddTest = (test: any) => {
-    if (!selectedTests.find(t => t.id === test.id)) {
+    if (!selectedTests.find((t) => t.id === test.id)) {
       setSelectedTests([...selectedTests, test]);
     }
   };
 
   const handleRemoveTest = (testId: string) => {
-    setSelectedTests(selectedTests.filter(t => t.id !== testId));
+    setSelectedTests(selectedTests.filter((t) => t.id !== testId));
   };
 
   const handleSubmit = () => {
@@ -71,7 +71,7 @@ export function NewOrderScreen() {
       patientName: selectedPatient.name,
       patientMRN: selectedPatient.mrn,
       patientDOB: selectedPatient.dateOfBirth,
-      tests: selectedTests.map(t => ({
+      tests: selectedTests.map((t) => ({
         id: t.id,
         code: t.code,
         name: t.name,
@@ -89,7 +89,7 @@ export function NewOrderScreen() {
       },
       onError: () => {
         toast.error('Failed to create order');
-      }
+      },
     });
   };
 
@@ -98,11 +98,7 @@ export function NewOrderScreen() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/clinician/orders')}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate('/clinician/orders')}>
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
           </Button>
@@ -127,28 +123,33 @@ export function NewOrderScreen() {
                 type="search"
                 placeholder="Search by name or MRN..."
                 value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(e.target.value)
+                }
                 className="pl-10"
               />
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {(Array.isArray(patients) ? patients : patients.patients || []).map((patient: any) => (
-                <div
-                  key={patient.id}
-                  onClick={() => handleSelectPatient(patient)}
-                  className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">{patient.name}</p>
-                      <p className="text-sm text-gray-600">
-                        MRN: {patient.mrn} • DOB: {format(new Date(patient.dateOfBirth), 'MMM d, yyyy')}
-                      </p>
+              {(Array.isArray(patients) ? patients : patients.patients || []).map(
+                (patient: any) => (
+                  <div
+                    key={patient.id}
+                    onClick={() => handleSelectPatient(patient)}
+                    className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-gray-900">{patient.name}</p>
+                        <p className="text-sm text-gray-600">
+                          MRN: {patient.mrn} • DOB:{' '}
+                          {format(new Date(patient.dateOfBirth), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-gray-400" />
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </Card>
         </div>
@@ -172,14 +173,16 @@ export function NewOrderScreen() {
 
           <Card className="p-4">
             <h2 className="font-semibold text-gray-900 mb-3">Select Tests</h2>
-            
+
             <Select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="mb-3"
             >
-              {testCategories.map(cat => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              {testCategories.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
               ))}
             </Select>
 
@@ -189,7 +192,9 @@ export function NewOrderScreen() {
                 type="search"
                 placeholder="Search tests..."
                 value={testSearchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTestSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setTestSearchQuery(e.target.value)
+                }
                 className="pl-10"
               />
             </div>
@@ -201,16 +206,15 @@ export function NewOrderScreen() {
                 </p>
                 <div className="space-y-2">
                   {selectedTests.map((test) => (
-                    <div key={test.id} className="flex items-center justify-between bg-blue-50 rounded-lg p-2">
+                    <div
+                      key={test.id}
+                      className="flex items-center justify-between bg-blue-50 rounded-lg p-2"
+                    >
                       <div>
                         <p className="font-medium text-sm">{test.name}</p>
                         <p className="text-xs text-gray-600">{test.code}</p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveTest(test.id)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => handleRemoveTest(test.id)}>
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
@@ -221,7 +225,7 @@ export function NewOrderScreen() {
 
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {tests.map((test) => {
-                const isSelected = selectedTests.find(t => t.id === test.id);
+                const isSelected = selectedTests.find((t) => t.id === test.id);
                 return (
                   <div
                     key={test.id}
@@ -238,7 +242,9 @@ export function NewOrderScreen() {
                         </p>
                       </div>
                       {isSelected ? (
-                        <Badge variant="outline" size="sm">Selected</Badge>
+                        <Badge variant="outline" size="sm">
+                          Selected
+                        </Badge>
                       ) : (
                         <Plus className="h-4 w-4 text-gray-400" />
                       )}
@@ -250,11 +256,7 @@ export function NewOrderScreen() {
           </Card>
 
           <div className="flex space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => setStep(1)}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
               Back
             </Button>
             <Button
@@ -274,7 +276,7 @@ export function NewOrderScreen() {
         <div className="space-y-4">
           <Card className="p-4">
             <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>
-            
+
             <div className="space-y-3 mb-4">
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-sm text-gray-600 mb-1">Patient</p>
@@ -294,13 +296,8 @@ export function NewOrderScreen() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Priority
-                </label>
-                <Select
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
-                >
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
                   <option value="routine">Routine</option>
                   <option value="urgent">Urgent</option>
                   <option value="stat">STAT</option>
@@ -337,11 +334,7 @@ export function NewOrderScreen() {
           )}
 
           <div className="flex space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => setStep(2)}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
               Back
             </Button>
             <Button

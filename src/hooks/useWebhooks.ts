@@ -14,7 +14,8 @@ const WEBHOOK_KEYS = {
   all: ['webhooks'] as const,
   endpoints: () => [...WEBHOOK_KEYS.all, 'endpoints'] as const,
   endpoint: (id: string) => [...WEBHOOK_KEYS.endpoints(), id] as const,
-  endpointsByConnection: (connectionId: string) => [...WEBHOOK_KEYS.endpoints(), 'connection', connectionId] as const,
+  endpointsByConnection: (connectionId: string) =>
+    [...WEBHOOK_KEYS.endpoints(), 'connection', connectionId] as const,
   metrics: (endpointId: string) => [...WEBHOOK_KEYS.all, 'metrics', endpointId] as const,
 };
 
@@ -57,8 +58,8 @@ export const useCreateWebhookEndpoint = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: WEBHOOK_KEYS.endpoints() });
-      queryClient.invalidateQueries({ 
-        queryKey: WEBHOOK_KEYS.endpointsByConnection(variables.connectionId) 
+      queryClient.invalidateQueries({
+        queryKey: WEBHOOK_KEYS.endpointsByConnection(variables.connectionId),
       });
       toast.success('Webhook endpoint created successfully');
     },
@@ -75,12 +76,12 @@ export const useUpdateWebhookEndpoint = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ 
-      endpointId, 
-      data 
-    }: { 
-      endpointId: string; 
-      data: Partial<WebhookEndpointFormData> 
+    mutationFn: ({
+      endpointId,
+      data,
+    }: {
+      endpointId: string;
+      data: Partial<WebhookEndpointFormData>;
     }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return webhookService.updateEndpoint(currentTenant.id, currentUser.id, endpointId, data);
@@ -121,12 +122,12 @@ export const useTestWebhookEndpoint = () => {
   const { currentTenant } = useTenantStore();
 
   return useMutation({
-    mutationFn: ({ 
-      endpointId, 
-      testPayload 
-    }: { 
-      endpointId: string; 
-      testPayload: WebhookTestPayload 
+    mutationFn: ({
+      endpointId,
+      testPayload,
+    }: {
+      endpointId: string;
+      testPayload: WebhookTestPayload;
     }) => {
       if (!currentTenant) throw new Error('No tenant selected');
       return webhookService.testEndpoint(currentTenant.id, endpointId, testPayload);
@@ -196,12 +197,12 @@ export const useTriggerWebhookEvent = () => {
   const { currentTenant } = useTenantStore();
 
   return useMutation({
-    mutationFn: ({ 
-      eventType, 
-      payload 
-    }: { 
-      eventType: WebhookEventType; 
-      payload: Record<string, unknown> 
+    mutationFn: ({
+      eventType,
+      payload,
+    }: {
+      eventType: WebhookEventType;
+      payload: Record<string, unknown>;
     }) => {
       if (!currentTenant) throw new Error('No tenant selected');
       return webhookService.triggerWebhookEvent(currentTenant.id, eventType, payload);

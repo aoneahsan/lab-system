@@ -30,13 +30,13 @@ class NotificationService {
   subscribe(callback: (notification: Notification) => void) {
     this.listeners.push(callback);
     return () => {
-      this.listeners = this.listeners.filter(cb => cb !== callback);
+      this.listeners = this.listeners.filter((cb) => cb !== callback);
     };
   }
 
   // Send notification to all listeners
   private notifyListeners(notification: Notification) {
-    this.listeners.forEach(callback => callback(notification));
+    this.listeners.forEach((callback) => callback(notification));
   }
 
   // Get all notifications
@@ -76,15 +76,15 @@ class NotificationService {
       priority: 'high',
       read: false,
       createdAt: new Date(),
-      metadata: data
+      metadata: data,
     };
 
     await api.post('/api/notifications', notification);
     this.notifyListeners(notification);
-    
+
     // Store locally for offline access
     await this.storeNotificationLocally(notification);
-    
+
     // Show system notification if permission granted
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(notification.title, {
@@ -92,7 +92,7 @@ class NotificationService {
         icon: '/icon-192.png',
         badge: '/icon-72.png',
         requireInteraction: true,
-        tag: notification.id
+        tag: notification.id,
       });
     }
   }
@@ -102,15 +102,15 @@ class NotificationService {
     const stored = await Preferences.get({ key: this.STORAGE_KEY });
     const notifications = stored.value ? JSON.parse(stored.value) : [];
     notifications.unshift(notification);
-    
+
     // Keep only last 100 notifications
     if (notifications.length > 100) {
       notifications.length = 100;
     }
-    
+
     await Preferences.set({
       key: this.STORAGE_KEY,
-      value: JSON.stringify(notifications)
+      value: JSON.stringify(notifications),
     });
   }
 
@@ -140,17 +140,21 @@ class NotificationService {
   }
 
   // Check if critical value requires notification
-  checkCriticalValue(testName: string, value: number, _referenceRange: { min: number; max: number }): boolean {
+  checkCriticalValue(
+    testName: string,
+    value: number,
+    _referenceRange: { min: number; max: number }
+  ): boolean {
     // Define critical ranges for common tests
     const criticalRanges: Record<string, { low?: number; high?: number }> = {
-      'Glucose': { low: 40, high: 500 },
-      'Potassium': { low: 2.5, high: 6.5 },
-      'Sodium': { low: 120, high: 160 },
-      'Hemoglobin': { low: 7, high: 20 },
-      'Platelet': { low: 20000, high: 1000000 },
-      'INR': { high: 4.5 },
-      'Creatinine': { high: 6 },
-      'Troponin': { high: 0.04 }
+      Glucose: { low: 40, high: 500 },
+      Potassium: { low: 2.5, high: 6.5 },
+      Sodium: { low: 120, high: 160 },
+      Hemoglobin: { low: 7, high: 20 },
+      Platelet: { low: 20000, high: 1000000 },
+      INR: { high: 4.5 },
+      Creatinine: { high: 6 },
+      Troponin: { high: 0.04 },
     };
 
     const critical = criticalRanges[testName];

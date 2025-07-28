@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Map, 
-  TestTube, 
-  Clock, 
-  CheckCircle, 
+import {
+  Map,
+  TestTube,
+  Clock,
+  CheckCircle,
   AlertCircle,
   Calendar,
   Navigation,
   Battery,
   Wifi,
-  WifiOff
+  WifiOff,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
@@ -45,8 +45,8 @@ const PhlebotomistHomePage: React.FC = () => {
       patientName: 'John Doe',
       address: '123 Main St, Apt 4B',
       time: '10:30 AM',
-      distance: '2.3 miles'
-    }
+      distance: '2.3 miles',
+    },
   };
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const PhlebotomistHomePage: React.FC = () => {
       const position = await Geolocation.getCurrentPosition();
       setCurrentLocation({
         lat: position.coords.latitude,
-        lng: position.coords.longitude
+        lng: position.coords.longitude,
       });
     } catch (error) {
       console.error('Failed to get location:', error);
@@ -111,7 +111,11 @@ const PhlebotomistHomePage: React.FC = () => {
               Hello, {currentUser?.displayName?.split(' ')[0] || 'User'}
             </h1>
             <p className="text-purple-100 mt-1">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -131,11 +135,13 @@ const PhlebotomistHomePage: React.FC = () => {
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
           <h3 className="text-sm text-purple-100 mb-2">Today's Progress</h3>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-2xl font-bold">{stats.completed}/{stats.scheduled}</span>
+            <span className="text-2xl font-bold">
+              {stats.completed}/{stats.scheduled}
+            </span>
             <span className="text-sm text-purple-100">Collections</span>
           </div>
           <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="bg-white h-full rounded-full transition-all duration-300"
               style={{ width: `${(stats.completed / stats.scheduled) * 100}%` }}
             />
@@ -154,7 +160,9 @@ const PhlebotomistHomePage: React.FC = () => {
                 onClick={() => navigate(action.path)}
                 className="bg-white rounded-xl p-4 shadow-sm"
               >
-                <div className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}>
+                <div
+                  className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}
+                >
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <p className="text-sm font-medium text-gray-900">{action.title}</p>
@@ -205,7 +213,11 @@ const PhlebotomistHomePage: React.FC = () => {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               )}
               <div>
-                <p className={`text-sm font-medium ${pendingSync > 0 ? 'text-yellow-900' : 'text-green-900'}`}>
+                <p
+                  className={`text-sm font-medium ${
+                    pendingSync > 0 ? 'text-yellow-900' : 'text-green-900'
+                  }`}
+                >
                   {pendingSync > 0 ? `${pendingSync} collections pending sync` : 'All data synced'}
                 </p>
                 {lastSyncTime && (
@@ -231,7 +243,9 @@ const PhlebotomistHomePage: React.FC = () => {
       {currentLocation && (
         <div className="px-6 mt-4 pb-20">
           <div className="bg-gray-100 rounded-lg p-3 text-xs text-gray-600">
-            <p>Current Location: {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}</p>
+            <p>
+              Current Location: {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}
+            </p>
           </div>
         </div>
       )}

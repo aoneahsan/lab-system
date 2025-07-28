@@ -21,7 +21,7 @@ const ReportFilters: React.FC<ReportFiltersProps> = ({ filters, onFiltersChange 
         <FunnelIcon className="h-5 w-5 mr-2" />
         Report Filters
       </h3>
-      
+
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Date Range</label>

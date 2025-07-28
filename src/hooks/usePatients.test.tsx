@@ -49,11 +49,9 @@ const createWrapper = () => {
       queries: { retry: false },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 };
 
@@ -106,10 +104,9 @@ describe('usePatients', () => {
   });
 
   it('applies search filter correctly', async () => {
-    const { result } = renderHook(
-      () => usePatients({ search: 'john' }),
-      { wrapper: createWrapper() }
-    );
+    const { result } = renderHook(() => usePatients({ search: 'john' }), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(patientService.searchPatients).toHaveBeenCalledWith(
@@ -140,7 +137,7 @@ describe('usePatient', () => {
 
   it('returns undefined when patientId is not provided', () => {
     vi.clearAllMocks(); // Clear previous calls
-    
+
     const { result } = renderHook(() => usePatient(undefined as any), {
       wrapper: createWrapper(),
     });
@@ -185,8 +182,8 @@ describe('useCreatePatient', () => {
       wrapper: createWrapper(),
     });
 
-    await expect(
-      result.current.mutateAsync({ firstName: 'John' } as any)
-    ).rejects.toThrow('Failed to create patient');
+    await expect(result.current.mutateAsync({ firstName: 'John' } as any)).rejects.toThrow(
+      'Failed to create patient'
+    );
   });
 });

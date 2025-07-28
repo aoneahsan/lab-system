@@ -7,11 +7,7 @@ interface BillingSettingsProps {
   isSaving: boolean;
 }
 
-const BillingSettings: React.FC<BillingSettingsProps> = ({
-  settings,
-  onSave,
-  isSaving
-}) => {
+const BillingSettings: React.FC<BillingSettingsProps> = ({ settings, onSave, isSaving }) => {
   const [formData, setFormData] = useState<BillingSettingsType>(settings);
 
   useEffect(() => {
@@ -31,7 +27,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Tax Configuration</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -48,9 +44,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
           {formData.taxEnabled && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Tax Rate (%)
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Tax Rate (%)</label>
               <input
                 type="number"
                 value={formData.taxRate}
@@ -67,7 +61,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Payment Terms</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -83,12 +77,12 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Billing Code System
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Billing Code System</label>
             <select
               value={formData.billingCodeSystem}
-              onChange={(e) => handleChange('billingCodeSystem', e.target.value as 'CPT' | 'ICD10' | 'CUSTOM')}
+              onChange={(e) =>
+                handleChange('billingCodeSystem', e.target.value as 'CPT' | 'ICD10' | 'CUSTOM')
+              }
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="CPT">CPT Codes</option>
@@ -101,7 +95,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Insurance Processing</h3>
-        
+
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -118,7 +112,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Late Fees</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -169,7 +163,7 @@ const BillingSettings: React.FC<BillingSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Discounts</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input

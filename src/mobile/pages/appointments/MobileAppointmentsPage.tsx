@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Plus,
-  ChevronRight,
-  X,
-  Check
-} from 'lucide-react';
+import { Calendar, Clock, MapPin, Plus, ChevronRight, X, Check } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { toast } from '@/hooks/useToast';
 
@@ -38,7 +30,7 @@ const MobileAppointmentsPage: React.FC = () => {
       type: 'Blood Test',
       status: 'upcoming',
       doctor: 'Dr. Smith',
-      tests: ['Complete Blood Count', 'Lipid Panel']
+      tests: ['Complete Blood Count', 'Lipid Panel'],
     },
     {
       id: '2',
@@ -47,14 +39,23 @@ const MobileAppointmentsPage: React.FC = () => {
       location: 'LabFlow Downtown',
       type: 'Routine Checkup',
       status: 'completed',
-      tests: ['Basic Metabolic Panel']
-    }
+      tests: ['Basic Metabolic Panel'],
+    },
   ];
 
   const availableTimes = [
-    '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM',
-    '11:00 AM', '11:30 AM', '2:00 PM', '2:30 PM',
-    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM'
+    '9:00 AM',
+    '9:30 AM',
+    '10:00 AM',
+    '10:30 AM',
+    '11:00 AM',
+    '11:30 AM',
+    '2:00 PM',
+    '2:30 PM',
+    '3:00 PM',
+    '3:30 PM',
+    '4:00 PM',
+    '4:30 PM',
   ];
 
   const commonTests = [
@@ -63,13 +64,13 @@ const MobileAppointmentsPage: React.FC = () => {
     { id: 'glucose', name: 'Glucose Test' },
     { id: 'thyroid', name: 'Thyroid Function Test' },
     { id: 'liver', name: 'Liver Function Test' },
-    { id: 'kidney', name: 'Kidney Function Test' }
+    { id: 'kidney', name: 'Kidney Function Test' },
   ];
 
   const scheduleReminder = async (appointment: Appointment) => {
     try {
       const permission = await LocalNotifications.requestPermissions();
-      
+
       if (permission.display === 'granted') {
         const notificationTime = new Date(appointment.date);
         notificationTime.setHours(notificationTime.getHours() - 1); // 1 hour before
@@ -81,8 +82,8 @@ const MobileAppointmentsPage: React.FC = () => {
               body: `You have an appointment at ${appointment.time} at ${appointment.location}`,
               id: parseInt(appointment.id),
               schedule: { at: notificationTime },
-            }
-          ]
+            },
+          ],
         });
       }
     } catch (error) {
@@ -105,11 +106,11 @@ const MobileAppointmentsPage: React.FC = () => {
         location: 'LabFlow Main Center',
         type: 'Lab Tests',
         status: 'upcoming',
-        tests: selectedTests.map(id => commonTests.find(t => t.id === id)?.name || '')
+        tests: selectedTests.map((id) => commonTests.find((t) => t.id === id)?.name || ''),
       };
 
       await scheduleReminder(newAppointment);
-      
+
       toast.success('Appointment booked successfully');
       setShowBooking(false);
       setSelectedDate(null);
@@ -164,14 +165,15 @@ const MobileAppointmentsPage: React.FC = () => {
         ) : (
           <div className="space-y-4">
             {appointments.map((appointment) => (
-              <div
-                key={appointment.id}
-                className="bg-white rounded-lg shadow-sm p-4"
-              >
+              <div key={appointment.id} className="bg-white rounded-lg shadow-sm p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="font-medium text-gray-900">{appointment.type}</h3>
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${getStatusColor(appointment.status)}`}>
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${getStatusColor(
+                        appointment.status
+                      )}`}
+                    >
                       {appointment.status}
                     </span>
                   </div>
@@ -232,10 +234,7 @@ const MobileAppointmentsPage: React.FC = () => {
             <div className="px-6 py-4 border-b sticky top-0 bg-white">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Book Appointment</h2>
-                <button
-                  onClick={() => setShowBooking(false)}
-                  className="p-2 text-gray-500"
-                >
+                <button onClick={() => setShowBooking(false)} className="p-2 text-gray-500">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -244,9 +243,7 @@ const MobileAppointmentsPage: React.FC = () => {
             <div className="px-6 py-4 space-y-6">
               {/* Date Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Date
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
                 <input
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
@@ -287,10 +284,7 @@ const MobileAppointmentsPage: React.FC = () => {
                   </label>
                   <div className="space-y-2">
                     {commonTests.map((test) => (
-                      <label
-                        key={test.id}
-                        className="flex items-center p-3 bg-gray-50 rounded-lg"
-                      >
+                      <label key={test.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
                         <input
                           type="checkbox"
                           value={test.id}
@@ -299,7 +293,7 @@ const MobileAppointmentsPage: React.FC = () => {
                             if (e.target.checked) {
                               setSelectedTests([...selectedTests, test.id]);
                             } else {
-                              setSelectedTests(selectedTests.filter(t => t !== test.id));
+                              setSelectedTests(selectedTests.filter((t) => t !== test.id));
                             }
                           }}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"

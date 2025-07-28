@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Route, ArrowRight, Building2, Cpu, Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Badge } from '@/components/ui/Badge';
 import { ScrollArea } from '@/components/ui/ScrollArea';
@@ -40,17 +46,17 @@ export const BatchRouting: React.FC = () => {
   const { analyzers } = useAnalyzerStore();
 
   // Filter samples that need routing
-  const samplesToRoute = samples.filter(s => 
-    s.status === 'received' && !s.departmentId
-  );
+  const samplesToRoute = samples.filter((s) => s.status === 'received' && !s.departmentId);
 
   useEffect(() => {
     // Load default routing rules based on test types
-    const defaultRules: RoutingRule[] = tests.map((test: TestDefinition) => ({
-      testId: test.id,
-      departmentId: test.department || '',
-      analyzerId: undefined
-    })).filter(rule => rule.departmentId);
+    const defaultRules: RoutingRule[] = tests
+      .map((test: TestDefinition) => ({
+        testId: test.id,
+        departmentId: test.department || '',
+        analyzerId: undefined,
+      }))
+      .filter((rule) => rule.departmentId);
 
     setRoutingRules(defaultRules);
   }, [tests]);
@@ -59,32 +65,30 @@ export const BatchRouting: React.FC = () => {
     if (selectedSamples.length === samplesToRoute.length) {
       setSelectedSamples([]);
     } else {
-      setSelectedSamples(samplesToRoute.map(s => s.id));
+      setSelectedSamples(samplesToRoute.map((s) => s.id));
     }
   };
 
   const handleSampleSelect = (sampleId: string) => {
-    setSelectedSamples(prev => 
-      prev.includes(sampleId) 
-        ? prev.filter(id => id !== sampleId)
-        : [...prev, sampleId]
+    setSelectedSamples((prev) =>
+      prev.includes(sampleId) ? prev.filter((id) => id !== sampleId) : [...prev, sampleId]
     );
   };
 
   const getRoutingForSample = (sample: Sample): SampleRouting | null => {
     // Check manual routing first
-    const manual = manualRouting.find(r => r.sampleId === sample.id);
+    const manual = manualRouting.find((r) => r.sampleId === sample.id);
     if (manual) return manual;
 
     // Auto-route based on test type
     if (autoRoute) {
-      const rule = routingRules.find(r => sample.tests.includes(r.testId));
+      const rule = routingRules.find((r) => sample.tests.includes(r.testId));
       if (rule && rule.departmentId) {
         return {
           sampleId: sample.id,
           departmentId: rule.departmentId,
           analyzerId: rule.analyzerId,
-          priority: (sample.priority === 'asap' ? 'urgent' : sample.priority) || 'routine'
+          priority: (sample.priority === 'asap' ? 'urgent' : sample.priority) || 'routine',
         };
       }
     }
@@ -93,13 +97,13 @@ export const BatchRouting: React.FC = () => {
   };
 
   const handleManualRoute = (sampleId: string, departmentId: string, analyzerId?: string) => {
-    setManualRouting(prev => {
-      const existing = prev.findIndex(r => r.sampleId === sampleId);
+    setManualRouting((prev) => {
+      const existing = prev.findIndex((r) => r.sampleId === sampleId);
       const routing: SampleRouting = {
         sampleId,
         departmentId,
         analyzerId,
-        priority: 'routine'
+        priority: 'routine',
       };
 
       if (existing >= 0) {
@@ -113,14 +117,13 @@ export const BatchRouting: React.FC = () => {
   };
 
   const handleBatchRoute = async () => {
-    const samplesToProcess = selectedSamples.length > 0 
-      ? selectedSamples 
-      : samplesToRoute.map(s => s.id);
+    const samplesToProcess =
+      selectedSamples.length > 0 ? selectedSamples : samplesToRoute.map((s) => s.id);
 
     const updates: Array<{ id: string; [key: string]: any }> = [];
 
     for (const sampleId of samplesToProcess) {
-      const sample = samples.find(s => s.id === sampleId);
+      const sample = samples.find((s) => s.id === sampleId);
       if (!sample) continue;
 
       const routing = getRoutingForSample(sample);
@@ -141,12 +144,14 @@ export const BatchRouting: React.FC = () => {
             action: 'routed',
             timestamp: new Date(),
             userId: 'current-user',
-            location: departments.find(d => d.id === routing.departmentId)?.name || 'Unknown',
-            notes: `Routed to ${departments.find(d => d.id === routing.departmentId)?.name}${
-              routing.analyzerId ? ` - ${analyzers.find(a => a.id === routing.analyzerId)?.name}` : ''
-            }`
-          }
-        ]
+            location: departments.find((d) => d.id === routing.departmentId)?.name || 'Unknown',
+            notes: `Routed to ${departments.find((d) => d.id === routing.departmentId)?.name}${
+              routing.analyzerId
+                ? ` - ${analyzers.find((a) => a.id === routing.analyzerId)?.name}`
+                : ''
+            }`,
+          },
+        ],
       });
     }
 
@@ -170,13 +175,16 @@ export const BatchRouting: React.FC = () => {
     }
   };
 
-  const groupedByDepartment = samplesToRoute.reduce((acc, sample) => {
-    const routing = getRoutingForSample(sample);
-    const deptId = routing?.departmentId || 'unassigned';
-    if (!acc[deptId]) acc[deptId] = [];
-    acc[deptId].push(sample);
-    return acc;
-  }, {} as Record<string, Sample[]>);
+  const groupedByDepartment = samplesToRoute.reduce(
+    (acc, sample) => {
+      const routing = getRoutingForSample(sample);
+      const deptId = routing?.departmentId || 'unassigned';
+      if (!acc[deptId]) acc[deptId] = [];
+      acc[deptId].push(sample);
+      return acc;
+    },
+    {} as Record<string, Sample[]>
+  );
 
   return (
     <div className="space-y-6">
@@ -186,19 +194,13 @@ export const BatchRouting: React.FC = () => {
             <Route className="h-5 w-5" />
             Batch Sample Routing
           </CardTitle>
-          <CardDescription>
-            Route samples to appropriate departments and analyzers
-          </CardDescription>
+          <CardDescription>Route samples to appropriate departments and analyzers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Controls */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSelectAll}
-              >
+              <Button variant="outline" size="sm" onClick={handleSelectAll}>
                 {selectedSamples.length === samplesToRoute.length ? 'Deselect All' : 'Select All'}
               </Button>
               <div className="flex items-center space-x-2">
@@ -212,9 +214,7 @@ export const BatchRouting: React.FC = () => {
                 </label>
               </div>
             </div>
-            <Badge variant="outline">
-              {samplesToRoute.length} samples pending routing
-            </Badge>
+            <Badge variant="outline">{samplesToRoute.length} samples pending routing</Badge>
           </div>
 
           {/* Routing Preview */}
@@ -223,16 +223,14 @@ export const BatchRouting: React.FC = () => {
               <h3 className="text-sm font-medium">Routing Preview</h3>
               <div className="grid gap-4">
                 {Object.entries(groupedByDepartment).map(([deptId, deptSamples]) => {
-                  const department = departments.find(d => d.id === deptId);
+                  const department = departments.find((d) => d.id === deptId);
                   return (
                     <Card key={deptId} className={deptId === 'unassigned' ? 'border-red-200' : ''}>
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
-                            <span className="font-medium">
-                              {department?.name || 'Unassigned'}
-                            </span>
+                            <span className="font-medium">{department?.name || 'Unassigned'}</span>
                           </div>
                           <Badge>{deptSamples.length} samples</Badge>
                         </div>
@@ -240,10 +238,10 @@ export const BatchRouting: React.FC = () => {
                       <CardContent>
                         <ScrollArea className="h-48">
                           <div className="space-y-2">
-                            {deptSamples.map(sample => {
+                            {deptSamples.map((sample) => {
                               const routing = getRoutingForSample(sample);
                               const isSelected = selectedSamples.includes(sample.id);
-                              
+
                               return (
                                 <div
                                   key={sample.id}
@@ -263,7 +261,7 @@ export const BatchRouting: React.FC = () => {
                                       </p>
                                     </div>
                                   </div>
-                                  
+
                                   {deptId === 'unassigned' && (
                                     <div className="flex items-center space-x-2">
                                       <Select
@@ -271,23 +269,25 @@ export const BatchRouting: React.FC = () => {
                                         onChange={(e) => {
                                           const value = e.target.value;
                                           const [deptId, analyzerId] = value.split('|');
-                                          handleManualRoute(sample.id, deptId, analyzerId || undefined);
+                                          handleManualRoute(
+                                            sample.id,
+                                            deptId,
+                                            analyzerId || undefined
+                                          );
                                         }}
                                       >
                                         <SelectTrigger className="w-48">
                                           <SelectValue placeholder="Select destination" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          {departments.map(dept => (
+                                          {departments.map((dept) => (
                                             <React.Fragment key={dept.id}>
-                                              <SelectItem value={dept.id}>
-                                                {dept.name}
-                                              </SelectItem>
+                                              <SelectItem value={dept.id}>{dept.name}</SelectItem>
                                               {analyzers
-                                                .filter(a => a.departmentId === dept.id)
-                                                .map(analyzer => (
-                                                  <SelectItem 
-                                                    key={analyzer.id} 
+                                                .filter((a) => a.departmentId === dept.id)
+                                                .map((analyzer) => (
+                                                  <SelectItem
+                                                    key={analyzer.id}
                                                     value={`${dept.id}|${analyzer.id}`}
                                                   >
                                                     <span className="ml-4">
@@ -302,12 +302,12 @@ export const BatchRouting: React.FC = () => {
                                       </Select>
                                     </div>
                                   )}
-                                  
+
                                   {routing?.analyzerId && (
                                     <div className="flex items-center text-xs text-muted-foreground">
                                       <ArrowRight className="h-3 w-3 mx-1" />
                                       <Cpu className="h-3 w-3 mr-1" />
-                                      {analyzers.find(a => a.id === routing.analyzerId)?.name}
+                                      {analyzers.find((a) => a.id === routing.analyzerId)?.name}
                                     </div>
                                   )}
                                 </div>
@@ -329,7 +329,11 @@ export const BatchRouting: React.FC = () => {
               className="w-full"
               size="lg"
               onClick={handleBatchRoute}
-              disabled={isProcessing || (Object.keys(groupedByDepartment).includes('unassigned') && groupedByDepartment['unassigned'].length > 0)}
+              disabled={
+                isProcessing ||
+                (Object.keys(groupedByDepartment).includes('unassigned') &&
+                  groupedByDepartment['unassigned'].length > 0)
+              }
             >
               {isProcessing ? (
                 <>

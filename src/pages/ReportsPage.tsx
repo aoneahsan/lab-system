@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
-import { 
-  FileText, 
-  Plus, 
-  Download, 
-  Play, 
+import {
+  FileText,
+  Plus,
+  Download,
+  Play,
   Clock,
   CheckCircle,
   XCircle,
   Calendar,
-  Filter
+  Filter,
 } from 'lucide-react';
 import { useReports, useCreateReport, useGenerateReport } from '@/hooks/useReports';
 import ReportBuilder from '@/components/reports/ReportBuilder';
-import type { ReportFormData, ReportQueryFilter, ReportStatus, ReportType } from '@/types/report.types';
+import type {
+  ReportFormData,
+  ReportQueryFilter,
+  ReportStatus,
+  ReportType,
+} from '@/types/report.types';
 
 const ReportsPage: React.FC = () => {
   const [showReportBuilder, setShowReportBuilder] = useState(false);
   const [filter, setFilter] = useState<ReportQueryFilter>({});
-  
+
   const { data: reports = [], isLoading } = useReports(filter);
   const createReportMutation = useCreateReport();
   const generateReportMutation = useGenerateReport();
@@ -68,7 +73,7 @@ const ReportsPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Create New Report</h1>
           <p className="text-gray-600 mt-2">Configure and generate a new report</p>
         </div>
-        
+
         <ReportBuilder
           onSubmit={handleCreateReport}
           onCancel={() => setShowReportBuilder(false)}
@@ -102,7 +107,9 @@ const ReportsPage: React.FC = () => {
           <Filter className="h-5 w-5 text-gray-500" />
           <select
             value={filter.type || ''}
-            onChange={(e) => setFilter({ ...filter, type: e.target.value as ReportType || undefined })}
+            onChange={(e) =>
+              setFilter({ ...filter, type: (e.target.value as ReportType) || undefined })
+            }
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Types</option>
@@ -115,10 +122,12 @@ const ReportsPage: React.FC = () => {
             <option value="workload">Workload</option>
             <option value="custom">Custom</option>
           </select>
-          
+
           <select
             value={filter.status || ''}
-            onChange={(e) => setFilter({ ...filter, status: e.target.value as ReportStatus || undefined })}
+            onChange={(e) =>
+              setFilter({ ...filter, status: (e.target.value as ReportStatus) || undefined })
+            }
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Status</option>
@@ -191,7 +200,11 @@ const ReportsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(report.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getStatusColor(
+                          report.status
+                        )}`}
+                      >
                         {report.status}
                       </span>
                     </td>
@@ -205,7 +218,7 @@ const ReportsPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => window.location.href = `/reports/${report.id}`}
+                        onClick={() => (window.location.href = `/reports/${report.id}`)}
                         className="text-blue-600 hover:text-blue-900 mr-3"
                       >
                         View

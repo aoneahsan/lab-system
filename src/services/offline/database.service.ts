@@ -40,19 +40,13 @@ class OfflineDatabaseService {
       if (retCC.result && isConn) {
         this.db = await this.sqlite.retrieveConnection(this.dbName, false);
       } else {
-        this.db = await this.sqlite.createConnection(
-          this.dbName,
-          false,
-          'no-encryption',
-          1,
-          false
-        );
+        this.db = await this.sqlite.createConnection(this.dbName, false, 'no-encryption', 1, false);
       }
 
       await this.db.open();
       await this.createTables();
       this.isInitialized = true;
-      
+
       console.log('Offline database initialized successfully');
     } catch (error) {
       console.error('Error initializing offline database:', error);
@@ -129,7 +123,7 @@ class OfflineDatabaseService {
       `CREATE INDEX IF NOT EXISTS idx_cached_samples_patient ON cached_samples(patient_id)`,
       `CREATE INDEX IF NOT EXISTS idx_cached_results_patient ON cached_results(patient_id)`,
       `CREATE INDEX IF NOT EXISTS idx_cached_results_sample ON cached_results(sample_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_cached_appointments_patient ON cached_appointments(patient_id)`
+      `CREATE INDEX IF NOT EXISTS idx_cached_appointments_patient ON cached_appointments(patient_id)`,
     ];
 
     for (const sql of tables) {
@@ -137,7 +131,9 @@ class OfflineDatabaseService {
     }
   }
 
-  async queueOperation(operation: Omit<OfflineRecord, 'id' | 'timestamp' | 'synced'>): Promise<void> {
+  async queueOperation(
+    operation: Omit<OfflineRecord, 'id' | 'timestamp' | 'synced'>
+  ): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -154,7 +150,7 @@ class OfflineDatabaseService {
       operation.documentId,
       operation.operation,
       JSON.stringify(operation.data),
-      timestamp
+      timestamp,
     ]);
   }
 
@@ -165,53 +161,63 @@ class OfflineDatabaseService {
       'SELECT * FROM offline_queue WHERE synced = 0 ORDER BY timestamp ASC'
     );
 
-    return result.values?.map(row => ({
-      id: row.id,
-      collection: row.collection,
-      documentId: row.document_id,
-      operation: row.operation as 'create' | 'update' | 'delete',
-      data: JSON.parse(row.data),
-      timestamp: row.timestamp,
-      synced: row.synced === 1,
-      syncError: row.sync_error
-    })) || [];
+    return (
+      result.values?.map((row) => ({
+        id: row.id,
+        collection: row.collection,
+        documentId: row.document_id,
+        operation: row.operation as 'create' | 'update' | 'delete',
+        data: JSON.parse(row.data),
+        timestamp: row.timestamp,
+        synced: row.synced === 1,
+        syncError: row.sync_error,
+      })) || []
+    );
   }
 
   async markSynced(id: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execute(
-      'UPDATE offline_queue SET synced = 1 WHERE id = ?',
-      [id]
-    );
+    await this.db.execute('UPDATE offline_queue SET synced = 1 WHERE id = ?', [id]);
   }
 
   async markSyncError(id: string, error: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execute(
-      'UPDATE offline_queue SET sync_error = ? WHERE id = ?',
-      [error, id]
-    );
+    await this.db.execute('UPDATE offline_queue SET sync_error = ? WHERE id = ?', [error, id]);
   }
 
   // Cache management methods
-  async cacheData(collection: string, id: string, data: any, additionalFields?: Record<string, any>): Promise<void> {
+  async cacheData(
+    collection: string,
+    id: string,
+    data: any,
+    additionalFields?: Record<string, any>
+  ): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = `cached_${collection}`;
     const timestamp = Date.now();
 
     const sql = `
-      INSERT OR REPLACE INTO ${tableName} (id, data, last_synced${additionalFields ? ', ' + Object.keys(additionalFields).join(', ') : ''})
-      VALUES (?, ?, ?${additionalFields ? ', ' + Object.keys(additionalFields).map(() => '?').join(', ') : ''})
+      INSERT OR REPLACE INTO ${tableName} (id, data, last_synced${
+        additionalFields ? ', ' + Object.keys(additionalFields).join(', ') : ''
+      })
+      VALUES (?, ?, ?${
+        additionalFields
+          ? ', ' +
+            Object.keys(additionalFields)
+              .map(() => '?')
+              .join(', ')
+          : ''
+      })
     `;
 
     const values = [
       id,
       JSON.stringify(data),
       timestamp,
-      ...(additionalFields ? Object.values(additionalFields) : [])
+      ...(additionalFields ? Object.values(additionalFields) : []),
     ];
 
     await this.db.execute(sql, values);
@@ -221,38 +227,41 @@ class OfflineDatabaseService {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = `cached_${collection}`;
-    
+
     let sql = `SELECT * FROM ${tableName}`;
     const values: any[] = [];
-    
+
     if (id) {
       sql += ' WHERE id = ?';
       values.push(id);
     }
 
     const result = await this.db.query(sql, values);
-    
-    return result.values?.map(row => ({
-      id: row.id,
-      ...JSON.parse(row.data),
-      _lastSynced: row.last_synced
-    })) || [];
+
+    return (
+      result.values?.map((row) => ({
+        id: row.id,
+        ...JSON.parse(row.data),
+        _lastSynced: row.last_synced,
+      })) || []
+    );
   }
 
   async getCachedDataByPatient(collection: string, patientId: string): Promise<any[]> {
     if (!this.db) throw new Error('Database not initialized');
 
     const tableName = `cached_${collection}`;
-    const result = await this.db.query(
-      `SELECT * FROM ${tableName} WHERE patient_id = ?`,
-      [patientId]
-    );
+    const result = await this.db.query(`SELECT * FROM ${tableName} WHERE patient_id = ?`, [
+      patientId,
+    ]);
 
-    return result.values?.map(row => ({
-      id: row.id,
-      ...JSON.parse(row.data),
-      _lastSynced: row.last_synced
-    })) || [];
+    return (
+      result.values?.map((row) => ({
+        id: row.id,
+        ...JSON.parse(row.data),
+        _lastSynced: row.last_synced,
+      })) || []
+    );
   }
 
   async clearCache(collection?: string): Promise<void> {
@@ -272,10 +281,9 @@ class OfflineDatabaseService {
   async getSyncMetadata(collection: string): Promise<any> {
     if (!this.db) throw new Error('Database not initialized');
 
-    const result = await this.db.query(
-      'SELECT * FROM sync_metadata WHERE collection = ?',
-      [collection]
-    );
+    const result = await this.db.query('SELECT * FROM sync_metadata WHERE collection = ?', [
+      collection,
+    ]);
 
     return result.values?.[0];
   }

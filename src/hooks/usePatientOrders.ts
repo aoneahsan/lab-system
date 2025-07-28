@@ -25,14 +25,10 @@ export function usePatientOrders(patientId: string) {
       if (!currentTenant || !patientId) return [];
 
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
-      const q = query(
-        ordersRef,
-        where('patientId', '==', patientId),
-        orderBy('createdAt', 'desc')
-      );
+      const q = query(ordersRef, where('patientId', '==', patientId), orderBy('createdAt', 'desc'));
 
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt.toDate(),

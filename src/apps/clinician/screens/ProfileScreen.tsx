@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { 
+import {
   User,
   Mail,
   Phone,
@@ -14,7 +14,7 @@ import {
   ChevronRight,
   Fingerprint,
   Award,
-  Clock
+  Clock,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { format } from 'date-fns';
@@ -45,25 +45,25 @@ export function ProfileScreen() {
       icon: Bell,
       label: 'Notification Settings',
       value: 'All notifications enabled',
-      onClick: () => navigate('/clinician/settings/notifications')
+      onClick: () => navigate('/clinician/settings/notifications'),
     },
     {
       icon: Fingerprint,
       label: 'Biometric Authentication',
       value: 'Not configured',
-      onClick: handleBiometricSetup
+      onClick: handleBiometricSetup,
     },
     {
       icon: Shield,
       label: 'Security Settings',
       value: 'Two-factor enabled',
-      onClick: () => navigate('/clinician/settings/security')
+      onClick: () => navigate('/clinician/settings/security'),
     },
     {
       icon: Award,
       label: 'Certifications',
       value: '3 active',
-      onClick: () => navigate('/clinician/certifications')
+      onClick: () => navigate('/clinician/certifications'),
     },
   ];
 
@@ -77,7 +77,9 @@ export function ProfileScreen() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Dr. {currentUser.displayName}</h1>
-            <p className="text-gray-600">{currentUser.metadata?.specialization || 'General Practitioner'}</p>
+            <p className="text-gray-600">
+              {currentUser.metadata?.specialization || 'General Practitioner'}
+            </p>
             <div className="flex items-center space-x-2 mt-2">
               <Badge variant="outline">
                 <Shield className="h-3 w-3 mr-1" />

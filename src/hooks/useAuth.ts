@@ -23,8 +23,7 @@ export function useLogin() {
   const { setCurrentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ email, password }: LoginCredentials) => 
-      authService.login(email, password),
+    mutationFn: ({ email, password }: LoginCredentials) => authService.login(email, password),
     onSuccess: (user) => {
       setCurrentUser(user);
       toast.success('Login successful');
@@ -66,8 +65,7 @@ export function useLogout() {
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: ({ email }: { email: string }) => 
-      authService.resetPassword(email),
+    mutationFn: ({ email }: { email: string }) => authService.resetPassword(email),
     onSuccess: () => {
       toast.success('Password reset email sent');
     },

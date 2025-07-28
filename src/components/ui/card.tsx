@@ -34,44 +34,42 @@ export const CardHeader = React.forwardRef<HTMLDivElement, CardProps>(
 );
 CardHeader.displayName = 'CardHeader';
 
-export const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className = '', children, ...props }, ref) => {
-    return (
-      <h3
-        ref={ref}
-        className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}
-        {...props}
-      >
-        {children}
-      </h3>
-    );
-  }
-);
+export const CardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className = '', children, ...props }, ref) => {
+  return (
+    <h3
+      ref={ref}
+      className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}
+      {...props}
+    >
+      {children}
+    </h3>
+  );
+});
 CardTitle.displayName = 'CardTitle';
 
-export const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className = '', children, ...props }, ref) => {
-    return (
-      <p
-        ref={ref}
-        className={`mt-1 text-sm text-gray-600 dark:text-gray-400 ${className}`}
-        {...props}
-      >
-        {children}
-      </p>
-    );
-  }
-);
+export const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className = '', children, ...props }, ref) => {
+  return (
+    <p
+      ref={ref}
+      className={`mt-1 text-sm text-gray-600 dark:text-gray-400 ${className}`}
+      {...props}
+    >
+      {children}
+    </p>
+  );
+});
 CardDescription.displayName = 'CardDescription';
 
 export const CardContent = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={`px-6 py-4 ${className}`}
-        {...props}
-      >
+      <div ref={ref} className={`px-6 py-4 ${className}`} {...props}>
         {children}
       </div>
     );

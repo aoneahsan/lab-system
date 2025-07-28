@@ -19,66 +19,59 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const BillingDashboard: React.FC = () => {
   const [dateRange] = useState({
     startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
-    endDate: new Date()
+    endDate: new Date(),
   });
 
   const { data: revenueSummary } = useQuery({
     queryKey: ['revenue-summary', dateRange],
-    queryFn: () => billingService.getRevenueSummary({
-      ...dateRange,
-      groupBy: 'day'
-    })
+    queryFn: () =>
+      billingService.getRevenueSummary({
+        ...dateRange,
+        groupBy: 'day',
+      }),
   });
 
   const { data: outstandingData } = useQuery({
     queryKey: ['outstanding-balances'],
-    queryFn: () => billingService.getOutstandingBalances({ limit: 5 })
+    queryFn: () => billingService.getOutstandingBalances({ limit: 5 }),
   });
 
   const { data: paymentSummary } = useQuery({
     queryKey: ['payment-summary', dateRange],
-    queryFn: () => billingService.getPaymentSummary(dateRange)
+    queryFn: () => billingService.getPaymentSummary(dateRange),
   });
 
   const { data: recentBills } = useQuery({
     queryKey: ['recent-bills'],
-    queryFn: () => billingService.getBills({ limit: 10 })
+    queryFn: () => billingService.getBills({ limit: 10 }),
   });
 
   const chartData = {
-    labels: revenueSummary?.data.map(d => new Date(d.date).toLocaleDateString()) || [],
+    labels: revenueSummary?.data.map((d) => new Date(d.date).toLocaleDateString()) || [],
     datasets: [
       {
         label: 'Revenue',
-        data: revenueSummary?.data.map(d => d.revenue) || [],
+        data: revenueSummary?.data.map((d) => d.revenue) || [],
         borderColor: 'rgb(59, 130, 246)',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        tension: 0.4
+        tension: 0.4,
       },
       {
         label: 'Payments',
-        data: revenueSummary?.data.map(d => d.payments) || [],
+        data: revenueSummary?.data.map((d) => d.payments) || [],
         borderColor: 'rgb(34, 197, 94)',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        tension: 0.4
-      }
-    ]
+        tension: 0.4,
+      },
+    ],
   };
 
   const chartOptions = {
@@ -89,17 +82,17 @@ const BillingDashboard: React.FC = () => {
         position: 'top' as const,
       },
       title: {
-        display: false
-      }
+        display: false,
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          callback: (value: any) => formatCurrency(value)
-        }
-      }
-    }
+          callback: (value: any) => formatCurrency(value),
+        },
+      },
+    },
   };
 
   return (
@@ -145,7 +138,8 @@ const BillingDashboard: React.FC = () => {
             <CheckCircleIcon className="h-12 w-12 text-green-500" />
           </div>
           <p className="mt-2 text-sm text-gray-500">
-            {((revenueSummary?.paid || 0) / (revenueSummary?.total || 1) * 100).toFixed(1)}% collected
+            {(((revenueSummary?.paid || 0) / (revenueSummary?.total || 1)) * 100).toFixed(1)}%
+            collected
           </p>
         </div>
 
@@ -172,9 +166,7 @@ const BillingDashboard: React.FC = () => {
             </div>
             <ExclamationCircleIcon className="h-12 w-12 text-red-500" />
           </div>
-          <p className="mt-2 text-sm text-gray-500">
-            {outstandingData?.bills.length || 0} bills
-          </p>
+          <p className="mt-2 text-sm text-gray-500">{outstandingData?.bills.length || 0} bills</p>
         </div>
       </div>
 
@@ -204,23 +196,24 @@ const BillingDashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Payment Methods</h2>
           <div className="space-y-3">
-            {paymentSummary?.byMethod && Object.entries(paymentSummary.byMethod).map(([method, amount]) => {
-              const percentage = (amount / paymentSummary.total) * 100;
-              return (
-                <div key={method}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700 capitalize">{method}</span>
-                    <span className="text-sm text-gray-500">{formatCurrency(amount)}</span>
+            {paymentSummary?.byMethod &&
+              Object.entries(paymentSummary.byMethod).map(([method, amount]) => {
+                const percentage = (amount / paymentSummary.total) * 100;
+                return (
+                  <div key={method}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700 capitalize">{method}</span>
+                      <span className="text-sm text-gray-500">{formatCurrency(amount)}</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
 
@@ -228,13 +221,14 @@ const BillingDashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium text-gray-900">Outstanding Balances</h2>
-            <button className="text-sm text-blue-600 hover:text-blue-800">
-              View All →
-            </button>
+            <button className="text-sm text-blue-600 hover:text-blue-800">View All →</button>
           </div>
           <div className="space-y-3">
             {outstandingData?.bills.slice(0, 5).map((bill) => (
-              <div key={bill.billId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div
+                key={bill.billId}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
                 <div>
                   <p className="text-sm font-medium text-gray-900">{bill.billNumber}</p>
                   <p className="text-xs text-gray-500">
@@ -301,12 +295,17 @@ const BillingDashboard: React.FC = () => {
                     {formatCurrency(bill.totals.total)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      bill.status === 'paid' ? 'bg-green-100 text-green-800' :
-                      bill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      bill.status === 'overdue' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        bill.status === 'paid'
+                          ? 'bg-green-100 text-green-800'
+                          : bill.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : bill.status === 'overdue'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {bill.status}
                     </span>
                   </td>

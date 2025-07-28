@@ -3,25 +3,17 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  Search, 
-  Clock,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Beaker,
-  DollarSign
-} from 'lucide-react';
+import { Search, Clock, Info, ChevronDown, ChevronUp, Beaker, DollarSign } from 'lucide-react';
 import { useTests } from '@/hooks/useTests';
 
 export function TestCatalogScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
-  
-  const { data: tests = [], isLoading } = useTests({ 
+
+  const { data: tests = [], isLoading } = useTests({
     searchTerm: searchQuery,
-    category: selectedCategory === 'all' ? undefined : selectedCategory 
+    category: selectedCategory === 'all' ? undefined : selectedCategory,
   });
 
   const categories = [
@@ -45,9 +37,7 @@ export function TestCatalogScreen() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Test Catalog</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Browse available laboratory tests and panels
-        </p>
+        <p className="text-sm text-gray-600 mt-1">Browse available laboratory tests and panels</p>
       </div>
 
       {/* Search and Filter */}
@@ -62,13 +52,12 @@ export function TestCatalogScreen() {
             className="pl-10"
           />
         </div>
-        
-        <Select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map(cat => (
-            <option key={cat.value} value={cat.value}>{cat.label}</option>
+
+        <Select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+          {categories.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
           ))}
         </Select>
       </div>
@@ -91,7 +80,7 @@ export function TestCatalogScreen() {
         ) : (
           tests.map((test) => {
             const isExpanded = expandedTest === test.id;
-            
+
             return (
               <Card key={test.id} className="overflow-hidden">
                 <div
@@ -101,9 +90,7 @@ export function TestCatalogScreen() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {test.name}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900">{test.name}</h3>
                         <Badge variant="outline" size="sm">
                           {test.code}
                         </Badge>
@@ -119,8 +106,7 @@ export function TestCatalogScreen() {
                         </span>
                         {test.price && (
                           <span className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-1" />
-                            ${test.price}
+                            <DollarSign className="h-4 w-4 mr-1" />${test.price}
                           </span>
                         )}
                       </div>
@@ -144,13 +130,14 @@ export function TestCatalogScreen() {
                         </div>
                       )}
 
-
                       {/* Specimen Requirements */}
                       <div>
                         <h4 className="font-medium text-gray-900 mb-1">Specimen Requirements</h4>
                         <div className="text-sm text-gray-700">
                           <p>Type: {test.specimen.type}</p>
-                          <p>Volume: {test.specimen.volume} {test.specimen.volumeUnit}</p>
+                          <p>
+                            Volume: {test.specimen.volume} {test.specimen.volumeUnit}
+                          </p>
                           <p>Container: {test.specimen.container || 'Standard'}</p>
                           {test.specimen.specialInstructions && (
                             <p className="mt-1 italic">
@@ -165,12 +152,13 @@ export function TestCatalogScreen() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">Reference Ranges</h4>
                           <p className="text-sm text-gray-700">
-                            {test.referenceRanges[0].textRange || 
-                             `${test.referenceRanges[0].normalMin || ''} - ${test.referenceRanges[0].normalMax || ''}`}
+                            {test.referenceRanges[0].textRange ||
+                              `${test.referenceRanges[0].normalMin || ''} - ${
+                                test.referenceRanges[0].normalMax || ''
+                              }`}
                           </p>
                         </div>
                       )}
-
 
                       {/* Additional Info */}
                       <div className="flex items-start space-x-2 bg-blue-50 rounded-lg p-3">

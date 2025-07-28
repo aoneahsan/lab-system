@@ -60,191 +60,174 @@ const TestForm: React.FC<TestFormProps> = ({
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Basic Information */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Basic Information
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Test Code *
-            </label>
-            <input
-              type="text"
-              {...register('code', { required: 'Test code is required' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.code && (
-              <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Test Name *
-            </label>
-            <input
-              type="text"
-              {...register('name', { required: 'Test name is required' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category *
-            </label>
-            <select
-              {...register('category', { required: 'Category is required' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="chemistry">Chemistry</option>
-              <option value="hematology">Hematology</option>
-              <option value="microbiology">Microbiology</option>
-              <option value="immunology">Immunology</option>
-              <option value="pathology">Pathology</option>
-              <option value="genetics">Genetics</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Department
-            </label>
-            <input
-              type="text"
-              {...register('department')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Test Options */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Test Options
-        </h3>
-        <div className="space-y-4">
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
+        {/* Basic Information */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Test Code *</label>
               <input
-                type="checkbox"
-                {...register('isActive')}
-                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                type="text"
+                {...register('code', { required: 'Test code is required' })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
+              {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>}
             </div>
-            <div className="ml-3 text-sm">
-              <label className="font-medium text-gray-700">Active</label>
-              <p className="text-gray-500">Test is available for ordering</p>
-            </div>
-          </div>
-          
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Test Name *</label>
               <input
-                type="checkbox"
-                {...register('isOrderable')}
-                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                type="text"
+                {...register('name', { required: 'Test name is required' })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
+              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
             </div>
-            <div className="ml-3 text-sm">
-              <label className="font-medium text-gray-700">Orderable</label>
-              <p className="text-gray-500">Test can be ordered by providers</p>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Category *</label>
+              <select
+                {...register('category', { required: 'Category is required' })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="chemistry">Chemistry</option>
+                <option value="hematology">Hematology</option>
+                <option value="microbiology">Microbiology</option>
+                <option value="immunology">Immunology</option>
+                <option value="pathology">Pathology</option>
+                <option value="genetics">Genetics</option>
+                <option value="other">Other</option>
+              </select>
             </div>
-          </div>
-          
-          <div className="flex items-start">
-            <div className="flex items-center h-5">
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Department</label>
               <input
-                type="checkbox"
-                {...register('requiresApproval')}
-                className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                type="text"
+                {...register('department')}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-            </div>
-            <div className="ml-3 text-sm">
-              <label className="font-medium text-gray-700">Requires Approval</label>
-              <p className="text-gray-500">Orders for this test require approval before processing</p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* LOINC Integration */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          LOINC Integration
-        </h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              LOINC Code
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowLOINCBrowser(true)}
-              className="w-full px-4 py-2 text-left border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
-            >
-              <span className="flex items-center gap-2">
-                <Search className="h-4 w-4 text-gray-400" />
-                {selectedLoinc ? (
-                  <span>
-                    <span className="font-mono">{selectedLoinc.code}</span> - {selectedLoinc.displayName}
-                  </span>
-                ) : (
-                  <span className="text-gray-500">Browse LOINC codes...</span>
-                )}
-              </span>
-            </button>
+        {/* Test Options */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Test Options</h3>
+          <div className="space-y-4">
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  {...register('isActive')}
+                  className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label className="font-medium text-gray-700">Active</label>
+                <p className="text-gray-500">Test is available for ordering</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  {...register('isOrderable')}
+                  className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label className="font-medium text-gray-700">Orderable</label>
+                <p className="text-gray-500">Test can be ordered by providers</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  {...register('requiresApproval')}
+                  className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label className="font-medium text-gray-700">Requires Approval</label>
+                <p className="text-gray-500">
+                  Orders for this test require approval before processing
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {selectedLoinc && (
-            <div className="bg-blue-50 p-4 rounded-md">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">Selected LOINC Code</h4>
-              <dl className="space-y-1 text-sm">
-                <div>
-                  <dt className="inline text-gray-600">Code:</dt>
-                  <dd className="inline ml-2 font-mono">{selectedLoinc.code}</dd>
-                </div>
-                <div>
-                  <dt className="inline text-gray-600">Name:</dt>
-                  <dd className="inline ml-2">{selectedLoinc.displayName}</dd>
-                </div>
-                {selectedLoinc.class && (
+        {/* LOINC Integration */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">LOINC Integration</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">LOINC Code</label>
+              <button
+                type="button"
+                onClick={() => setShowLOINCBrowser(true)}
+                className="w-full px-4 py-2 text-left border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <Search className="h-4 w-4 text-gray-400" />
+                  {selectedLoinc ? (
+                    <span>
+                      <span className="font-mono">{selectedLoinc.code}</span> -{' '}
+                      {selectedLoinc.displayName}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500">Browse LOINC codes...</span>
+                  )}
+                </span>
+              </button>
+            </div>
+
+            {selectedLoinc && (
+              <div className="bg-blue-50 p-4 rounded-md">
+                <h4 className="text-sm font-medium text-blue-900 mb-2">Selected LOINC Code</h4>
+                <dl className="space-y-1 text-sm">
                   <div>
-                    <dt className="inline text-gray-600">Class:</dt>
-                    <dd className="inline ml-2">{selectedLoinc.class}</dd>
+                    <dt className="inline text-gray-600">Code:</dt>
+                    <dd className="inline ml-2 font-mono">{selectedLoinc.code}</dd>
                   </div>
-                )}
-              </dl>
-            </div>
-          )}
+                  <div>
+                    <dt className="inline text-gray-600">Name:</dt>
+                    <dd className="inline ml-2">{selectedLoinc.displayName}</dd>
+                  </div>
+                  {selectedLoinc.class && (
+                    <div>
+                      <dt className="inline text-gray-600">Class:</dt>
+                      <dd className="inline ml-2">{selectedLoinc.class}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isLoading ? 'Saving...' : 'Save Test'}
-        </button>
-      </div>
-    </form>
+        {/* Actions */}
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isLoading ? 'Saving...' : 'Save Test'}
+          </button>
+        </div>
+      </form>
 
       {/* LOINC Browser Modal */}
       {showLOINCBrowser && (

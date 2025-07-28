@@ -30,22 +30,22 @@ class BarcodeScannerService {
 
     try {
       const status = await BarcodeScanner.checkPermission({ force: true });
-      
+
       if (status.granted) {
         return true;
       }
-      
+
       if (status.denied) {
         // User denied permission
         alert('Camera permission is required for barcode scanning. Please enable it in settings.');
         return false;
       }
-      
+
       if (status.restricted || status.unknown) {
         // iOS only - permission is restricted
         return false;
       }
-      
+
       // Permission not requested yet
       const newStatus = await BarcodeScanner.checkPermission({ force: true });
       return newStatus.granted;
@@ -73,17 +73,17 @@ class BarcodeScannerService {
 
     try {
       this.isScanning = true;
-      
+
       // Hide background to show camera preview
       await BarcodeScanner.hideBackground();
       document.body.classList.add('scanner-active');
-      
+
       const result = await BarcodeScanner.startScan();
-      
+
       return {
         hasContent: result.hasContent,
         content: result.content || '',
-        format: result.format || 'UNKNOWN'
+        format: result.format || 'UNKNOWN',
       };
     } catch (error) {
       console.error('Error during barcode scan:', error);
@@ -124,7 +124,7 @@ class BarcodeScannerService {
     if (match) {
       return {
         type: match[1].toLowerCase() as BarcodeData['type'],
-        id: match[2]
+        id: match[2],
       };
     }
 
@@ -132,7 +132,7 @@ class BarcodeScannerService {
     if (/^[A-Z]{2}\d{6,}$/.test(content)) {
       return {
         type: 'sample',
-        id: content
+        id: content,
       };
     }
 
@@ -140,7 +140,7 @@ class BarcodeScannerService {
     if (/^P\d{6,}$/.test(content)) {
       return {
         type: 'patient',
-        id: content
+        id: content,
       };
     }
 
@@ -161,27 +161,34 @@ class BarcodeScannerService {
   // Mock scan for web/development
   private async mockScan(): Promise<ScanResult> {
     // Simulate scanning delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Return mock data
     const mockData = [
       { content: 'SAMPLE:ST20241027001', format: 'CODE128' },
       { content: 'PATIENT:P12345678', format: 'QR_CODE' },
-      { content: JSON.stringify({ type: 'order', id: 'ORD20241027001', metadata: { priority: 'urgent' } }), format: 'QR_CODE' },
+      {
+        content: JSON.stringify({
+          type: 'order',
+          id: 'ORD20241027001',
+          metadata: { priority: 'urgent' },
+        }),
+        format: 'QR_CODE',
+      },
     ];
-    
+
     const randomIndex = Math.floor(Math.random() * mockData.length);
-    
+
     return {
       hasContent: true,
-      ...mockData[randomIndex]
+      ...mockData[randomIndex],
     };
   }
 
   // Enable torch/flashlight
   async enableTorch(): Promise<void> {
     if (!this.isSupported() || !this.isScanning) return;
-    
+
     try {
       await BarcodeScanner.enableTorch();
     } catch (error) {
@@ -192,7 +199,7 @@ class BarcodeScannerService {
   // Disable torch/flashlight
   async disableTorch(): Promise<void> {
     if (!this.isSupported() || !this.isScanning) return;
-    
+
     try {
       await BarcodeScanner.disableTorch();
     } catch (error) {
@@ -203,7 +210,7 @@ class BarcodeScannerService {
   // Toggle torch/flashlight
   async toggleTorch(): Promise<void> {
     if (!this.isSupported() || !this.isScanning) return;
-    
+
     try {
       await BarcodeScanner.toggleTorch();
     } catch (error) {
@@ -214,7 +221,7 @@ class BarcodeScannerService {
   // Get torch status
   async getTorchState(): Promise<boolean> {
     if (!this.isSupported() || !this.isScanning) return false;
-    
+
     try {
       const state = await BarcodeScanner.getTorchState();
       return state.isEnabled || false;

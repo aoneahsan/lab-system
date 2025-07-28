@@ -10,7 +10,7 @@ const loincApi = axios.create({
   baseURL: LOINC_API_BASE_URL,
   timeout: LOINC_API_TIMEOUT,
   headers: {
-    'Accept': 'application/fhir+json',
+    Accept: 'application/fhir+json',
     'Content-Type': 'application/fhir+json',
   },
 });
@@ -64,9 +64,9 @@ interface FHIRBundle {
 // Convert FHIR concept to our LOINCCode format
 const convertFHIRToLOINC = (concept: FHIRCodeSystemConcept): LOINCCode => {
   const properties = concept.property || [];
-  
+
   const findProperty = (code: string): string | undefined => {
-    const prop = properties.find(p => p.code === code);
+    const prop = properties.find((p) => p.code === code);
     return prop?.valueString || prop?.valueCode;
   };
 
@@ -115,7 +115,7 @@ export const loincApiService = {
 
       if (response.data.entry) {
         const results = response.data.entry
-          .map(entry => {
+          .map((entry) => {
             if (entry.resource && entry.resource.code) {
               return convertFHIRToLOINC({
                 code: entry.resource.code,
@@ -209,8 +209,8 @@ export const loincApiService = {
         '2160-0', // Creatinine
         '3094-0', // BUN
         '6690-2', // WBC
-        '789-8',  // RBC
-        '718-7',  // Hemoglobin
+        '789-8', // RBC
+        '718-7', // Hemoglobin
         '2093-3', // Total Cholesterol
         '2571-8', // Triglycerides
         '1742-6', // ALT
@@ -227,9 +227,7 @@ export const loincApiService = {
         '2324-2', // GGT
       ];
 
-      const results = await Promise.all(
-        commonTestCodes.map(code => this.getLOINCByCode(code))
-      );
+      const results = await Promise.all(commonTestCodes.map((code) => this.getLOINCByCode(code)));
 
       const validResults = results.filter((item): item is LOINCCode => item !== null);
 
@@ -266,9 +264,7 @@ export const loincApiService = {
 
       if (response.data.expansion?.contains) {
         const results = await Promise.all(
-          response.data.expansion.contains.map(item => 
-            this.getLOINCByCode(item.code)
-          )
+          response.data.expansion.contains.map((item) => this.getLOINCByCode(item.code))
         );
 
         const validResults = results.filter((item): item is LOINCCode => item !== null);
@@ -286,7 +282,7 @@ export const loincApiService = {
       // Fall back to local search filtered by category
       const { loincService } = await import('./loinc.service');
       const allTests = await loincService.searchLOINCCodes('');
-      return allTests.filter(test => test.class === category);
+      return allTests.filter((test) => test.class === category);
     }
   },
 

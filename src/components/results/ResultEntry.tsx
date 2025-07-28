@@ -27,9 +27,12 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
 
   const handleValueChange = (testId: string, testName: string, value: string, unit?: string) => {
     const numValue = parseFloat(value);
-    const flag = unit && !isNaN(numValue) ? calculateFlag(numValue, tests.find(t => t.id === testId)?.referenceRange) : undefined;
-    
-    setResults(prev => ({
+    const flag =
+      unit && !isNaN(numValue)
+        ? calculateFlag(numValue, tests.find((t) => t.id === testId)?.referenceRange)
+        : undefined;
+
+    setResults((prev) => ({
       ...prev,
       [testId]: {
         testId,
@@ -37,7 +40,7 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
         value: isNaN(numValue) ? value : numValue,
         unit,
         flag,
-      }
+      },
     }));
   };
 
@@ -51,7 +54,7 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
   const handleSubmit = async () => {
     if (!currentUser?.tenantId || !currentUser?.id) return;
 
-    const testResults = Object.values(results).filter(r => r.value !== '');
+    const testResults = Object.values(results).filter((r) => r.value !== '');
     if (testResults.length === 0) return;
 
     try {
@@ -81,38 +84,38 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
           {tests.map((test) => {
             const result = results[test.id];
             const hasFlag = result?.flag;
-            
+
             return (
               <div key={test.id} className="grid grid-cols-12 gap-4 items-center">
                 <div className="col-span-5">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {test.name}
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700">{test.name}</label>
                   {test.referenceRange?.normal && (
-                    <p className="text-xs text-gray-500">
-                      Normal: {test.referenceRange.normal}
-                    </p>
+                    <p className="text-xs text-gray-500">Normal: {test.referenceRange.normal}</p>
                   )}
                 </div>
-                
+
                 <div className="col-span-3">
                   <input
                     type="text"
                     placeholder="Value"
-                    onChange={(e) => handleValueChange(test.id, test.name, e.target.value, test.unit)}
+                    onChange={(e) =>
+                      handleValueChange(test.id, test.name, e.target.value, test.unit)
+                    }
                     className="input"
                   />
                 </div>
-                
+
                 <div className="col-span-2">
                   <span className="text-sm text-gray-600">{test.unit || '-'}</span>
                 </div>
-                
+
                 <div className="col-span-2">
                   {hasFlag && (
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      hasFlag === 'H' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        hasFlag === 'H' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
                       {hasFlag}
                     </span>
                   )}
@@ -157,7 +160,7 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
               <span className="text-sm">Saved successfully</span>
             </div>
           )}
-          
+
           <button
             onClick={handleSubmit}
             disabled={loading || Object.keys(results).length === 0}

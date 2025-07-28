@@ -1,12 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
-  Activity,
-  Cpu,
-  Search
-} from 'lucide-react';
+import { Home, FileText, Activity, Cpu, Search } from 'lucide-react';
 
 export const LabStaffLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +27,7 @@ export const LabStaffLayout: React.FC = () => {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <button
                 key={item.path}

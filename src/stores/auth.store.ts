@@ -1,323 +1,309 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import {
-	signInWithEmailAndPassword,
-	createUserWithEmailAndPassword,
-	signOut,
-	sendPasswordResetEmail,
-	updateProfile,
-	onAuthStateChanged,
-	type User as FirebaseUser,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updateProfile,
+  onAuthStateChanged,
+  type User as FirebaseUser,
 } from 'firebase/auth';
-import {
-	doc,
-	getDoc,
-	setDoc,
-	updateDoc,
-	serverTimestamp,
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, firestore } from '@/config/firebase.config';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
-import type {
-	User,
-	LoginCredentials,
-	RegisterData,
-	AuthState,
-} from '@/types/auth.types';
+import type { User, LoginCredentials, RegisterData, AuthState } from '@/types/auth.types';
 import { biometricService } from '@/services/biometric.service';
 import type { BiometricAuthResult } from '@/types/biometric.types';
 
 interface AuthStore extends AuthState {
-	setFirebaseUser: (user: FirebaseUser | null) => void;
-	setCurrentUser: (user: User | null) => void;
-	setLoading: (isLoading: boolean) => void;
-	setError: (error: Error | null) => void;
+  setFirebaseUser: (user: FirebaseUser | null) => void;
+  setCurrentUser: (user: User | null) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: Error | null) => void;
 
-	login: (credentials: LoginCredentials) => Promise<User>;
-	loginWithBiometric: () => Promise<BiometricAuthResult>;
-	register: (data: RegisterData) => Promise<User>;
-	logout: () => Promise<void>;
-	resetPassword: (email: string) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<User>;
+  loginWithBiometric: () => Promise<BiometricAuthResult>;
+  register: (data: RegisterData) => Promise<User>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 
-	fetchUserData: (uid: string) => Promise<User | null>;
-	updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
-	refreshUser: () => Promise<void>;
+  fetchUserData: (uid: string) => Promise<User | null>;
+  updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
+  refreshUser: () => Promise<void>;
 
-	initializeAuth: () => void;
+  initializeAuth: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
-	persist(
-		(set, get) => ({
-			firebaseUser: null,
-			currentUser: null,
-			isLoading: true,
-			isAuthenticated: false,
-			error: null,
+  persist(
+    (set, get) => ({
+      firebaseUser: null,
+      currentUser: null,
+      isLoading: true,
+      isAuthenticated: false,
+      error: null,
 
-			setFirebaseUser: (user) =>
-				set({ firebaseUser: user, isAuthenticated: !!user }),
-			setCurrentUser: (user) => set({ currentUser: user }),
-			setLoading: (isLoading) => set({ isLoading }),
-			setError: (error) => set({ error }),
+      setFirebaseUser: (user) => set({ firebaseUser: user, isAuthenticated: !!user }),
+      setCurrentUser: (user) => set({ currentUser: user }),
+      setLoading: (isLoading) => set({ isLoading }),
+      setError: (error) => set({ error }),
 
-			login: async (credentials) => {
-				const { setLoading, setError, fetchUserData } = get();
+      login: async (credentials) => {
+        const { setLoading, setError, fetchUserData } = get();
 
-				try {
-					setLoading(true);
-					setError(null);
+        try {
+          setLoading(true);
+          setError(null);
 
-					const userCredential = await signInWithEmailAndPassword(
-						auth,
-						credentials.email,
-						credentials.password
-					);
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            credentials.email,
+            credentials.password
+          );
 
-					const userData = await fetchUserData(userCredential.user.uid);
+          const userData = await fetchUserData(userCredential.user.uid);
 
-					if (!userData) {
-						throw new Error('User data not found');
-					}
+          if (!userData) {
+            throw new Error('User data not found');
+          }
 
-					if (!userData.isActive) {
-						await signOut(auth);
-						throw new Error('Account is deactivated');
-					}
+          if (!userData.isActive) {
+            await signOut(auth);
+            throw new Error('Account is deactivated');
+          }
 
-					// Update last login
-					await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
-						lastLoginAt: serverTimestamp(),
-					});
+          // Update last login
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
+            lastLoginAt: serverTimestamp(),
+          });
 
-					return userData;
-				} catch (error) {
-					setError(error as Error);
-					throw error;
-				} finally {
-					setLoading(false);
-				}
-			},
+          return userData;
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
 
-			register: async (data) => {
-				const { setLoading, setError, setCurrentUser } = get();
+      register: async (data) => {
+        const { setLoading, setError, setCurrentUser } = get();
 
-				try {
-					setLoading(true);
-					setError(null);
+        try {
+          setLoading(true);
+          setError(null);
 
-					// First check if tenant exists
-					const tenantDoc = await getDoc(doc(firestore, 'tenants', data.tenantCode.toLowerCase()));
-					if (!tenantDoc.exists()) {
-						throw new Error('Invalid laboratory code. Please check and try again.');
-					}
+          // First check if tenant exists
+          const tenantDoc = await getDoc(doc(firestore, 'tenants', data.tenantCode.toLowerCase()));
+          if (!tenantDoc.exists()) {
+            throw new Error('Invalid laboratory code. Please check and try again.');
+          }
 
-					// Create Firebase Auth user
-					const userCredential = await createUserWithEmailAndPassword(
-						auth,
-						data.email,
-						data.password
-					);
+          // Create Firebase Auth user
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            data.email,
+            data.password
+          );
 
-					// Update display name
-					await updateProfile(userCredential.user, {
-						displayName: `${data.firstName} ${data.lastName}`,
-					});
+          // Update display name
+          await updateProfile(userCredential.user, {
+            displayName: `${data.firstName} ${data.lastName}`,
+          });
 
-					// Create user document in Firestore
-					const userData: User = {
-						id: userCredential.user.uid,
-						uid: userCredential.user.uid,
-						email: data.email,
-						displayName: `${data.firstName} ${data.lastName}`,
-						firstName: data.firstName,
-						lastName: data.lastName,
-						phoneNumber: data.phoneNumber,
-						role: data.role || 'patient',
-						tenantId: data.tenantCode.toLowerCase(),
-						permissions: [],
-						isActive: true,
-						isEmailVerified: false,
-						createdAt: new Date(),
-						updatedAt: new Date(),
-					};
+          // Create user document in Firestore
+          const userData: User = {
+            id: userCredential.user.uid,
+            uid: userCredential.user.uid,
+            email: data.email,
+            displayName: `${data.firstName} ${data.lastName}`,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phoneNumber: data.phoneNumber,
+            role: data.role || 'patient',
+            tenantId: data.tenantCode.toLowerCase(),
+            permissions: [],
+            isActive: true,
+            isEmailVerified: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
 
-					await setDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
-						...userData,
-						createdAt: serverTimestamp(),
-						updatedAt: serverTimestamp(),
-					});
+          await setDoc(doc(firestore, COLLECTION_NAMES.USERS, userData.id), {
+            ...userData,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
 
-					// Create tenant_users entry
-					const tenantUserId = `${userData.id}_${data.tenantCode.toLowerCase()}`;
-					await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
-						userId: userData.id,
-						tenantId: data.tenantCode.toLowerCase(),
-						role: userData.role,
-						permissions: [],
-						isActive: true,
-						createdAt: serverTimestamp(),
-						updatedAt: serverTimestamp(),
-					});
+          // Create tenant_users entry
+          const tenantUserId = `${userData.id}_${data.tenantCode.toLowerCase()}`;
+          await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+            userId: userData.id,
+            tenantId: data.tenantCode.toLowerCase(),
+            role: userData.role,
+            permissions: [],
+            isActive: true,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
 
-					setCurrentUser(userData);
-					return userData;
-				} catch (error) {
-					setError(error as Error);
-					throw error;
-				} finally {
-					setLoading(false);
-				}
-			},
+          setCurrentUser(userData);
+          return userData;
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
 
-			loginWithBiometric: async () => {
-				const { firebaseUser } = get();
+      loginWithBiometric: async () => {
+        const { firebaseUser } = get();
 
-				if (!firebaseUser) {
-					return {
-						success: false,
-						error: 'No authenticated user found',
-						errorCode: 'NO_USER',
-					};
-				}
+        if (!firebaseUser) {
+          return {
+            success: false,
+            error: 'No authenticated user found',
+            errorCode: 'NO_USER',
+          };
+        }
 
-				try {
-					// Authenticate with biometrics
-					const result = await biometricService.authenticate({
-						reason: 'Authenticate to access LabFlow',
-					});
+        try {
+          // Authenticate with biometrics
+          const result = await biometricService.authenticate({
+            reason: 'Authenticate to access LabFlow',
+          });
 
-					if (!result.success) {
-						return result;
-					}
+          if (!result.success) {
+            return result;
+          }
 
-					// Refresh user data after successful biometric auth
-					await get().refreshUser();
+          // Refresh user data after successful biometric auth
+          await get().refreshUser();
 
-					return { success: true };
-				} catch (error) {
-					console.error('Biometric login error:', error);
-					return {
-						success: false,
-						error: error instanceof Error ? error.message : 'Unknown error',
-						errorCode: 'AUTH_ERROR',
-					};
-				}
-			},
+          return { success: true };
+        } catch (error) {
+          console.error('Biometric login error:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            errorCode: 'AUTH_ERROR',
+          };
+        }
+      },
 
-			logout: async () => {
-				const { setLoading, setError, setFirebaseUser, setCurrentUser } = get();
+      logout: async () => {
+        const { setLoading, setError, setFirebaseUser, setCurrentUser } = get();
 
-				try {
-					setLoading(true);
-					setError(null);
+        try {
+          setLoading(true);
+          setError(null);
 
-					// Clear biometric data on logout
-					await biometricService.clearBiometricData();
+          // Clear biometric data on logout
+          await biometricService.clearBiometricData();
 
-					await signOut(auth);
-					setFirebaseUser(null);
-					setCurrentUser(null);
-				} catch (error) {
-					setError(error as Error);
-					throw error;
-				} finally {
-					setLoading(false);
-				}
-			},
+          await signOut(auth);
+          setFirebaseUser(null);
+          setCurrentUser(null);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
 
-			resetPassword: async (email) => {
-				const { setLoading, setError } = get();
+      resetPassword: async (email) => {
+        const { setLoading, setError } = get();
 
-				try {
-					setLoading(true);
-					setError(null);
+        try {
+          setLoading(true);
+          setError(null);
 
-					await sendPasswordResetEmail(auth, email);
-				} catch (error) {
-					setError(error as Error);
-					throw error;
-				} finally {
-					setLoading(false);
-				}
-			},
+          await sendPasswordResetEmail(auth, email);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        } finally {
+          setLoading(false);
+        }
+      },
 
-			fetchUserData: async (uid) => {
-				const { setCurrentUser } = get();
+      fetchUserData: async (uid) => {
+        const { setCurrentUser } = get();
 
-				try {
-					const userDoc = await getDoc(
-						doc(firestore, COLLECTION_NAMES.USERS, uid)
-					);
+        try {
+          const userDoc = await getDoc(doc(firestore, COLLECTION_NAMES.USERS, uid));
 
-					if (!userDoc.exists()) {
-						console.error('User document not found for uid:', uid);
-						return null;
-					}
+          if (!userDoc.exists()) {
+            console.error('User document not found for uid:', uid);
+            return null;
+          }
 
-					const userData = {
-						id: userDoc.id,
-						uid: userDoc.id,
-						...userDoc.data(),
-						createdAt: userDoc.data().createdAt?.toDate() || new Date(),
-						updatedAt: userDoc.data().updatedAt?.toDate() || new Date(),
-						lastLoginAt: userDoc.data().lastLoginAt?.toDate(),
-					} as User;
+          const userData = {
+            id: userDoc.id,
+            uid: userDoc.id,
+            ...userDoc.data(),
+            createdAt: userDoc.data().createdAt?.toDate() || new Date(),
+            updatedAt: userDoc.data().updatedAt?.toDate() || new Date(),
+            lastLoginAt: userDoc.data().lastLoginAt?.toDate(),
+          } as User;
 
-					setCurrentUser(userData);
-					return userData;
-				} catch (error) {
-					console.error('Error fetching user data:', error);
-					return null;
-				}
-			},
+          setCurrentUser(userData);
+          return userData;
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          return null;
+        }
+      },
 
-			updateUserProfile: async (userId, data) => {
-				const { setError, fetchUserData } = get();
+      updateUserProfile: async (userId, data) => {
+        const { setError, fetchUserData } = get();
 
-				try {
-					setError(null);
+        try {
+          setError(null);
 
-					await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userId), {
-						...data,
-						updatedAt: serverTimestamp(),
-					});
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userId), {
+            ...data,
+            updatedAt: serverTimestamp(),
+          });
 
-					await fetchUserData(userId);
-				} catch (error) {
-					setError(error as Error);
-					throw error;
-				}
-			},
+          await fetchUserData(userId);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        }
+      },
 
-			refreshUser: async () => {
-				const { firebaseUser, fetchUserData } = get();
+      refreshUser: async () => {
+        const { firebaseUser, fetchUserData } = get();
 
-				if (firebaseUser) {
-					await fetchUserData(firebaseUser.uid);
-				}
-			},
+        if (firebaseUser) {
+          await fetchUserData(firebaseUser.uid);
+        }
+      },
 
-			initializeAuth: () => {
-				const { setFirebaseUser, fetchUserData, setLoading } = get();
+      initializeAuth: () => {
+        const { setFirebaseUser, fetchUserData, setLoading } = get();
 
-				onAuthStateChanged(auth, async (user) => {
-					setFirebaseUser(user);
+        onAuthStateChanged(auth, async (user) => {
+          setFirebaseUser(user);
 
-					if (user) {
-						await fetchUserData(user.uid);
-					}
+          if (user) {
+            await fetchUserData(user.uid);
+          }
 
-					setLoading(false);
-				});
-			},
-		}),
-		{
-			name: 'auth-storage',
-			storage: createJSONStorage(() => localStorage),
-			partialize: (state) => ({
-				currentUser: state.currentUser,
-			}),
-		}
-	)
+          setLoading(false);
+        });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        currentUser: state.currentUser,
+      }),
+    }
+  )
 );

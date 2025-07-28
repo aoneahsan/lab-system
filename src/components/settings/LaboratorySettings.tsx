@@ -7,11 +7,7 @@ interface LaboratorySettingsProps {
   isSaving: boolean;
 }
 
-const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
-  settings,
-  onSave,
-  isSaving
-}) => {
+const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({ settings, onSave, isSaving }) => {
   const [formData, setFormData] = useState<LaboratorySettingsType>(settings);
 
   useEffect(() => {
@@ -31,7 +27,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Sample Management</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -63,9 +59,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Barcode Format
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Barcode Format</label>
             <select
               value={formData.barcodeFormat}
               onChange={(e) => handleChange('barcodeFormat', e.target.value)}
@@ -78,9 +72,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Sample ID Format
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Sample ID Format</label>
             <input
               type="text"
               value={formData.sampleIdFormat}
@@ -94,7 +86,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Result Management</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -139,7 +131,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Critical Values</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -177,7 +169,7 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Quality Control</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -194,12 +186,12 @@ const LaboratorySettings: React.FC<LaboratorySettingsProps> = ({
 
           {formData.enableQualityControl && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                QC Frequency
-              </label>
+              <label className="block text-sm font-medium text-gray-700">QC Frequency</label>
               <select
                 value={formData.qcFrequency}
-                onChange={(e) => handleChange('qcFrequency', e.target.value as 'daily' | 'weekly' | 'monthly')}
+                onChange={(e) =>
+                  handleChange('qcFrequency', e.target.value as 'daily' | 'weekly' | 'monthly')
+                }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="daily">Daily</option>

@@ -10,7 +10,7 @@ interface LeveyJenningsChartProps {
 const LeveyJenningsChart: React.FC<LeveyJenningsChartProps> = ({ data, height = 400 }) => {
   // Simple text-based chart for now
   // In production, use a charting library like recharts or chart.js
-  
+
   const getPointSymbol = (value: number): { symbol: string; color: string } => {
     if (value > data.ucl || value < data.lcl) {
       return { symbol: '✕', color: 'text-red-600' };
@@ -59,31 +59,41 @@ const LeveyJenningsChart: React.FC<LeveyJenningsChartProps> = ({ data, height = 
           {/* Control Limits */}
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>UCL</span>
-            <span>{data.ucl.toFixed(2)} {data.unit}</span>
+            <span>
+              {data.ucl.toFixed(2)} {data.unit}
+            </span>
           </div>
           <div className="border-t border-red-400"></div>
-          
+
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>UWL</span>
-            <span>{data.uwl.toFixed(2)} {data.unit}</span>
+            <span>
+              {data.uwl.toFixed(2)} {data.unit}
+            </span>
           </div>
           <div className="border-t border-yellow-400"></div>
-          
+
           <div className="flex items-center justify-between text-xs font-medium text-gray-700">
             <span>Mean</span>
-            <span>{data.mean.toFixed(2)} {data.unit}</span>
+            <span>
+              {data.mean.toFixed(2)} {data.unit}
+            </span>
           </div>
           <div className="border-t-2 border-blue-600"></div>
-          
+
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>LWL</span>
-            <span>{data.lwl.toFixed(2)} {data.unit}</span>
+            <span>
+              {data.lwl.toFixed(2)} {data.unit}
+            </span>
           </div>
           <div className="border-t border-yellow-400"></div>
-          
+
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>LCL</span>
-            <span>{data.lcl.toFixed(2)} {data.unit}</span>
+            <span>
+              {data.lcl.toFixed(2)} {data.unit}
+            </span>
           </div>
           <div className="border-t border-red-400"></div>
         </div>
@@ -102,31 +112,38 @@ const LeveyJenningsChart: React.FC<LeveyJenningsChartProps> = ({ data, height = 
                 </tr>
               </thead>
               <tbody>
-                {data.points.slice(-10).reverse().map((point, index) => {
-                  const { symbol, color } = getPointSymbol(point.value);
-                  return (
-                    <tr key={index} className="border-b">
-                      <td className="py-1">{formatDate(point.date)}</td>
-                      <td className="text-center py-1">
-                        <span className={color}>
-                          {point.value.toFixed(2)} {symbol}
-                        </span>
-                      </td>
-                      <td className="text-center py-1">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          point.status === 'pass' ? 'bg-green-100 text-green-800' :
-                          point.status === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {point.status}
-                        </span>
-                      </td>
-                      <td className="py-1 text-xs text-gray-600">
-                        {point.violatedRules.join(', ') || '-'}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {data.points
+                  .slice(-10)
+                  .reverse()
+                  .map((point, index) => {
+                    const { symbol, color } = getPointSymbol(point.value);
+                    return (
+                      <tr key={index} className="border-b">
+                        <td className="py-1">{formatDate(point.date)}</td>
+                        <td className="text-center py-1">
+                          <span className={color}>
+                            {point.value.toFixed(2)} {symbol}
+                          </span>
+                        </td>
+                        <td className="text-center py-1">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                              point.status === 'pass'
+                                ? 'bg-green-100 text-green-800'
+                                : point.status === 'warning'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                            }`}
+                          >
+                            {point.status}
+                          </span>
+                        </td>
+                        <td className="py-1 text-xs text-gray-600">
+                          {point.violatedRules.join(', ') || '-'}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
@@ -137,8 +154,8 @@ const LeveyJenningsChart: React.FC<LeveyJenningsChartProps> = ({ data, height = 
       <div className="mt-4 flex items-start gap-2 text-sm text-gray-600">
         <AlertCircle className="h-4 w-4 mt-0.5" />
         <p>
-          This is a simplified view. In production, a full charting library would display
-          the data points plotted over time with control and warning limits.
+          This is a simplified view. In production, a full charting library would display the data
+          points plotted over time with control and warning limits.
         </p>
       </div>
     </div>

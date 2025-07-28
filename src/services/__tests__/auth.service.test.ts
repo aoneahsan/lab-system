@@ -8,7 +8,7 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword,
-  User
+  User,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import * as authService from '../auth.service';
@@ -63,7 +63,11 @@ describe('AuthService', () => {
 
       const result = await authService.login('test@example.com', 'password123');
 
-      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, 'test@example.com', 'password123');
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        auth,
+        'test@example.com',
+        'password123'
+      );
       expect(getDoc).toHaveBeenCalled();
       expect(result).toEqual(mockUserData);
     });
@@ -77,13 +81,17 @@ describe('AuthService', () => {
         exists: () => false,
       } as any);
 
-      await expect(authService.login('test@example.com', 'password123')).rejects.toThrow('User data not found');
+      await expect(authService.login('test@example.com', 'password123')).rejects.toThrow(
+        'User data not found'
+      );
     });
 
     it('should handle login errors', async () => {
       vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error('Invalid credentials'));
 
-      await expect(authService.login('test@example.com', 'wrong-password')).rejects.toThrow('Invalid credentials');
+      await expect(authService.login('test@example.com', 'wrong-password')).rejects.toThrow(
+        'Invalid credentials'
+      );
     });
   });
 
@@ -107,7 +115,11 @@ describe('AuthService', () => {
 
       const result = await authService.register(userData);
 
-      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(auth, userData.email, userData.password);
+      expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        auth,
+        userData.email,
+        userData.password
+      );
       expect(updateProfile).toHaveBeenCalledWith(mockUser, { displayName: 'Test User' });
       expect(setDoc).toHaveBeenCalled();
       expect(result).toMatchObject({
@@ -122,7 +134,9 @@ describe('AuthService', () => {
     });
 
     it('should handle registration errors', async () => {
-      vi.mocked(createUserWithEmailAndPassword).mockRejectedValue(new Error('Email already in use'));
+      vi.mocked(createUserWithEmailAndPassword).mockRejectedValue(
+        new Error('Email already in use')
+      );
 
       const userData = {
         email: 'test@example.com',
@@ -180,13 +194,10 @@ describe('AuthService', () => {
 
       await authService.updateUserProfile('test-uid', updates);
 
-      expect(updateDoc).toHaveBeenCalledWith(
-        doc(db, 'users', 'test-uid'),
-        {
-          ...updates,
-          updatedAt: serverTimestamp(),
-        }
-      );
+      expect(updateDoc).toHaveBeenCalledWith(doc(db, 'users', 'test-uid'), {
+        ...updates,
+        updatedAt: serverTimestamp(),
+      });
     });
 
     it('should handle profile update errors', async () => {
@@ -196,7 +207,9 @@ describe('AuthService', () => {
         displayName: 'Updated User',
       };
 
-      await expect(authService.updateUserProfile('test-uid', updates)).rejects.toThrow('Update failed');
+      await expect(authService.updateUserProfile('test-uid', updates)).rejects.toThrow(
+        'Update failed'
+      );
     });
   });
 

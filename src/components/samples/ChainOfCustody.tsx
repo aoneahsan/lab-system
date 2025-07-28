@@ -49,12 +49,8 @@ export default function ChainOfCustody({ entries, sampleNumber }: ChainOfCustody
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900">
-          Chain of Custody - {sampleNumber}
-        </h3>
-        <p className="text-sm text-gray-500 mt-1">
-          Complete tracking history of sample handling
-        </p>
+        <h3 className="text-lg font-medium text-gray-900">Chain of Custody - {sampleNumber}</h3>
+        <p className="text-sm text-gray-500 mt-1">Complete tracking history of sample handling</p>
       </div>
 
       <div className="p-6">
@@ -78,13 +74,15 @@ export default function ChainOfCustody({ entries, sampleNumber }: ChainOfCustody
                     <div className="min-w-0 flex-1">
                       <div>
                         <div className="text-sm">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(entry.action)}`}>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(
+                              entry.action
+                            )}`}
+                          >
                             {entry.action.charAt(0).toUpperCase() + entry.action.slice(1)}
                           </span>
                         </div>
-                        <p className="mt-2 text-sm text-gray-700">
-                          {entry.notes}
-                        </p>
+                        <p className="mt-2 text-sm text-gray-700">{entry.notes}</p>
                       </div>
                       <div className="mt-2 text-sm text-gray-500 space-y-1">
                         <div className="flex items-center gap-4">

@@ -55,14 +55,19 @@ export default function InventoryDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <div
+            key={stat.label}
+            className="bg-white rounded-lg shadow-sm p-6 border border-gray-200"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">{stat.label}</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                <p className={`text-sm mt-1 ${
-                  stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <p
+                  className={`text-sm mt-1 ${
+                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
                   {stat.change} from last month
                 </p>
               </div>

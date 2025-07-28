@@ -84,7 +84,7 @@ class HL7ParserService {
   parseMessage(rawMessage: string): HL7Message {
     const lines = rawMessage.trim().split(/\r?\n/);
     const segments: HL7Segment[] = [];
-    
+
     let messageType: HL7MessageType = 'ADT';
     let messageControlId = '';
     let sendingApplication = '';
@@ -96,10 +96,10 @@ class HL7ParserService {
 
     for (const line of lines) {
       if (!line.trim()) continue;
-      
+
       const fields = this.parseSegment(line);
       if (fields.length === 0) continue;
-      
+
       const segmentType = fields[0];
       segments.push({
         type: segmentType,
@@ -146,13 +146,13 @@ class HL7ParserService {
       this.repetitionSeparator = encodingChars[1];
       // escapeCharacter = encodingChars[2];
       // subcomponentSeparator = encodingChars[3];
-      
+
       // Parse remaining fields
       const remainingFields = segmentString.substring(4).split(this.fieldSeparator);
       fields.push(...remainingFields);
       return fields;
     }
-    
+
     return segmentString.split(this.fieldSeparator);
   }
 
@@ -177,7 +177,7 @@ class HL7ParserService {
   // Parse PID segment
   parsePIDSegment(segment: HL7Segment): PIDSegment | null {
     if (segment.type !== 'PID') return null;
-    
+
     const fields = segment.fields;
     const pid: PIDSegment = {};
 
@@ -189,7 +189,7 @@ class HL7ParserService {
 
     // Patient Identifier List
     if (fields[2]) {
-      pid.patientIdentifierList = this.parseRepeatingField(fields[2]).map(id => {
+      pid.patientIdentifierList = this.parseRepeatingField(fields[2]).map((id) => {
         const components = this.parseComponents(id);
         return {
           id: components[0],
@@ -201,7 +201,7 @@ class HL7ParserService {
 
     // Patient Name
     if (fields[4]) {
-      pid.patientName = this.parseRepeatingField(fields[4]).map(name => {
+      pid.patientName = this.parseRepeatingField(fields[4]).map((name) => {
         const components = this.parseComponents(name);
         return {
           familyName: components[0] || '',
@@ -221,7 +221,7 @@ class HL7ParserService {
 
     // Patient Address
     if (fields[10]) {
-      pid.patientAddress = this.parseRepeatingField(fields[10]).map(address => {
+      pid.patientAddress = this.parseRepeatingField(fields[10]).map((address) => {
         const components = this.parseComponents(address);
         return {
           streetAddress: components[0],
@@ -260,7 +260,7 @@ class HL7ParserService {
   // Generate HL7 message
   generateMessage(message: Partial<HL7Message>): string {
     const segments: string[] = [];
-    
+
     // Generate MSH segment
     const msh = this.generateMSHSegment({
       sendingApplication: message.sendingApplication || '',
@@ -272,7 +272,7 @@ class HL7ParserService {
       timestamp: message.timestamp || new Date().toISOString(),
       version: message.version || '2.5',
     });
-    
+
     segments.push(msh);
 
     // Add other segments
@@ -335,7 +335,7 @@ class HL7ParserService {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    
+
     return `${year}${month}${day}${hours}${minutes}${seconds}`;
   }
 
@@ -344,7 +344,7 @@ class HL7ParserService {
     const errors: string[] = [];
 
     // Check for MSH segment
-    if (!message.segments.find(s => s.type === 'MSH')) {
+    if (!message.segments.find((s) => s.type === 'MSH')) {
       errors.push('Missing required MSH segment');
     }
 

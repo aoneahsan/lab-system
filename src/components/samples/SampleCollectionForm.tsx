@@ -53,15 +53,18 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
 
   useEffect(() => {
     if (selectedOrderId) {
-      const order = orders.find(o => o.id === selectedOrderId);
+      const order = orders.find((o) => o.id === selectedOrderId);
       if (order) {
         setSelectedOrder(order);
         setValue('patientId', order.patientId);
         setValue('priority', order.priority);
-        setValue('tests', order.tests.map(t => t.testId));
+        setValue(
+          'tests',
+          order.tests.map((t) => t.testId)
+        );
 
         // Load patient data
-        const patient = patients.find(p => p.id === order.patientId);
+        const patient = patients.find((p) => p.id === order.patientId);
         if (patient) {
           setSelectedPatient(patient);
         }
@@ -98,7 +101,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
       const firstTest = selectedOrder.tests[0];
       const sampleType = getSampleTypeForTest(firstTest.specimenType || 'blood');
       const container = getContainerForSampleType(sampleType);
-      
+
       onSubmit({
         ...data,
         type: sampleType as SampleFormData['type'],
@@ -112,20 +115,21 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
       {/* Order Selection */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Order Information</h3>
-        
+
         {!orderId && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Select Order *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Select Order *</label>
             <select
               {...register('orderId', { required: 'Order is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Select an order...</option>
-              {orders.map(order => (
+              {orders.map((order) => (
                 <option key={order.id} value={order.id}>
-                  {order.orderNumber} - {new Date(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleDateString()}
+                  {order.orderNumber} -{' '}
+                  {new Date(
+                    order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()
+                  ).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -139,16 +143,14 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           <div className="bg-blue-50 p-4 rounded-md">
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-medium">
-                  {selectedPatient.fullName}
-                </p>
+                <p className="font-medium">{selectedPatient.fullName}</p>
                 <p className="text-sm text-gray-600">
-                  Patient ID: {selectedPatient.patientId} | 
-                  DOB: {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}
+                  Patient ID: {selectedPatient.patientId} | DOB:{' '}
+                  {new Date(selectedPatient.dateOfBirth).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
-                  Order: {selectedOrder.orderNumber} | 
-                  Priority: <span className="font-medium">{selectedOrder.priority.toUpperCase()}</span>
+                  Order: {selectedOrder.orderNumber} | Priority:{' '}
+                  <span className="font-medium">{selectedOrder.priority.toUpperCase()}</span>
                 </p>
               </div>
             </div>
@@ -172,7 +174,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
       {/* Collection Details */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Collection Details</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -234,9 +236,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Volume
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Volume</label>
             <div className="mt-1 flex rounded-md shadow-sm">
               <input
                 type="number"
@@ -256,9 +256,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Storage Temperature
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Storage Temperature</label>
             <select
               {...register('storageTemperature')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -272,9 +270,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Storage Location
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Storage Location</label>
             <input
               type="text"
               {...register('storageLocation')}
@@ -284,9 +280,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Notes
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Notes</label>
             <textarea
               {...register('notes')}
               rows={3}
@@ -302,7 +296,8 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
             <div>
               <p className="text-sm font-medium text-red-800">STAT Order</p>
               <p className="text-sm text-red-700 mt-1">
-                This is a STAT order. Please ensure immediate processing and notify the lab of sample arrival.
+                This is a STAT order. Please ensure immediate processing and notify the lab of
+                sample arrival.
               </p>
             </div>
           </div>

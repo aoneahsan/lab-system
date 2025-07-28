@@ -29,7 +29,7 @@ interface OfflineState {
   pendingSync: number;
   isOnline: boolean;
   lastSyncTime: Date | null;
-  
+
   // Actions
   addCollection: (collection: Omit<OfflineCollection, 'id' | 'syncStatus'>) => void;
   updateCollection: (id: string, updates: Partial<OfflineCollection>) => void;
@@ -165,7 +165,7 @@ export const useOfflineStore = create<OfflineState>()(
 
       initializeDatabase: async () => {
         await initializeOfflineDB();
-        
+
         // Monitor network status
         const status = await Network.getStatus();
         set({ isOnline: status.connected });

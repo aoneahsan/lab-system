@@ -6,30 +6,30 @@ const HomeScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const stats = [
-    { label: 'Today\'s Collections', value: '12', icon: ClipboardList },
+    { label: "Today's Collections", value: '12', icon: ClipboardList },
     { label: 'Completed', value: '8', icon: BarChart3 },
     { label: 'Pending', value: '4', icon: Calendar },
     { label: 'Routes', value: '2', icon: MapPin },
   ];
 
   const quickActions = [
-    { 
-      title: 'Start Collection', 
+    {
+      title: 'Start Collection',
       icon: ClipboardList,
       path: '/phlebotomist/collections',
-      color: 'bg-blue-500'
+      color: 'bg-blue-500',
     },
-    { 
-      title: 'View Schedule', 
+    {
+      title: 'View Schedule',
       icon: Calendar,
       path: '/phlebotomist/schedule',
-      color: 'bg-green-500'
+      color: 'bg-green-500',
     },
-    { 
-      title: 'Scan Sample', 
+    {
+      title: 'Scan Sample',
       icon: BarChart3,
       path: '/phlebotomist/scan',
-      color: 'bg-purple-500'
+      color: 'bg-purple-500',
     },
   ];
 
@@ -70,7 +70,12 @@ const HomeScreen: React.FC = () => {
                   <span className="font-medium">{action.title}</span>
                 </div>
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             );

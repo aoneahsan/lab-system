@@ -165,9 +165,7 @@ class SettingsService {
   }
 
   // Get specific setting section
-  async getSettingSection<K extends keyof SystemSettings>(
-    section: K
-  ): Promise<SystemSettings[K]> {
+  async getSettingSection<K extends keyof SystemSettings>(section: K): Promise<SystemSettings[K]> {
     const settings = await this.getSettings();
     return settings[section];
   }
@@ -189,7 +187,7 @@ class SettingsService {
   // Export settings
   async exportSettings(): Promise<Blob> {
     const response = await api.get('/api/settings/export', {
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   }
@@ -199,7 +197,7 @@ class SettingsService {
     const formData = new FormData();
     formData.append('settings', file);
     await api.post('/api/settings/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     // Invalidate cache
     this.cache = null;

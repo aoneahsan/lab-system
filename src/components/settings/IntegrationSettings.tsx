@@ -10,7 +10,7 @@ interface IntegrationSettingsProps {
 const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
   settings,
   onSave,
-  isSaving
+  isSaving,
 }) => {
   const [formData, setFormData] = useState<IntegrationSettingsType>(settings);
 
@@ -22,14 +22,14 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
     const keys = path.split('.');
     const newData = { ...formData };
     let current: any = newData;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       if (!current[keys[i]]) {
         current[keys[i]] = {};
       }
       current = current[keys[i]];
     }
-    
+
     current[keys[keys.length - 1]] = value;
     setFormData(newData);
   };
@@ -43,7 +43,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">HL7 Integration</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -60,9 +60,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
           {formData.hl7Enabled && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                HL7 Version
-              </label>
+              <label className="block text-sm font-medium text-gray-700">HL7 Version</label>
               <select
                 value={formData.hl7Version}
                 onChange={(e) => handleChange('hl7Version', e.target.value)}
@@ -80,7 +78,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">FHIR Integration</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -97,9 +95,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
           {formData.fhirEnabled && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                FHIR Version
-              </label>
+              <label className="block text-sm font-medium text-gray-700">FHIR Version</label>
               <select
                 value={formData.fhirVersion}
                 onChange={(e) => handleChange('fhirVersion', e.target.value)}
@@ -116,7 +112,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">API Configuration</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -164,7 +160,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">EMR Integration</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center">
             <input
@@ -222,7 +218,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">LIS Integration</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -240,9 +236,7 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
           {formData.lisIntegration.enabled && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  LIS Vendor
-                </label>
+                <label className="block text-sm font-medium text-gray-700">LIS Vendor</label>
                 <input
                   type="text"
                   value={formData.lisIntegration.vendor}
@@ -253,12 +247,15 @@ const IntegrationSettings: React.FC<IntegrationSettingsProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Connection Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Connection Type</label>
                 <select
                   value={formData.lisIntegration.connectionType}
-                  onChange={(e) => handleChange('lisIntegration.connectionType', e.target.value as 'TCP' | 'FILE' | 'API')}
+                  onChange={(e) =>
+                    handleChange(
+                      'lisIntegration.connectionType',
+                      e.target.value as 'TCP' | 'FILE' | 'API'
+                    )
+                  }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
                   <option value="TCP">TCP/IP Socket</option>

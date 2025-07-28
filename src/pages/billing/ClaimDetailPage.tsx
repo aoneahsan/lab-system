@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  FileText, 
-  Calendar, 
-  DollarSign, 
-  User, 
-  Building, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  ArrowLeft,
+  FileText,
+  Calendar,
+  DollarSign,
+  User,
+  Building,
+  Clock,
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Send,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import { useClaim, useSubmitClaim } from '@/hooks/useBilling';
 import { format } from 'date-fns';
@@ -22,7 +22,7 @@ const ClaimDetailPage: React.FC = () => {
   const { claimId } = useParams<{ claimId: string }>();
   const navigate = useNavigate();
   const [showAppealModal, setShowAppealModal] = useState(false);
-  
+
   const { data: claim, isLoading } = useClaim(claimId!);
   const submitClaimMutation = useSubmitClaim();
 
@@ -96,19 +96,23 @@ const ClaimDetailPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4" />
           Back to Claims
         </button>
-        
+
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Claim #{claim.claimNumber}</h1>
             <p className="text-gray-600 mt-2">Invoice #{claim.invoiceNumber}</p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg ${getStatusColor(claim.status)}`}>
+            <span
+              className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg ${getStatusColor(
+                claim.status
+              )}`}
+            >
               {getStatusIcon(claim.status)}
               {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
             </span>
-            
+
             {claim.status === 'draft' && (
               <button
                 onClick={handleSubmitClaim}
@@ -119,7 +123,7 @@ const ClaimDetailPage: React.FC = () => {
                 Submit Claim
               </button>
             )}
-            
+
             {claim.status === 'rejected' && (
               <button
                 onClick={() => setShowAppealModal(true)}
@@ -142,22 +146,30 @@ const ClaimDetailPage: React.FC = () => {
             <dl className="grid grid-cols-2 gap-4">
               <div>
                 <dt className="text-sm text-gray-500">Claim Date</dt>
-                <dd className="text-sm font-medium">{claim.claimDate.toDate().toLocaleDateString()}</dd>
+                <dd className="text-sm font-medium">
+                  {claim.claimDate.toDate().toLocaleDateString()}
+                </dd>
               </div>
               <div>
                 <dt className="text-sm text-gray-500">Service Date</dt>
-                <dd className="text-sm font-medium">{claim.serviceDate.toDate().toLocaleDateString()}</dd>
+                <dd className="text-sm font-medium">
+                  {claim.serviceDate.toDate().toLocaleDateString()}
+                </dd>
               </div>
               {claim.submittedDate && (
                 <div>
                   <dt className="text-sm text-gray-500">Submitted Date</dt>
-                  <dd className="text-sm font-medium">{claim.submittedDate.toDate().toLocaleDateString()}</dd>
+                  <dd className="text-sm font-medium">
+                    {claim.submittedDate.toDate().toLocaleDateString()}
+                  </dd>
                 </div>
               )}
               {claim.processedDate && (
                 <div>
                   <dt className="text-sm text-gray-500">Processed Date</dt>
-                  <dd className="text-sm font-medium">{claim.processedDate.toDate().toLocaleDateString()}</dd>
+                  <dd className="text-sm font-medium">
+                    {claim.processedDate.toDate().toLocaleDateString()}
+                  </dd>
                 </div>
               )}
             </dl>
@@ -170,11 +182,21 @@ const ClaimDetailPage: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CPT Code</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Units</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Charge</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      CPT Code
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Description
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      Units
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      Charge
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -192,8 +214,12 @@ const ClaimDetailPage: React.FC = () => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={4} className="px-4 py-3 text-sm font-medium text-right">Total Charges:</td>
-                    <td className="px-4 py-3 text-sm font-bold text-right">${claim.totalCharges.toFixed(2)}</td>
+                    <td colSpan={4} className="px-4 py-3 text-sm font-medium text-right">
+                      Total Charges:
+                    </td>
+                    <td className="px-4 py-3 text-sm font-bold text-right">
+                      ${claim.totalCharges.toFixed(2)}
+                    </td>
                   </tr>
                 </tfoot>
               </table>
@@ -213,7 +239,9 @@ const ClaimDetailPage: React.FC = () => {
                   <h3 className="text-sm font-medium text-gray-700">Secondary Diagnoses</h3>
                   <ul className="list-disc list-inside space-y-1">
                     {claim.secondaryDiagnoses.map((dx, index) => (
-                      <li key={index} className="text-sm text-gray-900">{dx}</li>
+                      <li key={index} className="text-sm text-gray-900">
+                        {dx}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -235,19 +263,25 @@ const ClaimDetailPage: React.FC = () => {
               {claim.approvedAmount && (
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-500">Approved Amount</dt>
-                  <dd className="text-sm font-medium text-green-600">${claim.approvedAmount.toFixed(2)}</dd>
+                  <dd className="text-sm font-medium text-green-600">
+                    ${claim.approvedAmount.toFixed(2)}
+                  </dd>
                 </div>
               )}
               {claim.deniedAmount && (
                 <div className="flex justify-between">
                   <dt className="text-sm text-gray-500">Denied Amount</dt>
-                  <dd className="text-sm font-medium text-red-600">${claim.deniedAmount.toFixed(2)}</dd>
+                  <dd className="text-sm font-medium text-red-600">
+                    ${claim.deniedAmount.toFixed(2)}
+                  </dd>
                 </div>
               )}
               {claim.paidAmount && (
                 <div className="flex justify-between pt-3 border-t">
                   <dt className="text-sm font-medium">Paid Amount</dt>
-                  <dd className="text-sm font-bold text-green-600">${claim.paidAmount.toFixed(2)}</dd>
+                  <dd className="text-sm font-bold text-green-600">
+                    ${claim.paidAmount.toFixed(2)}
+                  </dd>
                 </div>
               )}
             </dl>
@@ -259,7 +293,9 @@ const ClaimDetailPage: React.FC = () => {
             <dl className="space-y-3">
               <div>
                 <dt className="text-sm text-gray-500">Rendering Provider</dt>
-                <dd className="text-sm font-medium">{claim.renderingProvider || 'Not specified'}</dd>
+                <dd className="text-sm font-medium">
+                  {claim.renderingProvider || 'Not specified'}
+                </dd>
               </div>
               {claim.npiNumber && (
                 <div>

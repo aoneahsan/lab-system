@@ -1,29 +1,29 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
   orderBy,
   serverTimestamp,
   Timestamp,
   updateDoc,
-  deleteDoc
+  deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { fhirService } from './fhir.service';
 import { hl7Parser } from './hl7-parser.service';
-import type { 
+import type {
   EMRConnection,
   EMRConnectionFormData,
   EMRConnectionFilter,
   ConnectionStatus,
   EMRMessage,
   IntegrationLog,
-  SyncStatus
+  SyncStatus,
 } from '@/types/emr.types';
 
 class EMRConnectionService {
@@ -34,7 +34,7 @@ class EMRConnectionService {
     data: EMRConnectionFormData
   ): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     const connectionData: Omit<EMRConnection, 'id'> = {
       tenantId,
       name: data.name,
@@ -49,7 +49,10 @@ class EMRConnectionService {
       updatedBy: userId,
     };
 
-    const connectionsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_CONNECTIONS}`);
+    const connectionsRef = collection(
+      db,
+      `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_CONNECTIONS}`
+    );
     const docRef = doc(connectionsRef);
     await setDoc(docRef, connectionData);
 
@@ -99,24 +102,21 @@ class EMRConnectionService {
       connectionId
     );
     const snapshot = await getDoc(connectionRef);
-    
+
     if (!snapshot.exists()) return null;
-    
+
     return {
       id: snapshot.id,
       ...snapshot.data(),
     } as EMRConnection;
   }
 
-  async getConnections(
-    tenantId: string,
-    filter?: EMRConnectionFilter
-  ): Promise<EMRConnection[]> {
+  async getConnections(tenantId: string, filter?: EMRConnectionFilter): Promise<EMRConnection[]> {
     const connectionsRef = collection(
       db,
       `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_CONNECTIONS}`
     );
-    
+
     let q = query(connectionsRef, orderBy('createdAt', 'desc'));
 
     if (filter?.systemType) {
@@ -133,10 +133,13 @@ class EMRConnectionService {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as EMRConnection));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as EMRConnection
+    );
   }
 
   // Connection testing
@@ -216,12 +219,12 @@ class EMRConnectionService {
       messageId
     );
     const messageDoc = await getDoc(messageRef);
-    
+
     if (!messageDoc.exists()) throw new Error('Message not found');
-    
+
     const message = { id: messageDoc.id, ...messageDoc.data() } as EMRMessage;
     const connection = await this.getConnection(tenantId, message.connectionId);
-    
+
     if (!connection) throw new Error('Connection not found');
 
     try {
@@ -257,10 +260,9 @@ class EMRConnectionService {
         completedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Processing failed';
-      
+
       // Update message with error
       await updateDoc(messageRef, {
         status: message.attempts >= (connection.config.retryAttempts || 3) ? 'failed' : 'retry',
@@ -295,7 +297,7 @@ class EMRConnectionService {
   ): Promise<void> {
     if (typeof message.content === 'string') {
       const parsed = hl7Parser.parseMessage(message.content);
-      
+
       // Update message with parsed content
       await updateDoc(
         doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`, message.id),
@@ -383,7 +385,7 @@ class EMRConnectionService {
       db,
       `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`
     );
-    
+
     const pendingQuery = query(
       messagesRef,
       where('connectionId', '==', connectionId),

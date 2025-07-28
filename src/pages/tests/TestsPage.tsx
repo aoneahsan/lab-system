@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, Upload, TestTube, BarChart3 } from 'lucide-react';
-import { useTests, useCreateTest, useUpdateTest, useDeleteTest, useTestStatistics } from '@/hooks/useTests';
+import {
+  useTests,
+  useCreateTest,
+  useUpdateTest,
+  useDeleteTest,
+  useTestStatistics,
+} from '@/hooks/useTests';
 import TestListTable from '@/components/tests/TestListTable';
 import TestSearchFilters from '@/components/tests/TestSearchFilters';
 import TestForm from '@/components/tests/TestForm';
@@ -67,10 +73,14 @@ const TestsPage: React.FC = () => {
         </div>
 
         <TestForm
-          initialData={editingTest ? {
-            ...editingTest,
-            loincCode: editingTest.loincCode?.code
-          } : undefined}
+          initialData={
+            editingTest
+              ? {
+                  ...editingTest,
+                  loincCode: editingTest.loincCode?.code,
+                }
+              : undefined
+          }
           onSubmit={editingTest ? handleEditTest : handleAddTest}
           onCancel={() => {
             setShowAddForm(false);
@@ -153,12 +163,14 @@ const TestsPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600 mb-2">By Category</p>
               <div className="text-xs space-y-1">
-                {Object.entries(statistics.testsByCategory).slice(0, 3).map(([cat, count]) => (
-                  <div key={cat} className="flex justify-between">
-                    <span className="capitalize">{cat}:</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
+                {Object.entries(statistics.testsByCategory)
+                  .slice(0, 3)
+                  .map(([cat, count]) => (
+                    <div key={cat} className="flex justify-between">
+                      <span className="capitalize">{cat}:</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -166,12 +178,14 @@ const TestsPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600 mb-2">By Specimen</p>
               <div className="text-xs space-y-1">
-                {Object.entries(statistics.testsBySpecimenType).slice(0, 3).map(([type, count]) => (
-                  <div key={type} className="flex justify-between">
-                    <span className="capitalize">{type}:</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
+                {Object.entries(statistics.testsBySpecimenType)
+                  .slice(0, 3)
+                  .map(([type, count]) => (
+                    <div key={type} className="flex justify-between">
+                      <span className="capitalize">{type}:</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>

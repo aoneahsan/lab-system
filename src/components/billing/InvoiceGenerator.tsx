@@ -9,7 +9,7 @@ import {
   ArrowDownTrayIcon,
   MagnifyingGlassIcon,
   CheckIcon,
-  XMarkIcon
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 const InvoiceGenerator: React.FC = () => {
@@ -19,16 +19,17 @@ const InvoiceGenerator: React.FC = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-    endDate: new Date()
+    endDate: new Date(),
   });
 
   const { data: billsData, isLoading } = useQuery({
     queryKey: ['bills', searchTerm, dateRange],
-    queryFn: () => billingService.getBills({
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-      limit: 50
-    })
+    queryFn: () =>
+      billingService.getBills({
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        limit: 50,
+      }),
   });
 
   const generateMutation = useMutation({
@@ -43,11 +44,11 @@ const InvoiceGenerator: React.FC = () => {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-    }
+    },
   });
 
   const printMutation = useMutation({
-    mutationFn: (billId: string) => billingService.printInvoice(billId)
+    mutationFn: (billId: string) => billingService.printInvoice(billId),
   });
 
   const emailMutation = useMutation({
@@ -56,10 +57,10 @@ const InvoiceGenerator: React.FC = () => {
     onSuccess: () => {
       setShowEmailDialog(false);
       setEmailAddress('');
-    }
+    },
   });
 
-  const filteredBills = billsData?.bills.filter(bill => {
+  const filteredBills = billsData?.bills.filter((bill) => {
     if (!searchTerm) return true;
     const search = searchTerm.toLowerCase();
     return (
@@ -118,7 +119,9 @@ const InvoiceGenerator: React.FC = () => {
       <div className="bg-white shadow rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
-            <label htmlFor="search" className="sr-only">Search bills</label>
+            <label htmlFor="search" className="sr-only">
+              Search bills
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
@@ -135,29 +138,37 @@ const InvoiceGenerator: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="startDate" className="sr-only">Start Date</label>
+            <label htmlFor="startDate" className="sr-only">
+              Start Date
+            </label>
             <input
               type="date"
               id="startDate"
               value={dateRange.startDate.toISOString().split('T')[0]}
-              onChange={(e) => setDateRange({
-                ...dateRange,
-                startDate: new Date(e.target.value)
-              })}
+              onChange={(e) =>
+                setDateRange({
+                  ...dateRange,
+                  startDate: new Date(e.target.value),
+                })
+              }
               className="block w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
 
           <div>
-            <label htmlFor="endDate" className="sr-only">End Date</label>
+            <label htmlFor="endDate" className="sr-only">
+              End Date
+            </label>
             <input
               type="date"
               id="endDate"
               value={dateRange.endDate.toISOString().split('T')[0]}
-              onChange={(e) => setDateRange({
-                ...dateRange,
-                endDate: new Date(e.target.value)
-              })}
+              onChange={(e) =>
+                setDateRange({
+                  ...dateRange,
+                  endDate: new Date(e.target.value),
+                })
+              }
               className="block w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -218,7 +229,11 @@ const InvoiceGenerator: React.FC = () => {
                     {formatCurrency(bill.totals.total)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(bill.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        bill.status
+                      )}`}
+                    >
                       {bill.status}
                     </span>
                   </td>
@@ -226,7 +241,9 @@ const InvoiceGenerator: React.FC = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleGenerateInvoice(bill)}
-                        disabled={generateMutation.isPending && selectedBill?.billId === bill.billId}
+                        disabled={
+                          generateMutation.isPending && selectedBill?.billId === bill.billId
+                        }
                         className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
                         title="Download Invoice"
                       >
@@ -260,9 +277,7 @@ const InvoiceGenerator: React.FC = () => {
       {showEmailDialog && selectedBill && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Email Invoice
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Email Invoice</h3>
             <p className="text-sm text-gray-500 mb-4">
               Send invoice for bill #{selectedBill.billNumber} via email
             </p>
@@ -317,9 +332,7 @@ const InvoiceGenerator: React.FC = () => {
         <div className="fixed bottom-4 right-4 bg-green-50 p-4 rounded-lg shadow-lg">
           <div className="flex">
             <CheckIcon className="h-5 w-5 text-green-400" />
-            <p className="ml-3 text-sm font-medium text-green-800">
-              Invoice sent to printer!
-            </p>
+            <p className="ml-3 text-sm font-medium text-green-800">Invoice sent to printer!</p>
           </div>
         </div>
       )}
@@ -328,9 +341,7 @@ const InvoiceGenerator: React.FC = () => {
         <div className="fixed bottom-4 right-4 bg-green-50 p-4 rounded-lg shadow-lg">
           <div className="flex">
             <CheckIcon className="h-5 w-5 text-green-400" />
-            <p className="ml-3 text-sm font-medium text-green-800">
-              Invoice emailed successfully!
-            </p>
+            <p className="ml-3 text-sm font-medium text-green-800">Invoice emailed successfully!</p>
           </div>
         </div>
       )}

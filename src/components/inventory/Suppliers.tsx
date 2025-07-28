@@ -24,7 +24,7 @@ export default function Suppliers() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (editingSupplier) {
       await updateVendor(editingSupplier.id, formData);
     } else {
@@ -64,10 +64,7 @@ export default function Suppliers() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Suppliers</h2>
-        <button 
-          onClick={() => setShowAddSupplier(true)}
-          className="btn btn-primary"
-        >
+        <button onClick={() => setShowAddSupplier(true)} className="btn btn-primary">
           <Plus className="h-4 w-4" />
           Add Supplier
         </button>
@@ -107,9 +104,7 @@ export default function Suppliers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
                   value={formData.email}
@@ -119,9 +114,7 @@ export default function Suppliers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                 <input
                   type="tel"
                   value={formData.phone}
@@ -131,9 +124,7 @@ export default function Suppliers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Website
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
                 <input
                   type="url"
                   value={formData.website}
@@ -144,9 +135,7 @@ export default function Suppliers() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                 <textarea
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -156,9 +145,7 @@ export default function Suppliers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <input
                   type="text"
                   value={formData.notes}
@@ -188,11 +175,7 @@ export default function Suppliers() {
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {editingSupplier ? 'Update' : 'Add'} Supplier
               </button>
             </div>
@@ -203,7 +186,10 @@ export default function Suppliers() {
       {/* Suppliers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {vendors.map((supplier: Vendor) => (
-          <div key={supplier.id} className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+          <div
+            key={supplier.id}
+            className="bg-white p-5 rounded-lg shadow-sm border border-gray-200"
+          >
             <div className="flex justify-between items-start mb-3">
               <Building2 className="h-8 w-8 text-gray-400" />
               <div className="flex gap-2">
@@ -215,9 +201,9 @@ export default function Suppliers() {
                 </button>
               </div>
             </div>
-            
+
             <h3 className="font-medium text-gray-900 mb-1">{supplier.name}</h3>
-            
+
             {supplier.contactPerson && (
               <p className="text-sm text-gray-600 mb-2">{supplier.contactPerson}</p>
             )}
@@ -238,9 +224,9 @@ export default function Suppliers() {
               {supplier.website && (
                 <div className="flex items-center gap-2">
                   <Globe className="h-3 w-3" />
-                  <a 
-                    href={supplier.website} 
-                    target="_blank" 
+                  <a
+                    href={supplier.website}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-indigo-600 hover:text-indigo-900 truncate"
                   >
@@ -249,7 +235,6 @@ export default function Suppliers() {
                 </div>
               )}
             </div>
-
           </div>
         ))}
       </div>

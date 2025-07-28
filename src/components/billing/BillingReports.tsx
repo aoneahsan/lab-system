@@ -3,42 +3,41 @@ import { useQuery } from '@tanstack/react-query';
 import { billingService } from '@/services/billing';
 import { formatCurrency } from '@/utils/formatters';
 import { Bar, Doughnut } from 'react-chartjs-2';
-import {
-  ArrowDownTrayIcon
-} from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 const BillingReports: React.FC = () => {
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 3)),
-    endDate: new Date()
+    endDate: new Date(),
   });
   const [reportType, setReportType] = useState<'revenue' | 'outstanding' | 'payments'>('revenue');
 
   const { data: revenueData } = useQuery({
     queryKey: ['revenue-report', dateRange],
-    queryFn: () => billingService.getRevenueSummary({
-      ...dateRange,
-      groupBy: 'month'
-    }),
-    enabled: reportType === 'revenue'
+    queryFn: () =>
+      billingService.getRevenueSummary({
+        ...dateRange,
+        groupBy: 'month',
+      }),
+    enabled: reportType === 'revenue',
   });
 
   const { data: outstandingData } = useQuery({
     queryKey: ['outstanding-report'],
     queryFn: () => billingService.getOutstandingBalances({}),
-    enabled: reportType === 'outstanding'
+    enabled: reportType === 'outstanding',
   });
 
   const { data: paymentData } = useQuery({
     queryKey: ['payment-report', dateRange],
     queryFn: () => billingService.getPaymentSummary(dateRange),
-    enabled: reportType === 'payments'
+    enabled: reportType === 'payments',
   });
 
   const exportReport = async () => {
     const blob = await billingService.exportBillingData({
       ...dateRange,
-      format: 'excel'
+      format: 'excel',
     });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -49,29 +48,34 @@ const BillingReports: React.FC = () => {
   };
 
   const revenueChartData = {
-    labels: revenueData?.data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })) || [],
+    labels:
+      revenueData?.data.map((d) =>
+        new Date(d.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+      ) || [],
     datasets: [
       {
         label: 'Revenue',
-        data: revenueData?.data.map(d => d.revenue) || [],
+        data: revenueData?.data.map((d) => d.revenue) || [],
         backgroundColor: 'rgba(59, 130, 246, 0.5)',
         borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2
-      }
-    ]
+        borderWidth: 2,
+      },
+    ],
   };
 
   const paymentMethodChartData = {
     labels: Object.keys(paymentData?.byMethod || {}),
-    datasets: [{
-      data: Object.values(paymentData?.byMethod || {}),
-      backgroundColor: [
-        'rgba(59, 130, 246, 0.8)',
-        'rgba(34, 197, 94, 0.8)',
-        'rgba(251, 146, 60, 0.8)',
-        'rgba(147, 51, 234, 0.8)'
-      ]
-    }]
+    datasets: [
+      {
+        data: Object.values(paymentData?.byMethod || {}),
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(34, 197, 94, 0.8)',
+          'rgba(251, 146, 60, 0.8)',
+          'rgba(147, 51, 234, 0.8)',
+        ],
+      },
+    ],
   };
 
   return (
@@ -131,7 +135,10 @@ const BillingReports: React.FC = () => {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Revenue Trend</h2>
             <div className="h-64">
-              <Bar data={revenueChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+              <Bar
+                data={revenueChartData}
+                options={{ responsive: true, maintainAspectRatio: false }}
+              />
             </div>
           </div>
 
@@ -144,15 +151,21 @@ const BillingReports: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Paid Amount</span>
-                <span className="font-semibold text-green-600">{formatCurrency(revenueData.paid)}</span>
+                <span className="font-semibold text-green-600">
+                  {formatCurrency(revenueData.paid)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Pending Amount</span>
-                <span className="font-semibold text-yellow-600">{formatCurrency(revenueData.pending)}</span>
+                <span className="font-semibold text-yellow-600">
+                  {formatCurrency(revenueData.pending)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Overdue Amount</span>
-                <span className="font-semibold text-red-600">{formatCurrency(revenueData.overdue)}</span>
+                <span className="font-semibold text-red-600">
+                  {formatCurrency(revenueData.overdue)}
+                </span>
               </div>
               <div className="pt-4 border-t">
                 <div className="flex justify-between">
@@ -172,7 +185,10 @@ const BillingReports: React.FC = () => {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Payment Methods</h2>
             <div className="h-64">
-              <Doughnut data={paymentMethodChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+              <Doughnut
+                data={paymentMethodChartData}
+                options={{ responsive: true, maintainAspectRatio: false }}
+              />
             </div>
           </div>
 
@@ -185,7 +201,9 @@ const BillingReports: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Refunds</span>
-                <span className="font-semibold text-red-600">{formatCurrency(paymentData.refunds)}</span>
+                <span className="font-semibold text-red-600">
+                  {formatCurrency(paymentData.refunds)}
+                </span>
               </div>
               <div className="pt-4 border-t">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">By Status</h3>
@@ -231,7 +249,13 @@ const BillingReports: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {outstandingData.bills.map((bill) => {
-                  const daysOverdue = Math.max(0, Math.floor((new Date().getTime() - new Date(bill.dueDate).getTime()) / (1000 * 60 * 60 * 24)));
+                  const daysOverdue = Math.max(
+                    0,
+                    Math.floor(
+                      (new Date().getTime() - new Date(bill.dueDate).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )
+                  );
                   return (
                     <tr key={bill.billId}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">

@@ -6,7 +6,7 @@ import {
   FunnelIcon,
   CheckCircleIcon,
   XCircleIcon,
-  DocumentArrowDownIcon
+  DocumentArrowDownIcon,
 } from '@heroicons/react/24/outline';
 
 const AuditLogViewer: React.FC = () => {
@@ -17,16 +17,17 @@ const AuditLogViewer: React.FC = () => {
     startDate: '',
     endDate: '',
     page: 1,
-    limit: 20
+    limit: 20,
   });
 
   const { data, isLoading } = useQuery({
     queryKey: ['audit-logs', filters],
-    queryFn: () => auditService.search({
-      ...filters,
-      startDate: filters.startDate ? new Date(filters.startDate) : undefined,
-      endDate: filters.endDate ? new Date(filters.endDate) : undefined
-    })
+    queryFn: () =>
+      auditService.search({
+        ...filters,
+        startDate: filters.startDate ? new Date(filters.startDate) : undefined,
+        endDate: filters.endDate ? new Date(filters.endDate) : undefined,
+      }),
   });
 
   const handleExport = async (format: 'csv' | 'pdf' | 'excel') => {
@@ -55,7 +56,7 @@ const AuditLogViewer: React.FC = () => {
       LOGOUT: 'text-purple-600',
       EXPORT: 'text-yellow-600',
       APPROVE: 'text-green-600',
-      REJECT: 'text-red-600'
+      REJECT: 'text-red-600',
     };
     return colors[action] || 'text-gray-600';
   };
@@ -204,7 +205,8 @@ const AuditLogViewer: React.FC = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {log.errorMessage || (log.details && JSON.stringify(log.details).substring(0, 50) + '...')}
+                      {log.errorMessage ||
+                        (log.details && JSON.stringify(log.details).substring(0, 50) + '...')}
                     </td>
                   </tr>
                 ))
@@ -217,9 +219,8 @@ const AuditLogViewer: React.FC = () => {
         {data && data.total > filters.limit && (
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-gray-700">
-              Showing {((filters.page - 1) * filters.limit) + 1} to{' '}
-              {Math.min(filters.page * filters.limit, data.total)} of{' '}
-              {data.total} results
+              Showing {(filters.page - 1) * filters.limit + 1} to{' '}
+              {Math.min(filters.page * filters.limit, data.total)} of {data.total} results
             </div>
             <div className="flex space-x-2">
               <button

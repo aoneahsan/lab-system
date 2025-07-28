@@ -12,11 +12,11 @@ const SetupDemoPage: React.FC = () => {
 
   const generateDemoTenant = async () => {
     setIsCreating(true);
-    
+
     try {
       // Generate a unique demo code
       const demoCode = 'DEMO' + Math.random().toString(36).substring(2, 6).toUpperCase();
-      
+
       // Create demo tenant
       await setDoc(doc(firestore, 'tenants', demoCode.toLowerCase()), {
         id: demoCode.toLowerCase(),
@@ -28,33 +28,33 @@ const SetupDemoPage: React.FC = () => {
           city: 'Demo City',
           state: 'DC',
           zipCode: '12345',
-          country: 'USA'
+          country: 'USA',
         },
         contact: {
           email: 'demo@labflow.com',
           phone: '(555) 123-4567',
-          fax: '(555) 123-4568'
+          fax: '(555) 123-4568',
         },
         settings: {
           timezone: 'America/New_York',
           currency: 'USD',
           resultFormat: 'standard',
-          criticalValueNotification: true
+          criticalValueNotification: true,
         },
         features: {
           billing: true,
           inventory: true,
           qualityControl: true,
           emrIntegration: true,
-          mobileApps: true
+          mobileApps: true,
         },
         subscription: {
           plan: 'demo',
           status: 'active',
-          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
         },
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
 
       setCreatedCode(demoCode);
@@ -86,10 +86,10 @@ const SetupDemoPage: React.FC = () => {
           {!createdCode ? (
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-6">
-                Click the button below to generate a unique demo laboratory code. 
-                This will create a fully functional demo environment for testing.
+                Click the button below to generate a unique demo laboratory code. This will create a
+                fully functional demo environment for testing.
               </p>
-              
+
               <button
                 onClick={generateDemoTenant}
                 disabled={isCreating}
@@ -128,13 +128,11 @@ const SetupDemoPage: React.FC = () => {
           ) : (
             <div className="text-center">
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Demo Laboratory Created!
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Demo Laboratory Created!</h3>
               <p className="text-sm text-gray-600 mb-4">
                 Your demo laboratory has been successfully created.
               </p>
-              
+
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <p className="text-sm text-gray-500 mb-2">Your laboratory code is:</p>
                 <p className="text-2xl font-bold text-gray-900">{createdCode}</p>

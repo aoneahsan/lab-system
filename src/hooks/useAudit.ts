@@ -4,24 +4,14 @@ import type { AuditAction, AuditResource } from '../services/audit';
 
 export const useAudit = () => {
   const logAction = useCallback(
-    async (
-      action: AuditAction,
-      resource: AuditResource,
-      resourceId?: string,
-      details?: any
-    ) => {
+    async (action: AuditAction, resource: AuditResource, resourceId?: string, details?: any) => {
       await auditService.log(action, resource, resourceId, details);
     },
     []
   );
 
   const logError = useCallback(
-    async (
-      action: AuditAction,
-      resource: AuditResource,
-      error: any,
-      resourceId?: string
-    ) => {
+    async (action: AuditAction, resource: AuditResource, error: any, resourceId?: string) => {
       await auditService.log(
         action,
         resource,
@@ -69,6 +59,6 @@ export const useAudit = () => {
     logExport: (resource: AuditResource, format: string, count: number) =>
       logAction('EXPORT', resource, undefined, { format, count }),
     logPrint: (resource: AuditResource, resourceId: string) =>
-      logAction('PRINT', resource, resourceId)
+      logAction('PRINT', resource, resourceId),
   };
 };

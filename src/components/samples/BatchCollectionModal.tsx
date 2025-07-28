@@ -27,7 +27,7 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
   const { data: testsData } = useTests();
   const patients = patientsData?.patients || [];
   const tests = testsData || [];
-  
+
   const [samples, setSamples] = useState<BatchSample[]>([
     {
       id: '1',
@@ -60,21 +60,23 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
   };
 
   const handleSubmit = () => {
-    const validSamples = samples.filter(s => s.patientId && s.tests.length > 0);
-    
+    const validSamples = samples.filter((s) => s.patientId && s.tests.length > 0);
+
     if (validSamples.length === 0) {
       toast.error('Invalid Batch', 'Please add at least one valid sample');
       return;
     }
 
     onSubmit(validSamples);
-    setSamples([{
-      id: '1',
-      patientId: '',
-      tests: [],
-      type: 'blood',
-      priority: 'routine',
-    }]);
+    setSamples([
+      {
+        id: '1',
+        patientId: '',
+        tests: [],
+        type: 'blood',
+        priority: 'routine',
+      },
+    ]);
   };
 
   if (!isOpen) return null;
@@ -86,10 +88,7 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
         <div className="relative bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-900">Batch Collection</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -99,9 +98,7 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
               {samples.map((sample, index) => (
                 <div key={sample.id} className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
-                    <h4 className="text-sm font-medium text-gray-900">
-                      Sample #{index + 1}
-                    </h4>
+                    <h4 className="text-sm font-medium text-gray-900">Sample #{index + 1}</h4>
                     {samples.length > 1 && (
                       <button
                         onClick={() => removeSample(sample.id)}
@@ -149,14 +146,15 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tests
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tests</label>
                       <select
                         multiple
                         value={sample.tests}
                         onChange={(e) => {
-                          const selected = Array.from(e.target.selectedOptions, option => option.value);
+                          const selected = Array.from(
+                            e.target.selectedOptions,
+                            (option) => option.value
+                          );
                           updateSample(sample.id, { tests: selected });
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,7 +174,11 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
                       </label>
                       <select
                         value={sample.priority}
-                        onChange={(e) => updateSample(sample.id, { priority: e.target.value as 'routine' | 'urgent' | 'stat' })}
+                        onChange={(e) =>
+                          updateSample(sample.id, {
+                            priority: e.target.value as 'routine' | 'urgent' | 'stat',
+                          })
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="routine">Routine</option>
@@ -209,7 +211,8 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
               onClick={handleSubmit}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
-              Create Batch ({samples.filter(s => s.patientId && s.tests.length > 0).length} samples)
+              Create Batch ({samples.filter((s) => s.patientId && s.tests.length > 0).length}{' '}
+              samples)
             </button>
           </div>
         </div>

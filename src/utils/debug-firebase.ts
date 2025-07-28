@@ -9,7 +9,7 @@ export const enableFirestoreDebug = () => {
   (window as any).__firestoreCollection = originalCollection;
   (window as any).collection = (...args: any[]) => {
     console.log('🔥 Firestore Collection:', args[1]);
-    return originalCollection(...args as [any, any, ...any[]]);
+    return originalCollection(...(args as [any, any, ...any[]]));
   };
 
   // Override query function to log query constraints
@@ -22,10 +22,10 @@ export const enableFirestoreDebug = () => {
         type: c?.type,
         fieldPath: c?._delegate?.fieldPath?.segments?.join('.'),
         op: c?._delegate?.op,
-        value: c?._delegate?.value
-      }))
+        value: c?._delegate?.value,
+      })),
     });
-    return originalQuery(...args as [any, ...any[]]);
+    return originalQuery(...(args as [any, ...any[]]));
   };
 
   // Override getDocs to catch permission errors
@@ -40,7 +40,7 @@ export const enableFirestoreDebug = () => {
       console.error('❌ Query Failed:', {
         path: query?.path || query,
         error: error.message,
-        code: error.code
+        code: error.code,
       });
       throw error;
     }
@@ -50,14 +50,14 @@ export const enableFirestoreDebug = () => {
 // Test all collection permissions for current user
 export const testAllPermissions = async () => {
   console.log('🧪 Testing Firebase Permissions...');
-  
+
   const user = auth.currentUser;
   const tenant = useTenantStore.getState().currentTenant;
-  
+
   console.log('Current User:', {
     uid: user?.uid,
     email: user?.email,
-    tenantId: tenant?.id
+    tenantId: tenant?.id,
   });
 
   if (!user || !tenant) {
@@ -74,7 +74,7 @@ export const testAllPermissions = async () => {
       limit(1)
     );
     const tenantUserSnap = await getDocs(tenantUserQuery);
-    
+
     if (tenantUserSnap.empty) {
       console.error('❌ No tenant_users document found for:', tenantUserDocId);
     } else {
@@ -82,7 +82,7 @@ export const testAllPermissions = async () => {
       console.log('✅ Tenant User Found:', {
         docId: tenantUserSnap.docs[0].id,
         role: userData.role,
-        isActive: userData.isActive
+        isActive: userData.isActive,
       });
     }
   } catch (error: any) {
@@ -92,7 +92,7 @@ export const testAllPermissions = async () => {
   // Test collections
   const collections = [
     'patients',
-    'tests', 
+    'tests',
     'samples',
     'results',
     'inventory_items',
@@ -104,7 +104,7 @@ export const testAllPermissions = async () => {
     'critical_notifications',
     'batches',
     'sampleCollections',
-    'resultValidations'
+    'resultValidations',
   ];
 
   for (const collName of collections) {
@@ -112,18 +112,14 @@ export const testAllPermissions = async () => {
       // Get the collection name with tenant prefix
       const { getCollectionName } = await import('@/config/firebase-collections');
       const fullCollectionName = getCollectionName(collName);
-      
+
       console.log(`\n📁 Testing: ${fullCollectionName}`);
-      
+
       // Try a simple query
-      const testQuery = query(
-        collection(db, fullCollectionName),
-        limit(1)
-      );
-      
+      const testQuery = query(collection(db, fullCollectionName), limit(1));
+
       const snapshot = await getDocs(testQuery);
       console.log(`✅ ${fullCollectionName}: Access GRANTED (${snapshot.size} docs)`);
-      
     } catch (error: any) {
       console.error(`❌ ${collName}: Access DENIED - ${error.message}`);
     }
@@ -136,19 +132,23 @@ export const testAllPermissions = async () => {
 export const logAuthState = () => {
   const user = auth.currentUser;
   const tenant = useTenantStore.getState().currentTenant;
-  
+
   console.log('🔐 Auth State:', {
-    user: user ? {
-      uid: user.uid,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      metadata: user.metadata
-    } : 'Not authenticated',
-    tenant: tenant ? {
-      id: tenant.id,
-      name: tenant.name,
-      isActive: tenant.isActive
-    } : 'No tenant selected'
+    user: user
+      ? {
+          uid: user.uid,
+          email: user.email,
+          emailVerified: user.emailVerified,
+          metadata: user.metadata,
+        }
+      : 'Not authenticated',
+    tenant: tenant
+      ? {
+          id: tenant.id,
+          name: tenant.name,
+          isActive: tenant.isActive,
+        }
+      : 'No tenant selected',
   });
 };
 
@@ -159,13 +159,13 @@ export const testQuery = async (collectionName: string, constraints: any[] = [])
     const snapshot = await getDocs(q);
     console.log(`✅ Query successful: ${collectionName}`, {
       docs: snapshot.size,
-      empty: snapshot.empty
+      empty: snapshot.empty,
     });
     return snapshot;
   } catch (error: any) {
     console.error(`❌ Query failed: ${collectionName}`, {
       error: error.message,
-      code: error.code
+      code: error.code,
     });
     throw error;
   }
@@ -177,9 +177,9 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     enableDebug: enableFirestoreDebug,
     testPermissions: testAllPermissions,
     logAuthState,
-    testQuery
+    testQuery,
   };
-  
+
   console.log('🐛 Firebase Debug Mode Available. Use:');
   console.log('- firebaseDebug.enableDebug() to log all queries');
   console.log('- firebaseDebug.testPermissions() to test all collections');

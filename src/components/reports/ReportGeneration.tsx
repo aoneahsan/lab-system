@@ -73,9 +73,7 @@ export default function ReportGeneration() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Output Format
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Output Format</label>
               <select
                 value={reportFormat}
                 onChange={(e) => setReportFormat(e.target.value as ReportFormat)}
@@ -92,12 +90,10 @@ export default function ReportGeneration() {
           {selectedTemplate && (
             <div className="mt-6 space-y-4">
               <h4 className="font-medium text-gray-900">Report Parameters</h4>
-              
+
               {selectedTemplate === '1' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Order ID
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Order ID</label>
                   <input
                     type="text"
                     placeholder="Enter order ID"
@@ -111,9 +107,7 @@ export default function ReportGeneration() {
               {selectedTemplate === '2' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Month
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Month</label>
                     <input
                       type="month"
                       value={parameters.month || ''}
@@ -184,7 +178,7 @@ export default function ReportGeneration() {
               {generatedReports.map((report) => {
                 const status = statusConfig[report.status];
                 const StatusIcon = status.icon;
-                
+
                 return (
                   <tr key={report.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-900">
@@ -201,7 +195,9 @@ export default function ReportGeneration() {
                       {(report.format as string).toUpperCase()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}
+                      >
                         <StatusIcon className="h-3 w-3 mr-1" />
                         {status.label}
                       </span>

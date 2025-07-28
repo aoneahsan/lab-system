@@ -20,12 +20,7 @@ interface TestListTableProps {
 
 const columnHelper = createColumnHelper<TestDefinition>();
 
-const TestListTable: React.FC<TestListTableProps> = ({
-  tests,
-  onEdit,
-  onDelete,
-  onView,
-}) => {
+const TestListTable: React.FC<TestListTableProps> = ({ tests, onEdit, onDelete, onView }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -33,9 +28,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
   const columns = [
     columnHelper.accessor('code', {
       header: 'Code',
-      cell: (info) => (
-        <span className="font-medium text-gray-900">{info.getValue()}</span>
-      ),
+      cell: (info) => <span className="font-medium text-gray-900">{info.getValue()}</span>,
     }),
     columnHelper.accessor('name', {
       header: 'Test Name',
@@ -43,9 +36,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
         <div>
           <div className="font-medium text-gray-900">{info.getValue()}</div>
           {info.row.original.loincCode && (
-            <div className="text-sm text-gray-500">
-              LOINC: {info.row.original.loincCode.code}
-            </div>
+            <div className="text-sm text-gray-500">LOINC: {info.row.original.loincCode.code}</div>
           )}
         </div>
       ),
@@ -60,9 +51,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
     }),
     columnHelper.accessor('specimen.type', {
       header: 'Specimen',
-      cell: (info) => (
-        <span className="capitalize">{info.getValue()}</span>
-      ),
+      cell: (info) => <span className="capitalize">{info.getValue()}</span>,
     }),
     columnHelper.accessor('turnaroundTime.routine', {
       header: 'TAT (hrs)',
@@ -73,9 +62,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
       cell: (info) => (
         <span
           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            info.getValue()
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
+            info.getValue() ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
           }`}
         >
           {info.getValue() ? 'Active' : 'Inactive'}
@@ -154,14 +141,9 @@ const TestListTable: React.FC<TestListTableProps> = ({
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     <div className="flex items-center gap-2">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                       {header.column.getIsSorted() && (
-                        <span>
-                          {header.column.getIsSorted() === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span>{header.column.getIsSorted() === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </th>
@@ -173,10 +155,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="px-6 py-4 whitespace-nowrap text-sm"
-                  >
+                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -190,8 +169,7 @@ const TestListTable: React.FC<TestListTableProps> = ({
       <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
         <div className="flex justify-between items-center w-full">
           <div className="text-sm text-gray-700">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </div>
           <div className="flex gap-2">
             <button

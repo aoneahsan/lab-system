@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Download, 
-  Share2, 
-  TrendingUp, 
+import {
+  ArrowLeft,
+  Download,
+  Share2,
+  TrendingUp,
   TrendingDown,
   Info,
   Calendar,
   User,
   MapPin,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -23,18 +23,10 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface TestParameter {
   name: string;
@@ -68,7 +60,8 @@ export const ResultDetailScreen: React.FC = () => {
     labAddress: '123 Medical Center Dr, City, State 12345',
     specimenType: 'Blood',
     collectionTime: '8:30 AM',
-    interpretation: 'All parameters are within normal limits. No significant abnormalities detected.',
+    interpretation:
+      'All parameters are within normal limits. No significant abnormalities detected.',
     parameters: [
       {
         name: 'Hemoglobin',
@@ -77,7 +70,7 @@ export const ResultDetailScreen: React.FC = () => {
         referenceRange: '13.5-17.5',
         previousValue: '14.2',
         trend: [13.8, 14.0, 14.2, 14.5],
-        interpretation: 'Normal hemoglobin level indicates adequate oxygen-carrying capacity.'
+        interpretation: 'Normal hemoglobin level indicates adequate oxygen-carrying capacity.',
       },
       {
         name: 'White Blood Cell Count',
@@ -86,7 +79,7 @@ export const ResultDetailScreen: React.FC = () => {
         referenceRange: '4.5-11.0',
         previousValue: '6.8',
         trend: [6.5, 6.8, 7.0, 7.2],
-        interpretation: 'WBC count is within normal range, suggesting no active infection.'
+        interpretation: 'WBC count is within normal range, suggesting no active infection.',
       },
       {
         name: 'Platelets',
@@ -95,7 +88,7 @@ export const ResultDetailScreen: React.FC = () => {
         referenceRange: '150-400',
         previousValue: '245',
         trend: [240, 242, 245, 250],
-        interpretation: 'Platelet count is normal, indicating normal blood clotting ability.'
+        interpretation: 'Platelet count is normal, indicating normal blood clotting ability.',
       },
       {
         name: 'Red Blood Cell Count',
@@ -103,7 +96,7 @@ export const ResultDetailScreen: React.FC = () => {
         unit: 'M/µL',
         referenceRange: '4.5-5.9',
         previousValue: '4.7',
-        trend: [4.6, 4.7, 4.7, 4.8]
+        trend: [4.6, 4.7, 4.7, 4.8],
       },
       {
         name: 'MCV',
@@ -111,7 +104,7 @@ export const ResultDetailScreen: React.FC = () => {
         unit: 'fL',
         referenceRange: '80-100',
         previousValue: '88',
-        trend: [87, 88, 88, 89]
+        trend: [87, 88, 88, 89],
       },
       {
         name: 'MCH',
@@ -119,7 +112,7 @@ export const ResultDetailScreen: React.FC = () => {
         unit: 'pg',
         referenceRange: '27-33',
         previousValue: '30',
-        trend: [29, 30, 30, 30]
+        trend: [29, 30, 30, 30],
       },
       {
         name: 'MCHC',
@@ -127,16 +120,14 @@ export const ResultDetailScreen: React.FC = () => {
         unit: 'g/dL',
         referenceRange: '32-36',
         previousValue: '34',
-        trend: [33, 34, 34, 34]
-      }
-    ]
+        trend: [33, 34, 34, 34],
+      },
+    ],
   };
 
   const toggleParamExpansion = (paramName: string) => {
-    setExpandedParams(prev => 
-      prev.includes(paramName) 
-        ? prev.filter(p => p !== paramName)
-        : [...prev, paramName]
+    setExpandedParams((prev) =>
+      prev.includes(paramName) ? prev.filter((p) => p !== paramName) : [...prev, paramName]
     );
   };
 
@@ -149,10 +140,8 @@ export const ResultDetailScreen: React.FC = () => {
 
   const getFlagIcon = (flag?: string) => {
     if (!flag) return null;
-    if (flag === 'H' || flag === 'HH') 
-      return <TrendingUp className="h-4 w-4 text-red-500" />;
-    if (flag === 'L' || flag === 'LL') 
-      return <TrendingDown className="h-4 w-4 text-blue-500" />;
+    if (flag === 'H' || flag === 'HH') return <TrendingUp className="h-4 w-4 text-red-500" />;
+    if (flag === 'L' || flag === 'LL') return <TrendingDown className="h-4 w-4 text-blue-500" />;
     return null;
   };
 
@@ -168,8 +157,8 @@ export const ResultDetailScreen: React.FC = () => {
           borderColor: 'rgb(99, 102, 241)',
           backgroundColor: 'rgba(99, 102, 241, 0.1)',
           tension: 0.4,
-        }
-      ]
+        },
+      ],
     };
 
     const options = {
@@ -177,14 +166,14 @@ export const ResultDetailScreen: React.FC = () => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false
-        }
+          display: false,
+        },
       },
       scales: {
         y: {
-          beginAtZero: false
-        }
-      }
+          beginAtZero: false,
+        },
+      },
     };
 
     return (
@@ -199,10 +188,7 @@ export const ResultDetailScreen: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="flex items-center p-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-4"
-          >
+          <button onClick={() => navigate(-1)} className="mr-4">
             <ArrowLeft className="h-6 w-6 text-gray-600" />
           </button>
           <div className="flex-1">
@@ -222,7 +208,9 @@ export const ResultDetailScreen: React.FC = () => {
           </div>
           <div className="flex items-center text-sm text-gray-600">
             <User className="h-4 w-4 mr-2" />
-            <span>{result.doctorName} - {result.doctorSpecialty}</span>
+            <span>
+              {result.doctorName} - {result.doctorSpecialty}
+            </span>
           </div>
           <div className="flex items-center text-sm text-gray-600">
             <MapPin className="h-4 w-4 mr-2" />
@@ -244,9 +232,7 @@ export const ResultDetailScreen: React.FC = () => {
             )}
           </button>
           {showInterpretation && (
-            <p className="mt-3 text-gray-700 leading-relaxed">
-              {result.interpretation}
-            </p>
+            <p className="mt-3 text-gray-700 leading-relaxed">{result.interpretation}</p>
           )}
         </div>
 
@@ -255,11 +241,11 @@ export const ResultDetailScreen: React.FC = () => {
           <div className="p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Test Results</h2>
           </div>
-          
+
           <div className="divide-y divide-gray-200">
             {result.parameters.map((param) => (
               <div key={param.name} className="p-4">
-                <div 
+                <div
                   onClick={() => toggleParamExpansion(param.name)}
                   className="flex items-center justify-between cursor-pointer"
                 >
@@ -283,12 +269,14 @@ export const ResultDetailScreen: React.FC = () => {
                     {param.previousValue && (
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">Previous Value:</span>
-                        <span className="font-medium">{param.previousValue} {param.unit}</span>
+                        <span className="font-medium">
+                          {param.previousValue} {param.unit}
+                        </span>
                       </div>
                     )}
-                    
+
                     {param.trend && renderTrendChart(param)}
-                    
+
                     {param.interpretation && (
                       <div className="bg-blue-50 p-3 rounded-lg">
                         <div className="flex items-start space-x-2">

@@ -45,9 +45,9 @@ export default function ReportDashboard() {
 
         <div className="p-6">
           {activeTab === 'generate' && <ReportGeneration />}
-          
+
           {activeTab === 'templates' && <ReportTemplates />}
-          
+
           {activeTab === 'scheduled' && (
             <div className="text-center py-12 text-gray-500">
               <Settings className="h-12 w-12 mx-auto mb-4" />
@@ -55,7 +55,7 @@ export default function ReportDashboard() {
               <p className="text-sm mt-2">Set up automatic report generation on a schedule</p>
             </div>
           )}
-          
+
           {activeTab === 'analytics' && (
             <div className="text-center py-12 text-gray-500">
               <TrendingUp className="h-12 w-12 mx-auto mb-4" />

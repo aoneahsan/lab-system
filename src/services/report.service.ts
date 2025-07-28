@@ -99,19 +99,19 @@ export const reportService = {
       orderBy('category'),
       orderBy('name')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ReportTemplate));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as ReportTemplate);
   },
 
   async getReportTemplate(tenantId: string, templateId: string): Promise<ReportTemplate | null> {
     const templateRef = doc(db, COLLECTIONS.REPORT_TEMPLATES, templateId);
     const templateDoc = await getDoc(templateRef);
-    
+
     if (!templateDoc.exists() || templateDoc.data()?.tenantId !== tenantId) {
       return null;
     }
-    
+
     return { id: templateDoc.id, ...templateDoc.data() } as ReportTemplate;
   },
 
@@ -121,7 +121,7 @@ export const reportService = {
     data: ReportTemplateFormData
   ): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     const templateData: Omit<ReportTemplate, 'id'> = {
       tenantId,
       ...data,
@@ -131,7 +131,7 @@ export const reportService = {
       updatedAt: now,
       updatedBy: userId,
     };
-    
+
     const docRef = await addDoc(collection(db, COLLECTIONS.REPORT_TEMPLATES), templateData as any);
     return docRef.id;
   },
@@ -144,11 +144,11 @@ export const reportService = {
   ): Promise<void> {
     const templateRef = doc(db, COLLECTIONS.REPORT_TEMPLATES, templateId);
     const templateDoc = await getDoc(templateRef);
-    
+
     if (!templateDoc.exists() || templateDoc.data()?.tenantId !== tenantId) {
       throw new Error('Report template not found');
     }
-    
+
     await updateDoc(templateRef, {
       ...data,
       updatedAt: serverTimestamp(),
@@ -159,11 +159,11 @@ export const reportService = {
   async deleteReportTemplate(tenantId: string, templateId: string): Promise<void> {
     const templateRef = doc(db, COLLECTIONS.REPORT_TEMPLATES, templateId);
     const templateDoc = await getDoc(templateRef);
-    
+
     if (!templateDoc.exists() || templateDoc.data()?.tenantId !== tenantId) {
       throw new Error('Report template not found');
     }
-    
+
     await deleteDoc(templateRef);
   },
 
@@ -171,7 +171,7 @@ export const reportService = {
   async getReports(tenantId: string, filter?: ReportQueryFilter): Promise<Report[]> {
     const reportsRef = collection(db, COLLECTIONS.REPORTS);
     let q = query(reportsRef, where('tenantId', '==', tenantId));
-    
+
     if (filter?.type) {
       q = query(q, where('type', '==', filter.type));
     }
@@ -181,31 +181,27 @@ export const reportService = {
     if (filter?.createdBy) {
       q = query(q, where('createdBy', '==', filter.createdBy));
     }
-    
+
     q = query(q, orderBy('createdAt', 'desc'), limit(100));
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Report));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Report);
   },
 
   async getReport(tenantId: string, reportId: string): Promise<Report | null> {
     const reportRef = doc(db, COLLECTIONS.REPORTS, reportId);
     const reportDoc = await getDoc(reportRef);
-    
+
     if (!reportDoc.exists() || reportDoc.data()?.tenantId !== tenantId) {
       return null;
     }
-    
+
     return { id: reportDoc.id, ...reportDoc.data() } as Report;
   },
 
-  async createReport(
-    tenantId: string,
-    userId: string,
-    data: ReportFormData
-  ): Promise<string> {
+  async createReport(tenantId: string, userId: string, data: ReportFormData): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     // Get template if specified
     let config: Record<string, unknown> = {};
     if (data.templateId) {
@@ -214,7 +210,7 @@ export const reportService = {
         config = template.config as unknown as Record<string, unknown>;
       }
     }
-    
+
     const reportData: Omit<Report, 'id'> = {
       tenantId,
       templateId: data.templateId,
@@ -230,7 +226,7 @@ export const reportService = {
       updatedAt: now,
       updatedBy: userId,
     };
-    
+
     const docRef = await addDoc(collection(db, COLLECTIONS.REPORTS), reportData);
     return docRef.id;
   },
@@ -243,11 +239,11 @@ export const reportService = {
   ): Promise<void> {
     const reportRef = doc(db, COLLECTIONS.REPORTS, reportId);
     const reportDoc = await getDoc(reportRef);
-    
+
     if (!reportDoc.exists() || reportDoc.data()?.tenantId !== tenantId) {
       throw new Error('Report not found');
     }
-    
+
     await updateDoc(reportRef, {
       ...data,
       updatedAt: serverTimestamp(),
@@ -258,11 +254,11 @@ export const reportService = {
   async deleteReport(tenantId: string, reportId: string): Promise<void> {
     const reportRef = doc(db, COLLECTIONS.REPORTS, reportId);
     const reportDoc = await getDoc(reportRef);
-    
+
     if (!reportDoc.exists() || reportDoc.data()?.tenantId !== tenantId) {
       throw new Error('Report not found');
     }
-    
+
     await deleteDoc(reportRef);
   },
 
@@ -275,19 +271,19 @@ export const reportService = {
       orderBy('isDefault', 'desc'),
       orderBy('name')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AnalyticsDashboard));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as AnalyticsDashboard);
   },
 
   async getDashboard(tenantId: string, dashboardId: string): Promise<AnalyticsDashboard | null> {
     const dashboardRef = doc(db, COLLECTIONS.ANALYTICS_DASHBOARDS, dashboardId);
     const dashboardDoc = await getDoc(dashboardRef);
-    
+
     if (!dashboardDoc.exists() || dashboardDoc.data()?.tenantId !== tenantId) {
       return null;
     }
-    
+
     return { id: dashboardDoc.id, ...dashboardDoc.data() } as AnalyticsDashboard;
   },
 
@@ -297,7 +293,7 @@ export const reportService = {
     data: DashboardFormData
   ): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     const dashboardData: Omit<AnalyticsDashboard, 'id'> = {
       tenantId,
       ...data,
@@ -307,7 +303,7 @@ export const reportService = {
       updatedAt: now,
       updatedBy: userId,
     };
-    
+
     const docRef = await addDoc(collection(db, COLLECTIONS.ANALYTICS_DASHBOARDS), dashboardData);
     return docRef.id;
   },
@@ -320,11 +316,11 @@ export const reportService = {
   ): Promise<void> {
     const dashboardRef = doc(db, COLLECTIONS.ANALYTICS_DASHBOARDS, dashboardId);
     const dashboardDoc = await getDoc(dashboardRef);
-    
+
     if (!dashboardDoc.exists() || dashboardDoc.data()?.tenantId !== tenantId) {
       throw new Error('Dashboard not found');
     }
-    
+
     await updateDoc(dashboardRef, {
       ...data,
       updatedAt: serverTimestamp(),
@@ -335,11 +331,11 @@ export const reportService = {
   async deleteDashboard(tenantId: string, dashboardId: string): Promise<void> {
     const dashboardRef = doc(db, COLLECTIONS.ANALYTICS_DASHBOARDS, dashboardId);
     const dashboardDoc = await getDoc(dashboardRef);
-    
+
     if (!dashboardDoc.exists() || dashboardDoc.data()?.tenantId !== tenantId) {
       throw new Error('Dashboard not found');
     }
-    
+
     await deleteDoc(dashboardRef);
   },
 
@@ -354,24 +350,30 @@ export const reportService = {
 
     // Get total counts
     const [testsSnapshot, patientsSnapshot, samplesSnapshot] = await Promise.all([
-      getDocs(query(
-        collection(db, COLLECTIONS.TEST_ORDERS),
-        where('tenantId', '==', tenantId),
-        where('createdAt', '>=', startTimestamp),
-        where('createdAt', '<=', endTimestamp)
-      )),
-      getDocs(query(
-        collection(db, COLLECTIONS.PATIENTS),
-        where('tenantId', '==', tenantId),
-        where('createdAt', '>=', startTimestamp),
-        where('createdAt', '<=', endTimestamp)
-      )),
-      getDocs(query(
-        collection(db, COLLECTIONS.SAMPLES),
-        where('tenantId', '==', tenantId),
-        where('collectedAt', '>=', startTimestamp),
-        where('collectedAt', '<=', endTimestamp)
-      )),
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.TEST_ORDERS),
+          where('tenantId', '==', tenantId),
+          where('createdAt', '>=', startTimestamp),
+          where('createdAt', '<=', endTimestamp)
+        )
+      ),
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.PATIENTS),
+          where('tenantId', '==', tenantId),
+          where('createdAt', '>=', startTimestamp),
+          where('createdAt', '<=', endTimestamp)
+        )
+      ),
+      getDocs(
+        query(
+          collection(db, COLLECTIONS.SAMPLES),
+          where('tenantId', '==', tenantId),
+          where('collectedAt', '>=', startTimestamp),
+          where('collectedAt', '<=', endTimestamp)
+        )
+      ),
     ]);
 
     const totalTests = testsSnapshot.size;
@@ -380,7 +382,7 @@ export const reportService = {
 
     // Calculate revenue (simplified)
     let totalRevenue = 0;
-    testsSnapshot.forEach(doc => {
+    testsSnapshot.forEach((doc) => {
       const order = doc.data();
       totalRevenue += order.totalAmount || 0;
     });
@@ -388,7 +390,7 @@ export const reportService = {
     // Calculate average turnaround time
     let totalTurnaroundTime = 0;
     let completedTests = 0;
-    testsSnapshot.forEach(doc => {
+    testsSnapshot.forEach((doc) => {
       const order = doc.data();
       if (order.status === 'completed' && order.completedAt && order.createdAt) {
         const turnaround = order.completedAt.toMillis() - order.createdAt.toMillis();
@@ -396,9 +398,10 @@ export const reportService = {
         completedTests++;
       }
     });
-    const averageTurnaroundTime = completedTests > 0 
-      ? totalTurnaroundTime / completedTests / (1000 * 60 * 60) // Convert to hours
-      : 0;
+    const averageTurnaroundTime =
+      completedTests > 0
+        ? totalTurnaroundTime / completedTests / (1000 * 60 * 60) // Convert to hours
+        : 0;
 
     // Get test volume trend (simplified - last 7 days)
     const testVolumeTrend = [];
@@ -406,17 +409,19 @@ export const reportService = {
       const date = new Date();
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
-      
+
       const nextDate = new Date(date);
       nextDate.setDate(nextDate.getDate() + 1);
-      
-      const daySnapshot = await getDocs(query(
-        collection(db, COLLECTIONS.TEST_ORDERS),
-        where('tenantId', '==', tenantId),
-        where('createdAt', '>=', Timestamp.fromDate(date)),
-        where('createdAt', '<', Timestamp.fromDate(nextDate))
-      ));
-      
+
+      const daySnapshot = await getDocs(
+        query(
+          collection(db, COLLECTIONS.TEST_ORDERS),
+          where('tenantId', '==', tenantId),
+          where('createdAt', '>=', Timestamp.fromDate(date)),
+          where('createdAt', '<', Timestamp.fromDate(nextDate))
+        )
+      );
+
       testVolumeTrend.push({
         date,
         value: daySnapshot.size,
@@ -426,7 +431,7 @@ export const reportService = {
 
     // Get revenue trend (simplified - same as test volume * average price)
     const avgPrice = totalRevenue / (totalTests || 1);
-    const revenueTrend = testVolumeTrend.map(item => ({
+    const revenueTrend = testVolumeTrend.map((item) => ({
       date: item.date,
       value: item.value * avgPrice,
       label: item.label,
@@ -434,7 +439,7 @@ export const reportService = {
 
     // Get top tests
     const testCounts = new Map<string, { name: string; count: number }>();
-    testsSnapshot.forEach(doc => {
+    testsSnapshot.forEach((doc) => {
       const order = doc.data();
       if (order.tests) {
         order.tests.forEach((test: { testCode: string; testName: string }) => {
@@ -453,9 +458,21 @@ export const reportService = {
     // Get department stats (simplified)
     const departmentStats = [
       { department: 'Chemistry', tests: Math.floor(totalTests * 0.4), revenue: totalRevenue * 0.4 },
-      { department: 'Hematology', tests: Math.floor(totalTests * 0.3), revenue: totalRevenue * 0.3 },
-      { department: 'Microbiology', tests: Math.floor(totalTests * 0.2), revenue: totalRevenue * 0.2 },
-      { department: 'Immunology', tests: Math.floor(totalTests * 0.1), revenue: totalRevenue * 0.1 },
+      {
+        department: 'Hematology',
+        tests: Math.floor(totalTests * 0.3),
+        revenue: totalRevenue * 0.3,
+      },
+      {
+        department: 'Microbiology',
+        tests: Math.floor(totalTests * 0.2),
+        revenue: totalRevenue * 0.2,
+      },
+      {
+        department: 'Immunology',
+        tests: Math.floor(totalTests * 0.1),
+        revenue: totalRevenue * 0.1,
+      },
     ];
 
     return {
@@ -472,11 +489,7 @@ export const reportService = {
   },
 
   // Generate report (placeholder - would implement actual report generation logic)
-  async generateReport(
-    tenantId: string,
-    userId: string,
-    reportId: string
-  ): Promise<void> {
+  async generateReport(tenantId: string, userId: string, reportId: string): Promise<void> {
     const report = await this.getReport(tenantId, reportId);
     if (!report) {
       throw new Error('Report not found');
@@ -496,7 +509,7 @@ export const reportService = {
       // 3. Generating charts if configured
       // 4. Creating output in requested formats
       // 5. Saving files to storage
-      
+
       // For now, just mark as completed after a delay
       setTimeout(async () => {
         await this.updateReport(tenantId, userId, reportId, {

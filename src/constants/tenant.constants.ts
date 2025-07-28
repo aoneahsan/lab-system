@@ -1,15 +1,15 @@
 /**
  * Tenant-related constants for the LabFlow system
- * 
+ *
  * The project prefix is used to isolate data for multi-tenant architecture.
  * Each tenant will have their own unique prefix that is prepended to all
  * collection names, storage paths, and other resources.
- * 
+ *
  * Example: For a tenant "tenant1", collections would be:
  * - labflow_tenant1_patients
  * - labflow_tenant1_tests
  * - labflow_tenant1_samples
- * 
+ *
  * This ensures complete data isolation between tenants.
  */
 
@@ -43,7 +43,7 @@ export const SYSTEM_ROLES = {
   PATIENT: 'patient',
 } as const;
 
-export type SystemRole = typeof SYSTEM_ROLES[keyof typeof SYSTEM_ROLES];
+export type SystemRole = (typeof SYSTEM_ROLES)[keyof typeof SYSTEM_ROLES];
 
 export const COLLECTION_NAMES = {
   USERS: 'users',
@@ -61,4 +61,4 @@ export const COLLECTION_NAMES = {
   REPORTS: 'reports',
 } as const;
 
-export type CollectionName = typeof COLLECTION_NAMES[keyof typeof COLLECTION_NAMES];
+export type CollectionName = (typeof COLLECTION_NAMES)[keyof typeof COLLECTION_NAMES];

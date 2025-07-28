@@ -33,7 +33,7 @@ export interface Sample {
   updatedBy: string;
 }
 
-export type SampleType = 
+export type SampleType =
   | 'blood'
   | 'serum'
   | 'plasma'
@@ -66,11 +66,7 @@ export type SampleStatus =
   | 'rejected'
   | 'expired';
 
-export type StorageTemperature =
-  | 'room_temp'
-  | 'refrigerated'
-  | 'frozen'
-  | 'ultra_frozen';
+export type StorageTemperature = 'room_temp' | 'refrigerated' | 'frozen' | 'ultra_frozen';
 
 export interface ChainOfCustodyEntry {
   timestamp: Timestamp;

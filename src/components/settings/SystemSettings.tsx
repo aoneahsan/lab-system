@@ -18,7 +18,7 @@ import {
   ShieldCheckIcon,
   ComputerDesktopIcon,
   ArrowDownTrayIcon,
-  ArrowUpTrayIcon
+  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';
 
 const tabs = [
@@ -28,7 +28,7 @@ const tabs = [
   { id: 'integration', label: 'Integration', icon: LinkIcon },
   { id: 'notifications', label: 'Notifications', icon: BellIcon },
   { id: 'security', label: 'Security', icon: ShieldCheckIcon },
-  { id: 'display', label: 'Display', icon: ComputerDesktopIcon }
+  { id: 'display', label: 'Display', icon: ComputerDesktopIcon },
 ];
 
 const SystemSettingsPage: React.FC = () => {
@@ -38,7 +38,7 @@ const SystemSettingsPage: React.FC = () => {
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
-    queryFn: () => settingsService.getSettings()
+    queryFn: () => settingsService.getSettings(),
   });
 
   const updateMutation = useMutation({
@@ -46,7 +46,7 @@ const SystemSettingsPage: React.FC = () => {
       settingsService.updateSettings(section, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
-    }
+    },
   });
 
   const exportMutation = useMutation({
@@ -60,7 +60,7 @@ const SystemSettingsPage: React.FC = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    }
+    },
   });
 
   const importMutation = useMutation({
@@ -68,7 +68,7 @@ const SystemSettingsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
       setImportFile(null);
-    }
+    },
   });
 
   const handleSave = (section: keyof SystemSettings, data: any) => {
@@ -215,9 +215,7 @@ const SystemSettingsPage: React.FC = () => {
             </nav>
           </div>
 
-          <div className="flex-1 p-6">
-            {renderTabContent()}
-          </div>
+          <div className="flex-1 p-6">{renderTabContent()}</div>
         </div>
       </div>
     </div>

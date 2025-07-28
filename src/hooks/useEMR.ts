@@ -22,7 +22,8 @@ const EMR_KEYS = {
   messageList: (filter?: EMRMessageFilter) => [...EMR_KEYS.messages(), filter] as const,
   mappings: () => [...EMR_KEYS.all, 'mappings'] as const,
   mapping: (id: string) => [...EMR_KEYS.mappings(), id] as const,
-  mappingsByConnection: (connectionId: string) => [...EMR_KEYS.mappings(), 'connection', connectionId] as const,
+  mappingsByConnection: (connectionId: string) =>
+    [...EMR_KEYS.mappings(), 'connection', connectionId] as const,
   logs: (connectionId: string) => [...EMR_KEYS.all, 'logs', connectionId] as const,
   syncStatus: (connectionId: string) => [...EMR_KEYS.all, 'sync-status', connectionId] as const,
 };
@@ -81,9 +82,20 @@ export const useUpdateEMRConnection = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ connectionId, data }: { connectionId: string; data: Partial<EMRConnectionFormData> }) => {
+    mutationFn: ({
+      connectionId,
+      data,
+    }: {
+      connectionId: string;
+      data: Partial<EMRConnectionFormData>;
+    }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
-      return emrConnectionService.updateConnection(currentTenant.id, currentUser.id, connectionId, data);
+      return emrConnectionService.updateConnection(
+        currentTenant.id,
+        currentUser.id,
+        connectionId,
+        data
+      );
     },
     onSuccess: (_, { connectionId }) => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.connections() });
@@ -160,10 +172,12 @@ export const useSyncFHIRPatient = () => {
   return useMutation({
     mutationFn: ({ connectionId, patientId }: { connectionId: string; patientId: string }) => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return emrConnectionService.getConnection(currentTenant.id, connectionId).then(connection => {
-        if (!connection) throw new Error('Connection not found');
-        return fhirService.syncPatient(connection, patientId, currentTenant.id);
-      });
+      return emrConnectionService
+        .getConnection(currentTenant.id, connectionId)
+        .then((connection) => {
+          if (!connection) throw new Error('Connection not found');
+          return fhirService.syncPatient(connection, patientId, currentTenant.id);
+        });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.messages() });
@@ -183,10 +197,12 @@ export const useCreateFHIRLabOrder = () => {
   return useMutation({
     mutationFn: ({ connectionId, order }: { connectionId: string; order: FHIRServiceRequest }) => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return emrConnectionService.getConnection(currentTenant.id, connectionId).then(connection => {
-        if (!connection) throw new Error('Connection not found');
-        return fhirService.createLabOrder(connection, order, currentTenant.id);
-      });
+      return emrConnectionService
+        .getConnection(currentTenant.id, connectionId)
+        .then((connection) => {
+          if (!connection) throw new Error('Connection not found');
+          return fhirService.createLabOrder(connection, order, currentTenant.id);
+        });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.messages() });
@@ -204,20 +220,27 @@ export const useSendFHIRResults = () => {
   const { currentTenant } = useTenantStore();
 
   return useMutation({
-    mutationFn: ({ 
-      connectionId, 
-      results, 
-      observations 
-    }: { 
-      connectionId: string; 
-      results: FHIRDiagnosticReport; 
-      observations: Array<Record<string, unknown>> 
+    mutationFn: ({
+      connectionId,
+      results,
+      observations,
+    }: {
+      connectionId: string;
+      results: FHIRDiagnosticReport;
+      observations: Array<Record<string, unknown>>;
     }) => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return emrConnectionService.getConnection(currentTenant.id, connectionId).then(connection => {
-        if (!connection) throw new Error('Connection not found');
-        return fhirService.sendLabResults(connection, results, observations as unknown as FHIRObservation[], currentTenant.id);
-      });
+      return emrConnectionService
+        .getConnection(currentTenant.id, connectionId)
+        .then((connection) => {
+          if (!connection) throw new Error('Connection not found');
+          return fhirService.sendLabResults(
+            connection,
+            results,
+            observations as unknown as FHIRObservation[],
+            currentTenant.id
+          );
+        });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: EMR_KEYS.messages() });
@@ -256,7 +279,9 @@ export const useCreateWebhookEndpoint = () => {
       return Promise.resolve({ id: 'webhook-' + Date.now(), ...data });
     },
     onSuccess: (_, { connectionId }) => {
-      queryClient.invalidateQueries({ queryKey: [...EMR_KEYS.connection(connectionId), 'webhooks'] });
+      queryClient.invalidateQueries({
+        queryKey: [...EMR_KEYS.connection(connectionId), 'webhooks'],
+      });
       toast.success('Webhook endpoint created successfully');
     },
     onError: (error) => {

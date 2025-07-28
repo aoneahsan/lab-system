@@ -42,8 +42,9 @@ const CollectionsScreen: React.FC = () => {
     },
   ];
 
-  const filteredCollections = collections.filter(collection => {
-    const matchesSearch = collection.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredCollections = collections.filter((collection) => {
+    const matchesSearch =
+      collection.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       collection.orderNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || collection.status === filterStatus;
     return matchesSearch && matchesFilter;
@@ -108,9 +109,7 @@ const CollectionsScreen: React.FC = () => {
       {/* Collections List */}
       <div className="space-y-3">
         {filteredCollections.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            No collections found
-          </div>
+          <div className="text-center py-8 text-gray-500">No collections found</div>
         ) : (
           filteredCollections.map((collection) => (
             <div
@@ -139,8 +138,18 @@ const CollectionsScreen: React.FC = () => {
                   </span>
                   <span>{collection.tests} tests</span>
                 </div>
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </div>

@@ -17,7 +17,7 @@ export const useOfflineData = <T extends { id: string } = any>({
   queryKey,
   onlineQuery,
   offlineQuery,
-  enableOffline = true
+  enableOffline = true,
 }: UseOfflineDataOptions) => {
   const { isOnline, isOfflineSupported } = useOfflineSupport();
   const queryClient = useQueryClient();
@@ -37,14 +37,14 @@ export const useOfflineData = <T extends { id: string } = any>({
       } else {
         // Use online data
         const data = await onlineQuery();
-        
+
         // Cache the data if offline support is enabled
         if (isOfflineSupported && enableOffline && Array.isArray(data)) {
           for (const item of data) {
             await offlineDatabase.cacheData(collection, item.id, item);
           }
         }
-        
+
         return data;
       }
     },
@@ -53,7 +53,7 @@ export const useOfflineData = <T extends { id: string } = any>({
 
   return {
     ...query,
-    isOffline: !isOnline && isOfflineSupported && enableOffline
+    isOffline: !isOnline && isOfflineSupported && enableOffline,
   };
 };
 
@@ -70,7 +70,7 @@ export const useOfflineMutation = <TData extends { id: string } = any, TVariable
   mutationKey,
   onlineMutation,
   offlineMutation,
-  operation
+  operation,
 }: UseOfflineMutationOptions) => {
   const { isOnline, isOfflineSupported } = useOfflineSupport();
   const queryClient = useQueryClient();
@@ -81,13 +81,8 @@ export const useOfflineMutation = <TData extends { id: string } = any, TVariable
       if (!isOnline && isOfflineSupported) {
         // Queue for later sync
         const documentId = variables.id || `temp_${Date.now()}`;
-        
-        await syncService.queueOperation(
-          collection,
-          documentId,
-          operation,
-          variables
-        );
+
+        await syncService.queueOperation(collection, documentId, operation, variables);
 
         // Execute offline mutation if provided
         if (offlineMutation) {
@@ -104,13 +99,13 @@ export const useOfflineMutation = <TData extends { id: string } = any, TVariable
     onSuccess: (data, variables) => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: [collection] });
-      
+
       // If offline, update cache
       if (!isOnline && isOfflineSupported) {
         if (operation !== 'delete') {
           offlineDatabase.cacheData(collection, data.id, data);
         }
       }
-    }
+    },
   });
 };

@@ -16,9 +16,7 @@ const ReportsPage: React.FC = () => {
             <FileText className="h-5 w-5" />
             Reports & Analytics
           </CardTitle>
-          <CardDescription>
-            Create custom reports, dashboards, and analytics
-          </CardDescription>
+          <CardDescription>Create custom reports, dashboards, and analytics</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">

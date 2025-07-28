@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Award, 
+import {
+  User,
+  Award,
   TrendingUp,
   Calendar,
   Clock,
@@ -15,7 +15,7 @@ import {
   Shield,
   Bell,
   HelpCircle,
-  FileText
+  FileText,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -42,7 +42,7 @@ interface Certification {
 export const ProfileScreen: React.FC = () => {
   const { currentUser, logout } = useAuthStore();
   const navigate = useNavigate();
-  
+
   const [metrics] = useState<PerformanceMetrics>({
     totalCollections: 1247,
     successRate: 98.5,
@@ -50,7 +50,7 @@ export const ProfileScreen: React.FC = () => {
     firstAttemptSuccess: 96.8,
     patientSatisfaction: 4.8,
     monthlyTarget: 300,
-    monthlyCompleted: 268
+    monthlyCompleted: 268,
   });
 
   const [certifications] = useState<Certification[]>([
@@ -59,22 +59,22 @@ export const ProfileScreen: React.FC = () => {
       name: 'Phlebotomy Certification',
       issuer: 'National Phlebotomy Association',
       expiryDate: new Date('2025-06-15'),
-      status: 'active'
+      status: 'active',
     },
     {
       id: '2',
       name: 'CPR/BLS',
       issuer: 'American Heart Association',
       expiryDate: new Date('2024-12-01'),
-      status: 'expiring'
+      status: 'expiring',
     },
     {
       id: '3',
       name: 'Infection Control',
       issuer: 'Healthcare Training Institute',
       expiryDate: new Date('2025-03-20'),
-      status: 'active'
-    }
+      status: 'active',
+    },
   ]);
 
   const menuItems = [
@@ -83,7 +83,7 @@ export const ProfileScreen: React.FC = () => {
     { icon: Bell, label: 'Notifications', action: '/notifications' },
     { icon: Settings, label: 'Settings', action: '/settings' },
     { icon: HelpCircle, label: 'Help & Support', action: '/help' },
-    { icon: FileText, label: 'Protocols & Guidelines', action: '/protocols' }
+    { icon: FileText, label: 'Protocols & Guidelines', action: '/protocols' },
   ];
 
   const handleLogout = () => {
@@ -117,14 +117,16 @@ export const ProfileScreen: React.FC = () => {
                 <User className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">{currentUser?.displayName || 'Phlebotomist'}</h2>
+                <h2 className="text-xl font-semibold">
+                  {currentUser?.displayName || 'Phlebotomist'}
+                </h2>
                 <p className="text-indigo-100">{currentUser?.email}</p>
                 <p className="text-sm text-indigo-200 mt-1">Employee ID: PH001</p>
               </div>
             </div>
             <Shield className="h-5 w-5 text-indigo-200" />
           </div>
-          
+
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="bg-white/10 rounded-lg p-3">
               <p className="text-2xl font-bold">{metrics.totalCollections}</p>
@@ -146,10 +148,12 @@ export const ProfileScreen: React.FC = () => {
           <div className="mb-2">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-600">Collections</span>
-              <span className="font-medium">{metrics.monthlyCompleted} / {metrics.monthlyTarget}</span>
+              <span className="font-medium">
+                {metrics.monthlyCompleted} / {metrics.monthlyTarget}
+              </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-indigo-600 h-2 rounded-full transition-all"
                 style={{ width: `${(metrics.monthlyCompleted / metrics.monthlyTarget) * 100}%` }}
               />
@@ -206,9 +210,15 @@ export const ProfileScreen: React.FC = () => {
               <div key={cert.id} className="flex items-center justify-between py-2">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">{cert.name}</p>
-                  <p className="text-xs text-gray-500">Expires {format(cert.expiryDate, 'MMM d, yyyy')}</p>
+                  <p className="text-xs text-gray-500">
+                    Expires {format(cert.expiryDate, 'MMM d, yyyy')}
+                  </p>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCertificationColor(cert.status)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${getCertificationColor(
+                    cert.status
+                  )}`}
+                >
                   {cert.status === 'expiring' ? 'Renew Soon' : cert.status}
                 </span>
               </div>

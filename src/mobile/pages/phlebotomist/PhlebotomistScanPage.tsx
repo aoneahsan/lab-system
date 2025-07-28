@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  QrCode, 
+import {
+  QrCode,
   Camera,
   Search,
   Package,
   User,
   TestTube,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { QRCodeScanner } from 'qrcode-studio';
 import { toast } from '@/hooks/useToast';
@@ -46,7 +46,7 @@ const PhlebotomistScanPage: React.FC = () => {
   const startScan = async () => {
     try {
       const permission = await BarcodeScanner.checkPermission({ force: true });
-      
+
       if (!permission.granted) {
         toast.error('Camera permission is required to scan barcodes');
         return;
@@ -54,9 +54,9 @@ const PhlebotomistScanPage: React.FC = () => {
 
       setIsScanning(true);
       document.querySelector('body')?.classList.add('barcode-scanner-active');
-      
+
       const result = await BarcodeScanner.startScan();
-      
+
       if (result.hasContent) {
         handleScanResult(result.content);
       }
@@ -172,15 +172,13 @@ const PhlebotomistScanPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Barcode Scanner</h1>
-        
+
         {/* Mode Toggle */}
         <div className="flex rounded-lg bg-gray-100 p-1">
           <button
             onClick={() => setScanMode('auto')}
             className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-              scanMode === 'auto' 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-600'
+              scanMode === 'auto' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
             }`}
           >
             Camera Scan
@@ -188,9 +186,7 @@ const PhlebotomistScanPage: React.FC = () => {
           <button
             onClick={() => setScanMode('manual')}
             className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
-              scanMode === 'manual' 
-                ? 'bg-white text-gray-900 shadow-sm' 
-                : 'text-gray-600'
+              scanMode === 'manual' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
             }`}
           >
             Manual Entry
@@ -206,9 +202,7 @@ const PhlebotomistScanPage: React.FC = () => {
               <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <QrCode className="h-12 w-12 text-purple-600" />
               </div>
-              <h2 className="text-lg font-medium text-gray-900 mb-2">
-                Scan Barcode or QR Code
-              </h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-2">Scan Barcode or QR Code</h2>
               <p className="text-sm text-gray-600 mb-6">
                 Point your camera at any patient, sample, or order barcode
               </p>
@@ -224,9 +218,7 @@ const PhlebotomistScanPage: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleManualSubmit} className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Manual Barcode Entry
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Manual Barcode Entry</h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -273,14 +265,11 @@ const PhlebotomistScanPage: React.FC = () => {
         <div className="flex-1 px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900">Recent Scans</h3>
-            <button
-              onClick={clearHistory}
-              className="text-sm text-gray-600 hover:text-gray-900"
-            >
+            <button onClick={clearHistory} className="text-sm text-gray-600 hover:text-gray-900">
               Clear History
             </button>
           </div>
-          
+
           <div className="space-y-3">
             {recentScans.map((scan, index) => (
               <div
@@ -292,9 +281,8 @@ const PhlebotomistScanPage: React.FC = () => {
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">{scan.id}</p>
                   <p className="text-sm text-gray-600">
-                    {scan.type.charAt(0).toUpperCase() + scan.type.slice(1)} • {
-                      new Date(scan.timestamp).toLocaleTimeString()
-                    }
+                    {scan.type.charAt(0).toUpperCase() + scan.type.slice(1)} •{' '}
+                    {new Date(scan.timestamp).toLocaleTimeString()}
                   </p>
                 </div>
                 <CheckCircle className="h-5 w-5 text-green-500" />
@@ -318,7 +306,7 @@ const PhlebotomistScanPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="p-6 text-center">
             <p className="text-white mb-4">Position barcode within the frame</p>
             <button

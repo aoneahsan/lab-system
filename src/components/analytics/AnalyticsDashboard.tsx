@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  TrendingUp, 
-  Users, 
-  Activity, 
-  DollarSign,
-  Clock,
-  BarChart3,
-  RefreshCw
-} from 'lucide-react';
+import { TrendingUp, Users, Activity, DollarSign, Clock, BarChart3, RefreshCw } from 'lucide-react';
 import { useAnalyticsMetrics } from '@/hooks/useReports';
 import type { DateRangePreset } from '@/types/report.types';
 
@@ -65,7 +57,7 @@ const AnalyticsDashboard: React.FC = () => {
             onChange={(e) => setDateRange(e.target.value as DateRangePreset)}
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
-            {dateRangeOptions.map(option => (
+            {dateRangeOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -87,7 +79,9 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Tests</p>
-              <p className="text-2xl font-bold text-gray-900">{metrics.totalTests.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {metrics.totalTests.toLocaleString()}
+              </p>
             </div>
             <Activity className="h-8 w-8 text-blue-500" />
           </div>
@@ -97,7 +91,9 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Patients</p>
-              <p className="text-2xl font-bold text-gray-900">{metrics.totalPatients.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {metrics.totalPatients.toLocaleString()}
+              </p>
             </div>
             <Users className="h-8 w-8 text-green-500" />
           </div>
@@ -107,7 +103,9 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.totalRevenue)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(metrics.totalRevenue)}
+              </p>
             </div>
             <DollarSign className="h-8 w-8 text-yellow-500" />
           </div>
@@ -117,7 +115,9 @@ const AnalyticsDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Avg. Turnaround</p>
-              <p className="text-2xl font-bold text-gray-900">{metrics.averageTurnaroundTime.toFixed(1)}h</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {metrics.averageTurnaroundTime.toFixed(1)}h
+              </p>
             </div>
             <Clock className="h-8 w-8 text-purple-500" />
           </div>
@@ -140,8 +140,11 @@ const AnalyticsDashboard: React.FC = () => {
                   <div
                     className="bg-blue-600 h-6 rounded-full flex items-center justify-end px-2"
                     style={{
-                      width: `${(item.value / Math.max(...metrics.testVolumeTrend.map(t => t.value))) * 100}%`,
-                      minWidth: '3rem'
+                      width: `${
+                        (item.value / Math.max(...metrics.testVolumeTrend.map((t) => t.value))) *
+                        100
+                      }%`,
+                      minWidth: '3rem',
                     }}
                   >
                     <span className="text-xs text-white font-medium">{item.value}</span>
@@ -166,11 +169,15 @@ const AnalyticsDashboard: React.FC = () => {
                   <div
                     className="bg-green-600 h-6 rounded-full flex items-center justify-end px-2"
                     style={{
-                      width: `${(item.value / Math.max(...metrics.revenueTrend.map(t => t.value))) * 100}%`,
-                      minWidth: '3rem'
+                      width: `${
+                        (item.value / Math.max(...metrics.revenueTrend.map((t) => t.value))) * 100
+                      }%`,
+                      minWidth: '3rem',
                     }}
                   >
-                    <span className="text-xs text-white font-medium">{formatCurrency(item.value)}</span>
+                    <span className="text-xs text-white font-medium">
+                      {formatCurrency(item.value)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -204,14 +211,16 @@ const AnalyticsDashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Department Performance</h3>
           <div className="space-y-3">
-            {metrics.departmentStats.map(dept => (
+            {metrics.departmentStats.map((dept) => (
               <div key={dept.department} className="border-b pb-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-900">{dept.department}</span>
                   <span className="text-sm text-gray-600">{dept.tests} tests</span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-sm text-green-600 font-medium">{formatCurrency(dept.revenue)}</span>
+                  <span className="text-sm text-green-600 font-medium">
+                    {formatCurrency(dept.revenue)}
+                  </span>
                 </div>
               </div>
             ))}

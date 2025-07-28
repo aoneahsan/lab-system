@@ -1,12 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Map, 
-  TestTube, 
-  QrCode,
-  RefreshCw
-} from 'lucide-react';
+import { Home, Map, TestTube, QrCode, RefreshCw } from 'lucide-react';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
 
 export const PhlebotomistLayout: React.FC = () => {
@@ -35,7 +29,7 @@ export const PhlebotomistLayout: React.FC = () => {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <button
                 key={item.path}

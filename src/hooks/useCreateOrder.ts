@@ -30,10 +30,10 @@ export function useCreateOrder() {
       if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
-      
+
       // Generate order number
       const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
-      
+
       // Calculate patient age
       const patientAge = new Date().getFullYear() - new Date(data.patientDOB).getFullYear();
 
@@ -45,15 +45,17 @@ export function useCreateOrder() {
         status: 'pending',
         createdAt: serverTimestamp(),
         createdBy: currentUser.uid,
-        timeline: [{
-          action: 'Order created',
-          timestamp: new Date(),
-          user: currentUser.displayName || currentUser.email || 'Unknown',
-        }],
+        timeline: [
+          {
+            action: 'Order created',
+            timestamp: new Date(),
+            user: currentUser.displayName || currentUser.email || 'Unknown',
+          },
+        ],
       };
 
       const docRef = await addDoc(ordersRef, orderData);
-      
+
       return { id: docRef.id, ...orderData };
     },
     onSuccess: () => {

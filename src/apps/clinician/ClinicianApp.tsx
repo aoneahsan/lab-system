@@ -38,10 +38,10 @@ export function ClinicianApp() {
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50">
       <TopBar title="LabFlow Clinician" />
-      
-      <main className="flex-1 overflow-y-auto pb-16">
+
+      <main className="overflow-y-auto flex-1 pb-16">
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/orders" element={<OrdersScreen />} />

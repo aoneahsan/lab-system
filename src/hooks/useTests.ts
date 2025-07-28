@@ -53,13 +53,8 @@ export const useUpdateTest = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthStore();
   return useMutation({
-    mutationFn: ({
-      testId,
-      data,
-    }: {
-      testId: string;
-      data: Partial<TestDefinitionFormData>;
-    }) => testService.updateTest(testId, currentUser!.id, data),
+    mutationFn: ({ testId, data }: { testId: string; data: Partial<TestDefinitionFormData> }) =>
+      testService.updateTest(testId, currentUser!.id, data),
     onSuccess: (_, { testId }) => {
       queryClient.invalidateQueries({ queryKey: ['tests'] });
       queryClient.invalidateQueries({ queryKey: ['test', testId] });
@@ -110,7 +105,10 @@ export const useCreateTestPanel = () => {
   const { currentUser } = useAuthStore();
   return useMutation({
     mutationFn: (
-      data: Omit<TestPanel, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
+      data: Omit<
+        TestPanel,
+        'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
+      >
     ) => testService.createTestPanel(currentTenant!.id, currentUser!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testPanels'] });
@@ -126,13 +124,8 @@ export const useUpdateTestPanel = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthStore();
   return useMutation({
-    mutationFn: ({
-      panelId,
-      data,
-    }: {
-      panelId: string;
-      data: Partial<TestPanel>;
-    }) => testService.updateTestPanel(panelId, currentUser!.id, data),
+    mutationFn: ({ panelId, data }: { panelId: string; data: Partial<TestPanel> }) =>
+      testService.updateTestPanel(panelId, currentUser!.id, data),
     onSuccess: (_, { panelId }) => {
       queryClient.invalidateQueries({ queryKey: ['testPanels'] });
       queryClient.invalidateQueries({ queryKey: ['testPanel', panelId] });
@@ -186,7 +179,7 @@ export const useCreateTestOrder = () => {
       // In a real app, get provider details from user profile
       const providerId = currentUser!.id;
       const providerName = currentUser!.displayName || 'Unknown Provider';
-      
+
       return testService.createTestOrder(
         currentTenant!.id,
         currentUser!.id,
@@ -209,7 +202,7 @@ export const useApproveTestOrder = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthStore();
   return useMutation({
-    mutationFn: ({ orderId, notes }: { orderId: string; notes?: string }) => 
+    mutationFn: ({ orderId, notes }: { orderId: string; notes?: string }) =>
       testService.approveTestOrder(orderId, currentUser!.id, notes),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });
@@ -226,7 +219,7 @@ export const useRejectTestOrder = () => {
   const queryClient = useQueryClient();
   const { currentUser } = useAuthStore();
   return useMutation({
-    mutationFn: ({ orderId, reason }: { orderId: string; reason: string }) => 
+    mutationFn: ({ orderId, reason }: { orderId: string; reason: string }) =>
       testService.rejectTestOrder(orderId, currentUser!.id, reason),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: ['testOrders'] });

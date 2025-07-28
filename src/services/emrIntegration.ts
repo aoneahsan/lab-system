@@ -35,11 +35,15 @@ export const emrIntegrationService = {
   // Test connection
   async testConnection(apiKey: string): Promise<boolean> {
     try {
-      const response = await api.post('/api/emr-integration/test', {}, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
+      const response = await api.post(
+        '/api/emr-integration/test',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
         }
-      });
+      );
       return response.status === 200;
     } catch {
       return false;
@@ -50,8 +54,8 @@ export const emrIntegrationService = {
   async importPatient(patient: EMRPatient, emrSystem?: string): Promise<any> {
     const response = await api.post('/api/emr-integration/patient', patient, {
       headers: {
-        'X-EMR-System': emrSystem || 'unknown'
-      }
+        'X-EMR-System': emrSystem || 'unknown',
+      },
     });
     return response.data;
   },
@@ -60,8 +64,8 @@ export const emrIntegrationService = {
   async importOrder(order: EMROrder, emrSystem?: string): Promise<any> {
     const response = await api.post('/api/emr-integration/order', order, {
       headers: {
-        'X-EMR-System': emrSystem || 'unknown'
-      }
+        'X-EMR-System': emrSystem || 'unknown',
+      },
     });
     return response.data;
   },
@@ -92,5 +96,5 @@ export const emrIntegrationService = {
   }): Promise<any[]> {
     const response = await api.get('/api/emr-integration/logs', { params: filters });
     return response.data;
-  }
+  },
 };

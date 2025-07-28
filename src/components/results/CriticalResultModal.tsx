@@ -23,11 +23,7 @@ interface CriticalResultModalProps {
   };
 }
 
-const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
-  isOpen,
-  onClose,
-  result,
-}) => {
+const CriticalResultModal: React.FC<CriticalResultModalProps> = ({ isOpen, onClose, result }) => {
   const { currentUser } = useAuthStore();
   const [notificationMethod, setNotificationMethod] = useState<'phone' | 'email' | 'sms'>('phone');
   const [notes, setNotes] = useState('');
@@ -69,7 +65,10 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
         updatedAt: serverTimestamp(),
       });
 
-      toast.success('Critical Value Notified', 'The physician has been notified of the critical result');
+      toast.success(
+        'Critical Value Notified',
+        'The physician has been notified of the critical result'
+      );
       onClose();
     } catch (error) {
       console.error('Error recording critical notification:', error);
@@ -93,10 +92,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
               </div>
               <h3 className="text-lg font-medium text-gray-900">Critical Result Notification</h3>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -106,11 +102,20 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
             <div className="bg-red-50 p-4 rounded-lg">
               <p className="text-sm font-medium text-red-900 mb-2">Critical Value Detected</p>
               <div className="space-y-1 text-sm text-red-800">
-                <p><span className="font-medium">Test:</span> {result.testName}</p>
-                <p><span className="font-medium">Result:</span> {result.value} {result.unit}</p>
-                <p><span className="font-medium">Patient:</span> {result.patientName} (ID: {result.patientId})</p>
+                <p>
+                  <span className="font-medium">Test:</span> {result.testName}
+                </p>
+                <p>
+                  <span className="font-medium">Result:</span> {result.value} {result.unit}
+                </p>
+                <p>
+                  <span className="font-medium">Patient:</span> {result.patientName} (ID:{' '}
+                  {result.patientId})
+                </p>
                 {result.physicianName && (
-                  <p><span className="font-medium">Physician:</span> {result.physicianName}</p>
+                  <p>
+                    <span className="font-medium">Physician:</span> {result.physicianName}
+                  </p>
                 )}
               </div>
             </div>
@@ -126,7 +131,9 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="phone"
                     checked={notificationMethod === 'phone'}
-                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
+                    onChange={(e) =>
+                      setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')
+                    }
                     className="mr-3"
                   />
                   <Phone className="h-5 w-5 text-gray-500 mr-2" />
@@ -143,7 +150,9 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="email"
                     checked={notificationMethod === 'email'}
-                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
+                    onChange={(e) =>
+                      setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')
+                    }
                     className="mr-3"
                   />
                   <Mail className="h-5 w-5 text-gray-500 mr-2" />
@@ -160,7 +169,9 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({
                     type="radio"
                     value="sms"
                     checked={notificationMethod === 'sms'}
-                    onChange={(e) => setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')}
+                    onChange={(e) =>
+                      setNotificationMethod(e.target.value as 'phone' | 'email' | 'sms')
+                    }
                     className="mr-3"
                   />
                   <MessageSquare className="h-5 w-5 text-gray-500 mr-2" />

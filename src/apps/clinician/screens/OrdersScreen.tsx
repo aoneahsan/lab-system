@@ -4,28 +4,22 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  Plus, 
-  Search, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle,
-  ChevronRight
-} from 'lucide-react';
+import { Plus, Search, Clock, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
 import { useOrders } from '@/hooks/useOrders';
 import { format } from 'date-fns';
 
 export function OrdersScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const { data: orders = [], isLoading } = useOrders({ 
+  const { data: orders = [], isLoading } = useOrders({
     clinicianId: 'current',
-    status: statusFilter === 'all' ? undefined : statusFilter 
+    status: statusFilter === 'all' ? undefined : statusFilter,
   });
 
-  const filteredOrders = orders.filter(order => 
-    order.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const statusColors = {
@@ -37,9 +31,9 @@ export function OrdersScreen() {
 
   const orderStats = {
     total: orders.length,
-    pending: orders.filter(o => o.status === 'pending').length,
-    inProgress: orders.filter(o => o.status === 'in_progress').length,
-    completed: orders.filter(o => o.status === 'completed').length,
+    pending: orders.filter((o) => o.status === 'pending').length,
+    inProgress: orders.filter((o) => o.status === 'in_progress').length,
+    completed: orders.filter((o) => o.status === 'completed').length,
   };
 
   return (
@@ -57,29 +51,37 @@ export function OrdersScreen() {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-2">
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'all' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'all' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('all')}
         >
           <p className="text-xs text-gray-600">Total</p>
           <p className="text-lg font-bold">{orderStats.total}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'pending' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'pending' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('pending')}
         >
           <p className="text-xs text-gray-600">Pending</p>
           <p className="text-lg font-bold text-yellow-600">{orderStats.pending}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'in_progress' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'in_progress' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('in_progress')}
         >
           <p className="text-xs text-gray-600">In Progress</p>
           <p className="text-lg font-bold text-blue-600">{orderStats.inProgress}</p>
         </Card>
-        <Card 
-          className={`p-3 text-center cursor-pointer ${statusFilter === 'completed' ? 'ring-2 ring-blue-500' : ''}`}
+        <Card
+          className={`p-3 text-center cursor-pointer ${
+            statusFilter === 'completed' ? 'ring-2 ring-blue-500' : ''
+          }`}
           onClick={() => setStatusFilter('completed')}
         >
           <p className="text-xs text-gray-600">Completed</p>
@@ -120,25 +122,19 @@ export function OrdersScreen() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {order.patientName}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900">{order.patientName}</h3>
                         <Badge className={`${status.bg} ${status.text}`}>
                           <StatusIcon className="h-3 w-3 mr-1" />
                           {order.status.replace('_', ' ')}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        Order #{order.orderNumber}
-                      </p>
+                      <p className="text-sm text-gray-600 mb-1">Order #{order.orderNumber}</p>
                       <p className="text-xs text-gray-500">
-                        {order.tests.length} test{order.tests.length > 1 ? 's' : ''} • 
-                        {' '}{format(new Date(order.createdAt), 'MMM d, h:mm a')}
+                        {order.tests.length} test{order.tests.length > 1 ? 's' : ''} •{' '}
+                        {format(new Date(order.createdAt), 'MMM d, h:mm a')}
                       </p>
                       {order.priority === 'stat' && (
-                        <Badge className="mt-2 bg-red-100 text-red-800">
-                          STAT
-                        </Badge>
+                        <Badge className="mt-2 bg-red-100 text-red-800">STAT</Badge>
                       )}
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />

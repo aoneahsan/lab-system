@@ -10,18 +10,23 @@ import { InventoryItemForm } from '@/components/inventory/InventoryItemForm';
 import { StockTransactionForm } from '@/components/inventory/StockTransactionForm';
 import { InventoryAlerts } from '@/components/inventory/InventoryAlerts';
 import { InventoryStats } from '@/components/inventory/InventoryStats';
-import { 
-  useInventoryItems, 
-  useCreateInventoryItem, 
+import {
+  useInventoryItems,
+  useCreateInventoryItem,
   useUpdateInventoryItem,
   useRecordTransaction,
   useInventoryAlerts,
   useAcknowledgeAlert,
   useInventoryValue,
   useReorderItems,
-  useExpiringItems
+  useExpiringItems,
 } from '@/hooks/useInventory';
-import type { InventoryItem, InventoryCategory, InventoryItemFormData, StockTransactionFormData } from '@/types/inventory.types';
+import type {
+  InventoryItem,
+  InventoryCategory,
+  InventoryItemFormData,
+  StockTransactionFormData,
+} from '@/types/inventory.types';
 
 export default function InventoryPage() {
   const [showForm, setShowForm] = useState(false);
@@ -35,7 +40,7 @@ export default function InventoryPage() {
   const { data: itemsData, isLoading: itemsLoading } = useInventoryItems({
     category: selectedCategory || undefined,
     isActive: true,
-    search: searchTerm
+    search: searchTerm,
   });
   const { data: alerts, isLoading: alertsLoading } = useInventoryAlerts();
   const { data: inventoryValue } = useInventoryValue();
@@ -54,9 +59,9 @@ export default function InventoryPage() {
     totalValue: inventoryValue?.totalValue || 0,
     lowStockItems: reorderItems?.length || 0,
     expiringItems: expiringItems?.length || 0,
-    outOfStockItems: itemsData?.items.filter(item => item.currentStock === 0).length || 0,
+    outOfStockItems: itemsData?.items.filter((item) => item.currentStock === 0).length || 0,
     activeAlerts: alerts?.length || 0,
-    categoryBreakdown: inventoryValue?.categoryBreakdown
+    categoryBreakdown: inventoryValue?.categoryBreakdown,
   };
 
   const handleCreateItem = async (data: InventoryItemFormData) => {
@@ -88,8 +93,15 @@ export default function InventoryPage() {
   };
 
   const categories: InventoryCategory[] = [
-    'reagent', 'control', 'calibrator', 'consumable', 
-    'equipment', 'ppe', 'office_supply', 'maintenance', 'other'
+    'reagent',
+    'control',
+    'calibrator',
+    'consumable',
+    'equipment',
+    'ppe',
+    'office_supply',
+    'maintenance',
+    'other',
   ];
 
   return (
@@ -180,7 +192,7 @@ export default function InventoryPage() {
                 className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Categories</option>
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ')}
                   </option>

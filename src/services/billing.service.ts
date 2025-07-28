@@ -41,7 +41,9 @@ export const billingService = {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `INV-${year}${month}-${random}`;
   },
 
@@ -60,14 +62,14 @@ export const billingService = {
     q = query(q, orderBy('invoiceDate', 'desc'), limit(50));
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Invoice));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Invoice);
   },
 
   // Get single invoice
   async getInvoice(tenantId: string, invoiceId: string): Promise<Invoice | null> {
     const invoiceRef = doc(db, COLLECTIONS.INVOICES, invoiceId);
     const invoiceDoc = await getDoc(invoiceRef);
-    
+
     if (!invoiceDoc.exists() || invoiceDoc.data()?.tenantId !== tenantId) {
       return null;
     }
@@ -76,22 +78,18 @@ export const billingService = {
   },
 
   // Create invoice
-  async createInvoice(
-    tenantId: string,
-    userId: string,
-    data: InvoiceFormData
-  ): Promise<string> {
+  async createInvoice(tenantId: string, userId: string, data: InvoiceFormData): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     // Calculate totals
     let subtotal = 0;
-    const items = data.items.map(item => {
+    const items = data.items.map((item) => {
       const amount = item.quantity * item.unitPrice;
       const discount = item.discount || 0;
       const tax = item.tax || 0;
       const total = amount - discount + tax;
       subtotal += total;
-      
+
       return {
         ...item,
         id: `item-${Date.now()}-${Math.random()}`,
@@ -109,24 +107,24 @@ export const billingService = {
       invoiceNumber: this.generateInvoiceNumber(),
       patientId: data.patientId,
       orderId: data.orderId,
-      
+
       invoiceDate: now,
       dueDate: Timestamp.fromDate(data.dueDate),
-      
+
       subtotal,
       taxAmount,
       discountAmount,
       totalAmount,
       balanceDue: totalAmount,
-      
+
       status: 'draft',
       paymentStatus: 'pending',
-      
+
       items,
       payments: [],
-      
+
       notes: data.notes,
-      
+
       createdAt: now,
       createdBy: userId,
       updatedAt: now,
@@ -146,7 +144,7 @@ export const billingService = {
   ): Promise<void> {
     const invoiceRef = doc(db, COLLECTIONS.INVOICES, invoiceId);
     const invoiceDoc = await getDoc(invoiceRef);
-    
+
     if (!invoiceDoc.exists() || invoiceDoc.data()?.tenantId !== tenantId) {
       throw new Error('Invoice not found');
     }
@@ -159,26 +157,18 @@ export const billingService = {
   },
 
   // Send invoice
-  async sendInvoice(
-    tenantId: string,
-    userId: string,
-    invoiceId: string
-  ): Promise<void> {
+  async sendInvoice(tenantId: string, userId: string, invoiceId: string): Promise<void> {
     await this.updateInvoice(tenantId, userId, invoiceId, {
       status: 'sent',
     });
-    
+
     // TODO: Implement actual email sending
   },
 
   // Record payment
-  async recordPayment(
-    tenantId: string,
-    userId: string,
-    data: PaymentFormData
-  ): Promise<string> {
+  async recordPayment(tenantId: string, userId: string, data: PaymentFormData): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     // Get invoice
     const invoice = await this.getInvoice(tenantId, data.invoiceId);
     if (!invoice) {
@@ -190,13 +180,13 @@ export const billingService = {
       tenantId,
       invoiceId: data.invoiceId,
       patientId: invoice.patientId,
-      
+
       paymentDate: Timestamp.fromDate(data.paymentDate),
       amount: data.amount,
       method: data.method,
       referenceNumber: data.referenceNumber,
       notes: data.notes,
-      
+
       createdAt: now,
       createdBy: userId,
     };
@@ -206,7 +196,7 @@ export const billingService = {
     // Update invoice balance and status
     const newBalance = invoice.balanceDue - data.amount;
     const newStatus: PaymentStatus = newBalance <= 0 ? 'paid' : 'partial';
-    
+
     await this.updateInvoice(tenantId, userId, data.invoiceId, {
       balanceDue: newBalance,
       paymentStatus: newStatus,
@@ -229,7 +219,7 @@ export const billingService = {
     q = query(q, orderBy('paymentDate', 'desc'));
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Payment));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Payment);
   },
 
   // Create insurance claim
@@ -239,7 +229,7 @@ export const billingService = {
     data: ClaimFormData
   ): Promise<string> {
     const now = serverTimestamp() as Timestamp;
-    
+
     // Get invoice
     const invoice = await this.getInvoice(tenantId, data.invoiceId);
     if (!invoice) {
@@ -247,8 +237,9 @@ export const billingService = {
     }
 
     // Calculate total charges
-    const totalCharges = data.services.reduce((sum, service) => 
-      sum + (service.units * service.charge), 0
+    const totalCharges = data.services.reduce(
+      (sum, service) => sum + service.units * service.charge,
+      0
     );
 
     const claimData: Omit<InsuranceClaim, 'id'> = {
@@ -256,32 +247,32 @@ export const billingService = {
       invoiceId: data.invoiceId,
       patientId: invoice.patientId,
       insuranceId: data.insuranceId,
-      
+
       claimNumber: `CLM-${Date.now()}`,
       claimDate: now,
       serviceDate: Timestamp.fromDate(data.serviceDate),
-      
+
       // TODO: Get provider information from configuration
       providerId: '',
       renderingProvider: data.renderingProvider,
       npiNumber: '',
       taxId: '',
-      
+
       primaryDiagnosis: data.primaryDiagnosis,
       secondaryDiagnoses: data.secondaryDiagnoses,
-      
-      services: data.services.map(service => ({
+
+      services: data.services.map((service) => ({
         ...service,
         id: `svc-${Date.now()}-${Math.random()}`,
         serviceDate: Timestamp.fromDate(data.serviceDate),
       })),
-      
+
       totalCharges,
-      
+
       status: 'draft',
-      
+
       notes: data.notes,
-      
+
       createdAt: now,
       createdBy: userId,
       updatedAt: now,
@@ -289,7 +280,7 @@ export const billingService = {
     };
 
     const docRef = await addDoc(collection(db, COLLECTIONS.INSURANCE_CLAIMS), claimData);
-    
+
     // Update invoice with claim reference
     await this.updateInvoice(tenantId, userId, data.invoiceId, {
       insuranceClaimId: docRef.id,
@@ -299,14 +290,10 @@ export const billingService = {
   },
 
   // Submit claim
-  async submitClaim(
-    tenantId: string,
-    userId: string,
-    claimId: string
-  ): Promise<void> {
+  async submitClaim(tenantId: string, userId: string, claimId: string): Promise<void> {
     const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
     const claimDoc = await getDoc(claimRef);
-    
+
     if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
       throw new Error('Claim not found');
     }
@@ -332,7 +319,7 @@ export const billingService = {
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InsuranceProvider));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as InsuranceProvider);
   },
 
   // Get billing statistics
@@ -346,7 +333,7 @@ export const billingService = {
     // Get all invoices
     const invoicesQuery = query(invoicesRef, where('tenantId', '==', tenantId));
     const invoicesSnapshot = await getDocs(invoicesQuery);
-    
+
     // Get today's data
     const todayTimestamp = Timestamp.fromDate(today);
     const todaysInvoicesQuery = query(
@@ -359,7 +346,7 @@ export const billingService = {
       where('tenantId', '==', tenantId),
       where('paymentDate', '>=', todayTimestamp)
     );
-    
+
     const [todaysInvoicesSnapshot, todaysPaymentsSnapshot] = await Promise.all([
       getDocs(todaysInvoicesQuery),
       getDocs(todaysPaymentsQuery),
@@ -382,26 +369,26 @@ export const billingService = {
       cancelled: 0,
     };
 
-    invoicesSnapshot.docs.forEach(doc => {
+    invoicesSnapshot.docs.forEach((doc) => {
       const invoice = doc.data() as Invoice;
       invoicesByStatus[invoice.status]++;
       totalRevenue += invoice.totalAmount;
-      
+
       if (invoice.paymentStatus === 'pending' || invoice.paymentStatus === 'partial') {
         pendingPayments += invoice.balanceDue;
       }
-      
+
       if (invoice.paymentStatus === 'overdue') {
         overdueAmount += invoice.balanceDue;
       }
     });
 
-    todaysInvoicesSnapshot.docs.forEach(doc => {
+    todaysInvoicesSnapshot.docs.forEach((doc) => {
       const invoice = doc.data() as Invoice;
       todaysCharges += invoice.totalAmount;
     });
 
-    todaysPaymentsSnapshot.docs.forEach(doc => {
+    todaysPaymentsSnapshot.docs.forEach((doc) => {
       const payment = doc.data() as Payment;
       todaysPayments += payment.amount;
     });
@@ -409,7 +396,7 @@ export const billingService = {
     // Get claims statistics
     const claimsQuery = query(claimsRef, where('tenantId', '==', tenantId));
     const claimsSnapshot = await getDocs(claimsQuery);
-    
+
     const claimsByStatus = {
       draft: 0,
       submitted: 0,
@@ -421,7 +408,7 @@ export const billingService = {
       appealed: 0,
     };
 
-    claimsSnapshot.docs.forEach(doc => {
+    claimsSnapshot.docs.forEach((doc) => {
       const claim = doc.data() as InsuranceClaim;
       claimsByStatus[claim.status]++;
     });
@@ -445,7 +432,8 @@ export const billingService = {
       }, // TODO: Calculate from payments
       claimsByStatus,
       averagePaymentTime: 15, // TODO: Calculate actual average
-      collectionRate: totalRevenue > 0 ? ((totalRevenue - pendingPayments) / totalRevenue) * 100 : 0,
+      collectionRate:
+        totalRevenue > 0 ? ((totalRevenue - pendingPayments) / totalRevenue) * 100 : 0,
     };
   },
 
@@ -467,14 +455,14 @@ export const billingService = {
     q = query(q, orderBy('claimDate', 'desc'));
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as InsuranceClaim));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as InsuranceClaim);
   },
 
   // Get single claim
   async getClaim(tenantId: string, claimId: string): Promise<InsuranceClaim | null> {
     const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
     const claimDoc = await getDoc(claimRef);
-    
+
     if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
       return null;
     }
@@ -495,13 +483,16 @@ export const billingService = {
     let totalProcessingDays = 0;
     let processedClaims = 0;
 
-    const providerStats: Record<string, {
-      claimCount: number;
-      acceptedCount: number;
-      totalReimbursement: number;
-    }> = {};
+    const providerStats: Record<
+      string,
+      {
+        claimCount: number;
+        acceptedCount: number;
+        totalReimbursement: number;
+      }
+    > = {};
 
-    snapshot.docs.forEach(doc => {
+    snapshot.docs.forEach((doc) => {
       const claim = doc.data() as InsuranceClaim;
       totalClaims++;
 
@@ -519,7 +510,9 @@ export const billingService = {
       if (claim.submittedDate && claim.processedDate) {
         const submittedDate = claim.submittedDate.toDate();
         const processedDate = claim.processedDate.toDate();
-        const daysDiff = Math.floor((processedDate.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24));
+        const daysDiff = Math.floor(
+          (processedDate.getTime() - submittedDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
         totalProcessingDays += daysDiff;
         processedClaims++;
       }
@@ -547,7 +540,8 @@ export const billingService = {
         provider: providerId, // TODO: Get provider name
         claimCount: stats.claimCount,
         acceptanceRate: stats.claimCount > 0 ? (stats.acceptedCount / stats.claimCount) * 100 : 0,
-        averageReimbursement: stats.acceptedCount > 0 ? stats.totalReimbursement / stats.acceptedCount : 0,
+        averageReimbursement:
+          stats.acceptedCount > 0 ? stats.totalReimbursement / stats.acceptedCount : 0,
       }))
       .sort((a, b) => b.claimCount - a.claimCount)
       .slice(0, 5);
@@ -577,7 +571,7 @@ export const billingService = {
   ): Promise<void> {
     const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
     const claimDoc = await getDoc(claimRef);
-    
+
     if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
       throw new Error('Claim not found');
     }
@@ -601,12 +595,15 @@ export const billingService = {
       where('active', '==', true),
       orderBy('insuranceType')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as PatientInsurance));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as PatientInsurance
+    );
   },
 
   // Check insurance eligibility
@@ -617,7 +614,7 @@ export const billingService = {
   ): Promise<InsuranceEligibility> {
     // In a real implementation, this would call an external eligibility API
     // For demo purposes, we'll simulate the check
-    
+
     const eligibilityData: Omit<InsuranceEligibility, 'id'> = {
       tenantId,
       patientId: request.patientId,
@@ -683,12 +680,15 @@ export const billingService = {
       orderBy('checkDate', 'desc'),
       limit(limitCount)
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as InsuranceEligibility));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as InsuranceEligibility
+    );
   },
 
   // Process claim response from insurance
@@ -712,7 +712,7 @@ export const billingService = {
   ): Promise<void> {
     const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
     const claimDoc = await getDoc(claimRef);
-    
+
     if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
       throw new Error('Claim not found');
     }
@@ -796,7 +796,7 @@ export const billingService = {
   ): Promise<void> {
     const claimRef = doc(db, COLLECTIONS.INSURANCE_CLAIMS, claimId);
     const claimDoc = await getDoc(claimRef);
-    
+
     if (!claimDoc.exists() || claimDoc.data()?.tenantId !== tenantId) {
       throw new Error('Claim not found');
     }
@@ -889,7 +889,7 @@ export const billingService = {
   },
 
   // Payment tracking and reconciliation features
-  
+
   // Get payment history for a patient
   async getPaymentHistory(
     tenantId: string,
@@ -907,7 +907,7 @@ export const billingService = {
       where('patientId', '==', patientId)
     );
     const invoicesSnapshot = await getDocs(invoicesQuery);
-    const invoiceIds = invoicesSnapshot.docs.map(doc => doc.id);
+    const invoiceIds = invoicesSnapshot.docs.map((doc) => doc.id);
 
     if (invoiceIds.length === 0) {
       return { payments: [], totalPaid: 0, paymentMethods: {} };
@@ -931,16 +931,19 @@ export const billingService = {
     paymentsQuery = query(paymentsQuery, orderBy('paymentDate', 'desc'));
 
     const paymentsSnapshot = await getDocs(paymentsQuery);
-    const payments = paymentsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Payment));
+    const payments = paymentsSnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as Payment
+    );
 
     // Calculate totals
     let totalPaid = 0;
     const paymentMethods: Record<string, number> = {};
 
-    payments.forEach(payment => {
+    payments.forEach((payment) => {
       totalPaid += payment.amount;
       paymentMethods[payment.method] = (paymentMethods[payment.method] || 0) + payment.amount;
     });
@@ -967,7 +970,7 @@ export const billingService = {
     for (const paymentId of reconciliationData.paymentIds) {
       const paymentRef = doc(db, COLLECTIONS.PAYMENTS, paymentId);
       const paymentDoc = await getDoc(paymentRef);
-      
+
       if (!paymentDoc.exists() || paymentDoc.data()?.tenantId !== tenantId) {
         throw new Error(`Payment ${paymentId} not found`);
       }
@@ -984,7 +987,9 @@ export const billingService = {
     // Check if amounts match
     const difference = Math.abs(totalPaymentAmount - reconciliationData.depositAmount);
     if (difference > 0.01) {
-      throw new Error(`Payment total ($${totalPaymentAmount}) does not match deposit amount ($${reconciliationData.depositAmount})`);
+      throw new Error(
+        `Payment total ($${totalPaymentAmount}) does not match deposit amount ($${reconciliationData.depositAmount})`
+      );
     }
 
     // Create reconciliation record
@@ -1004,7 +1009,7 @@ export const billingService = {
     });
 
     // Update payments as reconciled
-    const updatePromises = reconciliationData.paymentIds.map(paymentId =>
+    const updatePromises = reconciliationData.paymentIds.map((paymentId) =>
       updateDoc(doc(db, COLLECTIONS.PAYMENTS, paymentId), {
         reconciledDate: serverTimestamp(),
         reconciliationId: reconciliationRef.id,
@@ -1039,10 +1044,13 @@ export const billingService = {
     q = query(q, orderBy('paymentDate', 'desc'));
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Payment));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as Payment
+    );
   },
 
   // Payment plan management
@@ -1093,7 +1101,7 @@ export const billingService = {
     });
 
     // Update invoices to reference payment plan
-    const updatePromises = planData.invoiceIds.map(invoiceId =>
+    const updatePromises = planData.invoiceIds.map((invoiceId) =>
       updateDoc(doc(db, COLLECTIONS.INVOICES, invoiceId), {
         paymentPlanId: paymentPlanRef.id,
         updatedAt: serverTimestamp(),
@@ -1120,7 +1128,7 @@ export const billingService = {
   ): Promise<void> {
     const planRef = doc(db, COLLECTIONS.PAYMENT_PLANS, paymentPlanId);
     const planDoc = await getDoc(planRef);
-    
+
     if (!planDoc.exists() || planDoc.data()?.tenantId !== tenantId) {
       throw new Error('Payment plan not found');
     }
@@ -1136,17 +1144,18 @@ export const billingService = {
     // Update installment
     installments[installmentIndex].paidAmount += paymentData.amount;
     installments[installmentIndex].paidDate = Timestamp.fromDate(paymentData.paymentDate);
-    installments[installmentIndex].status = 
-      installments[installmentIndex].paidAmount >= installments[installmentIndex].amount 
-        ? 'paid' 
+    installments[installmentIndex].status =
+      installments[installmentIndex].paidAmount >= installments[installmentIndex].amount
+        ? 'paid'
         : 'partial';
 
     // Calculate new remaining balance
-    const totalPaid = installments.reduce((sum, inst) => sum + inst.paidAmount, 0) + plan.downPayment;
+    const totalPaid =
+      installments.reduce((sum, inst) => sum + inst.paidAmount, 0) + plan.downPayment;
     const remainingBalance = plan.totalAmount - totalPaid;
 
     // Update plan status
-    const allPaid = installments.every(inst => inst.status === 'paid');
+    const allPaid = installments.every((inst) => inst.status === 'paid');
     const planStatus = allPaid ? 'completed' : 'active';
 
     await updateDoc(planRef, {
@@ -1180,23 +1189,26 @@ export const billingService = {
       where('paymentDate', '>=', Timestamp.fromDate(dateRange.start)),
       where('paymentDate', '<=', Timestamp.fromDate(dateRange.end))
     );
-    
+
     const paymentsSnapshot = await getDocs(paymentsQuery);
-    const payments = paymentsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Payment));
+    const payments = paymentsSnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as Payment
+    );
 
     // Calculate analytics
     let totalCollected = 0;
     const paymentMethodBreakdown: Record<string, number> = {};
     const patientPayments: Record<string, number> = {};
 
-    payments.forEach(payment => {
+    payments.forEach((payment) => {
       totalCollected += payment.amount;
-      paymentMethodBreakdown[payment.method] = 
+      paymentMethodBreakdown[payment.method] =
         (paymentMethodBreakdown[payment.method] || 0) + payment.amount;
-      patientPayments[payment.patientId] = 
+      patientPayments[payment.patientId] =
         (patientPayments[payment.patientId] || 0) + payment.amount;
     });
 

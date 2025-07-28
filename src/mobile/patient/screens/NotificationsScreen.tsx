@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  Bell, 
-  FileText, 
-  Calendar, 
+import {
+  Bell,
+  FileText,
+  Calendar,
   AlertCircle,
   Info,
   CheckCircle,
@@ -12,7 +12,7 @@ import {
   TrendingUp,
   Settings,
   X,
-  Check
+  Check,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -45,7 +45,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
       priority: 'high',
       icon: AlertCircle,
       color: 'red',
-      actionUrl: '/patient/results/2'
+      actionUrl: '/patient/results/2',
     },
     {
       id: '2',
@@ -57,19 +57,20 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
       priority: 'medium',
       icon: FileText,
       color: 'green',
-      actionUrl: '/patient/results/1'
+      actionUrl: '/patient/results/1',
     },
     {
       id: '3',
       type: 'appointment',
       title: 'Appointment Tomorrow',
-      message: 'Blood test collection scheduled for tomorrow at 9:00 AM. Remember to fast for 12 hours.',
+      message:
+        'Blood test collection scheduled for tomorrow at 9:00 AM. Remember to fast for 12 hours.',
       timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       read: false,
       priority: 'high',
       icon: Calendar,
       color: 'blue',
-      actionUrl: '/patient/appointments/1'
+      actionUrl: '/patient/appointments/1',
     },
     {
       id: '4',
@@ -80,18 +81,19 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
       read: true,
       priority: 'medium',
       icon: Pill,
-      color: 'purple'
+      color: 'purple',
     },
     {
       id: '5',
       type: 'health_tip',
       title: 'Health Tip of the Day',
-      message: 'Stay hydrated! Drinking 8 glasses of water daily helps maintain healthy kidney function.',
+      message:
+        'Stay hydrated! Drinking 8 glasses of water daily helps maintain healthy kidney function.',
       timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       read: true,
       priority: 'low',
       icon: Heart,
-      color: 'pink'
+      color: 'pink',
     },
     {
       id: '6',
@@ -102,8 +104,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
       read: true,
       priority: 'low',
       icon: Info,
-      color: 'gray'
-    }
+      color: 'gray',
+    },
   ]);
 
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
@@ -116,38 +118,30 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
     { id: 'critical', label: 'Critical', icon: AlertCircle },
   ];
 
-  const filteredNotifications = notifications.filter(notif => {
+  const filteredNotifications = notifications.filter((notif) => {
     if (filter === 'unread' && notif.read) return false;
     if (selectedTypes.length > 0 && !selectedTypes.includes(notif.type)) return false;
     return true;
   });
 
   const markAsRead = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId ? { ...notif, read: true } : notif
-      )
+    setNotifications((prev) =>
+      prev.map((notif) => (notif.id === notificationId ? { ...notif, read: true } : notif))
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+    setNotifications((prev) => prev.map((notif) => ({ ...notif, read: true })));
     onRead?.();
   };
 
   const deleteNotification = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.filter(notif => notif.id !== notificationId)
-    );
+    setNotifications((prev) => prev.filter((notif) => notif.id !== notificationId));
   };
 
   const toggleTypeFilter = (typeId: string) => {
-    setSelectedTypes(prev => 
-      prev.includes(typeId) 
-        ? prev.filter(t => t !== typeId)
-        : [...prev, typeId]
+    setSelectedTypes((prev) =>
+      prev.includes(typeId) ? prev.filter((t) => t !== typeId) : [...prev, typeId]
     );
   };
 
@@ -169,7 +163,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
     );
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -179,16 +173,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-xl font-semibold text-gray-900">Notifications</h1>
-              {unreadCount > 0 && (
-                <p className="text-sm text-gray-500">{unreadCount} unread</p>
-              )}
+              {unreadCount > 0 && <p className="text-sm text-gray-500">{unreadCount} unread</p>}
             </div>
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-indigo-600 font-medium"
-                >
+                <button onClick={markAllAsRead} className="text-sm text-indigo-600 font-medium">
                   Mark all read
                 </button>
               )}
@@ -205,9 +194,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
               <button
                 onClick={() => setFilter('all')}
                 className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  filter === 'all' 
-                    ? 'bg-indigo-100 text-indigo-700' 
-                    : 'bg-gray-100 text-gray-600'
+                  filter === 'all' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 All
@@ -215,8 +202,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
               <button
                 onClick={() => setFilter('unread')}
                 className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  filter === 'unread' 
-                    ? 'bg-indigo-100 text-indigo-700' 
+                  filter === 'unread'
+                    ? 'bg-indigo-100 text-indigo-700'
                     : 'bg-gray-100 text-gray-600'
                 }`}
               >
@@ -226,7 +213,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
 
             {/* Type Filters */}
             <div className="flex space-x-2 overflow-x-auto pb-1">
-              {notificationTypes.map(type => (
+              {notificationTypes.map((type) => (
                 <button
                   key={type.id}
                   onClick={() => toggleTypeFilter(type.id)}
@@ -248,7 +235,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
       {/* Notifications List */}
       <div className="p-4 space-y-3">
         {filteredNotifications.length > 0 ? (
-          filteredNotifications.map(notification => (
+          filteredNotifications.map((notification) => (
             <div
               key={notification.id}
               className={`bg-white rounded-lg shadow-sm overflow-hidden ${
@@ -258,23 +245,23 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
               <div className="p-4">
                 <div className="flex items-start space-x-3">
                   {getNotificationIcon(notification)}
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className={`font-medium text-gray-900 ${
-                          !notification.read ? 'font-semibold' : ''
-                        }`}>
+                        <p
+                          className={`font-medium text-gray-900 ${
+                            !notification.read ? 'font-semibold' : ''
+                          }`}
+                        >
                           {notification.title}
                         </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {notification.message}
-                        </p>
+                        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                         <p className="text-xs text-gray-400 mt-2">
                           {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
                         </p>
                       </div>
-                      
+
                       <button
                         onClick={() => deleteNotification(notification.id)}
                         className="ml-2 text-gray-400 hover:text-gray-600"
@@ -308,9 +295,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onRead
             <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">No notifications</p>
             <p className="text-sm text-gray-400 mt-1">
-              {filter === 'unread' 
-                ? 'You\'re all caught up!'
-                : 'Notifications will appear here'}
+              {filter === 'unread' ? "You're all caught up!" : 'Notifications will appear here'}
             </p>
           </div>
         )}

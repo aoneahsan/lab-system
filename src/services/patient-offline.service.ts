@@ -35,10 +35,7 @@ class PatientOfflineService {
   }
 
   // Create patient with offline support
-  async createPatient(
-    tenantId: string,
-    data: CreatePatientData
-  ): Promise<Patient> {
+  async createPatient(tenantId: string, data: CreatePatientData): Promise<Patient> {
     const patientId = this.generatePatientId();
     const collectionName = this.getCollectionName(tenantId);
 
@@ -57,10 +54,7 @@ class PatientOfflineService {
       operation: 'create',
       data: patientData,
       onlineHandler: async () => {
-        const docRef = await addDoc(
-          collection(firestore, collectionName),
-          patientData
-        );
+        const docRef = await addDoc(collection(firestore, collectionName), patientData);
         return {
           id: docRef.id,
           ...patientData,
@@ -72,10 +66,7 @@ class PatientOfflineService {
   }
 
   // Get patient with offline support
-  async getPatient(
-    tenantId: string,
-    patientId: string
-  ): Promise<Patient | null> {
+  async getPatient(tenantId: string, patientId: string): Promise<Patient | null> {
     const collectionName = this.getCollectionName(tenantId);
 
     return offlineAwareService.execute({
@@ -86,11 +77,11 @@ class PatientOfflineService {
       onlineHandler: async () => {
         const docRef = doc(firestore, collectionName, patientId);
         const docSnap = await getDoc(docRef);
-        
+
         if (!docSnap.exists()) {
           return null;
         }
-        
+
         return {
           id: docSnap.id,
           ...docSnap.data(),
@@ -100,10 +91,7 @@ class PatientOfflineService {
   }
 
   // Search patients with offline support
-  async searchPatients(
-    tenantId: string,
-    filters: PatientSearchFilters = {}
-  ): Promise<Patient[]> {
+  async searchPatients(tenantId: string, filters: PatientSearchFilters = {}): Promise<Patient[]> {
     const collectionName = this.getCollectionName(tenantId);
 
     return offlineAwareService.execute({
@@ -113,57 +101,57 @@ class PatientOfflineService {
       filters,
       onlineHandler: async () => {
         const constraints: any[] = [];
-        
+
         if (filters.searchTerm) {
           // In a real implementation, you might use a search index
           // For now, we'll do client-side filtering
         }
-        
+
         if (filters.gender) {
           constraints.push(where('gender', '==', filters.gender));
         }
-        
+
         if (filters.active !== undefined) {
           constraints.push(where('active', '==', filters.active));
         }
-        
+
         constraints.push(orderBy('createdAt', 'desc'));
-        
+
         if (filters.limit) {
           constraints.push(limit(filters.limit));
         }
-        
+
         const q = query(collection(firestore, collectionName), ...constraints);
         const snapshot = await getDocs(q);
-        
-        let patients = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        } as Patient));
-        
+
+        let patients = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as Patient
+        );
+
         // Client-side filtering for search term
         if (filters.searchTerm) {
           const searchLower = filters.searchTerm.toLowerCase();
-          patients = patients.filter(p => 
-            p.firstName.toLowerCase().includes(searchLower) ||
-            p.lastName.toLowerCase().includes(searchLower) ||
-            p.patientId.toLowerCase().includes(searchLower) ||
-            p.email?.toLowerCase().includes(searchLower) ||
-            p.phone?.includes(filters.searchTerm)
+          patients = patients.filter(
+            (p) =>
+              p.firstName.toLowerCase().includes(searchLower) ||
+              p.lastName.toLowerCase().includes(searchLower) ||
+              p.patientId.toLowerCase().includes(searchLower) ||
+              p.email?.toLowerCase().includes(searchLower) ||
+              p.phone?.includes(filters.searchTerm)
           );
         }
-        
+
         return patients;
       },
     });
   }
 
   // Update patient with offline support
-  async updatePatient(
-    tenantId: string,
-    patientId: string,
-    data: UpdatePatientData
-  ): Promise<void> {
+  async updatePatient(tenantId: string, patientId: string, data: UpdatePatientData): Promise<void> {
     const collectionName = this.getCollectionName(tenantId);
 
     const updates = {
@@ -185,10 +173,7 @@ class PatientOfflineService {
   }
 
   // Delete patient with offline support
-  async deletePatient(
-    tenantId: string,
-    patientId: string
-  ): Promise<void> {
+  async deletePatient(tenantId: string, patientId: string): Promise<void> {
     const collectionName = this.getCollectionName(tenantId);
 
     return offlineAwareService.execute({
@@ -204,10 +189,7 @@ class PatientOfflineService {
   }
 
   // Soft delete (deactivate) patient with offline support
-  async deactivatePatient(
-    tenantId: string,
-    patientId: string
-  ): Promise<void> {
+  async deactivatePatient(tenantId: string, patientId: string): Promise<void> {
     return this.updatePatient(tenantId, patientId, { active: false });
   }
 
@@ -219,25 +201,25 @@ class PatientOfflineService {
     byGender: Record<string, number>;
   }> {
     const patients = await this.searchPatients(tenantId);
-    
+
     const stats = {
       total: patients.length,
       active: 0,
       inactive: 0,
       byGender: {} as Record<string, number>,
     };
-    
-    patients.forEach(patient => {
+
+    patients.forEach((patient) => {
       if (patient.active) {
         stats.active++;
       } else {
         stats.inactive++;
       }
-      
+
       const gender = patient.gender || 'unknown';
       stats.byGender[gender] = (stats.byGender[gender] || 0) + 1;
     });
-    
+
     return stats;
   }
 
@@ -246,7 +228,7 @@ class PatientOfflineService {
     tenantId: string,
     patientsData: CreatePatientData[]
   ): Promise<Patient[]> {
-    const operations = patientsData.map(data => ({
+    const operations = patientsData.map((data) => ({
       collection: this.getCollectionName(tenantId),
       tenantId,
       operation: 'create' as const,
@@ -267,12 +249,12 @@ class PatientOfflineService {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         };
-        
+
         const docRef = await addDoc(
           collection(firestore, this.getCollectionName(tenantId)),
           patientData
         );
-        
+
         return {
           id: docRef.id,
           ...patientData,
@@ -281,7 +263,7 @@ class PatientOfflineService {
         } as Patient;
       },
     }));
-    
+
     return offlineAwareService.executeBatch(operations);
   }
 }

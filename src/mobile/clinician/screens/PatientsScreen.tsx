@@ -11,7 +11,7 @@ import {
   FileText,
   Clock,
   Star,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -50,7 +50,7 @@ export const PatientsScreen: React.FC = () => {
       conditions: ['Diabetes Type 2', 'Hypertension'],
       recentTests: 5,
       criticalAlerts: 1,
-      starred: true
+      starred: true,
     },
     {
       id: '2',
@@ -63,7 +63,7 @@ export const PatientsScreen: React.FC = () => {
       conditions: ['CHF', 'CKD Stage 3'],
       recentTests: 8,
       criticalAlerts: 2,
-      starred: true
+      starred: true,
     },
     {
       id: '3',
@@ -77,7 +77,7 @@ export const PatientsScreen: React.FC = () => {
       conditions: ['Pregnancy - 24 weeks'],
       recentTests: 3,
       criticalAlerts: 0,
-      starred: false
+      starred: false,
     },
     {
       id: '4',
@@ -90,20 +90,23 @@ export const PatientsScreen: React.FC = () => {
       conditions: ['COPD', 'OSA'],
       recentTests: 4,
       criticalAlerts: 0,
-      starred: false
-    }
+      starred: false,
+    },
   ]);
 
-  const filteredPatients = patients.filter(patient => {
-    const matchesSearch = searchQuery === '' || 
+  const filteredPatients = patients.filter((patient) => {
+    const matchesSearch =
+      searchQuery === '' ||
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       patient.mrn.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilter = filterType === 'all' ||
+
+    const matchesFilter =
+      filterType === 'all' ||
       (filterType === 'starred' && patient.starred) ||
       (filterType === 'critical' && patient.criticalAlerts > 0) ||
-      (filterType === 'recent' && patient.lastVisit > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
-    
+      (filterType === 'recent' &&
+        patient.lastVisit > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+
     return matchesSearch && matchesFilter;
   });
 
@@ -129,7 +132,9 @@ export const PatientsScreen: React.FC = () => {
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 border rounded-lg ${showFilters ? 'bg-blue-50 border-blue-300' : 'border-gray-300'}`}
+              className={`p-2 border rounded-lg ${
+                showFilters ? 'bg-blue-50 border-blue-300' : 'border-gray-300'
+              }`}
             >
               <Filter className="h-5 w-5 text-gray-600" />
             </button>
@@ -142,7 +147,7 @@ export const PatientsScreen: React.FC = () => {
                 { id: 'all', label: 'All Patients' },
                 { id: 'starred', label: 'Starred' },
                 { id: 'critical', label: 'Critical' },
-                { id: 'recent', label: 'Recent Visits' }
+                { id: 'recent', label: 'Recent Visits' },
               ].map((filter) => (
                 <button
                   key={filter.id}
@@ -180,7 +185,11 @@ export const PatientsScreen: React.FC = () => {
                     }}
                     className="text-gray-400 hover:text-yellow-500"
                   >
-                    <Star className={`h-4 w-4 ${patient.starred ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                    <Star
+                      className={`h-4 w-4 ${
+                        patient.starred ? 'fill-yellow-500 text-yellow-500' : ''
+                      }`}
+                    />
                   </button>
                 </div>
                 <p className="text-sm text-gray-600">
@@ -200,7 +209,7 @@ export const PatientsScreen: React.FC = () => {
                 <Activity className="h-4 w-4 mr-2" />
                 <span>{patient.conditions.join(', ')}</span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-4 w-4 mr-2" />
@@ -255,13 +264,13 @@ export const PatientsScreen: React.FC = () => {
           </div>
           <div>
             <p className="text-2xl font-bold text-blue-600">
-              {patients.filter(p => p.nextAppointment).length}
+              {patients.filter((p) => p.nextAppointment).length}
             </p>
             <p className="text-xs text-gray-600">Upcoming</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-red-600">
-              {patients.filter(p => p.criticalAlerts > 0).length}
+              {patients.filter((p) => p.criticalAlerts > 0).length}
             </p>
             <p className="text-xs text-gray-600">Critical</p>
           </div>

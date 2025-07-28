@@ -11,7 +11,9 @@ const SampleScanPage: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [isBarcodeScanning, setIsBarcodeScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
-  const [scanResult, setScanResult] = useState<{ sampleId?: string; sampleNumber?: string } | null>(null);
+  const [scanResult, setScanResult] = useState<{ sampleId?: string; sampleNumber?: string } | null>(
+    null
+  );
   const isNativePlatform = Capacitor.isNativePlatform();
 
   useEffect(() => {
@@ -31,7 +33,7 @@ const SampleScanPage: React.FC = () => {
         handleScanResult(data);
         setIsScanning(false);
       });
-      
+
       if (!result.success) {
         toast.error('Scanner Error', result.error || 'Failed to start scanner');
         setIsScanning(false);
@@ -46,7 +48,7 @@ const SampleScanPage: React.FC = () => {
     try {
       const parsed = JSON.parse(data);
       setScanResult(parsed);
-      
+
       if (parsed.sampleId) {
         toast.success('Sample Found', `Sample ${parsed.sampleNumber} scanned successfully`);
         navigate(`/samples/${parsed.sampleId}`);
@@ -93,7 +95,7 @@ const SampleScanPage: React.FC = () => {
         <h2 className="text-lg font-medium text-gray-900 mb-4">
           {isNativePlatform ? 'Barcode Scanner' : 'QR Code Scanner'}
         </h2>
-        
+
         {!isScanning ? (
           <div className="text-center py-12">
             {isNativePlatform ? (
@@ -124,7 +126,11 @@ const SampleScanPage: React.FC = () => {
           </div>
         ) : (
           <div className="relative">
-            <div id="qr-reader" className="w-full rounded-lg overflow-hidden" style={{ minHeight: '400px' }}></div>
+            <div
+              id="qr-reader"
+              className="w-full rounded-lg overflow-hidden"
+              style={{ minHeight: '400px' }}
+            ></div>
             <button
               onClick={() => {
                 setIsScanning(false);
@@ -178,7 +184,16 @@ const SampleScanPage: React.FC = () => {
         isOpen={isBarcodeScanning}
         onClose={() => setIsBarcodeScanning(false)}
         onScan={handleBarcodeResult}
-        supportedFormats={['CODE128', 'CODE39', 'EAN13', 'EAN8', 'QR_CODE', 'DATA_MATRIX', 'CODE93', 'CODABAR']}
+        supportedFormats={[
+          'CODE128',
+          'CODE39',
+          'EAN13',
+          'EAN8',
+          'QR_CODE',
+          'DATA_MATRIX',
+          'CODE93',
+          'CODABAR',
+        ]}
       />
     </div>
   );

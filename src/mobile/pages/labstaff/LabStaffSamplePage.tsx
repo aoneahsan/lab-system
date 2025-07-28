@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  TestTube, 
-  User, 
+import {
+  TestTube,
+  User,
   Clock,
   FileText,
   Edit3,
   Save,
   ArrowLeft,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -44,7 +44,7 @@ const LabStaffSamplePage: React.FC = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Mock data - in real app would fetch based on ID
   const [sampleInfo] = useState<SampleInfo>({
     id: id || '1',
@@ -75,11 +75,9 @@ const LabStaffSamplePage: React.FC = () => {
   ]);
 
   const handleParameterChange = (parameterId: string, value: string) => {
-    setParameters(prev => 
-      prev.map(param => 
-        param.id === parameterId 
-          ? { ...param, value, flag: getFlag(value, param) }
-          : param
+    setParameters((prev) =>
+      prev.map((param) =>
+        param.id === parameterId ? { ...param, value, flag: getFlag(value, param) } : param
       )
     );
   };
@@ -88,11 +86,11 @@ const LabStaffSamplePage: React.FC = () => {
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return undefined;
 
-    const [min, max] = param.referenceRange.split('-').map(v => parseFloat(v));
-    
+    const [min, max] = param.referenceRange.split('-').map((v) => parseFloat(v));
+
     // Mock critical ranges
     const criticalRanges: { [key: string]: { low: number; high: number } } = {
-      'Hemoglobin': { low: 7, high: 20 },
+      Hemoglobin: { low: 7, high: 20 },
       'Platelet Count': { low: 50, high: 1000 },
     };
 
@@ -108,9 +106,9 @@ const LabStaffSamplePage: React.FC = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    
+
     // Validate all required fields
-    const missingValues = parameters.filter(p => !p.value);
+    const missingValues = parameters.filter((p) => !p.value);
     if (missingValues.length > 0) {
       toast.error('Please enter all test values');
       setIsSaving(false);
@@ -119,15 +117,17 @@ const LabStaffSamplePage: React.FC = () => {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       toast.success('Results saved successfully');
       setIsEditing(false);
-      
+
       // Check for critical values
-      const criticalParams = parameters.filter(p => p.flag === 'C');
+      const criticalParams = parameters.filter((p) => p.flag === 'C');
       if (criticalParams.length > 0) {
-        toast.error(`Critical values detected! Immediate notification sent to ${sampleInfo.clinician}`);
+        toast.error(
+          `Critical values detected! Immediate notification sent to ${sampleInfo.clinician}`
+        );
       }
     } catch (error) {
       toast.error('Failed to save results');
@@ -153,10 +153,7 @@ const LabStaffSamplePage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <div className="flex items-center gap-4 mb-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 -ml-2">
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           <h1 className="text-xl font-bold text-gray-900">Result Entry</h1>
@@ -171,11 +168,15 @@ const LabStaffSamplePage: React.FC = () => {
                 {sampleInfo.patientId} • {sampleInfo.patientAge}y {sampleInfo.patientGender}
               </p>
             </div>
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-              sampleInfo.priority === 'critical' ? 'bg-red-100 text-red-700' :
-              sampleInfo.priority === 'urgent' ? 'bg-orange-100 text-orange-700' :
-              'bg-blue-100 text-blue-700'
-            }`}>
+            <span
+              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                sampleInfo.priority === 'critical'
+                  ? 'bg-red-100 text-red-700'
+                  : sampleInfo.priority === 'urgent'
+                    ? 'bg-orange-100 text-orange-700'
+                    : 'bg-blue-100 text-blue-700'
+              }`}
+            >
               {sampleInfo.priority.toUpperCase()}
             </span>
           </div>
@@ -236,7 +237,7 @@ const LabStaffSamplePage: React.FC = () => {
                   </span>
                 )}
               </div>
-              
+
               {isEditing ? (
                 <div className="flex items-center gap-2">
                   <input
@@ -244,9 +245,11 @@ const LabStaffSamplePage: React.FC = () => {
                     value={param.value}
                     onChange={(e) => handleParameterChange(param.id, e.target.value)}
                     className={`flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                      param.flag === 'C' ? 'border-red-300 bg-red-50' :
-                      param.flag ? 'border-orange-300 bg-orange-50' :
-                      'border-gray-300'
+                      param.flag === 'C'
+                        ? 'border-red-300 bg-red-50'
+                        : param.flag
+                          ? 'border-orange-300 bg-orange-50'
+                          : 'border-gray-300'
                     }`}
                     placeholder="Enter value"
                   />
@@ -262,7 +265,7 @@ const LabStaffSamplePage: React.FC = () => {
         </div>
 
         {/* Critical Value Alert */}
-        {parameters.some(p => p.flag === 'C') && (
+        {parameters.some((p) => p.flag === 'C') && (
           <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600" />

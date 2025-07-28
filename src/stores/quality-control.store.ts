@@ -16,9 +16,13 @@ interface QualityControlStore {
   createQCTest: (data: Partial<QCTest>) => Promise<void>;
   recordQCResult: (data: Partial<QCResult>) => Promise<{ violations: string[] }>;
   fetchQCResults: (qcTestId: string, levelId?: string, days?: number) => Promise<void>;
-  calculateStatistics: (qcTestId: string, levelId: string, period: 'daily' | 'weekly' | 'monthly' | 'quarterly') => Promise<void>;
+  calculateStatistics: (
+    qcTestId: string,
+    levelId: string,
+    period: 'daily' | 'weekly' | 'monthly' | 'quarterly'
+  ) => Promise<void>;
   fetchLeveyJenningsData: (qcTestId: string, levelId: string, days?: number) => Promise<void>;
-  
+
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }

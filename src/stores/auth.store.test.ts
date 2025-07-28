@@ -54,7 +54,7 @@ describe('authStore', () => {
   describe('state management', () => {
     it('has correct initial state', () => {
       const { result } = renderHook(() => useAuthStore());
-      
+
       expect(result.current.currentUser).toBeNull();
       expect(result.current.isLoading).toBe(true); // Initial loading state is true
       expect(result.current.error).toBeNull();
@@ -113,9 +113,7 @@ describe('authStore', () => {
 
       expect(result.current.currentUser).toEqual(mockUser);
     });
-
   });
-
 
   describe('authentication state', () => {
     it('identifies authenticated state correctly', () => {

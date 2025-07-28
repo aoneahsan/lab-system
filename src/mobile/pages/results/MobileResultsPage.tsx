@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  FileText, 
-  Download, 
-  Share2, 
+import {
+  FileText,
+  Download,
+  Share2,
   Search,
   Filter,
   ChevronRight,
   CheckCircle,
   AlertCircle,
-  Clock
+  Clock,
 } from 'lucide-react';
 import { useTestResults } from '@/hooks/useTestResults';
 import { useAuthStore } from '@/stores/auth.store';
@@ -23,7 +23,7 @@ const MobileTestResultsPage: React.FC = () => {
   const { currentUser } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  
+
   // In real app, would filter by patient ID
   const { data: results = [], isLoading } = useTestResults();
 
@@ -57,15 +57,15 @@ const MobileTestResultsPage: React.FC = () => {
     try {
       // In real app, would fetch PDF from server
       const pdfBase64 = 'mock-pdf-content';
-      
+
       const fileName = `LabReport_${result.id}_${Date.now()}.pdf`;
-      
+
       await Filesystem.writeFile({
         path: fileName,
         data: pdfBase64,
         directory: Directory.Documents,
       });
-      
+
       toast.success('Report downloaded successfully');
     } catch (error) {
       console.error('Download failed:', error);
@@ -86,27 +86,30 @@ const MobileTestResultsPage: React.FC = () => {
     }
   };
 
-  const filteredTestResults = results.filter(result => {
+  const filteredTestResults = results.filter((result) => {
     const matchesSearch = result.testName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || result.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const groupedTestResults = filteredTestResults.reduce((groups, result) => {
-    const date = new Date(result.resultedAt).toLocaleDateString();
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(result);
-    return groups;
-  }, {} as Record<string, TestResult[]>);
+  const groupedTestResults = filteredTestResults.reduce(
+    (groups, result) => {
+      const date = new Date(result.resultedAt).toLocaleDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(result);
+      return groups;
+    },
+    {} as Record<string, TestResult[]>
+  );
 
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Test TestResults</h1>
-        
+
         {/* Search and Filter */}
         <div className="space-y-3">
           <div className="relative">
@@ -119,16 +122,14 @@ const MobileTestResultsPage: React.FC = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div className="flex gap-2 overflow-x-auto pb-2">
             {['all', 'final', 'preliminary', 'critical'].map((status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                  statusFilter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700'
+                  statusFilter === status ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -156,10 +157,7 @@ const MobileTestResultsPage: React.FC = () => {
                 <h3 className="text-sm font-medium text-gray-500 mb-3">{date}</h3>
                 <div className="space-y-3">
                   {dateTestResults.map((result) => (
-                    <div
-                      key={result.id}
-                      className="bg-white rounded-lg shadow-sm p-4"
-                    >
+                    <div key={result.id} className="bg-white rounded-lg shadow-sm p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
                           {getStatusIcon(result.status)}
@@ -170,7 +168,11 @@ const MobileTestResultsPage: React.FC = () => {
                             </p>
                           </div>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                            result.status
+                          )}`}
+                        >
                           {result.status}
                         </span>
                       </div>
@@ -186,7 +188,8 @@ const MobileTestResultsPage: React.FC = () => {
                           </div>
                           {result.referenceRange && (
                             <div className="text-xs text-gray-500 mt-1">
-                              Normal: {result.referenceRange.low} - {result.referenceRange.high} {result.value.unit}
+                              Normal: {result.referenceRange.low} - {result.referenceRange.high}{' '}
+                              {result.value.unit}
                             </div>
                           )}
                         </div>

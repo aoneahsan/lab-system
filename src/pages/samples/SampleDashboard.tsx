@@ -19,16 +19,11 @@ export default function SampleDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('list');
   const [selectedSample, setSelectedSample] = useState<string | null>(null);
-  
+
   const { currentUser } = useAuthStore();
-  const { 
-    statistics, 
-    loading, 
-    fetchSampleStatistics,
-    currentSample,
-    fetchSample
-  } = useSampleStore();
-  
+  const { statistics, loading, fetchSampleStatistics, currentSample, fetchSample } =
+    useSampleStore();
+
   const tenantId = currentUser?.tenantId || '';
 
   useEffect(() => {
@@ -56,10 +51,7 @@ export default function SampleDashboard() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Sample Management</h1>
-        <button
-          onClick={() => navigate('/samples/register')}
-          className="btn btn-primary"
-        >
+        <button onClick={() => navigate('/samples/register')} className="btn btn-primary">
           Register New Sample
         </button>
       </div>
@@ -71,9 +63,7 @@ export default function SampleDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Samples</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {statistics.totalSamples}
-                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{statistics.totalSamples}</p>
               </div>
               <TestTube className="h-10 w-10 text-blue-500" />
             </div>
@@ -83,9 +73,7 @@ export default function SampleDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Today's Samples</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {statistics.todaysSamples}
-                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{statistics.todaysSamples}</p>
               </div>
               <Clock className="h-10 w-10 text-green-500" />
             </div>
@@ -95,9 +83,7 @@ export default function SampleDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {statistics.pendingSamples}
-                </p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{statistics.pendingSamples}</p>
               </div>
               <AlertCircle className="h-10 w-10 text-yellow-500" />
             </div>
@@ -129,9 +115,10 @@ export default function SampleDashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`
                     py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2
-                    ${activeTab === tab.id
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ${
+                      activeTab === tab.id
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }
                   `}
                 >
@@ -149,17 +136,20 @@ export default function SampleDashboard() {
           {activeTab === 'statistics' && (
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-gray-900">Sample Statistics</h3>
-              
+
               {/* Sample by Status */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Samples by Status</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {statistics?.samplesByStatus && Object.entries(statistics.samplesByStatus).map(([status, count]) => (
-                    <div key={status} className="bg-white p-3 rounded border border-gray-200">
-                      <p className="text-xs text-gray-600 capitalize">{status.replace('_', ' ')}</p>
-                      <p className="text-xl font-semibold text-gray-900">{count}</p>
-                    </div>
-                  ))}
+                  {statistics?.samplesByStatus &&
+                    Object.entries(statistics.samplesByStatus).map(([status, count]) => (
+                      <div key={status} className="bg-white p-3 rounded border border-gray-200">
+                        <p className="text-xs text-gray-600 capitalize">
+                          {status.replace('_', ' ')}
+                        </p>
+                        <p className="text-xl font-semibold text-gray-900">{count}</p>
+                      </div>
+                    ))}
                 </div>
               </div>
 
@@ -167,12 +157,13 @@ export default function SampleDashboard() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Samples by Type</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {statistics?.samplesByType && Object.entries(statistics.samplesByType).map(([type, count]) => (
-                    <div key={type} className="bg-white p-3 rounded border border-gray-200">
-                      <p className="text-xs text-gray-600 capitalize">{type}</p>
-                      <p className="text-xl font-semibold text-gray-900">{count}</p>
-                    </div>
-                  ))}
+                  {statistics?.samplesByType &&
+                    Object.entries(statistics.samplesByType).map(([type, count]) => (
+                      <div key={type} className="bg-white p-3 rounded border border-gray-200">
+                        <p className="text-xs text-gray-600 capitalize">{type}</p>
+                        <p className="text-xl font-semibold text-gray-900">{count}</p>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
@@ -183,7 +174,10 @@ export default function SampleDashboard() {
       {/* Chain of Custody Modal/Sidebar */}
       {selectedSample && currentSample && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-gray-500 bg-opacity-75" onClick={() => setSelectedSample(null)} />
+          <div
+            className="absolute inset-0 bg-gray-500 bg-opacity-75"
+            onClick={() => setSelectedSample(null)}
+          />
           <div className="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl">
             <div className="h-full flex flex-col">
               <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">

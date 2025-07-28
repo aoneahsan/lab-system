@@ -23,7 +23,7 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
   onEdit,
   onViewDetails,
   onRecordTransaction,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -63,7 +63,7 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
     if (!amount) return '-';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(amount);
   };
 
@@ -145,7 +145,7 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
             {sortedItems.map((item) => {
               const status = getStockStatus(item);
               const stockValue = (item.unitCost || 0) * item.currentStock;
-              
+
               return (
                 <tr
                   key={item.id}
@@ -162,7 +162,8 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm text-gray-900">
-                      {item.category.charAt(0).toUpperCase() + item.category.slice(1).replace(/_/g, ' ')}
+                      {item.category.charAt(0).toUpperCase() +
+                        item.category.slice(1).replace(/_/g, ' ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -191,9 +192,7 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
-                      {formatCurrency(item.unitCost)}
-                    </span>
+                    <span className="text-sm text-gray-900">{formatCurrency(item.unitCost)}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-medium text-gray-900">
@@ -201,7 +200,10 @@ export const InventoryItemsTable: React.FC<InventoryItemsTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2" onClick={(e) => e.stopPropagation()}>
+                    <div
+                      className="flex justify-end space-x-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
                         onClick={() => onRecordTransaction(item)}
                         className="text-blue-600 hover:text-blue-900"

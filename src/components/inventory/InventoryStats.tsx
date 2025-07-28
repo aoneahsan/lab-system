@@ -4,14 +4,7 @@
  */
 
 import React from 'react';
-import { 
-  Package, 
-  DollarSign, 
-  AlertTriangle, 
-  TrendingDown,
-  BarChart3,
-  Clock
-} from 'lucide-react';
+import { Package, DollarSign, AlertTriangle, TrendingDown, BarChart3, Clock } from 'lucide-react';
 
 interface InventoryStatsProps {
   stats: {
@@ -26,16 +19,13 @@ interface InventoryStatsProps {
   isLoading?: boolean;
 }
 
-export const InventoryStats: React.FC<InventoryStatsProps> = ({
-  stats,
-  isLoading = false
-}) => {
+export const InventoryStats: React.FC<InventoryStatsProps> = ({ stats, isLoading = false }) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -45,43 +35,43 @@ export const InventoryStats: React.FC<InventoryStatsProps> = ({
       value: stats.totalItems,
       icon: Package,
       color: 'blue',
-      format: (val: number) => val.toString()
+      format: (val: number) => val.toString(),
     },
     {
       title: 'Total Value',
       value: stats.totalValue,
       icon: DollarSign,
       color: 'green',
-      format: formatCurrency
+      format: formatCurrency,
     },
     {
       title: 'Low Stock',
       value: stats.lowStockItems,
       icon: TrendingDown,
       color: 'yellow',
-      format: (val: number) => val.toString()
+      format: (val: number) => val.toString(),
     },
     {
       title: 'Expiring Soon',
       value: stats.expiringItems,
       icon: Clock,
       color: 'orange',
-      format: (val: number) => val.toString()
+      format: (val: number) => val.toString(),
     },
     {
       title: 'Out of Stock',
       value: stats.outOfStockItems,
       icon: AlertTriangle,
       color: 'red',
-      format: (val: number) => val.toString()
+      format: (val: number) => val.toString(),
     },
     {
       title: 'Active Alerts',
       value: stats.activeAlerts,
       icon: BarChart3,
       color: 'purple',
-      format: (val: number) => val.toString()
-    }
+      format: (val: number) => val.toString(),
+    },
   ];
 
   if (isLoading) {
@@ -111,18 +101,20 @@ export const InventoryStats: React.FC<InventoryStatsProps> = ({
             yellow: 'bg-yellow-100 text-yellow-600',
             orange: 'bg-orange-100 text-orange-600',
             red: 'bg-red-100 text-red-600',
-            purple: 'bg-purple-100 text-purple-600'
+            purple: 'bg-purple-100 text-purple-600',
           };
 
           return (
             <div key={index} className="bg-white rounded-lg shadow p-6">
-              <div className={`inline-flex p-2 rounded-lg ${colorClasses[stat.color as keyof typeof colorClasses]} mb-4`}>
+              <div
+                className={`inline-flex p-2 rounded-lg ${
+                  colorClasses[stat.color as keyof typeof colorClasses]
+                } mb-4`}
+              >
                 <Icon className="w-6 h-6" />
               </div>
               <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {stat.format(stat.value)}
-              </p>
+              <p className="text-2xl font-bold text-gray-900">{stat.format(stat.value)}</p>
             </div>
           );
         })}

@@ -12,11 +12,7 @@ interface TestOrderFormProps {
   isLoading?: boolean;
 }
 
-const TestOrderForm: React.FC<TestOrderFormProps> = ({
-  onSubmit,
-  onCancel,
-  isLoading = false,
-}) => {
+const TestOrderForm: React.FC<TestOrderFormProps> = ({ onSubmit, onCancel, isLoading = false }) => {
   const [patientSearch, setPatientSearch] = useState('');
   const [testSearch, setTestSearch] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<PatientListItem | null>(null);
@@ -28,12 +24,7 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
   const { data: tests = [] } = useTests({ isActive: true });
   const { data: panels = [] } = useTestPanels();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-  } = useForm<TestOrderFormData>({
+  const { register, handleSubmit, setValue, watch } = useForm<TestOrderFormData>({
     defaultValues: {
       priority: 'routine',
       fasting: false,
@@ -44,16 +35,16 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
   const priority = watch('priority');
 
   const filteredPatients = patients.filter(
-    patient =>
+    (patient) =>
       patient.fullName.toLowerCase().includes(patientSearch.toLowerCase()) ||
       patient.patientId.toLowerCase().includes(patientSearch.toLowerCase())
   );
 
   const filteredTests = tests.filter(
-    test =>
-      !selectedTests.some(st => st.id === test.id) &&
+    (test) =>
+      !selectedTests.some((st) => st.id === test.id) &&
       (test.name.toLowerCase().includes(testSearch.toLowerCase()) ||
-       test.code.toLowerCase().includes(testSearch.toLowerCase()))
+        test.code.toLowerCase().includes(testSearch.toLowerCase()))
   );
 
   const handlePatientSelect = (patient: PatientListItem) => {
@@ -64,22 +55,23 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
 
   const handleTestSelect = (test: TestDefinition) => {
     setSelectedTests([...selectedTests, test]);
-    setValue('tests', [...selectedTests.map(t => t.id), test.id]);
+    setValue('tests', [...selectedTests.map((t) => t.id), test.id]);
     setTestSearch('');
   };
 
   const handlePanelSelect = (panel: TestPanel) => {
-    const panelTests = tests.filter(test => panel.testIds.includes(test.id));
-    const newTests = panelTests.filter(
-      test => !selectedTests.some(st => st.id === test.id)
-    );
+    const panelTests = tests.filter((test) => panel.testIds.includes(test.id));
+    const newTests = panelTests.filter((test) => !selectedTests.some((st) => st.id === test.id));
     setSelectedTests([...selectedTests, ...newTests]);
-    setValue('tests', [...selectedTests.map(t => t.id), ...newTests.map(t => t.id)]);
+    setValue('tests', [...selectedTests.map((t) => t.id), ...newTests.map((t) => t.id)]);
   };
 
   const handleRemoveTest = (testId: string) => {
-    setSelectedTests(selectedTests.filter(t => t.id !== testId));
-    setValue('tests', selectedTests.filter(t => t.id !== testId).map(t => t.id));
+    setSelectedTests(selectedTests.filter((t) => t.id !== testId));
+    setValue(
+      'tests',
+      selectedTests.filter((t) => t.id !== testId).map((t) => t.id)
+    );
   };
 
   const calculateTotalCost = () => {
@@ -96,12 +88,10 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
       {/* Patient Selection */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Information</h3>
-        
+
         {!selectedPatient ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Search Patient
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search Patient</label>
             <div className="relative">
               <input
                 type="text"
@@ -122,11 +112,10 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
                     onClick={() => handlePatientSelect(patient)}
                     className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
                   >
-                    <div className="font-medium">
-                      {patient.fullName}
-                    </div>
+                    <div className="font-medium">{patient.fullName}</div>
                     <div className="text-sm text-gray-600">
-                      Patient ID: {patient.patientId} | DOB: {new Date(patient.dateOfBirth).toLocaleDateString()}
+                      Patient ID: {patient.patientId} | DOB:{' '}
+                      {new Date(patient.dateOfBirth).toLocaleDateString()}
                     </div>
                   </button>
                 ))}
@@ -137,13 +126,11 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
           <div className="bg-blue-50 p-4 rounded-md">
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-medium">
-                  {selectedPatient.fullName}
-                </p>
+                <p className="font-medium">{selectedPatient.fullName}</p>
                 <p className="text-sm text-gray-600">
-                  Patient ID: {selectedPatient.patientId} | 
-                  DOB: {new Date(selectedPatient.dateOfBirth).toLocaleDateString()} |
-                  Gender: {selectedPatient.gender}
+                  Patient ID: {selectedPatient.patientId} | DOB:{' '}
+                  {new Date(selectedPatient.dateOfBirth).toLocaleDateString()} | Gender:{' '}
+                  {selectedPatient.gender}
                 </p>
               </div>
               <button
@@ -164,7 +151,7 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
       {/* Order Details */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Order Details</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Priority</label>
@@ -184,15 +171,11 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
               {...register('fasting')}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label className="ml-2 block text-sm text-gray-900">
-              Fasting Required
-            </label>
+            <label className="ml-2 block text-sm text-gray-900">Fasting Required</label>
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Clinical History
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Clinical History</label>
             <textarea
               {...register('clinicalHistory')}
               rows={2}
@@ -216,7 +199,8 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
           <div className="mt-4 p-3 bg-yellow-50 rounded-md flex items-start gap-2">
             <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-yellow-800">
-              STAT orders require immediate processing. Please ensure specimen collection is prioritized.
+              STAT orders require immediate processing. Please ensure specimen collection is
+              prioritized.
             </p>
           </div>
         )}
@@ -242,7 +226,7 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
               type="text"
               value={testSearch}
               onChange={(e) => setTestSearch(e.target.value)}
-              placeholder={showPanels ? "Search panels..." : "Search tests..."}
+              placeholder={showPanels ? 'Search panels...' : 'Search tests...'}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -250,40 +234,39 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({
 
           {testSearch && (showPanels ? panels : filteredTests).length > 0 && (
             <div className="mt-2 border rounded-md max-h-48 overflow-y-auto">
-              {showPanels ? (
-                panels
-                  .filter(panel => 
-                    panel.name.toLowerCase().includes(testSearch.toLowerCase()) ||
-                    panel.code.toLowerCase().includes(testSearch.toLowerCase())
-                  )
-                  .map((panel) => (
+              {showPanels
+                ? panels
+                    .filter(
+                      (panel) =>
+                        panel.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+                        panel.code.toLowerCase().includes(testSearch.toLowerCase())
+                    )
+                    .map((panel) => (
+                      <button
+                        key={panel.id}
+                        type="button"
+                        onClick={() => handlePanelSelect(panel)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
+                      >
+                        <div className="font-medium">{panel.name}</div>
+                        <div className="text-sm text-gray-600">
+                          Code: {panel.code} | Tests: {panel.testIds.length}
+                        </div>
+                      </button>
+                    ))
+                : filteredTests.slice(0, 10).map((test) => (
                     <button
-                      key={panel.id}
+                      key={test.id}
                       type="button"
-                      onClick={() => handlePanelSelect(panel)}
+                      onClick={() => handleTestSelect(test)}
                       className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
                     >
-                      <div className="font-medium">{panel.name}</div>
+                      <div className="font-medium">{test.name}</div>
                       <div className="text-sm text-gray-600">
-                        Code: {panel.code} | Tests: {panel.testIds.length}
+                        Code: {test.code} | {test.specimen.type} | ${test.cost || 0}
                       </div>
                     </button>
-                  ))
-              ) : (
-                filteredTests.slice(0, 10).map((test) => (
-                  <button
-                    key={test.id}
-                    type="button"
-                    onClick={() => handleTestSelect(test)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50 border-b last:border-b-0"
-                  >
-                    <div className="font-medium">{test.name}</div>
-                    <div className="text-sm text-gray-600">
-                      Code: {test.code} | {test.specimen.type} | ${test.cost || 0}
-                    </div>
-                  </button>
-                ))
-              )}
+                  ))}
             </div>
           )}
         </div>

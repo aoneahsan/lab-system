@@ -14,16 +14,18 @@ export function useCancelOrder() {
       if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const orderRef = doc(db, `${currentTenant.id}_orders`, orderId);
-      
+
       await updateDoc(orderRef, {
         status: 'cancelled',
         cancelledAt: serverTimestamp(),
         cancelledBy: currentUser.uid,
-        timeline: [{
-          action: 'Order cancelled',
-          timestamp: new Date(),
-          user: currentUser.displayName || currentUser.email || 'Unknown',
-        }],
+        timeline: [
+          {
+            action: 'Order cancelled',
+            timestamp: new Date(),
+            user: currentUser.displayName || currentUser.email || 'Unknown',
+          },
+        ],
       });
 
       return orderId;

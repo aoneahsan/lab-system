@@ -3,10 +3,7 @@ import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
 
 export const qrcodeService = {
   // Generate QR code for sample
-  async generateSampleQRCode(
-    sampleLabel: SampleLabel,
-    config?: QRCodeConfig
-  ): Promise<string> {
+  async generateSampleQRCode(sampleLabel: SampleLabel, config?: QRCodeConfig): Promise<string> {
     const qrData = {
       sampleId: sampleLabel.sampleId,
       barcode: sampleLabel.barcode,
@@ -27,7 +24,10 @@ export const qrcodeService = {
       },
     };
 
-    const qrCodeDataUrl = await (QRCodeStudio as any).generateQRCode(JSON.stringify(qrData), options);
+    const qrCodeDataUrl = await (QRCodeStudio as any).generateQRCode(
+      JSON.stringify(qrData),
+      options
+    );
     return qrCodeDataUrl;
   },
 
@@ -60,7 +60,7 @@ export const qrcodeService = {
     onScanFailure?: (error: string) => void
   ): Promise<any> {
     const scanner = await (QRCodeStudio as any).createScanner();
-    
+
     await scanner.start(videoElement, {
       fps: 10,
       qrbox: { width: 250, height: 250 },
@@ -114,10 +114,13 @@ export const qrcodeService = {
             <p style="margin: 2px 0; font-size: 12px;">DOB: ${sampleLabel.patientDOB}</p>
             <p style="margin: 2px 0; font-size: 12px;">Sample: ${sampleLabel.sampleNumber}</p>
             <p style="margin: 2px 0; font-size: 12px;">Type: ${sampleLabel.sampleType}</p>
-            <p style="margin: 2px 0; font-size: 12px;">Date: ${sampleLabel.collectionDate} ${sampleLabel.collectionTime}</p>
-            ${sampleLabel.priority !== 'routine' ? 
-              `<p style="margin: 2px 0; font-size: 12px; color: red; font-weight: bold;">PRIORITY: ${sampleLabel.priority.toUpperCase()}</p>` : 
-              ''
+            <p style="margin: 2px 0; font-size: 12px;">Date: ${sampleLabel.collectionDate} ${
+              sampleLabel.collectionTime
+            }</p>
+            ${
+              sampleLabel.priority !== 'routine'
+                ? `<p style="margin: 2px 0; font-size: 12px; color: red; font-weight: bold;">PRIORITY: ${sampleLabel.priority.toUpperCase()}</p>`
+                : ''
             }
           </div>
           <div style="text-align: center;">
@@ -127,9 +130,10 @@ export const qrcodeService = {
         <div style="margin-top: 10px; text-align: center;">
           <img src="${barcode}" height="40" />
         </div>
-        ${sampleLabel.specialInstructions ? 
-          `<p style="margin: 5px 0 0 0; font-size: 10px; font-style: italic;">${sampleLabel.specialInstructions}</p>` : 
-          ''
+        ${
+          sampleLabel.specialInstructions
+            ? `<p style="margin: 5px 0 0 0; font-size: 10px; font-style: italic;">${sampleLabel.specialInstructions}</p>`
+            : ''
         }
       </div>
     `;
@@ -182,9 +186,12 @@ export const qrcodeService = {
             </style>
           </head>
           <body onload="window.print();window.close()">
-            ${labels.map((label, index) => 
-              `${label}${index < labels.length - 1 ? '<div class="page-break"></div>' : ''}`
-            ).join('')}
+            ${labels
+              .map(
+                (label, index) =>
+                  `${label}${index < labels.length - 1 ? '<div class="page-break"></div>' : ''}`
+              )
+              .join('')}
           </body>
         </html>
       `);

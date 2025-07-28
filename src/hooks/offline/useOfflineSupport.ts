@@ -17,8 +17,8 @@ export const useOfflineSupport = () => {
     syncStatus: {
       isSyncing: false,
       pendingChanges: 0,
-      errors: []
-    }
+      errors: [],
+    },
   });
 
   useEffect(() => {
@@ -28,36 +28,35 @@ export const useOfflineSupport = () => {
     const init = async () => {
       // Check network status
       const networkStatus = await Network.getStatus();
-      
+
       // Initialize offline support
       try {
         await syncService.initialize();
         const isSupported = offlineDatabase.isAvailable();
-        
-        setState(prev => ({
+
+        setState((prev) => ({
           ...prev,
           isOnline: networkStatus.connected,
-          isOfflineSupported: isSupported
+          isOfflineSupported: isSupported,
         }));
 
         // Listen for sync status changes
         if (isSupported) {
           syncListener = syncService.addListener((status) => {
-            setState(prev => ({
+            setState((prev) => ({
               ...prev,
-              syncStatus: status
+              syncStatus: status,
             }));
           });
         }
 
         // Listen for network changes
         networkListener = await Network.addListener('networkStatusChange', (status) => {
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
-            isOnline: status.connected
+            isOnline: status.connected,
           }));
         });
-
       } catch (error) {
         console.error('Error initializing offline support:', error);
       }
@@ -81,6 +80,6 @@ export const useOfflineSupport = () => {
 
   return {
     ...state,
-    sync
+    sync,
   };
 };

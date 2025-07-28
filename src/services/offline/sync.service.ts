@@ -1,6 +1,17 @@
 import { offlineDatabase } from './database.service';
 import { Network } from '@capacitor/network';
-import { collection, doc, setDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { toast } from 'sonner';
 
@@ -20,7 +31,7 @@ class SyncService {
   async initialize(): Promise<void> {
     try {
       await offlineDatabase.initialize();
-      
+
       // Set up network monitoring
       this.networkListener = await Network.addListener('networkStatusChange', async (status) => {
         console.log('Network status changed:', status);
@@ -44,9 +55,12 @@ class SyncService {
   }
 
   private startPeriodicSync(): void {
-    this.syncInterval = setInterval(() => {
-      this.sync();
-    }, 5 * 60 * 1000); // 5 minutes
+    this.syncInterval = setInterval(
+      () => {
+        this.sync();
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   async sync(): Promise<void> {
@@ -63,7 +77,7 @@ class SyncService {
 
     try {
       console.log('Starting sync...');
-      
+
       // Get unsynced changes
       const unsyncedRecords = await offlineDatabase.getUnsynced();
       console.log(`Found ${unsyncedRecords.length} unsynced records`);
@@ -76,7 +90,7 @@ class SyncService {
         } catch (error) {
           console.error(`Error syncing record ${record.id}:`, error);
           await offlineDatabase.markSyncError(
-            record.id, 
+            record.id,
             error instanceof Error ? error.message : 'Unknown error'
           );
         }
@@ -87,13 +101,16 @@ class SyncService {
 
       // Update sync metadata
       await offlineDatabase.updateSyncMetadata('all', 'completed');
-      
+
       console.log('Sync completed successfully');
       toast.success('Data synchronized successfully');
-      
     } catch (error) {
       console.error('Sync error:', error);
-      await offlineDatabase.updateSyncMetadata('all', 'error', error instanceof Error ? error.message : 'Unknown error');
+      await offlineDatabase.updateSyncMetadata(
+        'all',
+        'error',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       toast.error('Failed to sync data');
     } finally {
       this.syncInProgress = false;
@@ -110,21 +127,21 @@ class SyncService {
         await setDoc(docRef, {
           ...record.data,
           createdAt: new Date(record.timestamp),
-          updatedAt: new Date(record.timestamp)
+          updatedAt: new Date(record.timestamp),
         });
         break;
-        
+
       case 'update':
         await updateDoc(docRef, {
           ...record.data,
-          updatedAt: new Date(record.timestamp)
+          updatedAt: new Date(record.timestamp),
         });
         break;
-        
+
       case 'delete':
         await deleteDoc(docRef);
         break;
-        
+
       default:
         throw new Error(`Unknown operation: ${record.operation}`);
     }
@@ -133,12 +150,12 @@ class SyncService {
   private async pullLatestData(): Promise<void> {
     // Pull latest data for each collection
     const collections = ['patients', 'samples', 'results', 'appointments'];
-    
+
     for (const collectionName of collections) {
       try {
         const metadata = await offlineDatabase.getSyncMetadata(collectionName);
         const lastSync = metadata?.last_sync_timestamp || 0;
-        
+
         // Query for documents updated after last sync
         const q = query(
           collection(db, `labflow_${collectionName}`),
@@ -146,13 +163,13 @@ class SyncService {
           orderBy('updatedAt', 'desc'),
           limit(100) // Limit to prevent large downloads
         );
-        
+
         const snapshot = await getDocs(q);
-        
+
         for (const doc of snapshot.docs) {
           const data = doc.data();
           const additionalFields: Record<string, any> = {};
-          
+
           // Add relationship fields based on collection
           if (collectionName === 'samples' && data.patientId) {
             additionalFields.patient_id = data.patientId;
@@ -162,29 +179,28 @@ class SyncService {
           } else if (collectionName === 'appointments' && data.patientId) {
             additionalFields.patient_id = data.patientId;
           }
-          
-          await offlineDatabase.cacheData(
-            collectionName,
-            doc.id,
-            data,
-            additionalFields
-          );
+
+          await offlineDatabase.cacheData(collectionName, doc.id, data, additionalFields);
         }
-        
+
         await offlineDatabase.updateSyncMetadata(collectionName, 'completed');
-        
       } catch (error) {
         console.error(`Error pulling data for ${collectionName}:`, error);
         await offlineDatabase.updateSyncMetadata(
-          collectionName, 
-          'error', 
+          collectionName,
+          'error',
           error instanceof Error ? error.message : 'Unknown error'
         );
       }
     }
   }
 
-  async queueOperation(collection: string, documentId: string, operation: 'create' | 'update' | 'delete', data?: any): Promise<void> {
+  async queueOperation(
+    collection: string,
+    documentId: string,
+    operation: 'create' | 'update' | 'delete',
+    data?: any
+  ): Promise<void> {
     if (!offlineDatabase.isAvailable()) {
       // If offline support not available, throw error
       throw new Error('Offline support not available');
@@ -194,7 +210,7 @@ class SyncService {
       collection,
       documentId,
       operation,
-      data: data || {}
+      data: data || {},
     });
 
     // Notify listeners about pending changes
@@ -204,29 +220,27 @@ class SyncService {
   async getStatus(): Promise<SyncStatus> {
     const pendingChanges = await offlineDatabase.getUnsynced();
     const metadata = await offlineDatabase.getSyncMetadata('all');
-    
+
     return {
       isSyncing: this.syncInProgress,
       lastSync: metadata?.last_sync_timestamp ? new Date(metadata.last_sync_timestamp) : undefined,
       pendingChanges: pendingChanges.length,
-      errors: pendingChanges
-        .filter(r => r.syncError)
-        .map(r => r.syncError!)
+      errors: pendingChanges.filter((r) => r.syncError).map((r) => r.syncError!),
     };
   }
 
   addListener(callback: (status: SyncStatus) => void): () => void {
     this.syncListeners.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
-      this.syncListeners = this.syncListeners.filter(cb => cb !== callback);
+      this.syncListeners = this.syncListeners.filter((cb) => cb !== callback);
     };
   }
 
   private async notifyListeners(): Promise<void> {
     const status = await this.getStatus();
-    this.syncListeners.forEach(callback => callback(status));
+    this.syncListeners.forEach((callback) => callback(status));
   }
 
   async destroy(): Promise<void> {
@@ -234,12 +248,12 @@ class SyncService {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
     }
-    
+
     if (this.networkListener) {
       await this.networkListener.remove();
       this.networkListener = null;
     }
-    
+
     await offlineDatabase.close();
   }
 }

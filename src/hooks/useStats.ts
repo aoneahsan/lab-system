@@ -46,7 +46,7 @@ export function useStats() {
         where('createdAt', '>=', startOfToday)
       );
       const patientsSnapshot = await getDocs(patientsQuery);
-      const uniquePatients = new Set(patientsSnapshot.docs.map(doc => doc.data().patientId));
+      const uniquePatients = new Set(patientsSnapshot.docs.map((doc) => doc.data().patientId));
       const activePatients = uniquePatients.size;
 
       // Get tests ordered today
@@ -62,7 +62,7 @@ export function useStats() {
         limit(5)
       );
       const activitySnapshot = await getDocs(activityQuery);
-      const recentActivity = activitySnapshot.docs.map(doc => ({
+      const recentActivity = activitySnapshot.docs.map((doc) => ({
         description: `Order #${doc.data().orderNumber} created for ${doc.data().patientName}`,
         timestamp: doc.data().createdAt.toDate(),
       }));

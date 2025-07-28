@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@300;400;500;600;700&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-family-mono: 'Fira Code', 'Consolas', monospace;
-  
+
   --color-primary-50: #e6f1ff;
   --color-primary-100: #b3d1ff;
   --color-primary-200: #80b2ff;
@@ -15,7 +15,7 @@
   --color-primary-700: #003380;
   --color-primary-800: #00224d;
   --color-primary-900: #00111a;
-  
+
   --color-secondary-50: #f3e6ff;
   --color-secondary-100: #d9b3ff;
   --color-secondary-200: #bf80ff;
@@ -26,7 +26,7 @@
   --color-secondary-700: #400080;
   --color-secondary-800: #26004d;
   --color-secondary-900: #0d001a;
-  
+
   --color-success-50: #e6f9f1;
   --color-success-100: #b3edd7;
   --color-success-200: #80e0bd;
@@ -37,7 +37,7 @@
   --color-success-700: #006a3f;
   --color-success-800: #004328;
   --color-success-900: #001c11;
-  
+
   --color-warning-50: #fff9e6;
   --color-warning-100: #ffecb3;
   --color-warning-200: #ffdf80;
@@ -48,7 +48,7 @@
   --color-warning-700: #806000;
   --color-warning-800: #4d3a00;
   --color-warning-900: #1a1300;
-  
+
   --color-danger-50: #ffe6e6;
   --color-danger-100: #ffb3b3;
   --color-danger-200: #ff8080;
@@ -59,7 +59,7 @@
   --color-danger-700: #800000;
   --color-danger-800: #4d0000;
   --color-danger-900: #1a0000;
-  
+
   --color-gray-50: #f8f9fa;
   --color-gray-100: #e9ecef;
   --color-gray-200: #dee2e6;

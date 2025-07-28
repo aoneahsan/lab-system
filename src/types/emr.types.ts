@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 // EMR System Types
-export type EMRSystemType = 
+export type EMRSystemType =
   | 'epic'
   | 'cerner'
   | 'allscripts'
@@ -12,32 +12,16 @@ export type EMRSystemType =
   | 'custom';
 
 // Integration Protocol
-export type IntegrationProtocol = 
-  | 'fhir'
-  | 'hl7v2'
-  | 'hl7v3'
-  | 'api'
-  | 'webhook'
-  | 'file';
+export type IntegrationProtocol = 'fhir' | 'hl7v2' | 'hl7v3' | 'api' | 'webhook' | 'file';
 
 // Connection Status
-export type ConnectionStatus = 
-  | 'connected'
-  | 'disconnected'
-  | 'error'
-  | 'pending'
-  | 'unauthorized';
+export type ConnectionStatus = 'connected' | 'disconnected' | 'error' | 'pending' | 'unauthorized';
 
 // Message Status
-export type MessageStatus = 
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'retry';
+export type MessageStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'retry';
 
 // FHIR Resource Types
-export type FHIRResourceType = 
+export type FHIRResourceType =
   | 'Patient'
   | 'Practitioner'
   | 'Observation'
@@ -50,7 +34,7 @@ export type FHIRResourceType =
   | 'Procedure';
 
 // HL7 Message Types
-export type HL7MessageType = 
+export type HL7MessageType =
   | 'ADT' // Admit, Discharge, Transfer
   | 'ORM' // Order Message
   | 'ORU' // Observation Result
@@ -58,7 +42,7 @@ export type HL7MessageType =
   | 'QRY' // Query
   | 'ACK' // Acknowledgment
   | 'SIU' // Scheduling Information
-  | 'MDM' // Medical Document Management;
+  | 'MDM'; // Medical Document Management;
 
 // EMR Connection Configuration
 export interface EMRConnection {
@@ -85,7 +69,7 @@ export interface EMRConnectionConfig {
   fhirBaseUrl?: string;
   fhirVersion?: 'R4' | 'STU3' | 'DSTU2';
   fhirAuth?: FHIRAuthConfig;
-  
+
   // HL7 Configuration
   hl7Host?: string;
   hl7Port?: number;
@@ -94,22 +78,22 @@ export interface EMRConnectionConfig {
   hl7SendingFacility?: string;
   hl7ReceivingApplication?: string;
   hl7ReceivingFacility?: string;
-  
+
   // API Configuration
   apiBaseUrl?: string;
   apiAuth?: APIAuthConfig;
   apiHeaders?: Record<string, string>;
-  
+
   // Webhook Configuration
   webhookUrl?: string;
   webhookSecret?: string;
   webhookEvents?: string[];
-  
+
   // File Configuration
   fileDirectory?: string;
   filePattern?: string;
   fileFormat?: 'csv' | 'xml' | 'json' | 'hl7';
-  
+
   // Common settings
   retryAttempts?: number;
   retryDelay?: number;
@@ -218,7 +202,7 @@ export interface FieldTransformation {
 }
 
 // Transformation types
-export type TransformationType = 
+export type TransformationType =
   | 'uppercase'
   | 'lowercase'
   | 'trim'

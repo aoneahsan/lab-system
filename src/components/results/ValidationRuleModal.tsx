@@ -38,7 +38,7 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
     if (rule) {
       await updateRuleMutation.mutateAsync({
         id: rule.id,
-        data: validationData
+        data: validationData,
       });
     } else {
       await createRuleMutation.mutateAsync(validationData);
@@ -46,11 +46,12 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
     onClose();
   };
 
-  const testOptions = tests?.map(test => ({
-    id: test.id,
-    name: test.name,
-    code: test.code
-  })) || [];
+  const testOptions =
+    tests?.map((test) => ({
+      id: test.id,
+      name: test.name,
+      code: test.code,
+    })) || [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -59,31 +60,35 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
           <h2 className="text-xl font-semibold text-gray-900">
             {rule ? 'Edit Validation Rule' : 'Create Validation Rule'}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
             <X className="h-6 w-6" />
           </button>
         </div>
-        
+
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
           <ValidationRuleForm
-            initialData={rule ? {
-              testId: rule.testId,
-              ruleType: rule.ruleType === 'consistency' || rule.ruleType === 'calculated' ? 'custom' : rule.ruleType,
-              minValue: rule.parameters.min,
-              maxValue: rule.parameters.max,
-              deltaThreshold: rule.parameters.deltaPercent || rule.parameters.deltaValue,
-              deltaType: rule.parameters.deltaPercent ? 'percentage' : 'absolute',
-              criticalLow: rule.parameters.criticalLow,
-              criticalHigh: rule.parameters.criticalHigh,
-              customMessage: rule.message,
-              action: rule.action === 'notify' ? 'warn' : rule.action,
-              requiresReview: false,
-              notifyOnTrigger: rule.action === 'notify',
-              active: rule.enabled,
-            } : undefined}
+            initialData={
+              rule
+                ? {
+                    testId: rule.testId,
+                    ruleType:
+                      rule.ruleType === 'consistency' || rule.ruleType === 'calculated'
+                        ? 'custom'
+                        : rule.ruleType,
+                    minValue: rule.parameters.min,
+                    maxValue: rule.parameters.max,
+                    deltaThreshold: rule.parameters.deltaPercent || rule.parameters.deltaValue,
+                    deltaType: rule.parameters.deltaPercent ? 'percentage' : 'absolute',
+                    criticalLow: rule.parameters.criticalLow,
+                    criticalHigh: rule.parameters.criticalHigh,
+                    customMessage: rule.message,
+                    action: rule.action === 'notify' ? 'warn' : rule.action,
+                    requiresReview: false,
+                    notifyOnTrigger: rule.action === 'notify',
+                    active: rule.enabled,
+                  }
+                : undefined
+            }
             testOptions={testOptions}
             onSubmit={handleSubmit}
             onCancel={onClose}

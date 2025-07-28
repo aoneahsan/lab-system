@@ -11,13 +11,14 @@ interface ResultReviewProps {
 
 export default function ResultReview({ orderId, patientId }: ResultReviewProps) {
   const { currentUser } = useAuthStore();
-  const { results, fetchResultsByOrder, fetchResultsByPatient, verifyResult, loading } = useResultStore();
+  const { results, fetchResultsByOrder, fetchResultsByPatient, verifyResult, loading } =
+    useResultStore();
   const [selectedResults, setSelectedResults] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<'all' | 'pending' | 'entered' | 'verified'>('entered');
 
   useEffect(() => {
     if (!currentUser?.tenantId) return;
-    
+
     if (orderId) {
       fetchResultsByOrder(currentUser.tenantId, orderId);
     } else if (patientId) {
@@ -25,7 +26,7 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
     }
   }, [currentUser, orderId, patientId]);
 
-  const filteredResults = results.filter(result => {
+  const filteredResults = results.filter((result) => {
     if (filter === 'all') return true;
     return result.status === filter;
   });
@@ -34,7 +35,7 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
     if (selectedResults.size === filteredResults.length) {
       setSelectedResults(new Set());
     } else {
-      setSelectedResults(new Set(filteredResults.map(r => r.id)));
+      setSelectedResults(new Set(filteredResults.map((r) => r.id)));
     }
   };
 
@@ -44,9 +45,9 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
     for (const resultId of selectedResults) {
       await verifyResult(currentUser.tenantId, currentUser.id, resultId);
     }
-    
+
     setSelectedResults(new Set());
-    
+
     // Refresh results
     if (orderId) {
       await fetchResultsByOrder(currentUser.tenantId, orderId);
@@ -87,7 +88,7 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
               <option value="entered">Entered</option>
               <option value="verified">Verified</option>
             </select>
-            
+
             {selectedResults.size > 0 && (
               <button
                 onClick={handleVerifySelected}
@@ -109,7 +110,9 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
               <th className="px-6 py-3 text-left">
                 <input
                   type="checkbox"
-                  checked={selectedResults.size === filteredResults.length && filteredResults.length > 0}
+                  checked={
+                    selectedResults.size === filteredResults.length && filteredResults.length > 0
+                  }
                   onChange={handleSelectAll}
                   className="rounded"
                 />
@@ -178,26 +181,32 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
                       <span className="text-gray-900">{result.value}</span>
                       {result.unit && <span className="text-gray-500">{result.unit}</span>}
                       {result.flag && (
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${getFlagColor(result.flag)}`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded ${getFlagColor(
+                            result.flag
+                          )}`}
+                        >
                           {result.flag}
                         </span>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {result.referenceRange?.normal || 
-                     (result.referenceRange?.min && result.referenceRange?.max
-                       ? `${result.referenceRange.min} - ${result.referenceRange.max}`
-                       : '-')}
+                    {result.referenceRange?.normal ||
+                      (result.referenceRange?.min && result.referenceRange?.max
+                        ? `${result.referenceRange.min} - ${result.referenceRange.max}`
+                        : '-')}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      result.status === 'verified' 
-                        ? 'bg-green-100 text-green-800'
-                        : result.status === 'entered'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        result.status === 'verified'
+                          ? 'bg-green-100 text-green-800'
+                          : result.status === 'entered'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {result.status}
                     </span>
                   </td>
@@ -230,10 +239,7 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
                           <AlertCircle className="h-4 w-4 text-yellow-600" />
                         </span>
                       )}
-                      <button
-                        className="text-gray-600 hover:text-gray-700"
-                        title="View History"
-                      >
+                      <button className="text-gray-600 hover:text-gray-700" title="View History">
                         <History className="h-4 w-4" />
                       </button>
                     </div>

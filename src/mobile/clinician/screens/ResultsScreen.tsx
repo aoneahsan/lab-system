@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Clock,
   CheckCircle,
-  Eye
+  Eye,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -53,7 +53,7 @@ export const ResultsScreen: React.FC = () => {
       resultDate: new Date(Date.now() - 15 * 60 * 1000),
       reviewed: false,
       orderNumber: 'ORD-2024-0142',
-      previousValue: '0.8 ng/mL'
+      previousValue: '0.8 ng/mL',
     },
     {
       id: '2',
@@ -65,7 +65,7 @@ export const ResultsScreen: React.FC = () => {
       status: 'critical',
       resultDate: new Date(Date.now() - 1 * 60 * 60 * 1000),
       reviewed: false,
-      orderNumber: 'ORD-2024-0141'
+      orderNumber: 'ORD-2024-0141',
     },
     {
       id: '3',
@@ -79,7 +79,7 @@ export const ResultsScreen: React.FC = () => {
       resultDate: new Date(Date.now() - 6 * 60 * 60 * 1000),
       reviewed: true,
       orderNumber: 'ORD-2024-0140',
-      previousValue: '2.3 mIU/L'
+      previousValue: '2.3 mIU/L',
     },
     {
       id: '4',
@@ -93,7 +93,7 @@ export const ResultsScreen: React.FC = () => {
       resultDate: new Date(Date.now() - 12 * 60 * 60 * 1000),
       reviewed: true,
       orderNumber: 'ORD-2024-0139',
-      previousValue: '19.2 g/dL'
+      previousValue: '19.2 g/dL',
     },
     {
       id: '5',
@@ -107,21 +107,23 @@ export const ResultsScreen: React.FC = () => {
       resultDate: new Date(Date.now() - 2 * 60 * 60 * 1000),
       reviewed: false,
       orderNumber: 'ORD-2024-0142',
-      previousValue: '620 pg/mL'
-    }
+      previousValue: '620 pg/mL',
+    },
   ]);
 
-  const filteredResults = results.filter(result => {
-    const matchesSearch = searchQuery === '' || 
+  const filteredResults = results.filter((result) => {
+    const matchesSearch =
+      searchQuery === '' ||
       result.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       result.patientMRN.toLowerCase().includes(searchQuery.toLowerCase()) ||
       result.testName.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = filterStatus === 'all' || result.status === filterStatus;
-    const matchesReviewed = filterReviewed === 'all' || 
+    const matchesReviewed =
+      filterReviewed === 'all' ||
       (filterReviewed === 'reviewed' && result.reviewed) ||
       (filterReviewed === 'unreviewed' && !result.reviewed);
-    
+
     return matchesSearch && matchesStatus && matchesReviewed;
   });
 
@@ -152,8 +154,8 @@ export const ResultsScreen: React.FC = () => {
     console.log('Marking as reviewed:', resultId);
   };
 
-  const criticalCount = results.filter(r => r.status === 'critical' && !r.reviewed).length;
-  const unreviewed = results.filter(r => !r.reviewed).length;
+  const criticalCount = results.filter((r) => r.status === 'critical' && !r.reviewed).length;
+  const unreviewed = results.filter((r) => !r.reviewed).length;
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -195,7 +197,7 @@ export const ResultsScreen: React.FC = () => {
                 { id: 'all', label: 'All Results' },
                 { id: 'critical', label: 'Critical' },
                 { id: 'abnormal', label: 'Abnormal' },
-                { id: 'normal', label: 'Normal' }
+                { id: 'normal', label: 'Normal' },
               ].map((filter) => (
                 <button
                   key={filter.id}
@@ -214,15 +216,13 @@ export const ResultsScreen: React.FC = () => {
               {[
                 { id: 'all', label: 'All' },
                 { id: 'unreviewed', label: 'Unreviewed' },
-                { id: 'reviewed', label: 'Reviewed' }
+                { id: 'reviewed', label: 'Reviewed' },
               ].map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setFilterReviewed(filter.id)}
                   className={`flex-1 py-2 px-3 rounded text-sm font-medium ${
-                    filterReviewed === filter.id
-                      ? 'bg-gray-200 text-gray-900'
-                      : 'text-gray-600'
+                    filterReviewed === filter.id ? 'bg-gray-200 text-gray-900' : 'text-gray-600'
                   }`}
                 >
                   {filter.label}
@@ -255,27 +255,25 @@ export const ResultsScreen: React.FC = () => {
                   {result.patientName} • {result.patientMRN}
                 </p>
               </div>
-              {result.status === 'critical' && (
-                <AlertCircle className="h-5 w-5 text-red-600" />
-              )}
+              {result.status === 'critical' && <AlertCircle className="h-5 w-5 text-red-600" />}
             </div>
 
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-3">
-                <span className={`text-lg font-bold px-3 py-1 rounded-lg ${getStatusColor(result.status)}`}>
+                <span
+                  className={`text-lg font-bold px-3 py-1 rounded-lg ${getStatusColor(
+                    result.status
+                  )}`}
+                >
                   {result.result}
                 </span>
                 {result.trend && getTrendIcon(result.trend)}
               </div>
-              <span className="text-sm text-gray-500">
-                Ref: {result.normalRange}
-              </span>
+              <span className="text-sm text-gray-500">Ref: {result.normalRange}</span>
             </div>
 
             {result.previousValue && (
-              <p className="text-sm text-gray-600 mb-2">
-                Previous: {result.previousValue}
-              </p>
+              <p className="text-sm text-gray-600 mb-2">Previous: {result.previousValue}</p>
             )}
 
             <div className="flex items-center justify-between text-sm">

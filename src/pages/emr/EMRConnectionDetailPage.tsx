@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Settings,
   Activity,
   Webhook,
@@ -11,7 +11,7 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Clock
+  Clock,
 } from 'lucide-react';
 import { useEMRConnection, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
 import WebhookHandlers from '@/components/emr/WebhookHandlers';
@@ -57,7 +57,6 @@ const EMRConnectionDetailPage: React.FC = () => {
       navigate('/emr/connections');
     }
   };
-
 
   return (
     <div className="container mx-auto p-6">
@@ -161,7 +160,7 @@ const EMRConnectionDetailPage: React.FC = () => {
       {activeTab === 'overview' && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">Connection Details</h2>
-          
+
           <div className="grid grid-cols-2 gap-6">
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">Configuration</h3>
@@ -176,12 +175,16 @@ const EMRConnectionDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <dt className="text-sm text-gray-600">Base URL:</dt>
-                  <dd className="text-sm font-medium">{connection.config?.fhirBaseUrl || connection.config?.apiBaseUrl || 'N/A'}</dd>
+                  <dd className="text-sm font-medium">
+                    {connection.config?.fhirBaseUrl || connection.config?.apiBaseUrl || 'N/A'}
+                  </dd>
                 </div>
                 {(connection.config?.fhirAuth || connection.config?.apiAuth) && (
                   <div>
                     <dt className="text-sm text-gray-600">Authentication:</dt>
-                    <dd className="text-sm font-medium capitalize">{connection.config.fhirAuth?.type || connection.config.apiAuth?.type || 'N/A'}</dd>
+                    <dd className="text-sm font-medium capitalize">
+                      {connection.config.fhirAuth?.type || connection.config.apiAuth?.type || 'N/A'}
+                    </dd>
                   </div>
                 )}
               </dl>
@@ -221,22 +224,16 @@ const EMRConnectionDetailPage: React.FC = () => {
               </dl>
             </div>
           </div>
-
         </div>
       )}
 
-      {activeTab === 'webhooks' && (
-        <WebhookHandlers connectionId={connectionId!} />
-      )}
+      {activeTab === 'webhooks' && <WebhookHandlers connectionId={connectionId!} />}
 
       {activeTab === 'logs' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-500 text-center py-8">
-            Activity logs will be displayed here.
-          </p>
+          <p className="text-gray-500 text-center py-8">Activity logs will be displayed here.</p>
         </div>
       )}
-
     </div>
   );
 };

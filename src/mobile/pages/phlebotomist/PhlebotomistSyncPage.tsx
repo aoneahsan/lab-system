@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  RefreshCw, 
-  Cloud, 
+import {
+  RefreshCw,
+  Cloud,
   CloudOff,
   CheckCircle,
   AlertCircle,
@@ -12,7 +12,7 @@ import {
   Upload,
   Download,
   Trash2,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import { Network } from '@capacitor/network';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
@@ -27,24 +27,18 @@ interface SyncStats {
 
 const PhlebotomistSyncPage: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    collections, 
-    pendingSync, 
-    isOnline, 
-    lastSyncTime,
-    syncCollections,
-    removeCollection 
-  } = useOfflineStore();
-  
+  const { collections, pendingSync, isOnline, lastSyncTime, syncCollections, removeCollection } =
+    useOfflineStore();
+
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
 
   const syncStats: SyncStats = {
-    totalPending: collections.filter(c => c.syncStatus === 'pending').length,
-    syncing: collections.filter(c => c.syncStatus === 'syncing').length,
-    synced: collections.filter(c => c.syncStatus === 'synced').length,
-    failed: collections.filter(c => c.syncStatus === 'failed').length,
+    totalPending: collections.filter((c) => c.syncStatus === 'pending').length,
+    syncing: collections.filter((c) => c.syncStatus === 'syncing').length,
+    synced: collections.filter((c) => c.syncStatus === 'synced').length,
+    failed: collections.filter((c) => c.syncStatus === 'failed').length,
   };
 
   useEffect(() => {
@@ -70,16 +64,16 @@ const PhlebotomistSyncPage: React.FC = () => {
     try {
       // Simulate progress updates
       const progressInterval = setInterval(() => {
-        setSyncProgress(prev => Math.min(prev + 10, 90));
+        setSyncProgress((prev) => Math.min(prev + 10, 90));
       }, 300);
 
       await syncCollections();
-      
+
       clearInterval(progressInterval);
       setSyncProgress(100);
-      
+
       toast.success('Sync completed successfully');
-      
+
       // Reset progress after a delay
       setTimeout(() => {
         setSyncProgress(0);
@@ -100,17 +94,15 @@ const PhlebotomistSyncPage: React.FC = () => {
     );
 
     if (confirmDelete) {
-      selectedCollections.forEach(id => removeCollection(id));
+      selectedCollections.forEach((id) => removeCollection(id));
       setSelectedCollections([]);
       toast.success(`Deleted ${selectedCollections.length} collection(s)`);
     }
   };
 
   const toggleSelectCollection = (id: string) => {
-    setSelectedCollections(prev => 
-      prev.includes(id) 
-        ? prev.filter(cId => cId !== id)
-        : [...prev, id]
+    setSelectedCollections((prev) =>
+      prev.includes(id) ? prev.filter((cId) => cId !== id) : [...prev, id]
     );
   };
 
@@ -118,7 +110,7 @@ const PhlebotomistSyncPage: React.FC = () => {
     if (selectedCollections.length === collections.length) {
       setSelectedCollections([]);
     } else {
-      setSelectedCollections(collections.map(c => c.id));
+      setSelectedCollections(collections.map((c) => c.id));
     }
   };
 
@@ -140,11 +132,13 @@ const PhlebotomistSyncPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Sync Center</h1>
-        
+
         {/* Connection Status */}
-        <div className={`rounded-lg p-4 flex items-center justify-between ${
-          isOnline ? 'bg-green-50' : 'bg-red-50'
-        }`}>
+        <div
+          className={`rounded-lg p-4 flex items-center justify-between ${
+            isOnline ? 'bg-green-50' : 'bg-red-50'
+          }`}
+        >
           <div className="flex items-center gap-3">
             {isOnline ? (
               <>
@@ -182,7 +176,7 @@ const PhlebotomistSyncPage: React.FC = () => {
               <p className="text-sm text-gray-600">{syncProgress}%</p>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div 
+              <div
                 className="bg-blue-600 h-full rounded-full transition-all duration-300"
                 style={{ width: `${syncProgress}%` }}
               />
@@ -205,7 +199,7 @@ const PhlebotomistSyncPage: React.FC = () => {
             <p className="text-sm text-gray-600">Synced</p>
           </div>
         </div>
-        
+
         {lastSyncTime && (
           <p className="text-sm text-gray-600 text-center mt-4">
             Last sync: {new Date(lastSyncTime).toLocaleString()}
@@ -219,10 +213,7 @@ const PhlebotomistSyncPage: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium text-gray-900">Collections</h3>
             <div className="flex items-center gap-2">
-              <button
-                onClick={selectAll}
-                className="text-sm text-blue-600 hover:text-blue-700"
-              >
+              <button onClick={selectAll} className="text-sm text-blue-600 hover:text-blue-700">
                 {selectedCollections.length === collections.length ? 'Deselect All' : 'Select All'}
               </button>
               {selectedCollections.length > 0 && (
@@ -285,9 +276,7 @@ const PhlebotomistSyncPage: React.FC = () => {
           <div className="text-center">
             <CloudOff className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No collections to sync</h3>
-            <p className="text-sm text-gray-600">
-              All your collections are up to date
-            </p>
+            <p className="text-sm text-gray-600">All your collections are up to date</p>
           </div>
         </div>
       )}

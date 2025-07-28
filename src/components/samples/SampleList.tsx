@@ -17,15 +17,16 @@ export default function SampleList() {
     if (tenantId) {
       fetchSamples(tenantId, {
         status: filterStatus === 'all' ? undefined : filterStatus,
-        type: filterType === 'all' ? undefined : filterType
+        type: filterType === 'all' ? undefined : filterType,
       });
     }
   }, [tenantId, filterStatus, filterType, fetchSamples]);
 
-  const filteredSamples = samples.filter(sample =>
-    sample.sampleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sample.barcode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sample.patientId.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSamples = samples.filter(
+    (sample) =>
+      sample.sampleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sample.barcode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sample.patientId.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusIcon = (status: Sample['status']) => {
@@ -106,7 +107,7 @@ export default function SampleList() {
               className="pl-10 input"
             />
           </div>
-          
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -177,9 +178,7 @@ export default function SampleList() {
                         <div className="text-sm font-medium text-gray-900">
                           {sample.sampleNumber}
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {sample.barcode}
-                        </div>
+                        <div className="text-xs text-gray-500">{sample.barcode}</div>
                       </div>
                     </div>
                   </td>
@@ -193,28 +192,30 @@ export default function SampleList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(sample.priority)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
+                        sample.priority
+                      )}`}
+                    >
                       {sample.priority.toUpperCase()}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(sample.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        sample.status
+                      )}`}
+                    >
                       {sample.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {sample.collectionDate.toDate().toLocaleDateString()}
-                    <div className="text-xs">
-                      {sample.collectionTime}
-                    </div>
+                    <div className="text-xs">{sample.collectionTime}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                      Track
-                    </button>
-                    <button className="text-indigo-600 hover:text-indigo-900">
-                      Update
-                    </button>
+                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">Track</button>
+                    <button className="text-indigo-600 hover:text-indigo-900">Update</button>
                   </td>
                 </tr>
               ))}
@@ -223,9 +224,7 @@ export default function SampleList() {
         </div>
 
         {filteredSamples.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            No samples found
-          </div>
+          <div className="text-center py-12 text-gray-500">No samples found</div>
         )}
       </div>
     </div>

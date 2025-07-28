@@ -34,20 +34,21 @@ const ResultEntryPage: React.FC = () => {
   const patients = patientsData?.patients || [];
 
   // Filter orders based on search term
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order) => {
     if (!searchTerm) return true;
-    
-    const patient = patients.find(p => p.id === order.patientId);
+
+    const patient = patients.find((p) => p.id === order.patientId);
     if (!patient) return false;
-    
+
     const searchLower = searchTerm.toLowerCase();
     return (
       order.orderNumber.toLowerCase().includes(searchLower) ||
       patient.fullName.toLowerCase().includes(searchLower) ||
       patient.patientId.toLowerCase().includes(searchLower) ||
-      order.tests.some(test => 
-        test.testName.toLowerCase().includes(searchLower) ||
-        test.testCode.toLowerCase().includes(searchLower)
+      order.tests.some(
+        (test) =>
+          test.testName.toLowerCase().includes(searchLower) ||
+          test.testCode.toLowerCase().includes(searchLower)
       )
     );
   });
@@ -59,7 +60,7 @@ const ResultEntryPage: React.FC = () => {
 
   const handleOrderSelect = (orderId: string) => {
     setSelectedOrder(orderId);
-    const order = orders.find(o => o.id === orderId);
+    const order = orders.find((o) => o.id === orderId);
     if (order) {
       // Find associated sample
       const sample = samples.find((s: Sample) => s.orderId === orderId);
@@ -174,56 +175,73 @@ const ResultEntryPage: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.map((order) => {
-                  const patient = patients.find(p => p.id === order.patientId);
+                  const patient = patients.find((p) => p.id === order.patientId);
                   const sample = samples.find((s: Sample) => s.orderId === order.id);
-                  
+
                   return (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{order.orderNumber}</div>
                         <div className="text-sm text-gray-500">
-                          {order.orderDate instanceof Date ? order.orderDate.toLocaleDateString() : order.orderDate.toDate().toLocaleDateString()}
+                          {order.orderDate instanceof Date
+                            ? order.orderDate.toLocaleDateString()
+                            : order.orderDate.toDate().toLocaleDateString()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {patient && (
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{patient.fullName}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {patient.fullName}
+                            </div>
                             <div className="text-sm text-gray-500">ID: {patient.patientId}</div>
                           </div>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {order.tests.map((test) => (
-                            <div key={test.testId} className="mb-1">
-                              <span className="font-medium">{test.testName}</span>
-                              {test.status === 'completed' && (
-                                <span className="ml-2 text-xs text-green-600">(Resulted)</span>
-                              )}
-                            </div>
-                          )).slice(0, 3)}
+                          {order.tests
+                            .map((test) => (
+                              <div key={test.testId} className="mb-1">
+                                <span className="font-medium">{test.testName}</span>
+                                {test.status === 'completed' && (
+                                  <span className="ml-2 text-xs text-green-600">(Resulted)</span>
+                                )}
+                              </div>
+                            ))
+                            .slice(0, 3)}
                           {order.tests.length > 3 && (
-                            <div className="text-xs text-gray-500">+{order.tests.length - 3} more</div>
+                            <div className="text-xs text-gray-500">
+                              +{order.tests.length - 3} more
+                            </div>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          order.status === 'approved' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'specimen_collected' ? 'bg-green-100 text-green-800' :
-                          order.status === 'in_progress' ? 'bg-purple-100 text-purple-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                            order.status === 'approved'
+                              ? 'bg-blue-100 text-blue-800'
+                              : order.status === 'specimen_collected'
+                                ? 'bg-green-100 text-green-800'
+                                : order.status === 'in_progress'
+                                  ? 'bg-purple-100 text-purple-800'
+                                  : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {order.status.replace('_', ' ')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          order.priority === 'stat' ? 'bg-red-100 text-red-800' :
-                          order.priority === 'asap' ? 'bg-orange-100 text-orange-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                            order.priority === 'stat'
+                              ? 'bg-red-100 text-red-800'
+                              : order.priority === 'asap'
+                                ? 'bg-orange-100 text-orange-800'
+                                : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
                           {order.priority.toUpperCase()}
                         </span>
                       </td>
@@ -249,34 +267,38 @@ const ResultEntryPage: React.FC = () => {
       </div>
 
       {/* Test Selection Modal for orders with multiple tests */}
-      {selectedOrder && !selectedTest && (() => {
-        const order = orders.find(o => o.id === selectedOrder);
-        return order && order.tests.length > 1 ? (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Select Test</h3>
-              <div className="space-y-2">
-                {order.tests.filter(test => test.status !== 'completed').map((test) => (
-                  <button
-                    key={test.testId}
-                    onClick={() => setSelectedTest(test.testId)}
-                    className="w-full text-left px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50"
-                  >
-                    <div className="font-medium">{test.testName}</div>
-                    <div className="text-sm text-gray-500">{test.testCode}</div>
-                  </button>
-                ))}
+      {selectedOrder &&
+        !selectedTest &&
+        (() => {
+          const order = orders.find((o) => o.id === selectedOrder);
+          return order && order.tests.length > 1 ? (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Select Test</h3>
+                <div className="space-y-2">
+                  {order.tests
+                    .filter((test) => test.status !== 'completed')
+                    .map((test) => (
+                      <button
+                        key={test.testId}
+                        onClick={() => setSelectedTest(test.testId)}
+                        className="w-full text-left px-4 py-3 border border-gray-300 rounded-md hover:bg-gray-50"
+                      >
+                        <div className="font-medium">{test.testName}</div>
+                        <div className="text-sm text-gray-500">{test.testCode}</div>
+                      </button>
+                    ))}
+                </div>
+                <button
+                  onClick={() => setSelectedOrder('')}
+                  className="mt-4 w-full px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedOrder('')}
-                className="mt-4 w-full px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-              >
-                Cancel
-              </button>
             </div>
-          </div>
-        ) : null;
-      })()}
+          ) : null;
+        })()}
     </div>
   );
 };

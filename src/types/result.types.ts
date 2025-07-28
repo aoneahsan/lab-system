@@ -37,14 +37,20 @@ export interface ReferenceRange {
   gender?: 'male' | 'female' | 'both';
 }
 
-export type ResultFlag = 'H' | 'L' | 'HH' | 'LL' | 'A' | 'AA' | 'normal' | 'low' | 'high' | 'critical_low' | 'critical_high';
+export type ResultFlag =
+  | 'H'
+  | 'L'
+  | 'HH'
+  | 'LL'
+  | 'A'
+  | 'AA'
+  | 'normal'
+  | 'low'
+  | 'high'
+  | 'critical_low'
+  | 'critical_high';
 
-export type ResultStatus = 
-  | 'pending'
-  | 'entered'
-  | 'verified'
-  | 'amended'
-  | 'cancelled';
+export type ResultStatus = 'pending' | 'entered' | 'verified' | 'amended' | 'cancelled';
 
 export interface ResultValidation {
   id: string;

@@ -35,14 +35,14 @@ export const formatDate = (
   locale: string = 'en-US'
 ): string => {
   const dateObj = date instanceof Date ? date : new Date(date);
-  
+
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     ...options,
   };
-  
+
   return new Intl.DateTimeFormat(locale, defaultOptions).format(dateObj);
 };
 
@@ -52,17 +52,18 @@ export const formatDate = (
  * @param locale - The locale to use for formatting (default: en-US)
  * @returns Formatted date and time string
  */
-export const formatDateTime = (
-  date: Date | number | string,
-  locale: string = 'en-US'
-): string => {
-  return formatDate(date, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }, locale);
+export const formatDateTime = (date: Date | number | string, locale: string = 'en-US'): string => {
+  return formatDate(
+    date,
+    {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    },
+    locale
+  );
 };
 
 /**
@@ -94,13 +95,13 @@ export const formatDuration = (milliseconds: number): string => {
  */
 export const formatPhoneNumber = (phoneNumber: string): string => {
   const cleaned = phoneNumber.replace(/\D/g, '');
-  
+
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   } else if (cleaned.length === 11 && cleaned[0] === '1') {
     return `+1 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
   }
-  
+
   return phoneNumber;
 };
 

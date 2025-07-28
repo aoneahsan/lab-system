@@ -28,10 +28,7 @@ export function usePerformanceObserver(componentName: string) {
     // Track renders after mount
     if (renderCount.current > 0) {
       renderCount.current++;
-      performanceMonitor.trackComponentRender(
-        componentName,
-        performance.now() - mountTime.current
-      );
+      performanceMonitor.trackComponentRender(componentName, performance.now() - mountTime.current);
     }
   });
 }

@@ -50,9 +50,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
   const updateItem = (index: number, field: keyof InvoiceItem, value: string | number) => {
     const updatedItems = [...items];
     const item = { ...updatedItems[index] };
-    
+
     if (field === 'testCode') {
-      const test = tests.find(t => t.code === value);
+      const test = tests.find((t) => t.code === value);
       if (test) {
         item.testCode = test.code;
         item.testName = test.name;
@@ -62,14 +62,14 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
       // @ts-expect-error - Dynamic field assignment
       item[field] = value;
     }
-    
+
     // Recalculate totals
     const amount = item.quantity * item.unitPrice;
     const discount = item.discount || 0;
     const tax = item.tax || 0;
     item.amount = amount;
     item.total = amount - discount + tax;
-    
+
     updatedItems[index] = item;
     setItems(updatedItems);
   };
@@ -78,7 +78,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
     const subtotal = items.reduce((sum, item) => sum + item.total, 0);
     const discountAmount = Number(watch('discountAmount')) || 0;
     const total = subtotal - discountAmount;
-    
+
     return { subtotal, total };
   };
 
@@ -99,18 +99,16 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
           <User className="h-5 w-5" />
           Patient Information
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Patient *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Patient *</label>
             <select
               {...register('patientId', { required: 'Patient is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Select a patient...</option>
-              {patients.map(patient => (
+              {patients.map((patient) => (
                 <option key={patient.id} value={patient.id}>
                   {patient.fullName} - {patient.patientId}
                 </option>
@@ -122,9 +120,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Due Date *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Due Date *</label>
             <input
               type="date"
               {...register('dueDate', { required: 'Due date is required' })}
@@ -155,7 +151,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
         </div>
 
         {items.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No items added. Click "Add Item" to start.</p>
+          <p className="text-gray-500 text-center py-4">
+            No items added. Click "Add Item" to start.
+          </p>
         ) : (
           <div className="space-y-4">
             {items.map((item, index) => (
@@ -169,14 +167,14 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                       <option value="">Select test...</option>
-                      {tests.map(test => (
+                      {tests.map((test) => (
                         <option key={test.id} value={test.code}>
                           {test.code} - {test.name}
                         </option>
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Quantity</label>
                     <input
@@ -187,7 +185,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Unit Price</label>
                     <input
@@ -199,7 +197,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Total</label>
                     <input
@@ -209,7 +207,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
                       className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 text-gray-500"
                     />
                   </div>
-                  
+
                   <div>
                     <button
                       type="button"
@@ -254,9 +252,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSubmit, onCancel, isLoading
       {/* Notes */}
       <div className="bg-white shadow rounded-lg p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Notes
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Notes</label>
           <textarea
             {...register('notes')}
             rows={3}

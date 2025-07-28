@@ -193,11 +193,7 @@ export const testService = {
     } as TestPanel;
   },
 
-  async updateTestPanel(
-    panelId: string,
-    userId: string,
-    data: Partial<TestPanel>
-  ): Promise<void> {
+  async updateTestPanel(panelId: string, userId: string, data: Partial<TestPanel>): Promise<void> {
     const docRef = doc(db, TEST_PANELS_COLLECTION, panelId);
     await updateDoc(docRef, {
       ...data,
@@ -222,7 +218,9 @@ export const testService = {
     // Generate order number (format: ORD-YYYYMMDD-XXXX)
     const date = new Date();
     const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
-    const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomNum = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     const orderNumber = `ORD-${dateStr}-${randomNum}`;
 
     // Get test details for ordered tests
@@ -234,7 +232,7 @@ export const testService = {
       })
     );
 
-    const testDetails = tests.map(test => ({
+    const testDetails = tests.map((test) => ({
       testId: test.id,
       testName: test.name,
       testCode: test.code,
@@ -242,8 +240,8 @@ export const testService = {
     }));
 
     // Check if any test requires approval
-    const requiresApproval = tests.some(test => test.requiresApproval);
-    
+    const requiresApproval = tests.some((test) => test.requiresApproval);
+
     const orderData = {
       tenantId,
       patientId: data.patientId,
@@ -257,7 +255,7 @@ export const testService = {
       diagnosis: data.diagnosis,
       icdCodes: data.icdCodes || [],
       fasting: data.fasting || false,
-      status: requiresApproval ? 'awaiting_approval' as const : 'pending' as const,
+      status: requiresApproval ? ('awaiting_approval' as const) : ('pending' as const),
       requiresApproval,
       notes: data.notes,
       createdAt: serverTimestamp(),
@@ -275,10 +273,7 @@ export const testService = {
     } as TestOrder;
   },
 
-  async getTestOrders(
-    tenantId: string,
-    filter?: TestOrderFilter
-  ): Promise<TestOrder[]> {
+  async getTestOrders(tenantId: string, filter?: TestOrderFilter): Promise<TestOrder[]> {
     const constraints: QueryConstraint[] = [where('tenantId', '==', tenantId)];
 
     if (filter?.status) {
@@ -322,11 +317,7 @@ export const testService = {
     } as TestOrder;
   },
 
-  async updateTestOrder(
-    orderId: string,
-    userId: string,
-    data: Partial<TestOrder>
-  ): Promise<void> {
+  async updateTestOrder(orderId: string, userId: string, data: Partial<TestOrder>): Promise<void> {
     const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
     await updateDoc(docRef, {
       ...data,
@@ -335,11 +326,7 @@ export const testService = {
     });
   },
 
-  async approveTestOrder(
-    orderId: string,
-    userId: string,
-    notes?: string
-  ): Promise<void> {
+  async approveTestOrder(orderId: string, userId: string, notes?: string): Promise<void> {
     const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
     await updateDoc(docRef, {
       status: 'approved',
@@ -351,11 +338,7 @@ export const testService = {
     });
   },
 
-  async rejectTestOrder(
-    orderId: string,
-    userId: string,
-    reason: string
-  ): Promise<void> {
+  async rejectTestOrder(orderId: string, userId: string, reason: string): Promise<void> {
     const docRef = doc(db, TEST_ORDERS_COLLECTION, orderId);
     await updateDoc(docRef, {
       status: 'rejected',

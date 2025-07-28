@@ -10,16 +10,12 @@ interface LOINCBrowserProps {
   selectedCode?: string;
 }
 
-const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
-  onSelect,
-  onClose,
-  selectedCode,
-}) => {
+const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selectedCode }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [categoryResults, setCategoryResults] = useState<LOINCCode[]>([]);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
-  
+
   const { data: searchResults, isLoading: isSearching } = useLOINCSearch(searchTerm);
   const { data: commonTests, isLoading: isLoadingCommon } = useCommonLOINCTests();
 
@@ -53,13 +49,17 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
     }
   }, [selectedCategory, loadCategoryResults]);
 
-  const displayResults = searchTerm 
+  const displayResults = searchTerm
     ? searchResults || []
-    : selectedCategory 
-    ? categoryResults
-    : commonTests || [];
+    : selectedCategory
+      ? categoryResults
+      : commonTests || [];
 
-  const isLoading = searchTerm ? isSearching : selectedCategory ? isLoadingCategory : isLoadingCommon;
+  const isLoading = searchTerm
+    ? isSearching
+    : selectedCategory
+      ? isLoadingCategory
+      : isLoadingCommon;
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
@@ -68,10 +68,7 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">LOINC Code Browser</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -106,8 +103,10 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
               className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Common Tests</option>
-              {categories.map(cat => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              {categories.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
               ))}
             </select>
           </div>
@@ -124,7 +123,7 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
             <div className="text-center py-12">
               <Info className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">
-                {searchTerm 
+                {searchTerm
                   ? 'No LOINC codes found matching your search.'
                   : 'No LOINC codes available.'}
               </p>
@@ -143,9 +142,7 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">
-                        {loinc.displayName}
-                      </h3>
+                      <h3 className="font-medium text-gray-900">{loinc.displayName}</h3>
                       <p className="text-sm text-gray-600 mt-1">
                         {loinc.code} {loinc.class && `• ${loinc.class}`}
                       </p>

@@ -8,7 +8,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
 const InsuranceClaims: React.FC = () => {
@@ -18,14 +18,13 @@ const InsuranceClaims: React.FC = () => {
     status: '',
     provider: '',
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
-    endDate: new Date()
+    endDate: new Date(),
   });
 
   const { data: claims, isLoading } = useQuery({
     queryKey: ['insurance-claims', filters],
-    queryFn: () => billingService.getInsuranceClaims(filters)
+    queryFn: () => billingService.getInsuranceClaims(filters),
   });
-
 
   const getStatusIcon = (status: InsuranceClaim['status']) => {
     switch (status) {
@@ -124,13 +123,9 @@ const InsuranceClaims: React.FC = () => {
       {/* Claims Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {isLoading ? (
-          <div className="col-span-2 text-center py-8 text-gray-500">
-            Loading claims...
-          </div>
+          <div className="col-span-2 text-center py-8 text-gray-500">Loading claims...</div>
         ) : claims?.length === 0 ? (
-          <div className="col-span-2 text-center py-8 text-gray-500">
-            No claims found
-          </div>
+          <div className="col-span-2 text-center py-8 text-gray-500">No claims found</div>
         ) : (
           claims?.map((claim) => (
             <div
@@ -148,7 +143,11 @@ const InsuranceClaims: React.FC = () => {
                     <p className="text-sm text-gray-500">{claim.provider}</p>
                   </div>
                 </div>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(claim.status)}`}>
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                    claim.status
+                  )}`}
+                >
                   {claim.status}
                 </span>
               </div>
@@ -212,7 +211,11 @@ const InsuranceClaims: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Status</label>
                   <p className="mt-1">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedClaim.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        selectedClaim.status
+                      )}`}
+                    >
                       {selectedClaim.status}
                     </span>
                   </p>
@@ -223,7 +226,9 @@ const InsuranceClaims: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Policy Number</label>
-                  <p className="mt-1 text-sm font-mono text-gray-900">{selectedClaim.policyNumber}</p>
+                  <p className="mt-1 text-sm font-mono text-gray-900">
+                    {selectedClaim.policyNumber}
+                  </p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Bill ID</label>
@@ -240,7 +245,9 @@ const InsuranceClaims: React.FC = () => {
                 </div>
                 {selectedClaim.approvedAmount !== undefined && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Approved Amount</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Approved Amount
+                    </label>
                     <p className="mt-1 text-lg font-semibold text-green-600">
                       {formatCurrency(selectedClaim.approvedAmount)}
                     </p>
@@ -250,7 +257,9 @@ const InsuranceClaims: React.FC = () => {
 
               {selectedClaim.denialReason && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Denial Reason</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Denial Reason
+                  </label>
                   <div className="p-3 bg-red-50 rounded text-sm text-red-700">
                     {selectedClaim.denialReason}
                   </div>
@@ -264,9 +273,14 @@ const InsuranceClaims: React.FC = () => {
                     <p className="text-sm text-gray-500">No documents attached</p>
                   ) : (
                     selectedClaim.documents.map((doc, index) => (
-                      <div key={index} className="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                      <div
+                        key={index}
+                        className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                      >
                         <DocumentTextIcon className="h-4 w-4 mr-1" />
-                        <a href="#" className="underline">{doc}</a>
+                        <a href="#" className="underline">
+                          {doc}
+                        </a>
                       </div>
                     ))
                   )}

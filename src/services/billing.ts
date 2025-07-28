@@ -167,10 +167,13 @@ class BillingService {
     return response.data;
   }
 
-  async refundPayment(transactionId: string, data: {
-    amount: number;
-    reason: string;
-  }): Promise<PaymentTransaction> {
+  async refundPayment(
+    transactionId: string,
+    data: {
+      amount: number;
+      reason: string;
+    }
+  ): Promise<PaymentTransaction> {
     const response = await api.post(`/api/billing/payment/${transactionId}/refund`, data);
     return response.data;
   }
@@ -211,7 +214,7 @@ class BillingService {
   // Invoices
   async generateInvoice(billId: string): Promise<Blob> {
     const response = await api.get(`/api/billing/${billId}/invoice`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   }
@@ -271,10 +274,7 @@ class BillingService {
     return response.data;
   }
 
-  async getPaymentSummary(period: {
-    startDate: Date;
-    endDate: Date;
-  }): Promise<{
+  async getPaymentSummary(period: { startDate: Date; endDate: Date }): Promise<{
     byMethod: Record<string, number>;
     byStatus: Record<string, number>;
     total: number;
@@ -285,21 +285,27 @@ class BillingService {
   }
 
   // Utilities
-  async applyDiscount(billId: string, discount: {
-    type: 'percentage' | 'amount';
-    value: number;
-    reason: string;
-    approvedBy?: string;
-  }): Promise<Bill> {
+  async applyDiscount(
+    billId: string,
+    discount: {
+      type: 'percentage' | 'amount';
+      value: number;
+      reason: string;
+      approvedBy?: string;
+    }
+  ): Promise<Bill> {
     const response = await api.post(`/api/billing/${billId}/discount`, discount);
     return response.data;
   }
 
-  async createPaymentPlan(billId: string, plan: {
-    installments: number;
-    frequency: 'weekly' | 'biweekly' | 'monthly';
-    startDate: Date;
-  }): Promise<{
+  async createPaymentPlan(
+    billId: string,
+    plan: {
+      installments: number;
+      frequency: 'weekly' | 'biweekly' | 'monthly';
+      startDate: Date;
+    }
+  ): Promise<{
     planId: string;
     schedule: Array<{
       dueDate: Date;
@@ -321,7 +327,7 @@ class BillingService {
   }): Promise<Blob> {
     const response = await api.get('/api/billing/export', {
       params: filters,
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   }

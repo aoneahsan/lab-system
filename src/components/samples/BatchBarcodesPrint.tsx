@@ -9,11 +9,7 @@ interface BatchBarcodesPrintProps {
   samples: Sample[];
 }
 
-const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({
-  isOpen,
-  onClose,
-  samples,
-}) => {
+const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose, samples }) => {
   const printRef = useRef<HTMLDivElement>(null);
 
   // const generateQRCode = async (data: string): Promise<string> => {
@@ -98,10 +94,7 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({
         <div className="relative bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-900">Print Batch Barcodes</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-500"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -117,11 +110,13 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({
                 {samples.map((sample) => (
                   <div key={sample.id} className="barcode-label border rounded p-3 text-center">
                     <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${JSON.stringify({
-                        sampleId: sample.id,
-                        sampleNumber: sample.sampleNumber,
-                        barcode: sample.barcode,
-                      })}`}
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${JSON.stringify(
+                        {
+                          sampleId: sample.id,
+                          sampleNumber: sample.sampleNumber,
+                          barcode: sample.barcode,
+                        }
+                      )}`}
                       alt={`Barcode for ${sample.sampleNumber}`}
                       className="mx-auto mb-2"
                     />

@@ -18,7 +18,7 @@ export interface ReportTemplate {
   updatedAt: Timestamp;
 }
 
-export type ReportCategory = 
+export type ReportCategory =
   | 'patient'
   | 'laboratory'
   | 'financial'
@@ -26,7 +26,7 @@ export type ReportCategory =
   | 'quality'
   | 'administrative';
 
-export type ReportType = 
+export type ReportType =
   | 'patient_report'
   | 'patient_results'
   | 'cumulative_report'
@@ -55,7 +55,7 @@ export interface ReportSection {
   pageBreak?: boolean;
 }
 
-export type SectionType = 
+export type SectionType =
   | 'header'
   | 'patient_info'
   | 'test_results'
@@ -75,13 +75,7 @@ export interface ReportParameter {
   options?: Array<{ value: string; label: string }>;
 }
 
-export type ParameterType = 
-  | 'date'
-  | 'dateRange'
-  | 'select'
-  | 'multiSelect'
-  | 'text'
-  | 'number';
+export type ParameterType = 'date' | 'dateRange' | 'select' | 'multiSelect' | 'text' | 'number';
 
 export interface ReportLayout {
   pageSize: 'A4' | 'Letter' | 'Legal';
@@ -115,13 +109,9 @@ export interface GeneratedReport {
   error?: string;
 }
 
-export type ReportStatus = 
-  | 'pending'
-  | 'generating'
-  | 'completed'
-  | 'failed';
+export type ReportStatus = 'pending' | 'generating' | 'completed' | 'failed';
 
-export type DateRangePreset = 
+export type DateRangePreset =
   | 'today'
   | 'yesterday'
   | 'last7days'

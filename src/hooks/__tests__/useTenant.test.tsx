@@ -85,7 +85,7 @@ describe('useTenant', () => {
 
   it('returns error state', () => {
     const testError = new Error('Failed to fetch tenant');
-    
+
     // Update the mock store for this test
     mockStore.currentTenant = null;
     mockStore.isLoading = false;

@@ -15,7 +15,12 @@ interface ResultStore {
   fetchResultsByOrder: (tenantId: string, orderId: string) => Promise<void>;
   fetchResultsByPatient: (tenantId: string, patientId: string) => Promise<void>;
   enterResults: (tenantId: string, userId: string, entry: ResultEntry) => Promise<void>;
-  updateResult: (tenantId: string, userId: string, resultId: string, data: Partial<TestResult>) => Promise<void>;
+  updateResult: (
+    tenantId: string,
+    userId: string,
+    resultId: string,
+    data: Partial<TestResult>
+  ) => Promise<void>;
   verifyResult: (tenantId: string, userId: string, resultId: string) => Promise<void>;
   validateResult: (tenantId: string, testId: string, value: number) => Promise<void>;
   setLoading: (loading: boolean) => void;
@@ -101,9 +106,9 @@ export const useResultStore = create<ResultStore>((set, get) => ({
   validateResult: async (tenantId, testId, value) => {
     try {
       const validation = await resultService.validateResult(tenantId, testId, value);
-      set({ 
+      set({
         validationWarnings: validation.warnings,
-        validationErrors: validation.errors
+        validationErrors: validation.errors,
       });
     } catch (error) {
       console.error('Validation error:', error);

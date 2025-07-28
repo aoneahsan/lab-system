@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Calendar, 
-  FileText, 
-  CreditCard, 
-  Bell, 
+import {
+  Calendar,
+  FileText,
+  CreditCard,
+  Bell,
   ChevronRight,
   Activity,
   Clock,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePatient } from '@/hooks/usePatients';
@@ -19,14 +19,14 @@ const MobileHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [notifications, setNotifications] = useState(0);
-  
+
   // Mock patient data - in real app, would fetch based on currentUser
   const patientId = currentUser?.uid || '';
   const { data: patient } = usePatient(patientId);
 
   useEffect(() => {
     setupPushNotifications();
-    
+
     // Handle app state changes
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
@@ -40,19 +40,19 @@ const MobileHomePage: React.FC = () => {
     try {
       // Request permission
       const permission = await PushNotifications.requestPermissions();
-      
+
       if (permission.receive === 'granted') {
         // Register with APNS/FCM
         await PushNotifications.register();
-        
+
         // Handle registration
         PushNotifications.addListener('registration', (token) => {
           console.log('Push registration success, token: ' + token.value);
         });
-        
+
         // Handle incoming notifications
         PushNotifications.addListener('pushNotificationReceived', (notification) => {
-          setNotifications(prev => prev + 1);
+          setNotifications((prev) => prev + 1);
         });
       }
     } catch (error) {
@@ -120,10 +120,7 @@ const MobileHomePage: React.FC = () => {
             </h1>
             <p className="text-blue-100 mt-1">Welcome back to LabFlow</p>
           </div>
-          <button
-            onClick={() => navigate('/notifications')}
-            className="relative p-2"
-          >
+          <button onClick={() => navigate('/notifications')} className="relative p-2">
             <Bell className="h-6 w-6" />
             {notifications > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -164,7 +161,9 @@ const MobileHomePage: React.FC = () => {
                     {action.badge}
                   </span>
                 )}
-                <div className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}>
+                <div
+                  className={`${action.color} w-12 h-12 rounded-lg flex items-center justify-center mb-3 mx-auto`}
+                >
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <p className="text-sm font-medium text-gray-900">{action.title}</p>
@@ -187,21 +186,17 @@ const MobileHomePage: React.FC = () => {
                 className="bg-white rounded-lg p-4 shadow-sm flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    activity.urgent ? 'bg-red-50' : 'bg-gray-50'
-                  }`}>
-                    <Icon className={`h-5 w-5 ${
-                      activity.urgent ? 'text-red-600' : 'text-gray-600'
-                    }`} />
+                  <div className={`p-2 rounded-lg ${activity.urgent ? 'bg-red-50' : 'bg-gray-50'}`}>
+                    <Icon
+                      className={`h-5 w-5 ${activity.urgent ? 'text-red-600' : 'text-gray-600'}`}
+                    />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{activity.title}</p>
                     <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
                   </div>
                 </div>
-                {activity.urgent && (
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                )}
+                {activity.urgent && <AlertCircle className="h-5 w-5 text-red-500" />}
               </div>
             );
           })}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Cpu, 
-  AlertTriangle, 
+import {
+  Cpu,
+  AlertTriangle,
   CheckCircle,
   Activity,
   Wrench,
@@ -11,7 +11,7 @@ import {
   Power,
   Wifi,
   WifiOff,
-  Settings
+  Settings,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -42,7 +42,7 @@ interface Alert {
 const LabStaffEquipmentPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
-  
+
   // Mock data - in real app would fetch from API
   const [equipment] = useState<Equipment[]>([
     {
@@ -166,8 +166,8 @@ const LabStaffEquipmentPage: React.FC = () => {
 
   const equipmentStats = {
     total: equipment.length,
-    online: equipment.filter(e => e.status === 'online').length,
-    offline: equipment.filter(e => e.status === 'offline').length,
+    online: equipment.filter((e) => e.status === 'online').length,
+    offline: equipment.filter((e) => e.status === 'offline').length,
     alerts: equipment.reduce((acc, e) => acc + e.alerts.length, 0),
   };
 
@@ -176,7 +176,7 @@ const LabStaffEquipmentPage: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Equipment Status</h1>
-        
+
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-3 mb-4">
           <div className="bg-gray-50 rounded-lg p-3 text-center">
@@ -202,7 +202,8 @@ const LabStaffEquipmentPage: React.FC = () => {
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-3">
             <AlertTriangle className="h-5 w-5 text-red-600" />
             <p className="text-sm text-red-900 font-medium">
-              {equipmentStats.alerts} equipment alert{equipmentStats.alerts > 1 ? 's' : ''} require attention
+              {equipmentStats.alerts} equipment alert{equipmentStats.alerts > 1 ? 's' : ''} require
+              attention
             </p>
           </div>
         )}
@@ -211,24 +212,23 @@ const LabStaffEquipmentPage: React.FC = () => {
       {/* Equipment List */}
       <div className="flex-1 px-6 py-4 space-y-4">
         {equipment.map((equip) => (
-          <div
-            key={equip.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden"
-          >
+          <div key={equip.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div
               className="p-4"
               onClick={() => setSelectedEquipment(selectedEquipment === equip.id ? null : equip.id)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-50 rounded-lg">
-                    {getEquipmentIcon(equip.type)}
-                  </div>
+                  <div className="p-2 bg-purple-50 rounded-lg">{getEquipmentIcon(equip.type)}</div>
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900">{equip.name}</h3>
                     <p className="text-sm text-gray-600">{equip.model}</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(equip.status)}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                          equip.status
+                        )}`}
+                      >
                         {getStatusIcon(equip.status)}
                         {equip.status.toUpperCase()}
                       </span>
@@ -301,11 +301,15 @@ const LabStaffEquipmentPage: React.FC = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Last Maintenance:</span>
-                      <span className="font-medium">{equip.lastMaintenance.toLocaleDateString()}</span>
+                      <span className="font-medium">
+                        {equip.lastMaintenance.toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Next Due:</span>
-                      <span className="font-medium">{equip.nextMaintenance.toLocaleDateString()}</span>
+                      <span className="font-medium">
+                        {equip.nextMaintenance.toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
 

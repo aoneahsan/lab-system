@@ -2,16 +2,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  ArrowLeft, 
-  Clock, 
-  CheckCircle, 
+import {
+  ArrowLeft,
+  Clock,
+  CheckCircle,
   AlertCircle,
   User,
   Calendar,
   FileText,
   Printer,
-  X
+  X,
 } from 'lucide-react';
 import { useOrder } from '@/hooks/useOrder';
 import { format } from 'date-fns';
@@ -35,7 +35,7 @@ export function OrderDetailScreen() {
         },
         onError: () => {
           toast.error('Failed to cancel order');
-        }
+        },
       });
     }
   };
@@ -83,9 +83,9 @@ export function OrderDetailScreen() {
             Print
           </Button>
           {order.status === 'pending' && (
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleCancelOrder}
               className="text-red-600 hover:bg-red-50"
             >
@@ -100,9 +100,7 @@ export function OrderDetailScreen() {
       <Card className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Order #{order.orderNumber}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">Order #{order.orderNumber}</h1>
             <p className="text-sm text-gray-600 mt-1">
               Created {format(new Date(order.createdAt), 'PPpp')}
             </p>
@@ -137,9 +135,7 @@ export function OrderDetailScreen() {
             </div>
             <div>
               <p className="text-gray-600">DOB</p>
-              <p className="font-medium">
-                {format(new Date(order.patientDOB), 'MMM d, yyyy')}
-              </p>
+              <p className="font-medium">{format(new Date(order.patientDOB), 'MMM d, yyyy')}</p>
             </div>
             <div>
               <p className="text-gray-600">Age</p>
@@ -164,8 +160,8 @@ export function OrderDetailScreen() {
           </h2>
           <div className="space-y-2">
             {order.tests.map((test, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-gray-50 rounded-lg p-3 flex items-center justify-between"
               >
                 <div>
@@ -211,8 +207,8 @@ export function OrderDetailScreen() {
       {/* Actions */}
       {order.status === 'completed' && (
         <Card className="p-4">
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             className="w-full"
             onClick={() => navigate(`/clinician/results?orderId=${order.id}`)}
           >

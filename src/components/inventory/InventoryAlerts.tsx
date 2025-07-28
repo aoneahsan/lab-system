@@ -5,14 +5,7 @@
 
 import React from 'react';
 import type { InventoryAlert } from '@/types/inventory.types';
-import { 
-  AlertTriangle, 
-  Package, 
-  Clock, 
-  TrendingDown,
-  CheckCircle,
-  X
-} from 'lucide-react';
+import { AlertTriangle, Package, Clock, TrendingDown, CheckCircle, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface InventoryAlertsProps {
@@ -24,7 +17,7 @@ interface InventoryAlertsProps {
 export const InventoryAlerts: React.FC<InventoryAlertsProps> = ({
   alerts,
   onAcknowledge,
-  isLoading = false
+  isLoading = false,
 }) => {
   const getAlertIcon = (type: InventoryAlert['type']) => {
     switch (type) {
@@ -64,11 +57,15 @@ export const InventoryAlerts: React.FC<InventoryAlertsProps> = ({
         return `Reorder needed: ${alert.currentValue} units remaining (reorder point: ${alert.thresholdValue})`;
       case 'expiring_soon':
         return `Expiring soon: ${alert.lotNumber ? `Lot ${alert.lotNumber}` : 'Item'} expires on ${
-          alert.expirationDate ? new Date(alert.expirationDate.toDate()).toLocaleDateString() : 'unknown date'
+          alert.expirationDate
+            ? new Date(alert.expirationDate.toDate()).toLocaleDateString()
+            : 'unknown date'
         }`;
       case 'expired':
         return `Expired: ${alert.lotNumber ? `Lot ${alert.lotNumber}` : 'Item'} expired on ${
-          alert.expirationDate ? new Date(alert.expirationDate.toDate()).toLocaleDateString() : 'unknown date'
+          alert.expirationDate
+            ? new Date(alert.expirationDate.toDate()).toLocaleDateString()
+            : 'unknown date'
         }`;
       case 'overstock':
         return `Overstock: ${alert.currentValue} units in stock (maximum: ${alert.thresholdValue})`;
@@ -105,19 +102,19 @@ export const InventoryAlerts: React.FC<InventoryAlertsProps> = ({
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3">
-              <div className={`
+              <div
+                className={`
                 ${alert.priority === 'critical' ? 'text-red-600' : ''}
                 ${alert.priority === 'high' ? 'text-orange-600' : ''}
                 ${alert.priority === 'medium' ? 'text-yellow-600' : ''}
                 ${alert.priority === 'low' ? 'text-blue-600' : ''}
-              `}>
+              `}
+              >
                 {getAlertIcon(alert.type)}
               </div>
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900">{alert.itemName}</h4>
-                <p className="text-sm text-gray-600 mt-1">
-                  {getAlertMessage(alert)}
-                </p>
+                <p className="text-sm text-gray-600 mt-1">{getAlertMessage(alert)}</p>
                 <p className="text-xs text-gray-500 mt-2">
                   Created {formatDistanceToNow(alert.createdAt.toDate(), { addSuffix: true })}
                 </p>

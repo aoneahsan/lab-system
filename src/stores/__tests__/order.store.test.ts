@@ -32,7 +32,7 @@ describe('Order Store', () => {
       loading: false,
       error: null,
     });
-    
+
     // Reset all mocks
     vi.clearAllMocks();
   });
@@ -48,7 +48,7 @@ describe('Order Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.createTestOrder).mockResolvedValue(mockOrderId);
     vi.mocked(orderService.getTestOrders).mockResolvedValue(mockOrders);
 
@@ -63,7 +63,7 @@ describe('Order Store', () => {
       patientId: 'patient-123',
       tests: ['test-1'],
     });
-    
+
     const state = useOrderStore.getState();
     expect(state.orders).toEqual(mockOrders);
     expect(state.loading).toBe(false);
@@ -86,14 +86,14 @@ describe('Order Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.getTestOrders).mockResolvedValue(mockOrders);
 
     const { fetchTestOrders } = useOrderStore.getState();
     await fetchTestOrders({ status: 'pending' });
 
     expect(orderService.getTestOrders).toHaveBeenCalledWith({ status: 'pending' });
-    
+
     const state = useOrderStore.getState();
     expect(state.orders).toEqual(mockOrders);
     expect(state.loading).toBe(false);
@@ -107,14 +107,14 @@ describe('Order Store', () => {
       status: 'pending',
       createdAt: new Date(),
     };
-    
+
     vi.mocked(orderService.getTestOrder).mockResolvedValue(mockOrder);
 
     const { fetchTestOrder } = useOrderStore.getState();
     await fetchTestOrder('order-123');
 
     expect(orderService.getTestOrder).toHaveBeenCalledWith('order-123');
-    
+
     const state = useOrderStore.getState();
     expect(state.currentOrder).toEqual(mockOrder);
     expect(state.loading).toBe(false);
@@ -125,12 +125,14 @@ describe('Order Store', () => {
     vi.mocked(orderService.createTestOrder).mockRejectedValue(error);
 
     const { createTestOrder } = useOrderStore.getState();
-    
-    await expect(createTestOrder({
-      patientId: 'patient-123',
-      tests: ['test-1'],
-    })).rejects.toThrow('Failed to create order');
-    
+
+    await expect(
+      createTestOrder({
+        patientId: 'patient-123',
+        tests: ['test-1'],
+      })
+    ).rejects.toThrow('Failed to create order');
+
     const state = useOrderStore.getState();
     expect(state.error).toBe('Failed to create order');
     expect(state.loading).toBe(false);
@@ -147,7 +149,7 @@ describe('Order Store', () => {
         collectedAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.createSpecimen).mockResolvedValue(mockSpecimenId);
     vi.mocked(orderService.getSpecimens).mockResolvedValue(mockSpecimens);
 
@@ -162,7 +164,7 @@ describe('Order Store', () => {
       orderId: 'order-123',
       type: 'blood',
     });
-    
+
     const state = useOrderStore.getState();
     expect(state.specimens).toEqual(mockSpecimens);
   });
@@ -177,14 +179,14 @@ describe('Order Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.getPendingCollections).mockResolvedValue(mockPendingCollections);
 
     const { fetchPendingCollections } = useOrderStore.getState();
     await fetchPendingCollections();
 
     expect(orderService.getPendingCollections).toHaveBeenCalled();
-    
+
     const state = useOrderStore.getState();
     expect(state.pendingCollections).toEqual(mockPendingCollections);
     expect(state.loading).toBe(false);
@@ -200,14 +202,14 @@ describe('Order Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.searchOrders).mockResolvedValue(mockSearchResults);
 
     const { searchOrders } = useOrderStore.getState();
     await searchOrders('patient-123');
 
     expect(orderService.searchOrders).toHaveBeenCalledWith('patient-123');
-    
+
     const state = useOrderStore.getState();
     expect(state.orders).toEqual(mockSearchResults);
     expect(state.loading).toBe(false);
@@ -221,7 +223,7 @@ describe('Order Store', () => {
       status: 'pending',
       createdAt: new Date(),
     };
-    
+
     vi.mocked(orderService.updateTestStatus).mockResolvedValue(undefined);
     vi.mocked(orderService.getTestOrder).mockResolvedValue(mockOrder);
 
@@ -230,7 +232,7 @@ describe('Order Store', () => {
 
     expect(orderService.updateTestStatus).toHaveBeenCalledWith('order-123', 'test-1', 'completed');
     expect(orderService.getTestOrder).toHaveBeenCalledWith('order-123');
-    
+
     const state = useOrderStore.getState();
     expect(state.currentOrder).toEqual(mockOrder);
     expect(state.loading).toBe(false);
@@ -247,7 +249,7 @@ describe('Order Store', () => {
         receivedBy: 'tech-1',
       },
     ];
-    
+
     vi.mocked(orderService.receiveSpecimen).mockResolvedValue(undefined);
     vi.mocked(orderService.getSpecimens).mockResolvedValue(mockSpecimens);
 
@@ -256,7 +258,7 @@ describe('Order Store', () => {
 
     expect(orderService.receiveSpecimen).toHaveBeenCalledWith('specimen-123', 'tech-1');
     expect(orderService.getSpecimens).toHaveBeenCalled();
-    
+
     const state = useOrderStore.getState();
     expect(state.specimens).toEqual(mockSpecimens);
     expect(state.loading).toBe(false);
@@ -279,14 +281,14 @@ describe('Order Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(orderService.getTodayOrders).mockResolvedValue(mockTodayOrders);
 
     const { fetchTodayOrders } = useOrderStore.getState();
     await fetchTodayOrders();
 
     expect(orderService.getTodayOrders).toHaveBeenCalled();
-    
+
     const state = useOrderStore.getState();
     expect(state.todayOrders).toEqual(mockTodayOrders);
     expect(state.loading).toBe(false);

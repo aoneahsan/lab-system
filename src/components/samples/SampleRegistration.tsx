@@ -3,7 +3,12 @@ import { Save, X, User, TestTube, Calendar, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSampleStore } from '@/stores/sample.store';
 import { useAuthStore } from '@/stores/auth.store';
-import type { SampleFormData, SampleType, ContainerType, StorageTemperature } from '@/types/sample.types';
+import type {
+  SampleFormData,
+  SampleType,
+  ContainerType,
+  StorageTemperature,
+} from '@/types/sample.types';
 
 export default function SampleRegistration() {
   const navigate = useNavigate();
@@ -74,7 +79,7 @@ export default function SampleRegistration() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm() || !currentUser?.tenantId) return;
 
     try {
@@ -87,9 +92,9 @@ export default function SampleRegistration() {
   };
 
   const handleChange = (field: keyof SampleFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -118,15 +123,11 @@ export default function SampleRegistration() {
                 className={`input ${errors.patientId ? 'border-red-500' : ''}`}
                 placeholder="Enter patient ID"
               />
-              {errors.patientId && (
-                <p className="text-sm text-red-600 mt-1">{errors.patientId}</p>
-              )}
+              {errors.patientId && <p className="text-sm text-red-600 mt-1">{errors.patientId}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Order ID *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Order ID *</label>
               <input
                 type="text"
                 value={formData.orderId}
@@ -134,9 +135,7 @@ export default function SampleRegistration() {
                 className={`input ${errors.orderId ? 'border-red-500' : ''}`}
                 placeholder="Enter order ID"
               />
-              {errors.orderId && (
-                <p className="text-sm text-red-600 mt-1">{errors.orderId}</p>
-              )}
+              {errors.orderId && <p className="text-sm text-red-600 mt-1">{errors.orderId}</p>}
             </div>
           </div>
 
@@ -152,7 +151,7 @@ export default function SampleRegistration() {
                 onChange={(e) => handleChange('type', e.target.value as SampleType)}
                 className="input"
               >
-                {sampleTypes.map(type => (
+                {sampleTypes.map((type) => (
                   <option key={type.value} value={type.value}>
                     {type.label}
                   </option>
@@ -169,7 +168,7 @@ export default function SampleRegistration() {
                 onChange={(e) => handleChange('container', e.target.value as ContainerType)}
                 className="input"
               >
-                {containerTypes.map(container => (
+                {containerTypes.map((container) => (
                   <option key={container.value} value={container.value}>
                     {container.label}
                   </option>
@@ -181,9 +180,7 @@ export default function SampleRegistration() {
           {/* Volume */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Volume
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Volume</label>
               <div className="flex space-x-2">
                 <input
                   type="number"
@@ -203,18 +200,16 @@ export default function SampleRegistration() {
                   <option value="ul">µl</option>
                 </select>
               </div>
-              {errors.volume && (
-                <p className="text-sm text-red-600 mt-1">{errors.volume}</p>
-              )}
+              {errors.volume && <p className="text-sm text-red-600 mt-1">{errors.volume}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Priority
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
               <select
                 value={formData.priority}
-                onChange={(e) => handleChange('priority', e.target.value as 'routine' | 'stat' | 'asap')}
+                onChange={(e) =>
+                  handleChange('priority', e.target.value as 'routine' | 'stat' | 'asap')
+                }
                 className="input"
               >
                 <option value="routine">Routine</option>
@@ -254,9 +249,7 @@ export default function SampleRegistration() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Collected By *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Collected By *</label>
               <input
                 type="text"
                 value={formData.collectedBy}
@@ -305,10 +298,12 @@ export default function SampleRegistration() {
               </label>
               <select
                 value={formData.storageTemperature}
-                onChange={(e) => handleChange('storageTemperature', e.target.value as StorageTemperature)}
+                onChange={(e) =>
+                  handleChange('storageTemperature', e.target.value as StorageTemperature)
+                }
                 className="input"
               >
-                {storageTemps.map(temp => (
+                {storageTemps.map((temp) => (
                   <option key={temp.value} value={temp.value}>
                     {temp.label}
                   </option>
@@ -319,9 +314,7 @@ export default function SampleRegistration() {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
             <textarea
               value={formData.notes || ''}
               onChange={(e) => handleChange('notes', e.target.value)}
@@ -339,19 +332,11 @@ export default function SampleRegistration() {
 
           {/* Actions */}
           <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => navigate('/samples')}
-              className="btn btn-outline"
-            >
+            <button type="button" onClick={() => navigate('/samples')} className="btn btn-outline">
               <X className="h-4 w-4" />
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary"
-            >
+            <button type="submit" disabled={loading} className="btn btn-primary">
               <Save className="h-4 w-4" />
               {loading ? 'Creating...' : 'Create Sample'}
             </button>

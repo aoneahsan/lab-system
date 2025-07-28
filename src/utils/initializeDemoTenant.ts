@@ -5,10 +5,10 @@ export const initializeDemoTenant = async () => {
   try {
     // Check if DEMO tenant already exists
     const demoDoc = await getDoc(doc(firestore, 'tenants', 'demo'));
-    
+
     if (!demoDoc.exists()) {
       console.log('Creating DEMO tenant...');
-      
+
       // Create DEMO tenant
       await setDoc(doc(firestore, 'tenants', 'demo'), {
         id: 'demo',
@@ -20,35 +20,35 @@ export const initializeDemoTenant = async () => {
           city: 'Demo City',
           state: 'DC',
           zipCode: '12345',
-          country: 'USA'
+          country: 'USA',
         },
         contact: {
           email: 'demo@labflow.com',
           phone: '(555) 123-4567',
-          fax: '(555) 123-4568'
+          fax: '(555) 123-4568',
         },
         settings: {
           timezone: 'America/New_York',
           currency: 'USD',
           resultFormat: 'standard',
-          criticalValueNotification: true
+          criticalValueNotification: true,
         },
         features: {
           billing: true,
           inventory: true,
           qualityControl: true,
           emrIntegration: true,
-          mobileApps: true
+          mobileApps: true,
         },
         subscription: {
           plan: 'demo',
           status: 'active',
-          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         },
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
-      
+
       console.log('✅ DEMO tenant created successfully');
     }
   } catch {

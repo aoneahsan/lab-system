@@ -72,7 +72,7 @@ export function useClinicianResults(params?: UseClinicianResultsParams) {
       const q = query(resultsRef, ...constraints);
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         resultDate: doc.data().resultDate.toDate(),

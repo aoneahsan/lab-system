@@ -14,15 +14,7 @@ export interface OfflineAwareOptions {
 class OfflineAwareService {
   // Execute operation with offline support
   async execute(options: OfflineAwareOptions): Promise<any> {
-    const { 
-      collection, 
-      tenantId, 
-      operation, 
-      data, 
-      id, 
-      filters, 
-      onlineHandler 
-    } = options;
+    const { collection, tenantId, operation, data, id, filters, onlineHandler } = options;
 
     // Check if offline support is available
     if (!offlineDbService.isOfflineSupported()) {
@@ -37,16 +29,16 @@ class OfflineAwareService {
     switch (operation) {
       case 'create':
         return this.handleCreate(collection, tenantId, data, isOnline, onlineHandler);
-      
+
       case 'read':
         return this.handleRead(collection, tenantId, id, filters, isOnline, onlineHandler);
-      
+
       case 'update':
         return this.handleUpdate(collection, tenantId, id!, data, isOnline, onlineHandler);
-      
+
       case 'delete':
         return this.handleDelete(collection, tenantId, id!, isOnline, onlineHandler);
-      
+
       default:
         throw new Error(`Unsupported operation: ${operation}`);
     }
@@ -64,10 +56,10 @@ class OfflineAwareService {
       try {
         // Try online first
         const result = await onlineHandler();
-        
+
         // Cache the created item
         await offlineDbService.cacheData(collection, tenantId, [result]);
-        
+
         return result;
       } catch (error) {
         console.error('Online create failed, queuing for offline sync:', error);
@@ -81,7 +73,7 @@ class OfflineAwareService {
       ...data,
       id: offlineId,
       _isOffline: true,
-      _createdOffline: Date.now()
+      _createdOffline: Date.now(),
     };
 
     await offlineDbService.queueOperation(collection, 'create', offlineData);
@@ -103,14 +95,14 @@ class OfflineAwareService {
       try {
         // Try online first
         const result = await onlineHandler();
-        
+
         // Cache the results
         if (Array.isArray(result)) {
           await offlineDbService.cacheData(collection, tenantId, result);
         } else if (result && id) {
           await offlineDbService.cacheData(collection, tenantId, [result]);
         }
-        
+
         return result;
       } catch (error) {
         console.error('Online read failed, using cached data:', error);
@@ -139,10 +131,10 @@ class OfflineAwareService {
       try {
         // Try online first
         await onlineHandler();
-        
+
         // Update cached record
         await offlineDbService.updateCachedRecord(collection, id, updates);
-        
+
         return;
       } catch (error) {
         console.error('Online update failed, queuing for offline sync:', error);
@@ -152,7 +144,7 @@ class OfflineAwareService {
 
     // Queue for offline sync
     await offlineDbService.queueOperation(collection, 'update', { id, ...updates });
-    
+
     // Update cached record
     await offlineDbService.updateCachedRecord(collection, id, updates);
   }
@@ -169,14 +161,14 @@ class OfflineAwareService {
       try {
         // Try online first
         await onlineHandler();
-        
+
         // Remove from cache (implementation needed in offlineDbService)
         // For now, mark as deleted in cache
-        await offlineDbService.updateCachedRecord(collection, id, { 
+        await offlineDbService.updateCachedRecord(collection, id, {
           _deleted: true,
-          _deletedAt: Date.now()
+          _deletedAt: Date.now(),
         });
-        
+
         return;
       } catch (error) {
         console.error('Online delete failed, queuing for offline sync:', error);
@@ -186,18 +178,18 @@ class OfflineAwareService {
 
     // Queue for offline sync
     await offlineDbService.queueOperation(collection, 'delete', { id });
-    
+
     // Mark as deleted in cache
-    await offlineDbService.updateCachedRecord(collection, id, { 
+    await offlineDbService.updateCachedRecord(collection, id, {
       _deleted: true,
-      _deletedAt: Date.now()
+      _deletedAt: Date.now(),
     });
   }
 
   // Batch operations with offline support
   async executeBatch(operations: OfflineAwareOptions[]): Promise<any[]> {
     const results: any[] = [];
-    
+
     for (const operation of operations) {
       try {
         const result = await this.execute(operation);
@@ -207,7 +199,7 @@ class OfflineAwareService {
         results.push({ error: error });
       }
     }
-    
+
     return results;
   }
 
@@ -226,16 +218,16 @@ class OfflineAwareService {
     const metadata = await offlineDbService.getMetadata();
     const collectionMeta = metadata.collections[collection] || {
       lastFetch: 0,
-      recordCount: 0
+      recordCount: 0,
     };
 
     const pendingOps = await offlineDbService.getPendingOperations();
-    const pendingForCollection = pendingOps.filter(op => op.collection === collection).length;
+    const pendingForCollection = pendingOps.filter((op) => op.collection === collection).length;
 
     return {
       lastSync: collectionMeta.lastFetch,
       recordCount: collectionMeta.recordCount,
-      pendingOperations: pendingForCollection
+      pendingOperations: pendingForCollection,
     };
   }
 }

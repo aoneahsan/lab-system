@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Send,
   XCircle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -47,7 +47,7 @@ export const OrdersScreen: React.FC = () => {
       tests: ['CBC', 'CMP', 'Lipid Panel'],
       status: 'pending',
       priority: 'stat',
-      orderedDate: new Date(Date.now() - 2 * 60 * 60 * 1000)
+      orderedDate: new Date(Date.now() - 2 * 60 * 60 * 1000),
     },
     {
       id: '2',
@@ -57,7 +57,7 @@ export const OrdersScreen: React.FC = () => {
       tests: ['HbA1c', 'Glucose', 'Insulin'],
       status: 'in-progress',
       priority: 'routine',
-      orderedDate: new Date(Date.now() - 4 * 60 * 60 * 1000)
+      orderedDate: new Date(Date.now() - 4 * 60 * 60 * 1000),
     },
     {
       id: '3',
@@ -70,7 +70,7 @@ export const OrdersScreen: React.FC = () => {
       orderedDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
       completedDate: new Date(Date.now() - 6 * 60 * 60 * 1000),
       resultCount: 3,
-      criticalCount: 1
+      criticalCount: 1,
     },
     {
       id: '4',
@@ -80,18 +80,19 @@ export const OrdersScreen: React.FC = () => {
       tests: ['Troponin I', 'BNP', 'D-Dimer'],
       status: 'pending',
       priority: 'urgent',
-      orderedDate: new Date(Date.now() - 1 * 60 * 60 * 1000)
-    }
+      orderedDate: new Date(Date.now() - 1 * 60 * 60 * 1000),
+    },
   ]);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = searchQuery === '' || 
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      searchQuery === '' ||
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.patientMRN.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -133,10 +134,8 @@ export const OrdersScreen: React.FC = () => {
   };
 
   const toggleOrderSelection = (orderId: string) => {
-    setSelectedOrders(prev => 
-      prev.includes(orderId) 
-        ? prev.filter(id => id !== orderId)
-        : [...prev, orderId]
+    setSelectedOrders((prev) =>
+      prev.includes(orderId) ? prev.filter((id) => id !== orderId) : [...prev, orderId]
     );
     setShowBulkActions(true);
   };
@@ -180,15 +179,13 @@ export const OrdersScreen: React.FC = () => {
               { id: 'all', label: 'All' },
               { id: 'pending', label: 'Pending' },
               { id: 'in-progress', label: 'In Progress' },
-              { id: 'completed', label: 'Completed' }
+              { id: 'completed', label: 'Completed' },
             ].map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => setFilterStatus(filter.id)}
                 className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                  filterStatus === filter.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600'
+                  filterStatus === filter.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
                 {filter.label}
@@ -201,10 +198,7 @@ export const OrdersScreen: React.FC = () => {
       {/* Order List */}
       <div className="p-4 space-y-3">
         {filteredOrders.map((order) => (
-          <div
-            key={order.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden"
-          >
+          <div key={order.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div
               onClick={() => navigate(`/clinician/order/${order.id}`)}
               className="p-4 cursor-pointer hover:bg-gray-50"
@@ -214,7 +208,9 @@ export const OrdersScreen: React.FC = () => {
                   {getStatusIcon(order.status)}
                   <div>
                     <p className="font-semibold text-gray-900">{order.orderNumber}</p>
-                    <p className="text-sm text-gray-600">{order.patientName} • {order.patientMRN}</p>
+                    <p className="text-sm text-gray-600">
+                      {order.patientName} • {order.patientMRN}
+                    </p>
                   </div>
                 </div>
                 <span className={`text-xs uppercase ${getPriorityColor(order.priority)}`}>
@@ -239,7 +235,11 @@ export const OrdersScreen: React.FC = () => {
                     <Calendar className="h-4 w-4 inline mr-1" />
                     {format(order.orderedDate, 'MMM d, h:mm a')}
                   </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      order.status
+                    )}`}
+                  >
                     {order.status}
                   </span>
                 </div>

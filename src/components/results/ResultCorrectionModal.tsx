@@ -45,10 +45,12 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
         test.id,
         formData.value,
         result.patientId,
-        test.referenceRanges?.[0] ? { 
-          min: test.referenceRanges[0].normalMin, 
-          max: test.referenceRanges[0].normalMax 
-        } : undefined
+        test.referenceRanges?.[0]
+          ? {
+              min: test.referenceRanges[0].normalMin,
+              max: test.referenceRanges[0].normalMax,
+            }
+          : undefined
       );
 
       if (!validation.isValid && validation.errors.length > 0) {
@@ -78,7 +80,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
 
   const handleValueChange = async (value: string) => {
     setFormData({ ...formData, value });
-    
+
     // Validate the value
     if (value && test) {
       try {
@@ -86,10 +88,12 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
           test.id,
           value,
           result.patientId,
-          test.referenceRanges?.[0] ? { 
-            min: test.referenceRanges[0].normalMin, 
-            max: test.referenceRanges[0].normalMax 
-          } : undefined
+          test.referenceRanges?.[0]
+            ? {
+                min: test.referenceRanges[0].normalMin,
+                max: test.referenceRanges[0].normalMax,
+              }
+            : undefined
         );
         setValidationResult(validation);
       } catch (error) {
@@ -128,10 +132,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
                 <Edit className="h-5 w-5" />
                 Correct Result
               </h3>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-500"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -142,10 +143,18 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
             <div className="mb-6 bg-gray-50 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Result Information</h4>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Test:</span> {test.name} ({test.code})</p>
-                <p><span className="font-medium">Patient ID:</span> {result.patientId}</p>
-                <p><span className="font-medium">Sample ID:</span> {result.sampleId}</p>
-                <p><span className="font-medium">Current Status:</span> {result.status}</p>
+                <p>
+                  <span className="font-medium">Test:</span> {test.name} ({test.code})
+                </p>
+                <p>
+                  <span className="font-medium">Patient ID:</span> {result.patientId}
+                </p>
+                <p>
+                  <span className="font-medium">Sample ID:</span> {result.sampleId}
+                </p>
+                <p>
+                  <span className="font-medium">Current Status:</span> {result.status}
+                </p>
               </div>
             </div>
 
@@ -171,16 +180,18 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
                     </span>
                   )}
                 </div>
-                {errors.value && (
-                  <p className="text-sm text-red-600 mt-1">{errors.value}</p>
-                )}
-                
+                {errors.value && <p className="text-sm text-red-600 mt-1">{errors.value}</p>}
+
                 {/* Reference Range */}
                 {test.referenceRanges?.[0] && (
                   <p className="text-xs text-gray-600 mt-1">
-                    Reference: {test.referenceRanges[0].textRange || 
-                      (test.referenceRanges[0].normalMin !== undefined && test.referenceRanges[0].normalMax !== undefined
-                        ? `${test.referenceRanges[0].normalMin} - ${test.referenceRanges[0].normalMax}${test.unit ? ` ${test.unit}` : ''}`
+                    Reference:{' '}
+                    {test.referenceRanges[0].textRange ||
+                      (test.referenceRanges[0].normalMin !== undefined &&
+                      test.referenceRanges[0].normalMax !== undefined
+                        ? `${test.referenceRanges[0].normalMin} - ${
+                            test.referenceRanges[0].normalMax
+                          }${test.unit ? ` ${test.unit}` : ''}`
                         : 'Not specified')}
                   </p>
                 )}
@@ -188,30 +199,38 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
 
               {/* Validation Results */}
               {validationResult && (
-                <div className={`rounded-lg p-3 ${
-                  validationResult.isCritical ? 'bg-red-50 border border-red-200' :
-                  validationResult.warnings.length > 0 ? 'bg-yellow-50 border border-yellow-200' :
-                  'bg-green-50 border border-green-200'
-                }`}>
+                <div
+                  className={`rounded-lg p-3 ${
+                    validationResult.isCritical
+                      ? 'bg-red-50 border border-red-200'
+                      : validationResult.warnings.length > 0
+                        ? 'bg-yellow-50 border border-yellow-200'
+                        : 'bg-green-50 border border-green-200'
+                  }`}
+                >
                   {validationResult.isCritical && (
                     <p className="text-sm font-medium text-red-800 mb-1">Critical Value!</p>
                   )}
                   {validationResult.warnings.map((warning: string, index: number) => (
-                    <p key={index} className="text-sm text-yellow-800">{warning}</p>
+                    <p key={index} className="text-sm text-yellow-800">
+                      {warning}
+                    </p>
                   ))}
                   {validationResult.errors.map((error: string, index: number) => (
-                    <p key={index} className="text-sm text-red-800">{error}</p>
+                    <p key={index} className="text-sm text-red-800">
+                      {error}
+                    </p>
                   ))}
-                  {!validationResult.isCritical && validationResult.warnings.length === 0 && validationResult.errors.length === 0 && (
-                    <p className="text-sm text-green-800">Value is within normal range</p>
-                  )}
+                  {!validationResult.isCritical &&
+                    validationResult.warnings.length === 0 &&
+                    validationResult.errors.length === 0 && (
+                      <p className="text-sm text-green-800">Value is within normal range</p>
+                    )}
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notes
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -225,8 +244,8 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
             {/* Correction vs Amendment Info */}
             <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-xs text-blue-800">
-                <strong>Note:</strong> Corrections can only be made to results that haven't been finalized. 
-                For finalized results, use the Amendment feature instead.
+                <strong>Note:</strong> Corrections can only be made to results that haven't been
+                finalized. For finalized results, use the Amendment feature instead.
               </p>
             </div>
           </div>

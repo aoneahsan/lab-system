@@ -10,15 +10,16 @@ import {
   Tooltip,
   Legend,
   ReferenceLine,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 
 export default function LeveyJenningsChart() {
   const [selectedTest, setSelectedTest] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [dateRange, setDateRange] = useState(30);
-  
-  const { qcTests, leveyJenningsData, fetchQCTests, fetchLeveyJenningsData } = useQualityControlStore();
+
+  const { qcTests, leveyJenningsData, fetchQCTests, fetchLeveyJenningsData } =
+    useQualityControlStore();
 
   useEffect(() => {
     fetchQCTests({ status: 'active' });
@@ -30,19 +31,19 @@ export default function LeveyJenningsChart() {
     }
   }, [selectedTest, selectedLevel, dateRange, fetchLeveyJenningsData]);
 
-  const selectedQCTest = qcTests.find(t => t.id === selectedTest);
+  const selectedQCTest = qcTests.find((t) => t.id === selectedTest);
   const levels = selectedQCTest?.levels || [];
 
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     let fill = '#10B981'; // green for accepted
-    
+
     if (payload.status === 'warning') {
       fill = '#F59E0B'; // yellow for warning
     } else if (payload.status === 'rejected') {
       fill = '#EF4444'; // red for rejected
     }
-    
+
     return <circle cx={cx} cy={cy} r={4} fill={fill} stroke={fill} />;
   };
 
@@ -56,9 +57,7 @@ export default function LeveyJenningsChart() {
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              QC Test
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">QC Test</label>
             <select
               value={selectedTest}
               onChange={(e) => {
@@ -77,9 +76,7 @@ export default function LeveyJenningsChart() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Level
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
@@ -96,9 +93,7 @@ export default function LeveyJenningsChart() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date Range
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
             <select
               value={dateRange}
               onChange={(e) => setDateRange(Number(e.target.value))}
@@ -131,32 +126,67 @@ export default function LeveyJenningsChart() {
               margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tickFormatter={(date) => formatDate(new Date(date))}
                 angle={-45}
                 textAnchor="end"
                 height={60}
               />
               <YAxis />
-              <Tooltip 
+              <Tooltip
                 labelFormatter={(value) => new Date(value).toLocaleDateString()}
                 formatter={(value: any) => value.toFixed(2)}
               />
               <Legend />
-              
+
               {/* Reference lines for SD ranges */}
-              <ReferenceLine y={leveyJenningsData[0]?.mean} stroke="#000" strokeDasharray="5 5" label="Mean" />
-              <ReferenceLine y={leveyJenningsData[0]?.plusOneSD} stroke="#FFC107" strokeDasharray="3 3" label="+1SD" />
-              <ReferenceLine y={leveyJenningsData[0]?.minusOneSD} stroke="#FFC107" strokeDasharray="3 3" label="-1SD" />
-              <ReferenceLine y={leveyJenningsData[0]?.plusTwoSD} stroke="#FF9800" strokeDasharray="3 3" label="+2SD" />
-              <ReferenceLine y={leveyJenningsData[0]?.minusTwoSD} stroke="#FF9800" strokeDasharray="3 3" label="-2SD" />
-              <ReferenceLine y={leveyJenningsData[0]?.plusThreeSD} stroke="#F44336" strokeDasharray="3 3" label="+3SD" />
-              <ReferenceLine y={leveyJenningsData[0]?.minusThreeSD} stroke="#F44336" strokeDasharray="3 3" label="-3SD" />
-              
-              <Line 
-                type="monotone" 
-                dataKey="value" 
+              <ReferenceLine
+                y={leveyJenningsData[0]?.mean}
+                stroke="#000"
+                strokeDasharray="5 5"
+                label="Mean"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.plusOneSD}
+                stroke="#FFC107"
+                strokeDasharray="3 3"
+                label="+1SD"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.minusOneSD}
+                stroke="#FFC107"
+                strokeDasharray="3 3"
+                label="-1SD"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.plusTwoSD}
+                stroke="#FF9800"
+                strokeDasharray="3 3"
+                label="+2SD"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.minusTwoSD}
+                stroke="#FF9800"
+                strokeDasharray="3 3"
+                label="-2SD"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.plusThreeSD}
+                stroke="#F44336"
+                strokeDasharray="3 3"
+                label="+3SD"
+              />
+              <ReferenceLine
+                y={leveyJenningsData[0]?.minusThreeSD}
+                stroke="#F44336"
+                strokeDasharray="3 3"
+                label="-3SD"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="value"
                 stroke="#2563EB"
                 strokeWidth={2}
                 dot={<CustomDot />}
@@ -188,7 +218,9 @@ export default function LeveyJenningsChart() {
       ) : (
         <div className="bg-white p-12 rounded-lg shadow-sm border border-gray-200 text-center">
           <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-gray-500">Select a QC test and level to view the Levey-Jennings chart</p>
+          <p className="text-gray-500">
+            Select a QC test and level to view the Levey-Jennings chart
+          </p>
         </div>
       )}
     </div>

@@ -14,13 +14,14 @@ export default function InventoryList() {
     fetchInventoryItems({ category: filterCategory, status: filterStatus });
   }, [filterCategory, filterStatus, fetchInventoryItems]);
 
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.catalogNumber && item.catalogNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredItems = items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.catalogNumber && item.catalogNumber.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getLowStockItems = () => {
-    return items.filter(item => item.currentStock <= item.reorderPoint);
+    return items.filter((item) => item.currentStock <= item.reorderPoint);
   };
 
   const getStockStatus = (item: InventoryItem) => {
@@ -76,7 +77,7 @@ export default function InventoryList() {
               className="pl-10 input"
             />
           </div>
-          
+
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
@@ -138,12 +139,8 @@ export default function InventoryList() {
                       <div className="flex items-center">
                         <Package className="h-8 w-8 text-gray-400 mr-3" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {item.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {item.manufacturer}
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                          <div className="text-sm text-gray-500">{item.manufacturer}</div>
                         </div>
                       </div>
                     </td>
@@ -164,17 +161,15 @@ export default function InventoryList() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}
+                      >
                         {stockStatus.text}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                        View
-                      </button>
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        Edit
-                      </button>
+                      <button className="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
+                      <button className="text-indigo-600 hover:text-indigo-900">Edit</button>
                     </td>
                   </tr>
                 );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  FileText, 
-  Download, 
+import {
+  FileText,
+  Download,
   Calendar,
   TrendingUp,
   DollarSign,
@@ -9,7 +9,7 @@ import {
   CreditCard,
   BarChart3,
   PieChart,
-  Receipt
+  Receipt,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -19,11 +19,14 @@ const FinancialReportsPage: React.FC = () => {
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState({
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // First day of current month
-    endDate: new Date()
+    endDate: new Date(),
   });
   const [reportType, setReportType] = useState<string>('revenue');
 
-  const { data: statistics, isLoading } = useBillingStatistics(dateRange.startDate, dateRange.endDate);
+  const { data: statistics, isLoading } = useBillingStatistics(
+    dateRange.startDate,
+    dateRange.endDate
+  );
 
   const reportTypes = [
     { id: 'revenue', name: 'Revenue Report', icon: DollarSign },
@@ -63,12 +66,16 @@ const FinancialReportsPage: React.FC = () => {
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <Icon className={`h-6 w-6 mb-2 mx-auto ${
-                  reportType === type.id ? 'text-blue-600' : 'text-gray-400'
-                }`} />
-                <p className={`text-sm font-medium ${
-                  reportType === type.id ? 'text-blue-900' : 'text-gray-700'
-                }`}>
+                <Icon
+                  className={`h-6 w-6 mb-2 mx-auto ${
+                    reportType === type.id ? 'text-blue-600' : 'text-gray-400'
+                  }`}
+                />
+                <p
+                  className={`text-sm font-medium ${
+                    reportType === type.id ? 'text-blue-900' : 'text-gray-700'
+                  }`}
+                >
                   {type.name}
                 </p>
               </button>
@@ -82,30 +89,30 @@ const FinancialReportsPage: React.FC = () => {
         <h2 className="text-lg font-semibold mb-4">Select Date Range</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
             <input
               type="date"
               value={format(dateRange.startDate, 'yyyy-MM-dd')}
-              onChange={(e) => setDateRange({
-                ...dateRange,
-                startDate: new Date(e.target.value)
-              })}
+              onChange={(e) =>
+                setDateRange({
+                  ...dateRange,
+                  startDate: new Date(e.target.value),
+                })
+              }
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
             <input
               type="date"
               value={format(dateRange.endDate, 'yyyy-MM-dd')}
-              onChange={(e) => setDateRange({
-                ...dateRange,
-                endDate: new Date(e.target.value)
-              })}
+              onChange={(e) =>
+                setDateRange({
+                  ...dateRange,
+                  endDate: new Date(e.target.value),
+                })
+              }
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -181,7 +188,7 @@ const FinancialReportsPage: React.FC = () => {
       {/* Preview Section */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <h2 className="text-lg font-semibold mb-4">Report Preview</h2>
-        
+
         {isLoading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
@@ -248,14 +255,13 @@ const FinancialReportsPage: React.FC = () => {
                 <div className="border rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Average Invoice</p>
                   <p className="text-xl font-semibold">
-                    ${Math.round((statistics?.totalRevenue || 0) / (statistics?.totalInvoices || 1))}
+                    $
+                    {Math.round((statistics?.totalRevenue || 0) / (statistics?.totalInvoices || 1))}
                   </p>
                 </div>
                 <div className="border rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Collection Rate</p>
-                  <p className="text-xl font-semibold">
-                    {statistics?.collectionRate || 0}%
-                  </p>
+                  <p className="text-xl font-semibold">{statistics?.collectionRate || 0}%</p>
                 </div>
                 <div className="border rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Avg Payment Time</p>

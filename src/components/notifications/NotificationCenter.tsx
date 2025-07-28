@@ -12,13 +12,13 @@ const NotificationCenter: React.FC = () => {
   const { data: notifications = [], refetch } = useQuery({
     queryKey: ['notifications'],
     queryFn: notificationService.getNotifications,
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['notifications-unread'],
     queryFn: notificationService.getUnreadCount,
-    refetchInterval: 30000
+    refetchInterval: 30000,
   });
 
   const markAsReadMutation = useMutation({
@@ -26,7 +26,7 @@ const NotificationCenter: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread'] });
-    }
+    },
   });
 
   const markAllAsReadMutation = useMutation({
@@ -34,7 +34,7 @@ const NotificationCenter: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['notifications-unread'] });
-    }
+    },
   });
 
   // Subscribe to new notifications
@@ -63,9 +63,12 @@ const NotificationCenter: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -85,10 +88,7 @@ const NotificationCenter: React.FC = () => {
 
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
           <div className="absolute right-0 z-50 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 max-h-[600px] overflow-hidden">
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -127,17 +127,19 @@ const NotificationCenter: React.FC = () => {
                             <p className="text-sm font-medium text-gray-900">
                               {notification.title}
                             </p>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                              getPriorityColor(notification.priority)
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(
+                                notification.priority
+                              )}`}
+                            >
                               {notification.priority}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">
-                            {notification.message}
-                          </p>
+                          <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
                           <p className="mt-1 text-xs text-gray-400">
-                            {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(notification.createdAt), {
+                              addSuffix: true,
+                            })}
                           </p>
                         </div>
                       </div>

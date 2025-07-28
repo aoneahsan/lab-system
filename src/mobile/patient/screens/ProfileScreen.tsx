@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  Mail, 
-  Phone, 
+import {
+  User,
+  Mail,
+  Phone,
   Calendar,
   Shield,
   FileText,
@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Camera,
   Edit,
-  Download
+  Download,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
@@ -51,14 +51,14 @@ export const ProfileScreen: React.FC = () => {
     emergencyContact: {
       name: 'Jane Doe',
       relationship: 'Spouse',
-      phone: '+1 (555) 987-6543'
+      phone: '+1 (555) 987-6543',
     },
     address: {
       street: '123 Main Street',
       city: 'New York',
       state: 'NY',
-      zip: '10001'
-    }
+      zip: '10001',
+    },
   };
 
   const profileSections: ProfileSection[] = [
@@ -74,128 +74,128 @@ export const ProfileScreen: React.FC = () => {
         { label: 'Gender', value: userData.gender },
         { label: 'Blood Group', value: userData.bloodGroup },
         { label: 'Patient ID', value: userData.patientId },
-      ]
+      ],
     },
     {
       id: 'medical',
       title: 'Medical Information',
       icon: Heart,
       items: [
-        { 
-          label: 'Medical History', 
+        {
+          label: 'Medical History',
           action: () => navigate('/patient/medical-history'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Allergies & Medications', 
+        {
+          label: 'Allergies & Medications',
           action: () => navigate('/patient/allergies'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Emergency Contacts', 
+        {
+          label: 'Emergency Contacts',
           action: () => navigate('/patient/emergency-contacts'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-      ]
+      ],
     },
     {
       id: 'insurance',
       title: 'Insurance & Billing',
       icon: Shield,
       items: [
-        { 
-          label: 'Insurance Cards', 
+        {
+          label: 'Insurance Cards',
           action: () => navigate('/patient/insurance'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Payment Methods', 
+        {
+          label: 'Payment Methods',
           action: () => navigate('/patient/payment-methods'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Billing History', 
+        {
+          label: 'Billing History',
           action: () => navigate('/patient/billing-history'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-      ]
+      ],
     },
     {
       id: 'documents',
       title: 'Documents',
       icon: FileText,
       items: [
-        { 
-          label: 'Test Reports', 
+        {
+          label: 'Test Reports',
           action: () => navigate('/patient/results'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Prescriptions', 
+        {
+          label: 'Prescriptions',
           action: () => navigate('/patient/prescriptions'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Download All Records', 
+        {
+          label: 'Download All Records',
           action: () => console.log('Download records'),
-          icon: Download
+          icon: Download,
         },
-      ]
+      ],
     },
     {
       id: 'settings',
       title: 'Settings',
       icon: Bell,
       items: [
-        { 
-          label: 'Notification Preferences', 
+        {
+          label: 'Notification Preferences',
           action: () => navigate('/patient/notifications-settings'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Privacy Settings', 
+        {
+          label: 'Privacy Settings',
           action: () => navigate('/patient/privacy'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Change Password', 
+        {
+          label: 'Change Password',
           action: () => navigate('/patient/change-password'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Biometric Login', 
+        {
+          label: 'Biometric Login',
           action: () => navigate('/patient/biometric-settings'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-      ]
+      ],
     },
     {
       id: 'support',
       title: 'Help & Support',
       icon: HelpCircle,
       items: [
-        { 
-          label: 'FAQs', 
+        {
+          label: 'FAQs',
           action: () => navigate('/patient/faqs'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Contact Support', 
+        {
+          label: 'Contact Support',
           action: () => navigate('/patient/support'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Terms & Conditions', 
+        {
+          label: 'Terms & Conditions',
           action: () => navigate('/patient/terms'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-        { 
-          label: 'Privacy Policy', 
+        {
+          label: 'Privacy Policy',
           action: () => navigate('/patient/privacy-policy'),
-          icon: ChevronRight
+          icon: ChevronRight,
         },
-      ]
-    }
+      ],
+    },
   ];
 
   const handleLogout = async () => {
@@ -216,7 +216,7 @@ export const ProfileScreen: React.FC = () => {
             <Edit className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <div className="relative">
             <div className="h-20 w-20 bg-white/30 rounded-full flex items-center justify-center">
@@ -226,7 +226,7 @@ export const ProfileScreen: React.FC = () => {
               <Camera className="h-4 w-4 text-gray-600" />
             </button>
           </div>
-          
+
           <div className="flex-1">
             <h2 className="text-xl font-bold">{userData.name}</h2>
             <p className="text-indigo-100">{userData.email}</p>
@@ -261,7 +261,7 @@ export const ProfileScreen: React.FC = () => {
               <section.icon className="h-5 w-5 text-gray-600 mr-2" />
               <h3 className="font-semibold text-gray-900">{section.title}</h3>
             </div>
-            
+
             <div className="divide-y divide-gray-200">
               {section.items.map((item, index) => (
                 <div
@@ -272,13 +272,9 @@ export const ProfileScreen: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="text-sm text-gray-600">{item.label}</p>
-                      {item.value && (
-                        <p className="text-gray-900 font-medium">{item.value}</p>
-                      )}
+                      {item.value && <p className="text-gray-900 font-medium">{item.value}</p>}
                     </div>
-                    {item.icon && (
-                      <item.icon className="h-5 w-5 text-gray-400" />
-                    )}
+                    {item.icon && <item.icon className="h-5 w-5 text-gray-400" />}
                   </div>
                 </div>
               ))}
@@ -296,21 +292,15 @@ export const ProfileScreen: React.FC = () => {
         </button>
 
         {/* App Version */}
-        <p className="text-center text-sm text-gray-500 mt-4">
-          LabFlow Patient App v1.0.0
-        </p>
+        <p className="text-center text-sm text-gray-500 mt-4">LabFlow Patient App v1.0.0</p>
       </div>
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Sign Out?
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to sign out of your account?
-            </p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Sign Out?</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to sign out of your account?</p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}

@@ -11,7 +11,7 @@ export const OfflineIndicator: React.FC = () => {
     syncInProgress,
     syncProgress,
     syncNow,
-    isOfflineSupported
+    isOfflineSupported,
   } = useOffline();
 
   // Don't show anything if offline support is not available
@@ -57,7 +57,7 @@ export const OfflineIndicator: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div 
+      <div
         className={`
           flex items-center gap-2 px-4 py-2 rounded-lg border shadow-lg
           ${getSyncStatusColor()}
@@ -65,10 +65,8 @@ export const OfflineIndicator: React.FC = () => {
         `}
       >
         {getSyncStatusIcon()}
-        <span className="text-sm font-medium">
-          {getSyncStatusText()}
-        </span>
-        
+        <span className="text-sm font-medium">{getSyncStatusText()}</span>
+
         {!syncInProgress && (isOffline || pendingChanges > 0) && (
           <button
             onClick={syncNow}
@@ -83,10 +81,10 @@ export const OfflineIndicator: React.FC = () => {
       {/* Sync progress bar */}
       {syncInProgress && syncProgress && (
         <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-          <div 
+          <div
             className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
-            style={{ 
-              width: `${(syncProgress.completed / syncProgress.total) * 100}%` 
+            style={{
+              width: `${(syncProgress.completed / syncProgress.total) * 100}%`,
             }}
           />
         </div>
@@ -94,9 +92,7 @@ export const OfflineIndicator: React.FC = () => {
 
       {/* Error message */}
       {syncProgress?.lastError && (
-        <div className="mt-2 text-xs text-red-600 max-w-xs">
-          Error: {syncProgress.lastError}
-        </div>
+        <div className="mt-2 text-xs text-red-600 max-w-xs">Error: {syncProgress.lastError}</div>
       )}
     </div>
   );

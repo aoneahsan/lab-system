@@ -10,7 +10,7 @@ interface NotificationSettingsProps {
 const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   settings,
   onSave,
-  isSaving
+  isSaving,
 }) => {
   const [formData, setFormData] = useState<NotificationSettingsType>(settings);
 
@@ -22,14 +22,14 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     const keys = path.split('.');
     const newData = { ...formData };
     let current: any = newData;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       if (!current[keys[i]]) {
         current[keys[i]] = {};
       }
       current = current[keys[i]];
     }
-    
+
     current[keys[keys.length - 1]] = value;
     setFormData(newData);
   };
@@ -43,7 +43,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Channels</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center">
             <input
@@ -88,7 +88,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Notifications</h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-center">
             <input
@@ -108,10 +108,15 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               type="checkbox"
               id="patientAppointmentReminder"
               checked={formData.patientNotifications.appointmentReminder}
-              onChange={(e) => handleChange('patientNotifications.appointmentReminder', e.target.checked)}
+              onChange={(e) =>
+                handleChange('patientNotifications.appointmentReminder', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label htmlFor="patientAppointmentReminder" className="ml-2 block text-sm text-gray-900">
+            <label
+              htmlFor="patientAppointmentReminder"
+              className="ml-2 block text-sm text-gray-900"
+            >
               Send appointment reminders
             </label>
           </div>
@@ -133,14 +138,16 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Provider Notifications</h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-center">
             <input
               type="checkbox"
               id="providerCriticalValue"
               checked={formData.providerNotifications.criticalValue}
-              onChange={(e) => handleChange('providerNotifications.criticalValue', e.target.checked)}
+              onChange={(e) =>
+                handleChange('providerNotifications.criticalValue', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label htmlFor="providerCriticalValue" className="ml-2 block text-sm text-gray-900">
@@ -178,7 +185,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Staff Notifications</h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-center">
             <input
@@ -198,7 +205,9 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               type="checkbox"
               id="staffEquipmentMaintenance"
               checked={formData.staffNotifications.equipmentMaintenance}
-              onChange={(e) => handleChange('staffNotifications.equipmentMaintenance', e.target.checked)}
+              onChange={(e) =>
+                handleChange('staffNotifications.equipmentMaintenance', e.target.checked)
+              }
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label htmlFor="staffEquipmentMaintenance" className="ml-2 block text-sm text-gray-900">
@@ -223,15 +232,18 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Templates</h3>
-        
+
         <div className="bg-gray-50 p-4 rounded-lg">
           <p className="text-sm text-gray-600">
-            Configure notification templates in the Templates section. You can customize the subject and body for each notification type.
+            Configure notification templates in the Templates section. You can customize the subject
+            and body for each notification type.
           </p>
           <button
             type="button"
             className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-            onClick={() => {/* Navigate to templates */}}
+            onClick={() => {
+              /* Navigate to templates */
+            }}
           >
             Manage Templates →
           </button>

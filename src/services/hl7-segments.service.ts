@@ -111,14 +111,14 @@ class HL7SegmentsService {
   // Parse OBR segment
   parseOBRSegment(segment: HL7Segment): OBRSegment | null {
     if (segment.type !== 'OBR') return null;
-    
+
     const fields = segment.fields;
     const obr: OBRSegment = {};
 
     if (fields[0]) obr.setId = fields[0];
     if (fields[1]) obr.placerOrderNumber = fields[1];
     if (fields[2]) obr.fillerOrderNumber = fields[2];
-    
+
     // Universal Service ID
     if (fields[3]) {
       const components = this.parseComponents(fields[3]);
@@ -133,7 +133,7 @@ class HL7SegmentsService {
     if (fields[5]) obr.requestedDateTime = fields[5];
     if (fields[6]) obr.observationDateTime = fields[6];
     if (fields[7]) obr.observationEndDateTime = fields[7];
-    
+
     // Ordering Provider
     if (fields[15]) {
       const components = this.parseComponents(fields[15]);
@@ -155,13 +155,13 @@ class HL7SegmentsService {
   // Parse OBX segment
   parseOBXSegment(segment: HL7Segment): OBXSegment | null {
     if (segment.type !== 'OBX') return null;
-    
+
     const fields = segment.fields;
     const obx: OBXSegment = {};
 
     if (fields[0]) obx.setId = fields[0];
     if (fields[1]) obx.valueType = fields[1];
-    
+
     // Observation Identifier
     if (fields[2]) {
       const components = this.parseComponents(fields[2]);
@@ -173,7 +173,7 @@ class HL7SegmentsService {
     }
 
     if (fields[3]) obx.observationSubId = fields[3];
-    
+
     // Observation Value (can be repeating)
     if (fields[4]) {
       obx.observationValue = this.parseRepeatingField(fields[4]);
@@ -181,7 +181,7 @@ class HL7SegmentsService {
 
     if (fields[5]) obx.units = fields[5];
     if (fields[6]) obx.referenceRange = fields[6];
-    
+
     // Abnormal Flags (can be repeating)
     if (fields[7]) {
       obx.abnormalFlags = this.parseRepeatingField(fields[7]);
@@ -196,7 +196,7 @@ class HL7SegmentsService {
   // Parse ORC segment
   parseORCSegment(segment: HL7Segment): ORCSegment | null {
     if (segment.type !== 'ORC') return null;
-    
+
     const fields = segment.fields;
     const orc: ORCSegment = {
       orderControl: fields[0] || '',
@@ -207,9 +207,9 @@ class HL7SegmentsService {
     if (fields[3]) orc.placerGroupNumber = fields[3];
     if (fields[4]) orc.orderStatus = fields[4];
     if (fields[5]) orc.responseFlag = fields[5];
-    
+
     if (fields[8]) orc.dateTimeOfTransaction = fields[8];
-    
+
     // Ordering Provider
     if (fields[11]) {
       const components = this.parseComponents(fields[11]);
@@ -228,13 +228,13 @@ class HL7SegmentsService {
   // Parse NTE segment
   parseNTESegment(segment: HL7Segment): NTESegment | null {
     if (segment.type !== 'NTE') return null;
-    
+
     const fields = segment.fields;
     const nte: NTESegment = {};
 
     if (fields[0]) nte.setId = fields[0];
     if (fields[1]) nte.sourceOfComment = fields[1];
-    
+
     // Comment (can be repeating)
     if (fields[2]) {
       nte.comment = this.parseRepeatingField(fields[2]);
@@ -252,14 +252,16 @@ class HL7SegmentsService {
     fields.push(data.setId || '1');
     fields.push(data.placerOrderNumber || '');
     fields.push(data.fillerOrderNumber || '');
-    
+
     // Universal Service ID
     if (data.universalServiceId) {
-      fields.push([
-        data.universalServiceId.identifier,
-        data.universalServiceId.text,
-        data.universalServiceId.nameOfCodingSystem || '',
-      ].join(this.componentSeparator));
+      fields.push(
+        [
+          data.universalServiceId.identifier,
+          data.universalServiceId.text,
+          data.universalServiceId.nameOfCodingSystem || '',
+        ].join(this.componentSeparator)
+      );
     } else {
       fields.push('');
     }
@@ -268,7 +270,7 @@ class HL7SegmentsService {
     fields.push(data.requestedDateTime || '');
     fields.push(data.observationDateTime || '');
     fields.push(data.observationEndDateTime || '');
-    
+
     // Add empty fields up to ordering provider
     for (let i = fields.length; i < 16; i++) {
       fields.push('');
@@ -295,20 +297,22 @@ class HL7SegmentsService {
 
     fields.push(data.setId || '1');
     fields.push(data.valueType || 'ST');
-    
+
     // Observation Identifier
     if (data.observationIdentifier) {
-      fields.push([
-        data.observationIdentifier.identifier,
-        data.observationIdentifier.text,
-        data.observationIdentifier.nameOfCodingSystem || '',
-      ].join(this.componentSeparator));
+      fields.push(
+        [
+          data.observationIdentifier.identifier,
+          data.observationIdentifier.text,
+          data.observationIdentifier.nameOfCodingSystem || '',
+        ].join(this.componentSeparator)
+      );
     } else {
       fields.push('');
     }
 
     fields.push(data.observationSubId || '');
-    
+
     // Observation Value
     if (data.observationValue) {
       fields.push(data.observationValue.join(this.repetitionSeparator));
@@ -318,7 +322,7 @@ class HL7SegmentsService {
 
     fields.push(data.units || '');
     fields.push(data.referenceRange || '');
-    
+
     // Abnormal Flags
     if (data.abnormalFlags) {
       fields.push(data.abnormalFlags.join(this.repetitionSeparator));

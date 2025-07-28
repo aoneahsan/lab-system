@@ -13,7 +13,7 @@ const TestOrderReview: React.FC<TestOrderReviewProps> = ({
   order,
   onApprove,
   onReject,
-  isLoading = false
+  isLoading = false,
 }) => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -36,35 +36,37 @@ const TestOrderReview: React.FC<TestOrderReviewProps> = ({
       <div className="flex items-start gap-3">
         <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
         <div className="flex-1">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Order Review Required
-          </h3>
-          
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Order Review Required</h3>
+
           <div className="space-y-3 mb-4">
             <div className="bg-white rounded p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Priority:</span>
-                <span className={`font-medium ${
-                  order.priority === 'stat' ? 'text-red-600' : 
-                  order.priority === 'asap' ? 'text-orange-600' : 
-                  'text-gray-900'
-                }`}>
+                <span
+                  className={`font-medium ${
+                    order.priority === 'stat'
+                      ? 'text-red-600'
+                      : order.priority === 'asap'
+                        ? 'text-orange-600'
+                        : 'text-gray-900'
+                  }`}
+                >
                   {order.priority.toUpperCase()}
                 </span>
               </div>
-              
+
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Tests Ordered:</span>
                 <span className="font-medium">{order.tests.length}</span>
               </div>
-              
+
               {order.clinicalHistory && (
                 <div className="text-sm">
                   <span className="text-gray-600">Clinical History:</span>
                   <p className="mt-1 text-gray-900">{order.clinicalHistory}</p>
                 </div>
               )}
-              
+
               {order.diagnosis && (
                 <div className="text-sm">
                   <span className="text-gray-600">Diagnosis:</span>
@@ -96,7 +98,7 @@ const TestOrderReview: React.FC<TestOrderReviewProps> = ({
               <Check className="h-4 w-4" />
               Approve Order
             </button>
-            
+
             <button
               onClick={() => setShowRejectDialog(true)}
               disabled={isLoading}
@@ -113,10 +115,8 @@ const TestOrderReview: React.FC<TestOrderReviewProps> = ({
       {showRejectDialog && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Reject Test Order
-            </h3>
-            
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Reject Test Order</h3>
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Rejection Reason <span className="text-red-500">*</span>

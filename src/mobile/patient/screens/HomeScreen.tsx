@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-  FileText, 
-  Calendar, 
-  MapPin, 
-  CreditCard, 
-  Users, 
+import {
+  FileText,
+  Calendar,
+  MapPin,
+  CreditCard,
+  Users,
   Activity,
   Bell,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
@@ -20,33 +20,33 @@ export const HomeScreen: React.FC = () => {
   const { data: recentResults } = useOfflinePatients({ limit: 3 });
 
   const quickActions = [
-    { 
-      id: 'results', 
-      label: 'View Results', 
-      icon: FileText, 
+    {
+      id: 'results',
+      label: 'View Results',
+      icon: FileText,
       color: 'indigo',
-      route: '/patient/results'
+      route: '/patient/results',
     },
-    { 
-      id: 'appointments', 
-      label: 'Book Test', 
-      icon: Calendar, 
+    {
+      id: 'appointments',
+      label: 'Book Test',
+      icon: Calendar,
       color: 'green',
-      route: '/patient/appointments/new'
+      route: '/patient/appointments/new',
     },
-    { 
-      id: 'locations', 
-      label: 'Find Lab', 
-      icon: MapPin, 
+    {
+      id: 'locations',
+      label: 'Find Lab',
+      icon: MapPin,
       color: 'blue',
-      route: '/patient/locations'
+      route: '/patient/locations',
     },
-    { 
-      id: 'payments', 
-      label: 'Payments', 
-      icon: CreditCard, 
+    {
+      id: 'payments',
+      label: 'Payments',
+      icon: CreditCard,
       color: 'purple',
-      route: '/patient/payments'
+      route: '/patient/payments',
     },
   ];
 
@@ -56,21 +56,21 @@ export const HomeScreen: React.FC = () => {
       label: 'Family Members',
       icon: Users,
       description: 'Manage family health records',
-      route: '/patient/family'
+      route: '/patient/family',
     },
     {
       id: 'health-tracker',
       label: 'Health Tracker',
       icon: Activity,
       description: 'Track your health metrics',
-      route: '/patient/health-tracker'
+      route: '/patient/health-tracker',
     },
     {
       id: 'reminders',
       label: 'Test Reminders',
       icon: Bell,
       description: 'Set up test reminders',
-      route: '/patient/reminders'
+      route: '/patient/reminders',
     },
   ];
 
@@ -81,10 +81,8 @@ export const HomeScreen: React.FC = () => {
         <h1 className="text-2xl font-bold">
           Hello, {currentUser?.displayName?.split(' ')[0] || 'there'}!
         </h1>
-        <p className="text-indigo-100 mt-1">
-          Your health journey at your fingertips
-        </p>
-        
+        <p className="text-indigo-100 mt-1">Your health journey at your fingertips</p>
+
         {/* Health Score Card */}
         <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-lg p-4">
           <div className="flex items-center justify-between">
@@ -124,18 +122,18 @@ export const HomeScreen: React.FC = () => {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-900">Recent Results</h2>
-            <button 
+            <button
               onClick={() => navigate('/patient/results')}
               className="text-sm text-indigo-600 font-medium"
             >
               View All
             </button>
           </div>
-          
+
           <div className="space-y-2">
             {recentResults && recentResults.length > 0 ? (
               recentResults.map((result: any) => (
-                <div 
+                <div
                   key={result.id}
                   onClick={() => navigate(`/patient/results/${result.id}`)}
                   className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between"
@@ -147,9 +145,11 @@ export const HomeScreen: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`text-sm font-medium ${
-                      result.status === 'ready' ? 'text-green-600' : 'text-yellow-600'
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        result.status === 'ready' ? 'text-green-600' : 'text-yellow-600'
+                      }`}
+                    >
                       {result.status === 'ready' ? 'Ready' : 'Processing'}
                     </span>
                     <ChevronRight className="h-4 w-4 text-gray-400" />
@@ -160,7 +160,7 @@ export const HomeScreen: React.FC = () => {
               <div className="bg-white p-8 rounded-lg text-center">
                 <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500">No recent test results</p>
-                <button 
+                <button
                   onClick={() => navigate('/patient/appointments/new')}
                   className="mt-3 text-indigo-600 font-medium"
                 >
@@ -205,9 +205,7 @@ export const HomeScreen: React.FC = () => {
               <p className="text-sm text-indigo-700 mt-1">
                 Blood Test Collection - Tomorrow at 9:00 AM
               </p>
-              <button className="mt-2 text-sm text-indigo-600 font-medium">
-                View Details →
-              </button>
+              <button className="mt-2 text-sm text-indigo-600 font-medium">View Details →</button>
             </div>
           </div>
         </div>

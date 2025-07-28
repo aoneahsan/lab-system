@@ -6,41 +6,46 @@
 import { collection, query, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
-import { getFirestoreCollectionName, COLLECTION_NAMES, ROOT_COLLECTIONS, SHARED_COLLECTIONS } from '@/config/firebase-collections-helper';
+import {
+  getFirestoreCollectionName,
+  COLLECTION_NAMES,
+  ROOT_COLLECTIONS,
+  SHARED_COLLECTIONS,
+} from '@/config/firebase-collections-helper';
 
 export const runPermissionTests = async () => {
   console.log('🔍 Starting Firebase Permission Tests...\n');
-  
+
   // Check auth state
   const user = auth.currentUser;
   if (!user) {
     console.error('❌ No user authenticated. Please login first.');
     return;
   }
-  
+
   console.log('✅ User authenticated:', {
     uid: user.uid,
-    email: user.email
+    email: user.email,
   });
-  
+
   // Check tenant
   const tenant = useTenantStore.getState().currentTenant;
   if (!tenant) {
     console.error('❌ No tenant selected. Please select a tenant.');
     return;
   }
-  
+
   console.log('✅ Tenant selected:', {
     id: tenant.id,
-    name: tenant.name
+    name: tenant.name,
   });
-  
+
   // Check tenant_user document
   console.log('\n📋 Checking tenant_user document...');
   try {
     const tenantUserDocId = `${user.uid}_${tenant.id}`;
     const tenantUserDoc = await getDoc(doc(db, ROOT_COLLECTIONS.TENANT_USERS, tenantUserDocId));
-    
+
     if (!tenantUserDoc.exists()) {
       console.error(`❌ Tenant user document not found: ${tenantUserDocId}`);
       console.error('   This is required for accessing tenant-specific collections.');
@@ -51,13 +56,13 @@ export const runPermissionTests = async () => {
         role: data.role,
         isActive: data.isActive,
         tenantId: data.tenantId,
-        userId: data.userId
+        userId: data.userId,
       });
     }
   } catch (error: any) {
     console.error('❌ Error checking tenant_user:', error.message);
   }
-  
+
   // Test root collections
   console.log('\n📁 Testing ROOT collections...');
   for (const [name, collectionName] of Object.entries(ROOT_COLLECTIONS)) {
@@ -69,7 +74,7 @@ export const runPermissionTests = async () => {
       console.error(`❌ ${name} (${collectionName}): ${error.message}`);
     }
   }
-  
+
   // Test shared collections
   console.log('\n📁 Testing SHARED collections...');
   for (const [name, collectionName] of Object.entries(SHARED_COLLECTIONS)) {
@@ -81,31 +86,31 @@ export const runPermissionTests = async () => {
       console.error(`❌ ${name} (${collectionName}): ${error.message}`);
     }
   }
-  
+
   // Test tenant-specific collections
   console.log('\n📁 Testing TENANT-SPECIFIC collections...');
   const criticalCollections = [
     'PATIENTS',
-    'TESTS', 
+    'TESTS',
     'SAMPLES',
     'RESULTS',
     'INVENTORY_ITEMS',
     'QC_TESTS',
-    'REPORTS'
+    'REPORTS',
   ];
-  
+
   for (const collectionKey of criticalCollections) {
     const collectionName = COLLECTION_NAMES[collectionKey as keyof typeof COLLECTION_NAMES];
     if (!collectionName) continue;
-    
+
     try {
       const fullCollectionName = getFirestoreCollectionName(collectionName, tenant.id);
       console.log(`\n   Testing ${collectionKey}...`);
       console.log(`   Collection name: ${fullCollectionName}`);
-      
+
       const q = query(collection(db, fullCollectionName), limit(1));
       const snapshot = await getDocs(q);
-      
+
       console.log(`   ✅ ${collectionKey}: Access GRANTED (${snapshot.size} docs found)`);
     } catch (error: any) {
       console.error(`   ❌ ${collectionKey}: Access DENIED`);
@@ -113,7 +118,7 @@ export const runPermissionTests = async () => {
       console.error(`      Code: ${error.code}`);
     }
   }
-  
+
   console.log('\n✅ Permission test complete!');
   console.log('\n💡 If you see "Missing or insufficient permissions" errors:');
   console.log('   1. Ensure the tenant_users document exists with your user ID and tenant ID');

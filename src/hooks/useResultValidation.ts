@@ -64,17 +64,16 @@ export const useDeleteValidationRule = () => {
 
 export const useValidateResult = () => {
   return useMutation({
-    mutationFn: ({ 
-      testId, 
-      value, 
+    mutationFn: ({
+      testId,
+      value,
       patientId,
-      referenceRange 
-    }: { 
-      testId: string; 
-      value: string | number; 
+      referenceRange,
+    }: {
+      testId: string;
+      value: string | number;
       patientId: string;
       referenceRange?: { min?: number; max?: number };
-    }) => 
-      resultValidationService.validateResult(testId, value, patientId, referenceRange),
+    }) => resultValidationService.validateResult(testId, value, patientId, referenceRange),
   });
 };

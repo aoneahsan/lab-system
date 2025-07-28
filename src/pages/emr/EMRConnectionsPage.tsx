@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { 
-  Link2, 
-  Plus, 
-  RefreshCw, 
+import {
+  Link2,
+  Plus,
+  RefreshCw,
   Settings,
   CheckCircle,
   XCircle,
   AlertCircle,
   Clock,
   Trash2,
-  Edit
+  Edit,
 } from 'lucide-react';
 import { useEMRConnections, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
-import type { EMRConnectionFilter, ConnectionStatus, EMRSystemType, IntegrationProtocol } from '@/types/emr.types';
+import type {
+  EMRConnectionFilter,
+  ConnectionStatus,
+  EMRSystemType,
+  IntegrationProtocol,
+} from '@/types/emr.types';
 
 const EMRConnectionsPage: React.FC = () => {
   const [filter, setFilter] = useState<EMRConnectionFilter>({});
@@ -68,7 +73,7 @@ const EMRConnectionsPage: React.FC = () => {
             <p className="text-gray-600 mt-2">Manage your Electronic Medical Record integrations</p>
           </div>
           <button
-            onClick={() => window.location.href = '/emr/connections/new'}
+            onClick={() => (window.location.href = '/emr/connections/new')}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -82,7 +87,9 @@ const EMRConnectionsPage: React.FC = () => {
         <div className="flex items-center gap-4">
           <select
             value={filter.systemType || ''}
-            onChange={(e) => setFilter({ ...filter, systemType: e.target.value as EMRSystemType || undefined })}
+            onChange={(e) =>
+              setFilter({ ...filter, systemType: (e.target.value as EMRSystemType) || undefined })
+            }
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Systems</option>
@@ -95,10 +102,15 @@ const EMRConnectionsPage: React.FC = () => {
             <option value="practicefusion">Practice Fusion</option>
             <option value="custom">Custom</option>
           </select>
-          
+
           <select
             value={filter.protocol || ''}
-            onChange={(e) => setFilter({ ...filter, protocol: e.target.value as IntegrationProtocol || undefined })}
+            onChange={(e) =>
+              setFilter({
+                ...filter,
+                protocol: (e.target.value as IntegrationProtocol) || undefined,
+              })
+            }
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Protocols</option>
@@ -109,10 +121,12 @@ const EMRConnectionsPage: React.FC = () => {
             <option value="webhook">Webhook</option>
             <option value="file">File Based</option>
           </select>
-          
+
           <select
             value={filter.status || ''}
-            onChange={(e) => setFilter({ ...filter, status: e.target.value as ConnectionStatus || undefined })}
+            onChange={(e) =>
+              setFilter({ ...filter, status: (e.target.value as ConnectionStatus) || undefined })
+            }
             className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="">All Status</option>
@@ -137,7 +151,7 @@ const EMRConnectionsPage: React.FC = () => {
             <Link2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No EMR connections found.</p>
             <button
-              onClick={() => window.location.href = '/emr/connections/new'}
+              onClick={() => (window.location.href = '/emr/connections/new')}
               className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
               Create First Connection
@@ -188,9 +202,7 @@ const EMRConnectionsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900 uppercase">
-                        {connection.protocol}
-                      </span>
+                      <span className="text-sm text-gray-900 uppercase">{connection.protocol}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(connection.status)}
@@ -211,7 +223,7 @@ const EMRConnectionsPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => window.location.href = `/emr/connections/${connection.id}`}
+                        onClick={() => (window.location.href = `/emr/connections/${connection.id}`)}
                         className="text-blue-600 hover:text-blue-900 mr-3"
                         title="View Details"
                       >
@@ -226,7 +238,9 @@ const EMRConnectionsPage: React.FC = () => {
                         <RefreshCw className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => window.location.href = `/emr/connections/${connection.id}/edit`}
+                        onClick={() =>
+                          (window.location.href = `/emr/connections/${connection.id}/edit`)
+                        }
                         className="text-yellow-600 hover:text-yellow-900 mr-3"
                         title="Edit"
                       >

@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import type { 
-  InventoryItemFormData, 
-  UnitOfMeasure, 
-  InventoryCategory
+import type {
+  InventoryItemFormData,
+  UnitOfMeasure,
+  InventoryCategory,
 } from '@/types/inventory.types';
 
 interface InventoryItemFormProps {
@@ -19,33 +19,52 @@ interface InventoryItemFormProps {
 }
 
 const units: UnitOfMeasure[] = [
-  'piece', 'box', 'case', 'ml', 'l', 'mg', 'g', 'kg', 
-  'test', 'vial', 'bottle', 'pack', 'roll', 'sheet'
+  'piece',
+  'box',
+  'case',
+  'ml',
+  'l',
+  'mg',
+  'g',
+  'kg',
+  'test',
+  'vial',
+  'bottle',
+  'pack',
+  'roll',
+  'sheet',
 ];
 
 const categories: InventoryCategory[] = [
-  'reagent', 'control', 'calibrator', 'consumable', 
-  'equipment', 'ppe', 'office_supply', 'maintenance', 'other'
+  'reagent',
+  'control',
+  'calibrator',
+  'consumable',
+  'equipment',
+  'ppe',
+  'office_supply',
+  'maintenance',
+  'other',
 ];
 
 export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
-  isLoading = false
+  isLoading = false,
 }) => {
   const {
     register,
     handleSubmit,
     // watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm<InventoryItemFormData>({
     defaultValues: {
       requiresLotTracking: false,
       requiresExpirationTracking: false,
       hazardous: false,
-      ...initialData
-    }
+      ...initialData,
+    },
   });
 
   // const requiresRefrigeration = watch('storageCondition.requiresRefrigeration');
@@ -56,33 +75,27 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
       {/* Basic Information */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Item Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
             <input
               type="text"
               {...register('name', { required: 'Item name is required' })}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="Enter item name"
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
             <select
               {...register('category', { required: 'Category is required' })}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select category</option>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ')}
                 </option>
@@ -94,9 +107,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Manufacturer
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
             <input
               type="text"
               {...register('manufacturer')}
@@ -106,9 +117,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Catalog Number
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Catalog Number</label>
             <input
               type="text"
               {...register('catalogNumber')}
@@ -126,21 +135,17 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select unit</option>
-              {units.map(unit => (
+              {units.map((unit) => (
                 <option key={unit} value={unit}>
                   {unit}
                 </option>
               ))}
             </select>
-            {errors.unit && (
-              <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>
-            )}
+            {errors.unit && <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unit Cost
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost</label>
             <input
               type="number"
               step="0.01"
@@ -152,9 +157,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
             {...register('description')}
             rows={3}
@@ -167,18 +170,16 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
       {/* Stock Levels */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Stock Levels</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Minimum Stock *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Stock *</label>
             <input
               type="number"
-              {...register('minimumStock', { 
+              {...register('minimumStock', {
                 required: 'Minimum stock is required',
                 valueAsNumber: true,
-                min: { value: 0, message: 'Must be 0 or greater' }
+                min: { value: 0, message: 'Must be 0 or greater' },
               })}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="0"
@@ -189,9 +190,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Maximum Stock
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Stock</label>
             <input
               type="number"
               {...register('maximumStock', { valueAsNumber: true })}
@@ -201,15 +200,13 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reorder Point *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Point *</label>
             <input
               type="number"
-              {...register('reorderPoint', { 
+              {...register('reorderPoint', {
                 required: 'Reorder point is required',
                 valueAsNumber: true,
-                min: { value: 0, message: 'Must be 0 or greater' }
+                min: { value: 0, message: 'Must be 0 or greater' },
               })}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="0"
@@ -225,10 +222,10 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
             </label>
             <input
               type="number"
-              {...register('reorderQuantity', { 
+              {...register('reorderQuantity', {
                 required: 'Reorder quantity is required',
                 valueAsNumber: true,
-                min: { value: 1, message: 'Must be 1 or greater' }
+                min: { value: 1, message: 'Must be 1 or greater' },
               })}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="0"
@@ -243,7 +240,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
       {/* Storage Conditions */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Storage Conditions</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -323,40 +320,26 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
       {/* Compliance & Tracking */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Compliance & Tracking</h3>
-        
+
         <div className="space-y-2">
           <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('requiresLotTracking')}
-              className="mr-2"
-            />
+            <input type="checkbox" {...register('requiresLotTracking')} className="mr-2" />
             <span className="text-sm">Requires lot tracking</span>
           </label>
 
           <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('requiresExpirationTracking')}
-              className="mr-2"
-            />
+            <input type="checkbox" {...register('requiresExpirationTracking')} className="mr-2" />
             <span className="text-sm">Requires expiration date tracking</span>
           </label>
 
           <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('hazardous')}
-              className="mr-2"
-            />
+            <input type="checkbox" {...register('hazardous')} className="mr-2" />
             <span className="text-sm">Hazardous material</span>
           </label>
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            MSDS URL
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">MSDS URL</label>
           <input
             type="url"
             {...register('msdsUrl')}

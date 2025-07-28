@@ -44,15 +44,13 @@ export const useCreateOfflinePatient = () => {
   const tenantId = currentTenant?.id || '';
 
   return useMutation({
-    mutationFn: (data: CreatePatientData) =>
-      patientOfflineService.createPatient(tenantId, data),
+    mutationFn: (data: CreatePatientData) => patientOfflineService.createPatient(tenantId, data),
     onSuccess: (newPatient) => {
       // Update the patients list cache
-      queryClient.setQueryData<Patient[]>(
-        ['patients', tenantId],
-        (old) => (old ? [newPatient, ...old] : [newPatient])
+      queryClient.setQueryData<Patient[]>(['patients', tenantId], (old) =>
+        old ? [newPatient, ...old] : [newPatient]
       );
-      
+
       // Invalidate queries to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['patients', tenantId] });
     },
@@ -88,15 +86,14 @@ export const useDeleteOfflinePatient = () => {
   const tenantId = currentTenant?.id || '';
 
   return useMutation({
-    mutationFn: (patientId: string) =>
-      patientOfflineService.deletePatient(tenantId, patientId),
+    mutationFn: (patientId: string) => patientOfflineService.deletePatient(tenantId, patientId),
     onSuccess: (_, patientId) => {
       // Remove from cache
       queryClient.setQueryData<Patient[]>(
         ['patients', tenantId],
         (old) => old?.filter((p) => p.id !== patientId) || []
       );
-      
+
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['patient', tenantId, patientId] });
       queryClient.invalidateQueries({ queryKey: ['patients', tenantId] });

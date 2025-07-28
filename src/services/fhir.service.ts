@@ -1,17 +1,11 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  serverTimestamp,
-  Timestamp
-} from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import type { 
-  EMRConnection, 
+import type {
+  EMRConnection,
   FHIRAuthConfig,
   EMRMessage,
-  FHIRResourceType
+  FHIRResourceType,
 } from '@/types/emr.types';
 
 // FHIR Resource interfaces (simplified)
@@ -46,7 +40,15 @@ export interface FHIRPatient {
 export interface FHIRObservation {
   resourceType: 'Observation';
   id?: string;
-  status: 'registered' | 'preliminary' | 'final' | 'amended' | 'corrected' | 'cancelled' | 'entered-in-error' | 'unknown';
+  status:
+    | 'registered'
+    | 'preliminary'
+    | 'final'
+    | 'amended'
+    | 'corrected'
+    | 'cancelled'
+    | 'entered-in-error'
+    | 'unknown';
   code: {
     coding?: Array<{
       system?: string;
@@ -78,7 +80,17 @@ export interface FHIRObservation {
 export interface FHIRDiagnosticReport {
   resourceType: 'DiagnosticReport';
   id?: string;
-  status: 'registered' | 'partial' | 'preliminary' | 'final' | 'amended' | 'corrected' | 'appended' | 'cancelled' | 'entered-in-error' | 'unknown';
+  status:
+    | 'registered'
+    | 'partial'
+    | 'preliminary'
+    | 'final'
+    | 'amended'
+    | 'corrected'
+    | 'appended'
+    | 'cancelled'
+    | 'entered-in-error'
+    | 'unknown';
   code: {
     coding?: Array<{
       system?: string;
@@ -104,7 +116,16 @@ export interface FHIRServiceRequest {
   resourceType: 'ServiceRequest';
   id?: string;
   status: 'draft' | 'active' | 'on-hold' | 'revoked' | 'completed' | 'entered-in-error' | 'unknown';
-  intent: 'proposal' | 'plan' | 'directive' | 'order' | 'original-order' | 'reflex-order' | 'filler-order' | 'instance-order' | 'option';
+  intent:
+    | 'proposal'
+    | 'plan'
+    | 'directive'
+    | 'order'
+    | 'original-order'
+    | 'reflex-order'
+    | 'filler-order'
+    | 'instance-order'
+    | 'option';
   priority?: 'routine' | 'urgent' | 'asap' | 'stat';
   code?: {
     coding?: Array<{
@@ -150,7 +171,7 @@ class FHIRService {
 
     const cacheKey = connection.id;
     const cached = this.authTokens.get(cacheKey);
-    
+
     if (cached && cached.expiresAt > new Date()) {
       return cached.token;
     }
@@ -158,13 +179,13 @@ class FHIRService {
     switch (auth.type) {
       case 'basic':
         return this.getBasicAuthToken(auth.username!, auth.password!);
-      
+
       case 'bearer':
         return auth.token || null;
-      
+
       case 'oauth2':
         return this.getOAuth2Token(auth);
-      
+
       default:
         return null;
     }
@@ -209,7 +230,7 @@ class FHIRService {
       // Cache the token
       const expiresAt = new Date();
       expiresAt.setSeconds(expiresAt.getSeconds() + expiresIn - 60); // Refresh 1 minute early
-      
+
       this.authTokens.set(auth.clientId, { token, expiresAt });
 
       return `Bearer ${token}`;
@@ -229,7 +250,7 @@ class FHIRService {
     const authToken = await this.getAuthToken(connection);
     const headers: Record<string, string> = {
       'Content-Type': 'application/fhir+json',
-      'Accept': 'application/fhir+json',
+      Accept: 'application/fhir+json',
     };
 
     if (authToken) {
@@ -258,10 +279,7 @@ class FHIRService {
     return this.makeRequest(connection, 'GET', `/${resourceType}/${id}`) as Promise<FHIRResource>;
   }
 
-  async createResource(
-    connection: EMRConnection,
-    resource: FHIRResource
-  ): Promise<FHIRResource> {
+  async createResource(connection: EMRConnection, resource: FHIRResource): Promise<FHIRResource> {
     return this.makeRequest(
       connection,
       'POST',
@@ -270,14 +288,11 @@ class FHIRService {
     ) as Promise<FHIRResource>;
   }
 
-  async updateResource(
-    connection: EMRConnection,
-    resource: FHIRResource
-  ): Promise<FHIRResource> {
+  async updateResource(connection: EMRConnection, resource: FHIRResource): Promise<FHIRResource> {
     if (!resource.id) {
       throw new Error('Resource ID is required for update');
     }
-    
+
     return this.makeRequest(
       connection,
       'PUT',
@@ -292,22 +307,16 @@ class FHIRService {
     params: Record<string, string>
   ): Promise<{ entry?: Array<{ resource: FHIRResource }> }> {
     const queryString = new URLSearchParams(params).toString();
-    return this.makeRequest(
-      connection,
-      'GET',
-      `/${resourceType}?${queryString}`
-    ) as Promise<{ entry?: Array<{ resource: FHIRResource }> }>;
+    return this.makeRequest(connection, 'GET', `/${resourceType}?${queryString}`) as Promise<{
+      entry?: Array<{ resource: FHIRResource }>;
+    }>;
   }
 
   // Patient operations
-  async syncPatient(
-    connection: EMRConnection,
-    patientId: string,
-    tenantId: string
-  ): Promise<void> {
+  async syncPatient(connection: EMRConnection, patientId: string, tenantId: string): Promise<void> {
     try {
-      const fhirPatient = await this.getResource(connection, 'Patient', patientId) as FHIRPatient;
-      
+      const fhirPatient = (await this.getResource(connection, 'Patient', patientId)) as FHIRPatient;
+
       // Create a message for processing
       const message: Omit<EMRMessage, 'id'> = {
         tenantId,
@@ -329,7 +338,10 @@ class FHIRService {
       };
 
       // Save to message queue
-      const messagesRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`);
+      const messagesRef = collection(
+        db,
+        `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`
+      );
       await setDoc(doc(messagesRef), message);
     } catch (error) {
       console.error('Failed to sync patient:', error);
@@ -344,8 +356,8 @@ class FHIRService {
     tenantId: string
   ): Promise<string> {
     try {
-      const createdOrder = await this.createResource(connection, order) as FHIRServiceRequest;
-      
+      const createdOrder = (await this.createResource(connection, order)) as FHIRServiceRequest;
+
       // Create a message for tracking
       const message: Omit<EMRMessage, 'id'> = {
         tenantId,
@@ -368,7 +380,10 @@ class FHIRService {
         updatedAt: serverTimestamp() as Timestamp,
       };
 
-      const messagesRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`);
+      const messagesRef = collection(
+        db,
+        `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`
+      );
       await setDoc(doc(messagesRef), message);
 
       return createdOrder.id!;
@@ -388,9 +403,9 @@ class FHIRService {
     try {
       // Create observations first
       const observationRefs: Array<{ reference: string; display?: string }> = [];
-      
+
       for (const observation of observations) {
-        const created = await this.createResource(connection, observation) as FHIRObservation;
+        const created = (await this.createResource(connection, observation)) as FHIRObservation;
         observationRefs.push({
           reference: `Observation/${created.id}`,
           display: observation.code.text || observation.code.coding?.[0]?.display,
@@ -399,7 +414,10 @@ class FHIRService {
 
       // Create diagnostic report with observation references
       results.result = observationRefs;
-      const createdReport = await this.createResource(connection, results) as FHIRDiagnosticReport;
+      const createdReport = (await this.createResource(
+        connection,
+        results
+      )) as FHIRDiagnosticReport;
 
       // Create a message for tracking
       const message: Omit<EMRMessage, 'id'> = {
@@ -426,7 +444,10 @@ class FHIRService {
         updatedAt: serverTimestamp() as Timestamp,
       };
 
-      const messagesRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`);
+      const messagesRef = collection(
+        db,
+        `${COLLECTIONS.TENANTS}/${tenantId}/${COLLECTIONS.EMR_MESSAGES}`
+      );
       await setDoc(doc(messagesRef), message);
     } catch (error) {
       console.error('Failed to send lab results:', error);
@@ -439,7 +460,7 @@ class FHIRService {
     try {
       // Try to get the capability statement
       const response = await this.makeRequest(connection, 'GET', '/metadata');
-      
+
       if (response && typeof response === 'object' && 'resourceType' in response) {
         return {
           success: true,

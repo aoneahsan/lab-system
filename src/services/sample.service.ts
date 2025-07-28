@@ -31,7 +31,9 @@ const generateSampleNumber = (): string => {
   const year = date.getFullYear().toString().slice(-2);
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, '0');
   return `S${year}${month}${day}${random}`;
 };
 
@@ -73,10 +75,13 @@ export const sampleService = {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as Sample));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as Sample
+    );
   },
 
   // Get single sample
@@ -94,11 +99,7 @@ export const sampleService = {
   },
 
   // Create sample
-  async createSample(
-    tenantId: string,
-    userId: string,
-    data: SampleFormData
-  ): Promise<Sample> {
+  async createSample(tenantId: string, userId: string, data: SampleFormData): Promise<Sample> {
     const sampleNumber = generateSampleNumber();
     const barcode = generateBarcode(sampleNumber);
 
@@ -236,19 +237,24 @@ export const sampleService = {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as SampleCollection));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as SampleCollection
+    );
   },
 
   // Create sample collection
   async createSampleCollection(
     tenantId: string,
     userId: string,
-    data: Omit<SampleCollection, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
+    data: Omit<
+      SampleCollection,
+      'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
+    >
   ): Promise<SampleCollection> {
-
     const collectionData = {
       ...data,
       tenantId,
@@ -283,8 +289,8 @@ export const sampleService = {
     }
 
     const collectionData = currentCollection.data() as SampleCollection;
-    const updatedSamples = collectionData.samples.map(sample => {
-      const collected = collectedSamples.find(cs => cs.testId === sample.testId);
+    const updatedSamples = collectionData.samples.map((sample) => {
+      const collected = collectedSamples.find((cs) => cs.testId === sample.testId);
       if (collected) {
         return {
           ...sample,
@@ -344,14 +350,13 @@ export const sampleService = {
       pendingSamples: 0,
     };
 
-    samples.forEach(sample => {
+    samples.forEach((sample) => {
       // Count by status
-      statistics.samplesByStatus[sample.status] = 
+      statistics.samplesByStatus[sample.status] =
         (statistics.samplesByStatus[sample.status] || 0) + 1;
 
       // Count by type
-      statistics.samplesByType[sample.type] = 
-        (statistics.samplesByType[sample.type] || 0) + 1;
+      statistics.samplesByType[sample.type] = (statistics.samplesByType[sample.type] || 0) + 1;
 
       // Count today's samples
       const sampleDate = sample.collectionDate.toDate();

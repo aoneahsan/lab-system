@@ -21,7 +21,7 @@ export default function BarcodeGenerator({
   displayValue = true,
   text,
   fontSize = 20,
-  className = ''
+  className = '',
 }: BarcodeGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -37,7 +37,7 @@ export default function BarcodeGenerator({
         fontSize,
         margin: 10,
         background: '#ffffff',
-        lineColor: '#000000'
+        lineColor: '#000000',
       });
     }
   }, [value, format, width, height, displayValue, text, fontSize]);
@@ -47,7 +47,7 @@ export default function BarcodeGenerator({
     if (!printWindow) return;
 
     const svgContent = svgRef.current?.outerHTML || '';
-    
+
     printWindow.document.write(`
       <html>
         <head>
@@ -82,7 +82,7 @@ export default function BarcodeGenerator({
         </body>
       </html>
     `);
-    
+
     printWindow.document.close();
   };
 
@@ -105,7 +105,7 @@ export default function BarcodeGenerator({
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
-      
+
       // Download as PNG
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -116,7 +116,7 @@ export default function BarcodeGenerator({
         a.click();
         URL.revokeObjectURL(url);
       });
-      
+
       URL.revokeObjectURL(svgUrl);
     };
     img.src = svgUrl;
@@ -128,21 +128,13 @@ export default function BarcodeGenerator({
         <svg ref={svgRef}></svg>
         <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
       </div>
-      
+
       <div className="flex justify-center gap-2">
-        <button
-          onClick={handlePrint}
-          className="btn btn-secondary"
-          title="Print Barcode"
-        >
+        <button onClick={handlePrint} className="btn btn-secondary" title="Print Barcode">
           <Printer className="h-4 w-4" />
           Print
         </button>
-        <button
-          onClick={handleDownload}
-          className="btn btn-secondary"
-          title="Download Barcode"
-        >
+        <button onClick={handleDownload} className="btn btn-secondary" title="Download Barcode">
           <Download className="h-4 w-4" />
           Download
         </button>

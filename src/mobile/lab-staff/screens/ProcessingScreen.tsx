@@ -15,7 +15,7 @@ import {
   User,
   Calendar,
   FileText,
-  Beaker
+  Beaker,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -54,13 +54,25 @@ export const ProcessingScreen: React.FC = () => {
       patientName: 'John Doe',
       patientId: 'P12345',
       tests: [
-        { id: '1', name: 'CBC', status: 'in-progress', analyzer: 'Sysmex XN-1000', estimatedTime: 5 },
-        { id: '2', name: 'Chemistry Panel', status: 'pending', analyzer: 'Cobas 6000', estimatedTime: 15 }
+        {
+          id: '1',
+          name: 'CBC',
+          status: 'in-progress',
+          analyzer: 'Sysmex XN-1000',
+          estimatedTime: 5,
+        },
+        {
+          id: '2',
+          name: 'Chemistry Panel',
+          status: 'pending',
+          analyzer: 'Cobas 6000',
+          estimatedTime: 15,
+        },
       ],
       priority: 'stat',
       status: 'processing',
       receivedTime: new Date(Date.now() - 20 * 60 * 1000),
-      startTime: new Date(Date.now() - 10 * 60 * 1000)
+      startTime: new Date(Date.now() - 10 * 60 * 1000),
     },
     {
       id: '2',
@@ -68,12 +80,18 @@ export const ProcessingScreen: React.FC = () => {
       patientName: 'Mary Johnson',
       patientId: 'P12346',
       tests: [
-        { id: '3', name: 'Lipid Panel', status: 'pending', analyzer: 'Cobas 6000', estimatedTime: 10 },
-        { id: '4', name: 'HbA1c', status: 'pending', analyzer: 'Variant II', estimatedTime: 3 }
+        {
+          id: '3',
+          name: 'Lipid Panel',
+          status: 'pending',
+          analyzer: 'Cobas 6000',
+          estimatedTime: 10,
+        },
+        { id: '4', name: 'HbA1c', status: 'pending', analyzer: 'Variant II', estimatedTime: 3 },
       ],
       priority: 'routine',
       status: 'received',
-      receivedTime: new Date(Date.now() - 45 * 60 * 1000)
+      receivedTime: new Date(Date.now() - 45 * 60 * 1000),
     },
     {
       id: '3',
@@ -82,17 +100,17 @@ export const ProcessingScreen: React.FC = () => {
       patientId: 'P12347',
       tests: [
         { id: '5', name: 'TSH', status: 'completed', analyzer: 'Cobas e411' },
-        { id: '6', name: 'Free T4', status: 'completed', analyzer: 'Cobas e411' }
+        { id: '6', name: 'Free T4', status: 'completed', analyzer: 'Cobas e411' },
       ],
       priority: 'routine',
       status: 'completed',
       receivedTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
       startTime: new Date(Date.now() - 90 * 60 * 1000),
-      completedTime: new Date(Date.now() - 30 * 60 * 1000)
-    }
+      completedTime: new Date(Date.now() - 30 * 60 * 1000),
+    },
   ]);
 
-  const filteredSamples = samples.filter(sample => {
+  const filteredSamples = samples.filter((sample) => {
     if (filterStatus !== 'all' && sample.status !== filterStatus) {
       return false;
     }
@@ -141,7 +159,7 @@ export const ProcessingScreen: React.FC = () => {
   };
 
   const getTestProgress = (tests: Sample['tests']) => {
-    const completed = tests.filter(t => t.status === 'completed').length;
+    const completed = tests.filter((t) => t.status === 'completed').length;
     return `${completed}/${tests.length}`;
   };
 
@@ -161,7 +179,7 @@ export const ProcessingScreen: React.FC = () => {
       <div className="bg-white shadow-sm">
         <div className="p-4">
           <h1 className="text-xl font-semibold text-gray-900 mb-4">Sample Processing</h1>
-          
+
           {/* Search and Actions */}
           <div className="flex space-x-2 mb-4">
             <div className="flex-1 relative">
@@ -189,15 +207,13 @@ export const ProcessingScreen: React.FC = () => {
               { id: 'received', label: 'Received' },
               { id: 'processing', label: 'Processing' },
               { id: 'completed', label: 'Completed' },
-              { id: 'on-hold', label: 'On Hold' }
+              { id: 'on-hold', label: 'On Hold' },
             ].map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => setFilterStatus(filter.id)}
                 className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                  filterStatus === filter.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600'
+                  filterStatus === filter.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
                 {filter.label}
@@ -210,10 +226,7 @@ export const ProcessingScreen: React.FC = () => {
       {/* Samples List */}
       <div className="p-4 space-y-3">
         {filteredSamples.map((sample) => (
-          <div
-            key={sample.id}
-            className="bg-white rounded-lg shadow-sm overflow-hidden"
-          >
+          <div key={sample.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="p-4">
               {/* Sample Header */}
               <div className="flex items-start justify-between mb-3">
@@ -228,7 +241,11 @@ export const ProcessingScreen: React.FC = () => {
                     {sample.patientName} • {sample.patientId}
                   </p>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(sample.status)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    sample.status
+                  )}`}
+                >
                   {sample.status}
                 </span>
               </div>
@@ -254,7 +271,10 @@ export const ProcessingScreen: React.FC = () => {
                   <span className="font-medium">{getTestProgress(sample.tests)} completed</span>
                 </div>
                 {sample.tests.map((test) => (
-                  <div key={test.id} className="flex items-center justify-between bg-gray-50 rounded p-2">
+                  <div
+                    key={test.id}
+                    className="flex items-center justify-between bg-gray-50 rounded p-2"
+                  >
                     <div className="flex items-center space-x-2">
                       {test.status === 'completed' ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
@@ -268,9 +288,7 @@ export const ProcessingScreen: React.FC = () => {
                       <span className="text-sm font-medium">{test.name}</span>
                     </div>
                     <div className="text-right">
-                      {test.analyzer && (
-                        <p className="text-xs text-gray-500">{test.analyzer}</p>
-                      )}
+                      {test.analyzer && <p className="text-xs text-gray-500">{test.analyzer}</p>}
                       {test.estimatedTime && test.status === 'pending' && (
                         <p className="text-xs text-gray-500">~{test.estimatedTime} min</p>
                       )}

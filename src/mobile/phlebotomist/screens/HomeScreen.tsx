@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Package, 
-  CheckCircle, 
+import {
+  Calendar,
+  Package,
+  CheckCircle,
   Clock,
   TrendingUp,
   MapPin,
   AlertCircle,
   ChevronRight,
   User,
-  Activity
+  Activity,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -40,7 +40,7 @@ export const HomeScreen: React.FC = () => {
     completed: 8,
     pending: 7,
     successRate: 98.5,
-    avgTime: 4.2
+    avgTime: 4.2,
   });
 
   const [nextAppointments, setNextAppointments] = useState<NextAppointment[]>([
@@ -50,7 +50,7 @@ export const HomeScreen: React.FC = () => {
       time: '9:30 AM',
       location: 'Room 101',
       tests: ['CBC', 'Lipid Panel', 'HbA1c'],
-      priority: 'routine'
+      priority: 'routine',
     },
     {
       id: '2',
@@ -58,7 +58,7 @@ export const HomeScreen: React.FC = () => {
       time: '10:00 AM',
       location: 'Room 102',
       tests: ['Glucose'],
-      priority: 'stat'
+      priority: 'stat',
     },
     {
       id: '3',
@@ -66,14 +66,14 @@ export const HomeScreen: React.FC = () => {
       time: '10:30 AM',
       location: 'Ward B-205',
       tests: ['Chemistry Panel', 'PT/INR'],
-      priority: 'urgent'
-    }
+      priority: 'urgent',
+    },
   ]);
 
   const [routes, setRoutes] = useState([
     { id: '1', name: 'Ward A', collections: 5, completed: 3 },
     { id: '2', name: 'Ward B', collections: 4, completed: 2 },
-    { id: '3', name: 'Outpatient', collections: 6, completed: 3 }
+    { id: '3', name: 'Outpatient', collections: 6, completed: 3 },
   ]);
 
   const getTimeUntilNext = () => {
@@ -104,9 +104,7 @@ export const HomeScreen: React.FC = () => {
           <h2 className="text-xl font-semibold">
             Good morning, {currentUser?.displayName?.split(' ')[0] || 'Phlebotomist'}!
           </h2>
-          <p className="text-indigo-100 mt-1">
-            {format(new Date(), 'EEEE, MMMM d, yyyy')}
-          </p>
+          <p className="text-indigo-100 mt-1">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
           <div className="mt-4 flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold">{stats.scheduled}</p>
@@ -140,7 +138,7 @@ export const HomeScreen: React.FC = () => {
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">Next Collections</h3>
-              <button 
+              <button
                 onClick={() => navigate('/phlebotomist/schedule')}
                 className="text-sm text-indigo-600 font-medium"
               >
@@ -150,7 +148,7 @@ export const HomeScreen: React.FC = () => {
           </div>
           <div className="divide-y divide-gray-200">
             {nextAppointments.map((appointment) => (
-              <div 
+              <div
                 key={appointment.id}
                 onClick={() => navigate(`/phlebotomist/collection/${appointment.id}`)}
                 className="p-4 hover:bg-gray-50 cursor-pointer"
@@ -159,13 +157,15 @@ export const HomeScreen: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <p className="font-medium text-gray-900">{appointment.patientName}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(appointment.priority)}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(
+                          appointment.priority
+                        )}`}
+                      >
                         {appointment.priority.toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {appointment.tests.join(', ')}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1">{appointment.tests.join(', ')}</p>
                     <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
                       <span className="flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
@@ -205,7 +205,7 @@ export const HomeScreen: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="w-20 bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-indigo-600 h-2 rounded-full"
                       style={{ width: `${(route.completed / route.collections) * 100}%` }}
                     />

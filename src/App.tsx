@@ -16,53 +16,53 @@ import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics'
 import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 
 const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			staleTime: 5 * 60 * 1000, // 5 minutes
-			gcTime: 10 * 60 * 1000, // 10 minutes
-			retry: 3,
-			retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-		},
-	},
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+  },
 });
 
 function App() {
-	const { initializeAuth, isLoading } = useAuthStore();
-	const isNativePlatform = Capacitor.isNativePlatform();
+  const { initializeAuth, isLoading } = useAuthStore();
+  const isNativePlatform = Capacitor.isNativePlatform();
 
-	useEffect(() => {
-		// Track app initialization
-		performanceMonitor.startTrace('app_initialization');
-		initializeAuth();
-		// Stop trace after a short delay since initializeAuth is synchronous
-		setTimeout(() => {
-			performanceMonitor.stopTrace('app_initialization');
-		}, 100);
-	}, [initializeAuth]);
+  useEffect(() => {
+    // Track app initialization
+    performanceMonitor.startTrace('app_initialization');
+    initializeAuth();
+    // Stop trace after a short delay since initializeAuth is synchronous
+    setTimeout(() => {
+      performanceMonitor.stopTrace('app_initialization');
+    }, 100);
+  }, [initializeAuth]);
 
-	if (isLoading) {
-		return <LoadingScreen />;
-	}
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
-	// Use mobile app for native platforms
-	const RouterComponent = isNativePlatform ? MobileAppSelector : AppRouter;
+  // Use mobile app for native platforms
+  const RouterComponent = isNativePlatform ? MobileAppSelector : AppRouter;
 
-	return (
-		<ErrorBoundary>
-			<QueryClientProvider client={queryClient}>
-				<PerformanceProvider>
-					<BrowserRouter>
-						<InitializeDemoTenant />
-						<RouterComponent />
-						<Toaster />
-						<PerformanceMetrics />
-						<OfflineIndicator />
-					</BrowserRouter>
-					<ReactQueryDevtools initialIsOpen={false} />
-				</PerformanceProvider>
-			</QueryClientProvider>
-		</ErrorBoundary>
-	);
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <PerformanceProvider>
+          <BrowserRouter>
+            <InitializeDemoTenant />
+            <RouterComponent />
+            <Toaster />
+            <PerformanceMetrics />
+            <OfflineIndicator />
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </PerformanceProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
 }
 
 export default App;

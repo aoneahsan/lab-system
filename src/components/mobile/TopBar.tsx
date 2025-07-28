@@ -16,10 +16,7 @@ export function TopBar({ title, showBack = false, rightAction }: TopBarProps) {
       <div className="flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
           {showBack && (
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 rounded-lg hover:bg-gray-100"
-            >
+            <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-lg hover:bg-gray-100">
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}

@@ -57,24 +57,17 @@ export default function ResultDashboard() {
             <div className="space-y-6">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
-                  Select an order from the Orders module to enter results. This is a demo showing the result entry interface.
+                  Select an order from the Orders module to enter results. This is a demo showing
+                  the result entry interface.
                 </p>
               </div>
-              <ResultEntry
-                orderId="ORD-2024-001"
-                sampleId="SMP-2024-001"
-                tests={mockTests}
-              />
+              <ResultEntry orderId="ORD-2024-001" sampleId="SMP-2024-001" tests={mockTests} />
             </div>
           )}
 
-          {activeTab === 'review' && (
-            <ResultReview />
-          )}
+          {activeTab === 'review' && <ResultReview />}
 
-          {activeTab === 'validation' && (
-            <ResultValidationRules />
-          )}
+          {activeTab === 'validation' && <ResultValidationRules />}
 
           {activeTab === 'analytics' && (
             <div className="text-center py-12 text-gray-500">

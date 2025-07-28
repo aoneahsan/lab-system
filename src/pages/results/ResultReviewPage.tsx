@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
@@ -21,7 +29,7 @@ const ResultReviewPage: React.FC = () => {
   const { user } = useAuthStore();
   const { tenant } = useTenant();
   const queryClient = useQueryClient();
-  
+
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
 
@@ -38,7 +46,7 @@ const ResultReviewPage: React.FC = () => {
       );
 
       const snapshot = await getDocs(resultsQuery);
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         performedAt: doc.data().performedAt?.toDate() || new Date(),
@@ -52,7 +60,7 @@ const ResultReviewPage: React.FC = () => {
     mutationFn: async (resultIds: string[]) => {
       if (!tenant || !user) throw new Error('Missing tenant or user');
 
-      const updatePromises = resultIds.map(resultId =>
+      const updatePromises = resultIds.map((resultId) =>
         updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'final',
           verifiedBy: user.displayName || user.email,
@@ -81,7 +89,7 @@ const ResultReviewPage: React.FC = () => {
     mutationFn: async (data: { resultIds: string[]; reason: string }) => {
       if (!tenant || !user) throw new Error('Missing tenant or user');
 
-      const updatePromises = data.resultIds.map(resultId =>
+      const updatePromises = data.resultIds.map((resultId) =>
         updateDoc(doc(firestore, COLLECTIONS.RESULTS, resultId), {
           status: 'rejected',
           rejectedBy: user.displayName || user.email,
@@ -131,13 +139,13 @@ const ResultReviewPage: React.FC = () => {
     if (selectedResults.length === pendingResults.length) {
       setSelectedResults([]);
     } else {
-      setSelectedResults(pendingResults.map(r => r.id));
+      setSelectedResults(pendingResults.map((r) => r.id));
     }
   };
 
   const toggleSelect = (resultId: string) => {
     if (selectedResults.includes(resultId)) {
-      setSelectedResults(selectedResults.filter(id => id !== resultId));
+      setSelectedResults(selectedResults.filter((id) => id !== resultId));
     } else {
       setSelectedResults([...selectedResults, resultId]);
     }
@@ -248,7 +256,12 @@ const ResultReviewPage: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {pendingResults.map((result) => (
-                  <tr key={result.id} className={`hover:bg-gray-50 ${selectedResults.includes(result.id) ? 'bg-blue-50' : ''}`}>
+                  <tr
+                    key={result.id}
+                    className={`hover:bg-gray-50 ${
+                      selectedResults.includes(result.id) ? 'bg-blue-50' : ''
+                    }`}
+                  >
                     <td className="px-3 py-4">
                       <input
                         type="checkbox"

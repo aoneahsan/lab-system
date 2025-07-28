@@ -12,7 +12,7 @@ const InitializeDemoTenant = () => {
       try {
         // Check if DEMO tenant already exists
         const demoDoc = await getDoc(doc(firestore, 'tenants', 'demo'));
-        
+
         if (!demoDoc.exists()) {
           // Create DEMO tenant
           await setDoc(doc(firestore, 'tenants', 'demo'), {
@@ -25,12 +25,12 @@ const InitializeDemoTenant = () => {
               city: 'Demo City',
               state: 'DC',
               zipCode: '12345',
-              country: 'USA'
+              country: 'USA',
             },
             contact: {
               email: 'demo@labflow.com',
               phone: '(555) 123-4567',
-              fax: '(555) 123-4568'
+              fax: '(555) 123-4568',
             },
             settings: {
               timezone: 'America/New_York',
@@ -42,7 +42,7 @@ const InitializeDemoTenant = () => {
               defaultTAT: 24, // hours
               enableSMS: true,
               enableEmail: true,
-              enablePatientPortal: true
+              enablePatientPortal: true,
             },
             features: {
               billing: true,
@@ -52,7 +52,7 @@ const InitializeDemoTenant = () => {
               mobileApps: true,
               barcoding: true,
               analytics: true,
-              multiLanguage: true
+              multiLanguage: true,
             },
             subscription: {
               plan: 'demo',
@@ -60,24 +60,26 @@ const InitializeDemoTenant = () => {
               validUntil: new Date('2025-12-31'),
               maxUsers: 100,
               maxPatients: 10000,
-              maxTestsPerMonth: 50000
+              maxTestsPerMonth: 50000,
             },
             branding: {
               primaryColor: '#2563eb',
               logo: '/demo-logo.png',
-              reportHeader: 'Demo Laboratory Report'
+              reportHeader: 'Demo Laboratory Report',
             },
             active: true,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           });
-          
+
           console.log('DEMO tenant created successfully');
-          
+
           // Create demo insurance providers
           const providersRef = collection(firestore, 'demo_insurance_providers');
-          const existingProviders = await getDocs(query(providersRef, where('tenantId', '==', 'demo')));
-          
+          const existingProviders = await getDocs(
+            query(providersRef, where('tenantId', '==', 'demo'))
+          );
+
           if (existingProviders.empty) {
             const demoProviders = [
               {
@@ -95,22 +97,22 @@ const InitializeDemoTenant = () => {
                     street: '100 Insurance Way',
                     city: 'Chicago',
                     state: 'IL',
-                    zipCode: '60601'
-                  }
+                    zipCode: '60601',
+                  },
                 },
                 requirements: {
                   preAuthorization: true,
                   referralRequired: false,
-                  timeLimitDays: 90
+                  timeLimitDays: 90,
                 },
                 reimbursementRates: {
-                  labTests: 0.80,
+                  labTests: 0.8,
                   procedures: 0.75,
-                  supplies: 0.70
+                  supplies: 0.7,
                 },
                 active: true,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
               },
               {
                 tenantId: 'demo',
@@ -127,22 +129,22 @@ const InitializeDemoTenant = () => {
                     street: '200 Health Plaza',
                     city: 'Minneapolis',
                     state: 'MN',
-                    zipCode: '55401'
-                  }
+                    zipCode: '55401',
+                  },
                 },
                 requirements: {
                   preAuthorization: true,
                   referralRequired: true,
-                  timeLimitDays: 60
+                  timeLimitDays: 60,
                 },
                 reimbursementRates: {
                   labTests: 0.85,
-                  procedures: 0.80,
-                  supplies: 0.75
+                  procedures: 0.8,
+                  supplies: 0.75,
                 },
                 active: true,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
               },
               {
                 tenantId: 'demo',
@@ -159,22 +161,22 @@ const InitializeDemoTenant = () => {
                     street: '300 Coverage Blvd',
                     city: 'Hartford',
                     state: 'CT',
-                    zipCode: '06101'
-                  }
+                    zipCode: '06101',
+                  },
                 },
                 requirements: {
                   preAuthorization: false,
                   referralRequired: false,
-                  timeLimitDays: 120
+                  timeLimitDays: 120,
                 },
                 reimbursementRates: {
-                  labTests: 0.90,
+                  labTests: 0.9,
                   procedures: 0.85,
-                  supplies: 0.80
+                  supplies: 0.8,
                 },
                 active: true,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
               },
               {
                 tenantId: 'demo',
@@ -191,22 +193,22 @@ const InitializeDemoTenant = () => {
                     street: '7500 Security Blvd',
                     city: 'Baltimore',
                     state: 'MD',
-                    zipCode: '21244'
-                  }
+                    zipCode: '21244',
+                  },
                 },
                 requirements: {
                   preAuthorization: false,
                   referralRequired: false,
-                  timeLimitDays: 365
+                  timeLimitDays: 365,
                 },
                 reimbursementRates: {
-                  labTests: 1.00,
-                  procedures: 0.80,
-                  supplies: 0.80
+                  labTests: 1.0,
+                  procedures: 0.8,
+                  supplies: 0.8,
                 },
                 active: true,
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date(),
               },
               {
                 tenantId: 'demo',
@@ -223,34 +225,34 @@ const InitializeDemoTenant = () => {
                     street: '200 Independence Ave SW',
                     city: 'Washington',
                     state: 'DC',
-                    zipCode: '20201'
-                  }
+                    zipCode: '20201',
+                  },
                 },
                 requirements: {
                   preAuthorization: true,
                   referralRequired: false,
-                  timeLimitDays: 180
+                  timeLimitDays: 180,
                 },
                 reimbursementRates: {
                   labTests: 0.65,
-                  procedures: 0.60,
-                  supplies: 0.55
+                  procedures: 0.6,
+                  supplies: 0.55,
                 },
                 active: true,
                 createdAt: new Date(),
-                updatedAt: new Date()
-              }
+                updatedAt: new Date(),
+              },
             ];
-            
+
             // Create insurance providers
             for (const provider of demoProviders) {
               await setDoc(doc(collection(firestore, 'demo_insurance_providers')), provider);
             }
-            
+
             console.log('Demo insurance providers created successfully');
           }
         }
-        
+
         // setIsInitialized(true);
       } catch (error) {
         console.error('Error initializing DEMO tenant:', error);

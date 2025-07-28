@@ -11,7 +11,7 @@ import {
   Plus,
   BarChart3,
   AlertTriangle,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +56,7 @@ export const QualityControlScreen: React.FC = () => {
       runTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
       operator: 'John Smith',
       instrument: 'Cobas 6000',
-      lot: 'LOT123456'
+      lot: 'LOT123456',
     },
     {
       id: '2',
@@ -70,7 +70,7 @@ export const QualityControlScreen: React.FC = () => {
       runTime: new Date(Date.now() - 3 * 60 * 60 * 1000),
       operator: 'John Smith',
       instrument: 'Cobas 6000',
-      lot: 'LOT123456'
+      lot: 'LOT123456',
     },
     {
       id: '3',
@@ -84,8 +84,8 @@ export const QualityControlScreen: React.FC = () => {
       runTime: new Date(Date.now() - 4 * 60 * 60 * 1000),
       operator: 'Mary Johnson',
       instrument: 'Sysmex XN-1000',
-      lot: 'LOT789012'
-    }
+      lot: 'LOT789012',
+    },
   ]);
 
   const [westgardRules] = useState<QCRule[]>([
@@ -94,7 +94,7 @@ export const QualityControlScreen: React.FC = () => {
     { name: '2-2s', violated: true, description: 'Two consecutive controls exceed ±2SD' },
     { name: 'R-4s', violated: false, description: 'Range between controls exceeds 4SD' },
     { name: '4-1s', violated: false, description: 'Four consecutive controls exceed ±1SD' },
-    { name: '10x', violated: false, description: 'Ten consecutive controls on same side of mean' }
+    { name: '10x', violated: false, description: 'Ten consecutive controls on same side of mean' },
   ]);
 
   const getStatusColor = (status: string) => {
@@ -127,7 +127,7 @@ export const QualityControlScreen: React.FC = () => {
     return ((result - target) / sd).toFixed(1);
   };
 
-  const filteredResults = qcResults.filter(result => {
+  const filteredResults = qcResults.filter((result) => {
     if (filterTest !== 'all' && !result.testName.toLowerCase().includes(filterTest.toLowerCase())) {
       return false;
     }
@@ -137,7 +137,7 @@ export const QualityControlScreen: React.FC = () => {
     return true;
   });
 
-  const violatedRulesCount = westgardRules.filter(rule => rule.violated).length;
+  const violatedRulesCount = westgardRules.filter((rule) => rule.violated).length;
 
   return (
     <div className="flex-1 bg-gray-50">
@@ -158,19 +158,19 @@ export const QualityControlScreen: React.FC = () => {
           <div className="grid grid-cols-3 gap-3 mb-4">
             <div className="bg-green-50 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-green-600">
-                {qcResults.filter(r => r.status === 'pass').length}
+                {qcResults.filter((r) => r.status === 'pass').length}
               </p>
               <p className="text-xs text-green-700">Passed</p>
             </div>
             <div className="bg-yellow-50 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-yellow-600">
-                {qcResults.filter(r => r.status === 'warning').length}
+                {qcResults.filter((r) => r.status === 'warning').length}
               </p>
               <p className="text-xs text-yellow-700">Warning</p>
             </div>
             <div className="bg-red-50 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold text-red-600">
-                {qcResults.filter(r => r.status === 'fail').length}
+                {qcResults.filter((r) => r.status === 'fail').length}
               </p>
               <p className="text-xs text-red-700">Failed</p>
             </div>
@@ -225,10 +225,10 @@ export const QualityControlScreen: React.FC = () => {
       {/* QC Results List */}
       <div className="p-4 space-y-3">
         <h2 className="font-medium text-gray-900 mb-2">Today's QC Results</h2>
-        
+
         {filteredResults.map((result) => {
           const zScore = calculateZScore(result.result, result.target, result.sd);
-          
+
           return (
             <div
               key={result.id}
@@ -240,10 +240,16 @@ export const QualityControlScreen: React.FC = () => {
                   {getStatusIcon(result.status)}
                   <div>
                     <h3 className="font-medium text-gray-900">{result.testName}</h3>
-                    <p className="text-sm text-gray-600">{result.controlName} - {result.level}</p>
+                    <p className="text-sm text-gray-600">
+                      {result.controlName} - {result.level}
+                    </p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(result.status)}`}>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    result.status
+                  )}`}
+                >
                   {result.status.toUpperCase()}
                 </span>
               </div>

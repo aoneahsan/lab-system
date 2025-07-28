@@ -55,7 +55,7 @@ export function useCriticalResults(params?: UseCriticalResultsParams) {
       }
 
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         resultDate: doc.data().resultDate.toDate(),

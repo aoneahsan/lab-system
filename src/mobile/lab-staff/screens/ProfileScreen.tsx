@@ -14,7 +14,7 @@ import {
   FileText,
   Activity,
   Calendar,
-  Star
+  Star,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +61,7 @@ export const ProfileScreen: React.FC = () => {
     monthlyTarget: 600,
     monthlyCompleted: 487,
     rank: 3,
-    totalStaff: 12
+    totalStaff: 12,
   });
 
   const [certifications] = useState<Certification[]>([
@@ -70,22 +70,22 @@ export const ProfileScreen: React.FC = () => {
       name: 'Clinical Laboratory Technician',
       issuer: 'ASCP Board of Certification',
       expiryDate: new Date('2025-12-31'),
-      status: 'active'
+      status: 'active',
     },
     {
       id: '2',
       name: 'Lab Safety Certification',
       issuer: 'Healthcare Safety Council',
       expiryDate: new Date('2024-11-15'),
-      status: 'expiring'
+      status: 'expiring',
     },
     {
       id: '3',
       name: 'Quality Management Systems',
       issuer: 'ISO Training Institute',
       expiryDate: new Date('2025-06-30'),
-      status: 'active'
-    }
+      status: 'active',
+    },
   ]);
 
   const [achievements] = useState<Achievement[]>([
@@ -94,22 +94,22 @@ export const ProfileScreen: React.FC = () => {
       title: 'Speed Demon',
       description: 'Maintained <40min TAT for a month',
       earnedDate: new Date('2024-09-15'),
-      icon: '⚡'
+      icon: '⚡',
     },
     {
       id: '2',
       title: 'Quality Champion',
       description: '100% QC pass rate for 30 days',
       earnedDate: new Date('2024-08-20'),
-      icon: '🏆'
+      icon: '🏆',
     },
     {
       id: '3',
       title: 'Critical Care Hero',
       description: 'Handled 50+ critical results',
       earnedDate: new Date('2024-07-10'),
-      icon: '🦸'
-    }
+      icon: '🦸',
+    },
   ]);
 
   const menuItems = [
@@ -119,7 +119,7 @@ export const ProfileScreen: React.FC = () => {
     { icon: Bell, label: 'Notifications', action: '/notifications' },
     { icon: Settings, label: 'Settings', action: '/settings' },
     { icon: HelpCircle, label: 'Help & Support', action: '/help' },
-    { icon: FileText, label: 'SOPs & Guidelines', action: '/protocols' }
+    { icon: FileText, label: 'SOPs & Guidelines', action: '/protocols' },
   ];
 
   const handleLogout = () => {
@@ -153,14 +153,16 @@ export const ProfileScreen: React.FC = () => {
                 <User className="h-8 w-8" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">{currentUser?.displayName || 'Lab Technician'}</h2>
+                <h2 className="text-xl font-semibold">
+                  {currentUser?.displayName || 'Lab Technician'}
+                </h2>
                 <p className="text-blue-100">{currentUser?.email}</p>
                 <p className="text-sm text-blue-200 mt-1">Employee ID: LT001</p>
               </div>
             </div>
             <Shield className="h-5 w-5 text-blue-200" />
           </div>
-          
+
           <div className="mt-4 grid grid-cols-3 gap-3">
             <div className="bg-white/10 rounded-lg p-3 text-center">
               <p className="text-2xl font-bold">{stats.samplesProcessed}</p>
@@ -186,10 +188,12 @@ export const ProfileScreen: React.FC = () => {
           <div className="mb-2">
             <div className="flex justify-between text-sm mb-1">
               <span className="text-gray-600">Samples Processed</span>
-              <span className="font-medium">{stats.monthlyCompleted} / {stats.monthlyTarget}</span>
+              <span className="font-medium">
+                {stats.monthlyCompleted} / {stats.monthlyTarget}
+              </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
                 style={{ width: `${(stats.monthlyCompleted / stats.monthlyTarget) * 100}%` }}
               />
@@ -256,9 +260,15 @@ export const ProfileScreen: React.FC = () => {
               <div key={cert.id} className="flex items-center justify-between py-2">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">{cert.name}</p>
-                  <p className="text-xs text-gray-500">Expires {format(cert.expiryDate, 'MMM d, yyyy')}</p>
+                  <p className="text-xs text-gray-500">
+                    Expires {format(cert.expiryDate, 'MMM d, yyyy')}
+                  </p>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCertificationColor(cert.status)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${getCertificationColor(
+                    cert.status
+                  )}`}
+                >
                   {cert.status === 'expiring' ? 'Renew Soon' : cert.status}
                 </span>
               </div>

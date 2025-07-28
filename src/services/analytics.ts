@@ -93,8 +93,8 @@ export const analyticsService = {
     const response = await api.get('/api/analytics/dashboard', {
       params: {
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
+        endDate: endDate.toISOString(),
+      },
     });
     return response.data;
   },
@@ -104,8 +104,8 @@ export const analyticsService = {
     const response = await api.get('/api/analytics/performance', {
       params: {
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
+        endDate: endDate.toISOString(),
+      },
     });
     return response.data;
   },
@@ -115,8 +115,8 @@ export const analyticsService = {
     const response = await api.get('/api/analytics/financial', {
       params: {
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
+        endDate: endDate.toISOString(),
+      },
     });
     return response.data;
   },
@@ -126,8 +126,8 @@ export const analyticsService = {
     const response = await api.get('/api/analytics/quality', {
       params: {
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
+        endDate: endDate.toISOString(),
+      },
     });
     return response.data;
   },
@@ -137,21 +137,24 @@ export const analyticsService = {
     const response = await api.get('/api/analytics/operational', {
       params: {
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      }
+        endDate: endDate.toISOString(),
+      },
     });
     return response.data;
   },
 
   // Export analytics data
-  async exportAnalytics(type: 'pdf' | 'excel' | 'csv', filters: {
-    startDate: Date;
-    endDate: Date;
-    metrics: string[];
-  }): Promise<Blob> {
+  async exportAnalytics(
+    type: 'pdf' | 'excel' | 'csv',
+    filters: {
+      startDate: Date;
+      endDate: Date;
+      metrics: string[];
+    }
+  ): Promise<Blob> {
     const response = await api.post('/api/analytics/export', filters, {
       params: { type },
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   },
@@ -188,5 +191,5 @@ export const analyticsService = {
   }> {
     const response = await api.get('/api/analytics/predictive');
     return response.data;
-  }
+  },
 };

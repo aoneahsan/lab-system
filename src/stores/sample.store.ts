@@ -16,18 +16,39 @@ interface SampleStore {
   getSampleByBarcode: (barcode: string) => Promise<Sample | null>;
   createSample: (tenantId: string, userId: string, data: any) => Promise<string>;
   updateSample: (tenantId: string, userId: string, id: string, data: any) => Promise<void>;
-  updateSampleStatus: (tenantId: string, userId: string, id: string, status: string, notes?: string, location?: string) => Promise<void>;
+  updateSampleStatus: (
+    tenantId: string,
+    userId: string,
+    id: string,
+    status: string,
+    notes?: string,
+    location?: string
+  ) => Promise<void>;
   deleteSample: (tenantId: string, id: string) => Promise<void>;
-  
+
   fetchSampleCollections: (tenantId: string, filters?: any) => Promise<void>;
   createSampleCollection: (tenantId: string, userId: string, data: any) => Promise<string>;
-  completeSampleCollection: (tenantId: string, userId: string, collectionId: string, collectedSamples: any[]) => Promise<void>;
-  
+  completeSampleCollection: (
+    tenantId: string,
+    userId: string,
+    collectionId: string,
+    collectedSamples: any[]
+  ) => Promise<void>;
+
   fetchSampleStatistics: (tenantId: string) => Promise<void>;
-  batchUpdateSamples: (tenantId: string, userId: string, sampleIds: string[], updates: any) => Promise<void>;
-  updateBatchStatus: (tenantId: string, userId: string, sampleUpdates: Array<{ sampleId: string; status: string; notes?: string; location?: string }>) => Promise<void>;
+  batchUpdateSamples: (
+    tenantId: string,
+    userId: string,
+    sampleIds: string[],
+    updates: any
+  ) => Promise<void>;
+  updateBatchStatus: (
+    tenantId: string,
+    userId: string,
+    sampleUpdates: Array<{ sampleId: string; status: string; notes?: string; location?: string }>
+  ) => Promise<void>;
   updateBatchSamples: (updates: Array<{ id: string; [key: string]: any }>) => Promise<void>;
-  
+
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -132,7 +153,12 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
   completeSampleCollection: async (tenantId, userId, collectionId, collectedSamples) => {
     set({ loading: true, error: null });
     try {
-      await sampleService.completeSampleCollection(tenantId, userId, collectionId, collectedSamples);
+      await sampleService.completeSampleCollection(
+        tenantId,
+        userId,
+        collectionId,
+        collectedSamples
+      );
       await get().fetchSampleCollections(tenantId);
       set({ loading: false });
     } catch (error) {
@@ -177,9 +203,9 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
     try {
       // First check in current samples
       const currentSamples = get().samples;
-      const sample = currentSamples.find(s => s.barcode === barcode);
+      const sample = currentSamples.find((s) => s.barcode === barcode);
       if (sample) return sample;
-      
+
       // If not found, fetch from service
       // TODO: Implement in service
       return null;
@@ -195,13 +221,15 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       // TODO: Get tenantId and userId from auth context
       const tenantId = 'default-tenant';
       const userId = 'current-user';
-      
+
       // Group updates by operation type for efficiency
-      await Promise.all(updates.map(update => {
-        const { id, ...data } = update;
-        return sampleService.updateSample(tenantId, userId, id, data);
-      }));
-      
+      await Promise.all(
+        updates.map((update) => {
+          const { id, ...data } = update;
+          return sampleService.updateSample(tenantId, userId, id, data);
+        })
+      );
+
       await get().fetchSamples(tenantId);
       set({ loading: false });
     } catch (error) {

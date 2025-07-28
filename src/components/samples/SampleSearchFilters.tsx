@@ -7,10 +7,7 @@ interface SampleSearchFiltersProps {
   onFiltersChange: (filters: SampleFilter) => void;
 }
 
-const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
-  filters,
-  onFiltersChange,
-}) => {
+const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({ filters, onFiltersChange }) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFiltersChange({ ...filters, searchTerm: e.target.value });
   };
@@ -18,21 +15,21 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({
       ...filters,
-      status: e.target.value as SampleFilter['status'] || undefined,
+      status: (e.target.value as SampleFilter['status']) || undefined,
     });
   };
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({
       ...filters,
-      type: e.target.value as SampleFilter['type'] || undefined,
+      type: (e.target.value as SampleFilter['type']) || undefined,
     });
   };
 
   const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({
       ...filters,
-      priority: e.target.value as SampleFilter['priority'] || undefined,
+      priority: (e.target.value as SampleFilter['priority']) || undefined,
     });
   };
 
@@ -61,10 +58,7 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
           <Filter className="h-4 w-4" />
           Filters
         </h3>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-blue-600 hover:text-blue-800"
-        >
+        <button onClick={clearFilters} className="text-sm text-blue-600 hover:text-blue-800">
           Clear all
         </button>
       </div>
@@ -72,9 +66,7 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Search */}
         <div className="lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Search
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
           <div className="relative">
             <input
               type="text"
@@ -89,9 +81,7 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
 
         {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
           <select
             value={filters.status || ''}
             onChange={handleStatusChange}
@@ -112,9 +102,7 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
 
         {/* Priority */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Priority
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
           <select
             value={filters.priority || ''}
             onChange={handlePriorityChange}
@@ -129,9 +117,7 @@ const SampleSearchFilters: React.FC<SampleSearchFiltersProps> = ({
 
         {/* Sample Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sample Type
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sample Type</label>
           <select
             value={filters.type || ''}
             onChange={handleTypeChange}

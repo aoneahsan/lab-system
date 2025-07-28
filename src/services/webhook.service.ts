@@ -1,27 +1,27 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  getDocs, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
   orderBy,
   serverTimestamp,
   Timestamp,
   updateDoc,
-  deleteDoc
+  deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import type { 
+import type {
   WebhookEndpoint,
   WebhookEndpointFormData,
   WebhookEvent,
   WebhookEventType,
   WebhookDeliveryAttempt,
   WebhookTestPayload,
-  WebhookMetrics
+  WebhookMetrics,
 } from '@/types/webhook.types';
 
 class WebhookService {
@@ -29,7 +29,7 @@ class WebhookService {
     maxAttempts: 5,
     initialDelayMs: 1000,
     maxDelayMs: 60000,
-    backoffMultiplier: 2
+    backoffMultiplier: 2,
   };
 
   // Endpoint CRUD operations
@@ -40,7 +40,7 @@ class WebhookService {
   ): Promise<string> {
     // Generate a secure webhook secret if not provided
     const secret = data.secret || this.generateWebhookSecret();
-    
+
     const endpoint = {
       tenantId,
       connectionId: data.connectionId,
@@ -67,11 +67,7 @@ class WebhookService {
     endpointId: string,
     data: Partial<WebhookEndpointFormData>
   ): Promise<void> {
-    const endpointRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`,
-      endpointId
-    );
+    const endpointRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId);
 
     await updateDoc(endpointRef, {
       ...data,
@@ -81,24 +77,16 @@ class WebhookService {
   }
 
   async deleteEndpoint(tenantId: string, endpointId: string): Promise<void> {
-    const endpointRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`,
-      endpointId
-    );
+    const endpointRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId);
     await deleteDoc(endpointRef);
   }
 
   async getEndpoint(tenantId: string, endpointId: string): Promise<WebhookEndpoint | null> {
-    const endpointRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`,
-      endpointId
-    );
+    const endpointRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId);
     const snapshot = await getDoc(endpointRef);
-    
+
     if (!snapshot.exists()) return null;
-    
+
     return {
       id: snapshot.id,
       ...snapshot.data(),
@@ -109,11 +97,8 @@ class WebhookService {
     tenantId: string,
     connectionId: string
   ): Promise<WebhookEndpoint[]> {
-    const endpointsRef = collection(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`
-    );
-    
+    const endpointsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`);
+
     const q = query(
       endpointsRef,
       where('connectionId', '==', connectionId),
@@ -121,10 +106,13 @@ class WebhookService {
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WebhookEndpoint));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WebhookEndpoint
+    );
   }
 
   // Webhook secret generation
@@ -178,12 +166,12 @@ class WebhookService {
     timestamp: Date
   ): Promise<string> {
     const message = `${timestamp.getTime()}.${JSON.stringify(payload)}`;
-    
+
     // Use Web Crypto API for HMAC-SHA256
     const encoder = new TextEncoder();
     const keyData = encoder.encode(secret);
     const messageData = encoder.encode(message);
-    
+
     const key = await crypto.subtle.importKey(
       'raw',
       keyData,
@@ -191,12 +179,12 @@ class WebhookService {
       false,
       ['sign']
     );
-    
+
     const signature = await crypto.subtle.sign('HMAC', key, messageData);
     const signatureHex = Array.from(new Uint8Array(signature))
-      .map(b => b.toString(16).padStart(2, '0'))
+      .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
-    
+
     return `sha256=${signatureHex}`;
   }
 
@@ -204,11 +192,7 @@ class WebhookService {
   private async queueEventDelivery(tenantId: string, eventId: string): Promise<void> {
     // In production, this would queue to a task queue or Firebase Functions
     // For now, we'll update the event to indicate it's ready for processing
-    const eventRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`,
-      eventId
-    );
+    const eventRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`, eventId);
 
     await updateDoc(eventRef, {
       nextRetryAt: serverTimestamp(),
@@ -225,7 +209,7 @@ class WebhookService {
     if (!endpoint) throw new Error('Webhook endpoint not found');
 
     const sampleData = testPayload.sampleData || this.getSampleData(testPayload.eventType);
-    
+
     try {
       const response = await fetch(endpoint.url, {
         method: 'POST',
@@ -243,23 +227,17 @@ class WebhookService {
       });
 
       // Update last ping status
-      await updateDoc(
-        doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId),
-        {
-          lastPingAt: serverTimestamp(),
-          lastPingStatus: response.ok ? 'success' : 'failed',
-        }
-      );
+      await updateDoc(doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId), {
+        lastPingAt: serverTimestamp(),
+        lastPingStatus: response.ok ? 'success' : 'failed',
+      });
 
       return response.ok;
     } catch {
-      await updateDoc(
-        doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId),
-        {
-          lastPingAt: serverTimestamp(),
-          lastPingStatus: 'failed',
-        }
-      );
+      await updateDoc(doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`, endpointId), {
+        lastPingAt: serverTimestamp(),
+        lastPingStatus: 'failed',
+      });
       return false;
     }
   }
@@ -367,44 +345,41 @@ class WebhookService {
 
   // Process and deliver webhook event
   async processWebhookEvent(tenantId: string, eventId: string): Promise<void> {
-    const eventRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`,
-      eventId
-    );
-    
+    const eventRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`, eventId);
+
     const eventDoc = await getDoc(eventRef);
     if (!eventDoc.exists()) return;
-    
+
     const event = { id: eventDoc.id, ...eventDoc.data() } as WebhookEvent;
-    
+
     // Check if event should be processed
-    if (event.status !== 'pending' && event.status !== 'processing' && event.status !== 'failed') return;
+    if (event.status !== 'pending' && event.status !== 'processing' && event.status !== 'failed')
+      return;
     if (event.status === 'failed' && event.attempts >= this.DEFAULT_RETRY_POLICY.maxAttempts) {
       await updateDoc(eventRef, { status: 'expired' });
       return;
     }
-    
+
     // Get endpoint
     const endpoint = await this.getEndpoint(tenantId, event.endpointId);
     if (!endpoint || !endpoint.isActive) {
-      await updateDoc(eventRef, { 
+      await updateDoc(eventRef, {
         status: 'failed',
-        error: 'Endpoint not found or inactive'
+        error: 'Endpoint not found or inactive',
       });
       return;
     }
-    
+
     // Update status to processing
-    await updateDoc(eventRef, { 
+    await updateDoc(eventRef, {
       status: 'processing',
-      lastAttemptAt: serverTimestamp()
+      lastAttemptAt: serverTimestamp(),
     });
-    
+
     try {
       // Deliver webhook
       const response = await this.deliverWebhook(endpoint, event);
-      
+
       // Update event with success
       await updateDoc(eventRef, {
         status: 'delivered',
@@ -415,13 +390,18 @@ class WebhookService {
           headers: Object.fromEntries(response.headers.entries()),
         },
       });
-      
+
       // Record delivery attempt
-      await this.recordDeliveryAttempt(tenantId, eventId, event.attempts + 1, true, response.status);
-      
+      await this.recordDeliveryAttempt(
+        tenantId,
+        eventId,
+        event.attempts + 1,
+        true,
+        response.status
+      );
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
+
       // Update event with failure
       const nextRetryAt = this.calculateNextRetryTime(event.attempts + 1);
       await updateDoc(eventRef, {
@@ -430,17 +410,21 @@ class WebhookService {
         error: errorMessage,
         nextRetryAt: nextRetryAt ? Timestamp.fromDate(nextRetryAt) : null,
       });
-      
+
       // Record delivery attempt
-      await this.recordDeliveryAttempt(tenantId, eventId, event.attempts + 1, false, undefined, errorMessage);
+      await this.recordDeliveryAttempt(
+        tenantId,
+        eventId,
+        event.attempts + 1,
+        false,
+        undefined,
+        errorMessage
+      );
     }
   }
-  
+
   // Deliver webhook to endpoint
-  private async deliverWebhook(
-    endpoint: WebhookEndpoint,
-    event: WebhookEvent
-  ): Promise<Response> {
+  private async deliverWebhook(endpoint: WebhookEndpoint, event: WebhookEvent): Promise<Response> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Webhook-Id': event.id,
@@ -448,33 +432,34 @@ class WebhookService {
       'X-Webhook-Signature': event.signature,
       'X-Webhook-Timestamp': event.timestamp.toISOString(),
     };
-    
+
     const response = await fetch(endpoint.url, {
       method: 'POST',
       headers,
       body: JSON.stringify(event.payload),
       signal: AbortSignal.timeout(30000), // 30 second timeout
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     return response;
   }
-  
+
   // Calculate next retry time
   private calculateNextRetryTime(attemptNumber: number): Date | null {
     if (attemptNumber >= this.DEFAULT_RETRY_POLICY.maxAttempts) return null;
-    
-    let delay = this.DEFAULT_RETRY_POLICY.initialDelayMs * 
+
+    let delay =
+      this.DEFAULT_RETRY_POLICY.initialDelayMs *
       Math.pow(this.DEFAULT_RETRY_POLICY.backoffMultiplier, attemptNumber - 1);
-    
+
     delay = Math.min(delay, this.DEFAULT_RETRY_POLICY.maxDelayMs);
-    
+
     return new Date(Date.now() + delay);
   }
-  
+
   // Record delivery attempt
   private async recordDeliveryAttempt(
     tenantId: string,
@@ -492,14 +477,14 @@ class WebhookService {
       statusCode,
       error,
     };
-    
+
     const attemptsRef = collection(
       db,
       `${COLLECTIONS.TENANTS}/${tenantId}/webhook_delivery_attempts`
     );
     await setDoc(doc(attemptsRef), attempt);
   }
-  
+
   // Verify webhook signature
   async verifyWebhookSignature(
     secret: string,
@@ -513,68 +498,67 @@ class WebhookService {
         JSON.parse(payload),
         new Date(timestamp)
       );
-      
+
       // Constant time comparison to prevent timing attacks
       if (signature.length !== expectedSignature.length) return false;
-      
+
       let result = 0;
       for (let i = 0; i < signature.length; i++) {
         result |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i);
       }
-      
+
       return result === 0;
     } catch {
       return false;
     }
   }
-  
+
   // Get pending webhook events for processing
   async getPendingWebhookEvents(tenantId: string): Promise<WebhookEvent[]> {
     const eventsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`);
-    
+
     const q = query(
       eventsRef,
       where('status', 'in', ['pending', 'processing']),
       where('nextRetryAt', '<=', serverTimestamp()),
       orderBy('nextRetryAt', 'asc')
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WebhookEvent));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WebhookEvent
+    );
   }
 
   // Get webhook metrics
-  async getMetrics(
-    tenantId: string,
-    endpointId: string
-  ): Promise<WebhookMetrics> {
+  async getMetrics(tenantId: string, endpointId: string): Promise<WebhookMetrics> {
     const eventsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`);
-    
+
     // Get all events for this endpoint
-    const q = query(
-      eventsRef,
-      where('endpointId', '==', endpointId),
-      orderBy('timestamp', 'desc')
-    );
-    
+    const q = query(eventsRef, where('endpointId', '==', endpointId), orderBy('timestamp', 'desc'));
+
     const snapshot = await getDocs(q);
-    const events = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WebhookEvent));
+    const events = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WebhookEvent
+    );
 
     // Calculate metrics
     const totalEvents = events.length;
-    const successfulDeliveries = events.filter(e => e.status === 'delivered').length;
-    const failedDeliveries = events.filter(e => e.status === 'failed').length;
-    
+    const successfulDeliveries = events.filter((e) => e.status === 'delivered').length;
+    const failedDeliveries = events.filter((e) => e.status === 'failed').length;
+
     // Calculate average response time
     let totalResponseTime = 0;
     let responseTimeCount = 0;
-    events.forEach(event => {
+    events.forEach((event) => {
       if (event.response && event.response.statusCode) {
         responseTimeCount++;
         // Estimate response time (would be tracked in real implementation)
@@ -584,30 +568,31 @@ class WebhookService {
     const averageResponseTime = responseTimeCount > 0 ? totalResponseTime / responseTimeCount : 0;
 
     // Events by type
-    const eventsByType = events.reduce((acc, event) => {
-      acc[event.eventType] = (acc[event.eventType] || 0) + 1;
-      return acc;
-    }, {} as Record<WebhookEventType, number>);
+    const eventsByType = events.reduce(
+      (acc, event) => {
+        acc[event.eventType] = (acc[event.eventType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<WebhookEventType, number>
+    );
 
     // Last 24 hours metrics
     const now = new Date();
     const last24Hours: WebhookMetrics['last24Hours'] = [];
-    
+
     for (let i = 0; i < 24; i++) {
       const hourStart = new Date(now);
       hourStart.setHours(now.getHours() - i, 0, 0, 0);
       const hourEnd = new Date(hourStart);
       hourEnd.setHours(hourStart.getHours() + 1);
-      
-      const hourEvents = events.filter(e => 
-        e.timestamp >= hourStart && e.timestamp < hourEnd
-      );
-      
+
+      const hourEvents = events.filter((e) => e.timestamp >= hourStart && e.timestamp < hourEnd);
+
       last24Hours.unshift({
         hour: hourStart.toISOString(),
         events: hourEvents.length,
-        successes: hourEvents.filter(e => e.status === 'delivered').length,
-        failures: hourEvents.filter(e => e.status === 'failed').length,
+        successes: hourEvents.filter((e) => e.status === 'delivered').length,
+        failures: hourEvents.filter((e) => e.status === 'failed').length,
       });
     }
 
@@ -627,83 +612,72 @@ class WebhookService {
     payload: Record<string, unknown>
   ): Promise<void> {
     // Get all active endpoints subscribed to this event type
-    const endpointsRef = collection(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`
-    );
-    
+    const endpointsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_endpoints`);
+
     const q = query(
       endpointsRef,
       where('isActive', '==', true),
       where('events', 'array-contains', eventType)
     );
-    
+
     const snapshot = await getDocs(q);
-    const endpoints = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WebhookEndpoint));
-    
+    const endpoints = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WebhookEndpoint
+    );
+
     // Create events for each endpoint
-    const eventPromises = endpoints.map(endpoint =>
+    const eventPromises = endpoints.map((endpoint) =>
       this.createEvent(tenantId, endpoint.id, eventType, payload)
     );
-    
+
     await Promise.all(eventPromises);
   }
-  
+
   // Batch process webhook events
   async processWebhookBatch(tenantId: string): Promise<void> {
     const pendingEvents = await this.getPendingWebhookEvents(tenantId);
-    
+
     // Process up to 10 events in parallel
     const batchSize = 10;
     for (let i = 0; i < pendingEvents.length; i += batchSize) {
       const batch = pendingEvents.slice(i, i + batchSize);
-      await Promise.all(
-        batch.map(event => this.processWebhookEvent(tenantId, event.id))
-      );
+      await Promise.all(batch.map((event) => this.processWebhookEvent(tenantId, event.id)));
     }
   }
-  
+
   // Get event history for an endpoint
-  async getEventHistory(
-    tenantId: string,
-    endpointId: string,
-    limit = 50
-  ): Promise<WebhookEvent[]> {
+  async getEventHistory(tenantId: string, endpointId: string, limit = 50): Promise<WebhookEvent[]> {
     const eventsRef = collection(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`);
-    
-    const q = query(
-      eventsRef,
-      where('endpointId', '==', endpointId),
-      orderBy('timestamp', 'desc')
-    );
-    
+
+    const q = query(eventsRef, where('endpointId', '==', endpointId), orderBy('timestamp', 'desc'));
+
     const snapshot = await getDocs(q);
-    const events = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as WebhookEvent));
-    
+    const events = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as WebhookEvent
+    );
+
     return events.slice(0, limit);
   }
-  
+
   // Resend a webhook event
   async resendWebhookEvent(tenantId: string, eventId: string): Promise<void> {
-    const eventRef = doc(
-      db,
-      `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`,
-      eventId
-    );
-    
+    const eventRef = doc(db, `${COLLECTIONS.TENANTS}/${tenantId}/webhook_events`, eventId);
+
     // Reset event status for reprocessing
     await updateDoc(eventRef, {
       status: 'pending',
       nextRetryAt: serverTimestamp(),
       error: null,
     });
-    
+
     // Process immediately
     await this.processWebhookEvent(tenantId, eventId);
   }

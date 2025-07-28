@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Patient } from '@/types/patient.types';
-import { 
-  PhoneIcon, 
-  EnvelopeIcon, 
+import {
+  PhoneIcon,
+  EnvelopeIcon,
   CalendarIcon,
   ShieldCheckIcon,
-  UserIcon
+  UserIcon,
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 
@@ -20,16 +20,16 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) =>
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   };
 
   const age = calculateAge(patient.dateOfBirth);
-  const primaryInsurance = patient.insurances?.find(ins => ins.isPrimary);
+  const primaryInsurance = patient.insurances?.find((ins) => ins.isPrimary);
 
   return (
     <article
@@ -50,9 +50,7 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) =>
             <h3 className="font-medium text-gray-900">
               {patient.firstName} {patient.lastName}
             </h3>
-            <p className="text-sm text-gray-500">
-              MRN: {patient.mrn}
-            </p>
+            <p className="text-sm text-gray-500">MRN: {patient.mrn}</p>
           </div>
         </div>
       </div>
@@ -89,10 +87,9 @@ export const PatientCard: React.FC<PatientCardProps> = ({ patient, onClick }) =>
         <div className="flex items-center space-x-2 text-sm">
           <ShieldCheckIcon className="h-4 w-4 text-gray-400" />
           <span className="text-gray-600">
-            {primaryInsurance 
+            {primaryInsurance
               ? `${primaryInsurance.provider} - ${primaryInsurance.policyNumber}`
-              : 'No insurance on file'
-            }
+              : 'No insurance on file'}
           </span>
         </div>
       </div>

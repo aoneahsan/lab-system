@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  getDocs, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  getDocs,
+  query,
+  where,
   orderBy,
   onSnapshot,
-  type Unsubscribe
+  type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuthStore } from './auth.store';
@@ -53,7 +53,7 @@ interface DepartmentStore {
   error: string | null;
   selectedDepartmentId: string | null;
   unsubscribe: Unsubscribe | null;
-  
+
   // Actions
   fetchDepartments: () => Promise<void>;
   subscribeToDepartments: () => void;
@@ -81,7 +81,7 @@ export const useDepartmentStore = create<DepartmentStore>()(
           if (!currentUser || !currentTenant) return;
 
           set({ loading: true, error: null });
-          
+
           try {
             const projectPrefix = PROJECT_PREFIX;
             const q = query(
@@ -92,16 +92,19 @@ export const useDepartmentStore = create<DepartmentStore>()(
             );
 
             const snapshot = await getDocs(q);
-            const departments = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            } as Department));
+            const departments = snapshot.docs.map(
+              (doc) =>
+                ({
+                  id: doc.id,
+                  ...doc.data(),
+                }) as Department
+            );
 
             set({ departments, loading: false });
           } catch (error) {
-            set({ 
+            set({
               error: error instanceof Error ? error.message : 'Failed to fetch departments',
-              loading: false 
+              loading: false,
             });
           }
         },
@@ -125,18 +128,22 @@ export const useDepartmentStore = create<DepartmentStore>()(
             orderBy('name')
           );
 
-          const unsubscribe = onSnapshot(q, 
+          const unsubscribe = onSnapshot(
+            q,
             (snapshot) => {
-              const departments = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              } as Department));
+              const departments = snapshot.docs.map(
+                (doc) =>
+                  ({
+                    id: doc.id,
+                    ...doc.data(),
+                  }) as Department
+              );
               set({ departments, loading: false, error: null });
             },
             (error) => {
-              set({ 
+              set({
                 error: error.message,
-                loading: false 
+                loading: false,
               });
             }
           );
@@ -162,21 +169,18 @@ export const useDepartmentStore = create<DepartmentStore>()(
                 createdAt: new Date().toISOString(),
                 createdBy: currentUser.id,
                 updatedAt: new Date().toISOString(),
-                updatedBy: currentUser.id
-              }
+                updatedBy: currentUser.id,
+              },
             };
 
-            await addDoc(
-              collection(db, `${projectPrefix}departments`),
-              departmentData
-            );
+            await addDoc(collection(db, `${projectPrefix}departments`), departmentData);
 
             // Refresh departments
             await get().fetchDepartments();
           } catch (error) {
-            set({ 
+            set({
               error: error instanceof Error ? error.message : 'Failed to create department',
-              loading: false 
+              loading: false,
             });
             throw error;
           }
@@ -196,25 +200,22 @@ export const useDepartmentStore = create<DepartmentStore>()(
             const updateData = {
               ...data,
               'metadata.updatedAt': new Date().toISOString(),
-              'metadata.updatedBy': currentUser.uid
+              'metadata.updatedBy': currentUser.uid,
             };
 
-            await updateDoc(
-              doc(db, `${projectPrefix}departments`, id),
-              updateData
-            );
+            await updateDoc(doc(db, `${projectPrefix}departments`, id), updateData);
 
             // Update local state
-            set(state => ({
-              departments: state.departments.map(dept =>
+            set((state) => ({
+              departments: state.departments.map((dept) =>
                 dept.id === id ? { ...dept, ...data } : dept
               ),
-              loading: false
+              loading: false,
             }));
           } catch (error) {
-            set({ 
+            set({
               error: error instanceof Error ? error.message : 'Failed to update department',
-              loading: false 
+              loading: false,
             });
             throw error;
           }
@@ -231,27 +232,25 @@ export const useDepartmentStore = create<DepartmentStore>()(
 
           try {
             const projectPrefix = PROJECT_PREFIX;
-            
+
             // Soft delete by setting isActive to false
-            await updateDoc(
-              doc(db, `${projectPrefix}departments`, id),
-              {
-                isActive: false,
-                'metadata.updatedAt': new Date().toISOString(),
-                'metadata.updatedBy': currentUser.uid
-              }
-            );
+            await updateDoc(doc(db, `${projectPrefix}departments`, id), {
+              isActive: false,
+              'metadata.updatedAt': new Date().toISOString(),
+              'metadata.updatedBy': currentUser.uid,
+            });
 
             // Remove from local state
-            set(state => ({
-              departments: state.departments.filter(dept => dept.id !== id),
+            set((state) => ({
+              departments: state.departments.filter((dept) => dept.id !== id),
               loading: false,
-              selectedDepartmentId: state.selectedDepartmentId === id ? null : state.selectedDepartmentId
+              selectedDepartmentId:
+                state.selectedDepartmentId === id ? null : state.selectedDepartmentId,
             }));
           } catch (error) {
-            set({ 
+            set({
               error: error instanceof Error ? error.message : 'Failed to delete department',
-              loading: false 
+              loading: false,
             });
             throw error;
           }
@@ -262,7 +261,7 @@ export const useDepartmentStore = create<DepartmentStore>()(
         },
 
         getDepartmentById: (id) => {
-          return get().departments.find(dept => dept.id === id);
+          return get().departments.find((dept) => dept.id === id);
         },
 
         cleanup: () => {
@@ -270,18 +269,18 @@ export const useDepartmentStore = create<DepartmentStore>()(
           if (unsubscribe) {
             unsubscribe();
           }
-          set({ 
-            departments: [], 
-            loading: false, 
-            error: null, 
+          set({
+            departments: [],
+            loading: false,
+            error: null,
             selectedDepartmentId: null,
-            unsubscribe: null 
+            unsubscribe: null,
           });
-        }
+        },
       }),
       {
         name: 'department-store',
-        partialize: (state) => ({ selectedDepartmentId: state.selectedDepartmentId })
+        partialize: (state) => ({ selectedDepartmentId: state.selectedDepartmentId }),
       }
     )
   )

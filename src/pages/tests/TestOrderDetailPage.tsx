@@ -1,6 +1,16 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, FlaskRound } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  FileText,
+  AlertCircle,
+  Clock,
+  CheckCircle,
+  XCircle,
+  FlaskRound,
+} from 'lucide-react';
 import { useTestOrder, useApproveTestOrder, useRejectTestOrder } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
 import { useSampleByOrderId } from '@/hooks/useSamples';
@@ -11,11 +21,11 @@ import { ErrorState } from '@/components/common/ErrorState';
 const TestOrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
-  
+
   const { data: order, isLoading: orderLoading, error: orderError } = useTestOrder(orderId!);
   const { data: patient, isLoading: patientLoading } = usePatient(order?.patientId || '');
   const { data: sample } = useSampleByOrderId(orderId!);
-  
+
   const approveOrderMutation = useApproveTestOrder();
   const rejectOrderMutation = useRejectTestOrder();
 
@@ -93,7 +103,9 @@ const TestOrderDetailPage: React.FC = () => {
   }
 
   if (orderError || !order) {
-    return <ErrorState error="Failed to load order details" onRetry={() => navigate('/tests/orders')} />;
+    return (
+      <ErrorState error="Failed to load order details" onRetry={() => navigate('/tests/orders')} />
+    );
   }
 
   return (
@@ -107,18 +119,26 @@ const TestOrderDetailPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Orders
         </button>
-        
+
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Order {order.orderNumber}</h1>
             <div className="mt-2 flex items-center gap-4">
               <div className="flex items-center gap-2">
                 {getStatusIcon(order.status)}
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                    order.status
+                  )}`}
+                >
                   {order.status.replace(/_/g, ' ').toUpperCase()}
                 </span>
               </div>
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(order.priority)}`}>
+              <span
+                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                  order.priority
+                )}`}
+              >
                 {order.priority.toUpperCase()} PRIORITY
               </span>
             </div>
@@ -149,7 +169,9 @@ const TestOrderDetailPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Name</p>
-                  <p className="font-medium">{patient.firstName} {patient.lastName}</p>
+                  <p className="font-medium">
+                    {patient.firstName} {patient.lastName}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">MRN</p>
@@ -157,7 +179,9 @@ const TestOrderDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Date of Birth</p>
-                  <p className="font-medium">{new Date(patient.dateOfBirth).toLocaleDateString()}</p>
+                  <p className="font-medium">
+                    {new Date(patient.dateOfBirth).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Gender</p>
@@ -174,30 +198,47 @@ const TestOrderDetailPage: React.FC = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ordered Tests</h2>
             <div className="space-y-3">
               {order.tests.map((test, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                >
                   <div className="flex-1">
                     <p className="font-medium">{test.testName}</p>
                     <p className="text-sm text-gray-600">Code: {test.testCode}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      test.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      test.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                      test.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                      test.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        test.status === 'completed'
+                          ? 'bg-green-100 text-green-800'
+                          : test.status === 'in_progress'
+                            ? 'bg-blue-100 text-blue-800'
+                            : test.status === 'cancelled'
+                              ? 'bg-red-100 text-red-800'
+                              : test.status === 'rejected'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {test.status.replace(/_/g, ' ')}
                     </span>
-                    {test.status !== 'completed' && test.status !== 'cancelled' && test.status !== 'rejected' && sample && order.status !== 'awaiting_approval' && (
-                      <button
-                        onClick={() => navigate(`/results/entry?orderId=${orderId}&sampleId=${sample.id}&testId=${test.testId}`)}
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
-                      >
-                        <FlaskRound className="h-3 w-3" />
-                        Enter Result
-                      </button>
-                    )}
+                    {test.status !== 'completed' &&
+                      test.status !== 'cancelled' &&
+                      test.status !== 'rejected' &&
+                      sample &&
+                      order.status !== 'awaiting_approval' && (
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/results/entry?orderId=${orderId}&sampleId=${sample.id}&testId=${test.testId}`
+                            )
+                          }
+                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
+                        >
+                          <FlaskRound className="h-3 w-3" />
+                          Enter Result
+                        </button>
+                      )}
                   </div>
                 </div>
               ))}
@@ -226,7 +267,10 @@ const TestOrderDetailPage: React.FC = () => {
                     <p className="text-sm text-gray-600">ICD Codes</p>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {order.icdCodes.map((code, index) => (
-                        <span key={index} className="inline-flex px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-800">
+                        <span
+                          key={index}
+                          className="inline-flex px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-800"
+                        >
                           {code}
                         </span>
                       ))}
@@ -248,7 +292,10 @@ const TestOrderDetailPage: React.FC = () => {
                 <p className="text-sm text-gray-600">Order Date</p>
                 <p className="font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleString()}
+                  {(order.orderDate instanceof Date
+                    ? order.orderDate
+                    : order.orderDate.toDate()
+                  ).toLocaleString()}
                 </p>
               </div>
               <div>
@@ -282,7 +329,10 @@ const TestOrderDetailPage: React.FC = () => {
                   <div className="border-l-4 border-green-500 pl-4">
                     <p className="text-sm font-medium">Approved</p>
                     <p className="text-xs text-gray-600">
-                      {(order.approvedAt instanceof Date ? order.approvedAt : order.approvedAt.toDate()).toLocaleString()}
+                      {(order.approvedAt instanceof Date
+                        ? order.approvedAt
+                        : order.approvedAt.toDate()
+                      ).toLocaleString()}
                     </p>
                     {order.approvedBy && (
                       <p className="text-xs text-gray-600">By: {order.approvedBy}</p>
@@ -293,7 +343,10 @@ const TestOrderDetailPage: React.FC = () => {
                   <div className="border-l-4 border-red-500 pl-4">
                     <p className="text-sm font-medium">Rejected</p>
                     <p className="text-xs text-gray-600">
-                      {(order.rejectedAt instanceof Date ? order.rejectedAt : order.rejectedAt.toDate()).toLocaleString()}
+                      {(order.rejectedAt instanceof Date
+                        ? order.rejectedAt
+                        : order.rejectedAt.toDate()
+                      ).toLocaleString()}
                     </p>
                     {order.rejectedBy && (
                       <p className="text-xs text-gray-600">By: {order.rejectedBy}</p>

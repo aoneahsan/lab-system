@@ -26,7 +26,7 @@ describe('Quality Control Store', () => {
       loading: false,
       error: null,
     });
-    
+
     // Reset all mocks
     vi.clearAllMocks();
   });
@@ -48,14 +48,14 @@ describe('Quality Control Store', () => {
         active: true,
       },
     ];
-    
+
     vi.mocked(qualityControlService.getQCTests).mockResolvedValue(mockTests);
 
     const { fetchQCTests } = useQualityControlStore.getState();
     await fetchQCTests({ active: true });
 
     expect(qualityControlService.getQCTests).toHaveBeenCalledWith({ active: true });
-    
+
     const state = useQualityControlStore.getState();
     expect(state.qcTests).toEqual(mockTests);
     expect(state.loading).toBe(false);
@@ -71,7 +71,7 @@ describe('Quality Control Store', () => {
         active: true,
       },
     ];
-    
+
     vi.mocked(qualityControlService.createQCTest).mockResolvedValue(undefined);
     vi.mocked(qualityControlService.getQCTests).mockResolvedValue(mockTests);
 
@@ -88,7 +88,7 @@ describe('Quality Control Store', () => {
       levels: ['normal'],
     });
     expect(qualityControlService.getQCTests).toHaveBeenCalled();
-    
+
     const state = useQualityControlStore.getState();
     expect(state.qcTests).toEqual(mockTests);
     expect(state.loading).toBe(false);
@@ -106,7 +106,7 @@ describe('Quality Control Store', () => {
         violations: ['13s', '22s'],
       },
     ];
-    
+
     vi.mocked(qualityControlService.recordQCResult).mockResolvedValue(mockResult);
     vi.mocked(qualityControlService.getQCResults).mockResolvedValue(mockResults);
 
@@ -123,7 +123,7 @@ describe('Quality Control Store', () => {
       levelId: 'normal',
       value: 102,
     });
-    
+
     const state = useQualityControlStore.getState();
     expect(state.qcResults).toEqual(mockResults);
     expect(state.loading).toBe(false);
@@ -146,14 +146,14 @@ describe('Quality Control Store', () => {
         timestamp: new Date(),
       },
     ];
-    
+
     vi.mocked(qualityControlService.getQCResults).mockResolvedValue(mockResults);
 
     const { fetchQCResults } = useQualityControlStore.getState();
     await fetchQCResults('qc-test-1', 'normal', 30);
 
     expect(qualityControlService.getQCResults).toHaveBeenCalledWith('qc-test-1', 'normal', 30);
-    
+
     const state = useQualityControlStore.getState();
     expect(state.qcResults).toEqual(mockResults);
     expect(state.loading).toBe(false);
@@ -168,14 +168,18 @@ describe('Quality Control Store', () => {
       min: 95,
       max: 105,
     };
-    
+
     vi.mocked(qualityControlService.calculateStatistics).mockResolvedValue(mockStatistics);
 
     const { calculateStatistics } = useQualityControlStore.getState();
     await calculateStatistics('qc-test-1', 'normal', 'monthly');
 
-    expect(qualityControlService.calculateStatistics).toHaveBeenCalledWith('qc-test-1', 'normal', 'monthly');
-    
+    expect(qualityControlService.calculateStatistics).toHaveBeenCalledWith(
+      'qc-test-1',
+      'normal',
+      'monthly'
+    );
+
     const state = useQualityControlStore.getState();
     expect(state.statistics).toEqual(mockStatistics);
     expect(state.loading).toBe(false);
@@ -198,14 +202,18 @@ describe('Quality Control Store', () => {
         violations: ['13s'],
       },
     ];
-    
+
     vi.mocked(qualityControlService.getLeveyJenningsData).mockResolvedValue(mockLJData);
 
     const { fetchLeveyJenningsData } = useQualityControlStore.getState();
     await fetchLeveyJenningsData('qc-test-1', 'normal', 30);
 
-    expect(qualityControlService.getLeveyJenningsData).toHaveBeenCalledWith('qc-test-1', 'normal', 30);
-    
+    expect(qualityControlService.getLeveyJenningsData).toHaveBeenCalledWith(
+      'qc-test-1',
+      'normal',
+      30
+    );
+
     const state = useQualityControlStore.getState();
     expect(state.leveyJenningsData).toEqual(mockLJData);
     expect(state.loading).toBe(false);
@@ -217,7 +225,7 @@ describe('Quality Control Store', () => {
 
     const { fetchQCTests } = useQualityControlStore.getState();
     await fetchQCTests();
-    
+
     const state = useQualityControlStore.getState();
     expect(state.error).toBe('Failed to fetch QC tests');
     expect(state.loading).toBe(false);
@@ -228,13 +236,15 @@ describe('Quality Control Store', () => {
     vi.mocked(qualityControlService.recordQCResult).mockRejectedValue(error);
 
     const { recordQCResult } = useQualityControlStore.getState();
-    
-    await expect(recordQCResult({
-      qcTestId: 'qc-test-1',
-      levelId: 'normal',
-      value: 102,
-    })).rejects.toThrow('Failed to record result');
-    
+
+    await expect(
+      recordQCResult({
+        qcTestId: 'qc-test-1',
+        levelId: 'normal',
+        value: 102,
+      })
+    ).rejects.toThrow('Failed to record result');
+
     const state = useQualityControlStore.getState();
     expect(state.error).toBe('Failed to record result');
     expect(state.loading).toBe(false);

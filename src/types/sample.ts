@@ -16,7 +16,14 @@ export interface Sample {
   collectionTime: string;
   collectedBy: string;
   collectionSite?: string;
-  status: 'collected' | 'in_transit' | 'received' | 'processing' | 'completed' | 'rejected' | 'discarded';
+  status:
+    | 'collected'
+    | 'in_transit'
+    | 'received'
+    | 'processing'
+    | 'completed'
+    | 'rejected'
+    | 'discarded';
   priority: 'routine' | 'urgent' | 'stat';
   storageLocation?: string;
   storageTemperature?: string;

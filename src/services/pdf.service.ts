@@ -1,6 +1,16 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { TestResult, Sample, Patient, Test, Invoice, Payment, QCRun, QCMaterial, QCStatistics } from '@/types';
+import type {
+  TestResult,
+  Sample,
+  Patient,
+  Test,
+  Invoice,
+  Payment,
+  QCRun,
+  QCMaterial,
+  QCStatistics,
+} from '@/types';
 
 interface ReportData {
   result: TestResult;
@@ -121,13 +131,15 @@ export class PDFService {
     yPosition += 10;
 
     // Results table
-    const tableData = [[
-      data.test.name,
-      data.result.value,
-      data.result.unit || '-',
-      data.test.referenceRange || '-',
-      data.result.status,
-    ]];
+    const tableData = [
+      [
+        data.test.name,
+        data.result.value,
+        data.result.unit || '-',
+        data.test.referenceRange || '-',
+        data.result.status,
+      ],
+    ];
 
     autoTable(doc, {
       startY: yPosition,
@@ -173,7 +185,7 @@ export class PDFService {
     doc.setFont('helvetica', 'normal');
     doc.text('Report Date:', 20, footerY);
     doc.text(new Date().toLocaleDateString(), 55, footerY);
-    
+
     doc.text('Reported By:', 20, footerY + 6);
     doc.text(data.result.enteredBy || 'Laboratory Staff', 55, footerY + 6);
 
@@ -231,9 +243,7 @@ export class PDFService {
     const pdfData = doc.output('datauristring');
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      printWindow.document.write(
-        `<iframe width='100%' height='100%' src='${pdfData}'></iframe>`
-      );
+      printWindow.document.write(`<iframe width='100%' height='100%' src='${pdfData}'></iframe>`);
       printWindow.document.close();
       setTimeout(() => {
         printWindow.print();
@@ -275,12 +285,16 @@ export class PDFService {
     doc.setFont('helvetica', 'bold');
     doc.text(tenant.name, 20, yPosition);
     yPosition += 6;
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(tenant.address.street, 20, yPosition);
     yPosition += 5;
-    doc.text(`${tenant.address.city}, ${tenant.address.state} ${tenant.address.zipCode}`, 20, yPosition);
+    doc.text(
+      `${tenant.address.city}, ${tenant.address.state} ${tenant.address.zipCode}`,
+      20,
+      yPosition
+    );
     yPosition += 5;
     doc.text(`Phone: ${tenant.contact.phone}`, 20, yPosition);
     yPosition += 5;
@@ -298,17 +312,21 @@ export class PDFService {
     doc.setFont('helvetica', 'normal');
     doc.text(invoice.invoiceNumber, pageWidth - 20, yPosition, { align: 'right' });
     yPosition += 5;
-    
+
     doc.setFont('helvetica', 'bold');
     doc.text('Invoice Date:', pageWidth - 80, yPosition);
     doc.setFont('helvetica', 'normal');
-    doc.text(invoice.invoiceDate.toDate().toLocaleDateString(), pageWidth - 20, yPosition, { align: 'right' });
+    doc.text(invoice.invoiceDate.toDate().toLocaleDateString(), pageWidth - 20, yPosition, {
+      align: 'right',
+    });
     yPosition += 5;
-    
+
     doc.setFont('helvetica', 'bold');
     doc.text('Due Date:', pageWidth - 80, yPosition);
     doc.setFont('helvetica', 'normal');
-    doc.text(invoice.dueDate.toDate().toLocaleDateString(), pageWidth - 20, yPosition, { align: 'right' });
+    doc.text(invoice.dueDate.toDate().toLocaleDateString(), pageWidth - 20, yPosition, {
+      align: 'right',
+    });
 
     // Patient Info
     yPosition = 80;
@@ -316,7 +334,7 @@ export class PDFService {
     doc.setFont('helvetica', 'bold');
     doc.text('Bill To:', 20, yPosition);
     yPosition += 7;
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(patient.fullName, 20, yPosition);
@@ -324,20 +342,24 @@ export class PDFService {
     if (patient.address) {
       doc.text(patient.address.street, 20, yPosition);
       yPosition += 5;
-      doc.text(`${patient.address.city}, ${patient.address.state} ${patient.address.zipCode}`, 20, yPosition);
+      doc.text(
+        `${patient.address.city}, ${patient.address.state} ${patient.address.zipCode}`,
+        20,
+        yPosition
+      );
       yPosition += 5;
     }
     doc.text(`Patient ID: ${patient.patientId}`, 20, yPosition);
     yPosition += 15;
 
     // Items table
-    const tableData = invoice.items.map(item => [
+    const tableData = invoice.items.map((item) => [
       item.testCode,
       item.testName,
       item.quantity.toString(),
       `$${item.unitPrice.toFixed(2)}`,
       item.discount ? `$${item.discount.toFixed(2)}` : '-',
-      `$${item.total.toFixed(2)}`
+      `$${item.total.toFixed(2)}`,
     ]);
 
     autoTable(doc, {
@@ -358,7 +380,7 @@ export class PDFService {
         2: { halign: 'center' },
         3: { halign: 'right' },
         4: { halign: 'right' },
-        5: { halign: 'right' }
+        5: { halign: 'right' },
       },
     });
 
@@ -373,7 +395,9 @@ export class PDFService {
 
     if (invoice.discountAmount > 0) {
       doc.text('Discount:', totalsX, yPosition);
-      doc.text(`-$${invoice.discountAmount.toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
+      doc.text(`-$${invoice.discountAmount.toFixed(2)}`, pageWidth - 20, yPosition, {
+        align: 'right',
+      });
       yPosition += 5;
     }
 
@@ -392,7 +416,7 @@ export class PDFService {
     if (payments.length > 0) {
       yPosition += 5;
       doc.setFont('helvetica', 'normal');
-      payments.forEach(payment => {
+      payments.forEach((payment) => {
         doc.text(`Paid (${payment.method}):`, totalsX, yPosition);
         doc.text(`-$${payment.amount.toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
         yPosition += 5;
@@ -451,7 +475,12 @@ export class PDFService {
     doc.setFont('helvetica', 'normal');
     doc.text(tenant.name, pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 5;
-    doc.text(`${tenant.address.street}, ${tenant.address.city}, ${tenant.address.state} ${tenant.address.zipCode}`, pageWidth / 2, yPosition, { align: 'center' });
+    doc.text(
+      `${tenant.address.street}, ${tenant.address.city}, ${tenant.address.state} ${tenant.address.zipCode}`,
+      pageWidth / 2,
+      yPosition,
+      { align: 'center' }
+    );
     yPosition += 10;
 
     // Run Information
@@ -468,7 +497,7 @@ export class PDFService {
       ['Shift:', qcRun.shift.charAt(0).toUpperCase() + qcRun.shift.slice(1)],
       ['Operator:', qcRun.operator],
       ['Instrument:', qcRun.instrumentName || 'N/A'],
-      ['Status:', qcRun.status.toUpperCase()]
+      ['Status:', qcRun.status.toUpperCase()],
     ];
 
     runInfo.forEach(([label, value]) => {
@@ -494,7 +523,7 @@ export class PDFService {
       ['Lot Number:', material.lotNumber],
       ['Level:', material.level.toUpperCase()],
       ['Matrix:', material.matrix],
-      ['Exp Date:', material.expirationDate.toDate().toLocaleDateString()]
+      ['Exp Date:', material.expirationDate.toDate().toLocaleDateString()],
     ];
 
     materialInfo.forEach(([label, value]) => {
@@ -512,16 +541,16 @@ export class PDFService {
     doc.text('QC Results', 20, yPosition);
     yPosition += 8;
 
-    const tableData = qcRun.results.map(result => {
-      const analyte = material.analytes.find(a => a.testCode === result.testCode);
-      
+    const tableData = qcRun.results.map((result) => {
+      const analyte = material.analytes.find((a) => a.testCode === result.testCode);
+
       return [
         result.testName,
         result.value.toFixed(2),
         result.unit,
         analyte ? `${analyte.targetMean.toFixed(2)} ± ${analyte.targetSD.toFixed(2)}` : 'N/A',
         result.zscore ? result.zscore.toFixed(2) : 'N/A',
-        result.status.toUpperCase()
+        result.status.toUpperCase(),
       ];
     });
 
@@ -542,8 +571,8 @@ export class PDFService {
       columnStyles: {
         5: {
           fontStyle: 'bold',
-          cellWidth: 25
-        }
+          cellWidth: 25,
+        },
       },
       didDrawCell: (data) => {
         if (data.column.index === 5 && data.row.section === 'body') {
@@ -558,13 +587,13 @@ export class PDFService {
           doc.text(data.cell.text[0], data.cell.x + 2, data.cell.y + data.cell.height / 2 + 1);
           doc.setTextColor(0, 0, 0);
         }
-      }
+      },
     });
 
     yPosition = doc.lastAutoTable.finalY + 10;
 
     // Westgard Rule Violations
-    const violations = qcRun.results.filter(r => r.violatedRules && r.violatedRules.length > 0);
+    const violations = qcRun.results.filter((r) => r.violatedRules && r.violatedRules.length > 0);
     if (violations.length > 0) {
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
@@ -573,12 +602,12 @@ export class PDFService {
 
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      violations.forEach(result => {
+      violations.forEach((result) => {
         doc.setFont('helvetica', 'bold');
         doc.text(`${result.testName}:`, 25, yPosition);
         yPosition += 5;
-        
-        result.violatedRules.forEach(violation => {
+
+        result.violatedRules.forEach((violation) => {
           doc.setFont('helvetica', 'normal');
           const severity = violation.severity === 'rejection' ? '[REJECTION]' : '[WARNING]';
           doc.text(`  ${severity} ${violation.description}`, 30, yPosition);
@@ -602,13 +631,18 @@ export class PDFService {
 
       doc.setFontSize(10);
       const statsInfo = [
-        ['Period:', `${statistics.periodStart.toDate().toLocaleDateString()} - ${statistics.periodEnd.toDate().toLocaleDateString()}`],
+        [
+          'Period:',
+          `${statistics.periodStart.toDate().toLocaleDateString()} - ${statistics.periodEnd
+            .toDate()
+            .toLocaleDateString()}`,
+        ],
         ['Data Points:', statistics.n.toString()],
         ['Mean:', statistics.mean.toFixed(2)],
         ['SD:', statistics.sd.toFixed(2)],
         ['CV%:', statistics.cv.toFixed(2) + '%'],
         ['Bias%:', statistics.bias.toFixed(2) + '%'],
-        ['Sigma:', statistics.sigma.toFixed(2)]
+        ['Sigma:', statistics.sigma.toFixed(2)],
       ];
 
       statsInfo.forEach(([label, value]) => {
@@ -627,7 +661,7 @@ export class PDFService {
       doc.setFont('helvetica', 'bold');
       doc.text('Comments', 20, yPosition);
       yPosition += 6;
-      
+
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       const splitComments = doc.splitTextToSize(qcRun.comments, pageWidth - 40);
@@ -677,15 +711,32 @@ export class PDFService {
     yPosition += 5;
     doc.text(`Test: ${analyte}`, 20, yPosition);
     yPosition += 5;
-    doc.text(`Period: ${statistics.periodStart.toDate().toLocaleDateString()} - ${statistics.periodEnd.toDate().toLocaleDateString()}`, 20, yPosition);
+    doc.text(
+      `Period: ${statistics.periodStart.toDate().toLocaleDateString()} - ${statistics.periodEnd
+        .toDate()
+        .toLocaleDateString()}`,
+      20,
+      yPosition
+    );
     yPosition += 5;
-    doc.text(`N = ${statistics.n}, Mean = ${statistics.mean.toFixed(2)}, SD = ${statistics.sd.toFixed(2)}, CV = ${statistics.cv.toFixed(2)}%`, 20, yPosition);
+    doc.text(
+      `N = ${statistics.n}, Mean = ${statistics.mean.toFixed(2)}, SD = ${statistics.sd.toFixed(
+        2
+      )}, CV = ${statistics.cv.toFixed(2)}%`,
+      20,
+      yPosition
+    );
     yPosition += 15;
 
     // Note about chart
     doc.setFontSize(12);
     doc.setFont('helvetica', 'italic');
-    doc.text('Note: For the actual Levey-Jennings chart visualization, please view in the application.', pageWidth / 2, yPosition, { align: 'center' });
+    doc.text(
+      'Note: For the actual Levey-Jennings chart visualization, please view in the application.',
+      pageWidth / 2,
+      yPosition,
+      { align: 'center' }
+    );
     yPosition += 10;
 
     // Data Points Table
@@ -700,7 +751,7 @@ export class PDFService {
       point.value.toFixed(2),
       point.zscore.toFixed(2),
       point.status.toUpperCase(),
-      point.isExcluded ? 'Yes' : 'No'
+      point.isExcluded ? 'Yes' : 'No',
     ]);
 
     autoTable(doc, {
@@ -720,8 +771,8 @@ export class PDFService {
       columnStyles: {
         0: { cellWidth: 15 },
         4: { fontStyle: 'bold' },
-        5: { fontStyle: 'bold' }
-      }
+        5: { fontStyle: 'bold' },
+      },
     });
 
     return doc;
@@ -752,9 +803,9 @@ export class PDFService {
       revenue: 'Revenue Report',
       aging: 'Accounts Receivable Aging Report',
       insurance: 'Insurance Analysis Report',
-      monthly: 'Monthly Summary Report'
+      monthly: 'Monthly Summary Report',
     }[reportType];
-    
+
     doc.text(reportTitle, pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 8;
 
@@ -816,7 +867,7 @@ export class PDFService {
       ['Total Revenue:', `$${data.totalRevenue.toFixed(2)}`],
       ['Collected:', `$${data.collectedRevenue.toFixed(2)}`],
       ['Pending:', `$${data.pendingRevenue.toFixed(2)}`],
-      ['Collection Rate:', `${((data.collectedRevenue / data.totalRevenue) * 100).toFixed(1)}%`]
+      ['Collection Rate:', `${((data.collectedRevenue / data.totalRevenue) * 100).toFixed(1)}%`],
     ];
 
     summaryData.forEach(([label, value]) => {
@@ -836,8 +887,10 @@ export class PDFService {
       doc.text('Revenue by Category', 20, yPosition);
       yPosition += 8;
 
-      const categoryData = Object.entries(data.revenueByCategory)
-        .map(([category, amount]) => [category, `$${(amount as number).toFixed(2)}`]);
+      const categoryData = Object.entries(data.revenueByCategory).map(([category, amount]) => [
+        category,
+        `$${(amount as number).toFixed(2)}`,
+      ]);
 
       autoTable(doc, {
         startY: yPosition,
@@ -845,7 +898,7 @@ export class PDFService {
         body: categoryData,
         theme: 'striped',
         headStyles: { fillColor: [41, 128, 185] },
-        columnStyles: { 1: { halign: 'right' } }
+        columnStyles: { 1: { halign: 'right' } },
       });
     }
   }
@@ -859,9 +912,14 @@ export class PDFService {
       ['31-60 days', data.thirtyDays.count, `$${data.thirtyDays.amount.toFixed(2)}`],
       ['61-90 days', data.sixtyDays.count, `$${data.sixtyDays.amount.toFixed(2)}`],
       ['Over 90 days', data.overNinetyDays.count, `$${data.overNinetyDays.amount.toFixed(2)}`],
-      ['Total Outstanding', 
-       data.current.count + data.thirtyDays.count + data.sixtyDays.count + data.overNinetyDays.count,
-       `$${data.totalOutstanding.toFixed(2)}`]
+      [
+        'Total Outstanding',
+        data.current.count +
+          data.thirtyDays.count +
+          data.sixtyDays.count +
+          data.overNinetyDays.count,
+        `$${data.totalOutstanding.toFixed(2)}`,
+      ],
     ];
 
     autoTable(doc, {
@@ -872,9 +930,9 @@ export class PDFService {
       headStyles: { fillColor: [41, 128, 185] },
       columnStyles: {
         1: { halign: 'center' },
-        2: { halign: 'right' }
+        2: { halign: 'right' },
       },
-      footStyles: { fontStyle: 'bold' }
+      footStyles: { fontStyle: 'bold' },
     });
   }
 
@@ -895,7 +953,7 @@ export class PDFService {
       ['Denied Amount:', `$${data.deniedAmount.toFixed(2)}`],
       ['Pending Amount:', `$${data.pendingAmount.toFixed(2)}`],
       ['Approval Rate:', `${data.approvalRate.toFixed(1)}%`],
-      ['Avg Processing Days:', data.averageProcessingDays.toFixed(1)]
+      ['Avg Processing Days:', data.averageProcessingDays.toFixed(1)],
     ];
 
     summaryData.forEach(([label, value]) => {
@@ -930,7 +988,7 @@ export class PDFService {
     doc.setFont('helvetica', 'bold');
     doc.text('Tests Performed', 20, yPosition);
     yPosition += 8;
-    
+
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Total Tests: ${data.tests.totalPerformed}`, 25, yPosition);
@@ -943,11 +1001,9 @@ export class PDFService {
       doc.text('Top Tests by Revenue', 20, yPosition);
       yPosition += 8;
 
-      const topTestsData = data.topTests.slice(0, 5).map((test: any) => [
-        test.testName,
-        test.count.toString(),
-        `$${test.revenue.toFixed(2)}`
-      ]);
+      const topTestsData = data.topTests
+        .slice(0, 5)
+        .map((test: any) => [test.testName, test.count.toString(), `$${test.revenue.toFixed(2)}`]);
 
       autoTable(doc, {
         startY: yPosition,
@@ -958,8 +1014,8 @@ export class PDFService {
         bodyStyles: { fontSize: 9 },
         columnStyles: {
           1: { halign: 'center' },
-          2: { halign: 'right' }
-        }
+          2: { halign: 'right' },
+        },
       });
     }
   }

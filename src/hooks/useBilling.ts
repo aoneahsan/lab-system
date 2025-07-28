@@ -233,9 +233,9 @@ export const useBillingStatistics = (startDate?: Date, endDate?: Date) => {
     queryKey: [...BILLING_KEYS.statistics(), startDate, endDate],
     queryFn: () => {
       if (!currentTenant) throw new Error('No tenant selected');
-      return billingService.getBillingStatistics(currentTenant.id, { 
-        dateFrom: startDate, 
-        dateTo: endDate 
+      return billingService.getBillingStatistics(currentTenant.id, {
+        dateFrom: startDate,
+        dateTo: endDate,
       });
     },
     enabled: !!currentTenant,
@@ -291,13 +291,23 @@ export const useAppealClaim = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ claimId, appealReason, additionalDocuments }: { 
-      claimId: string; 
+    mutationFn: ({
+      claimId,
+      appealReason,
+      additionalDocuments,
+    }: {
+      claimId: string;
       appealReason: string;
       additionalDocuments?: string;
     }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
-      return billingService.appealClaim(currentTenant.id, currentUser.id, claimId, appealReason, additionalDocuments);
+      return billingService.appealClaim(
+        currentTenant.id,
+        currentUser.id,
+        claimId,
+        appealReason,
+        additionalDocuments
+      );
     },
     onSuccess: (_, { claimId }) => {
       queryClient.invalidateQueries({ queryKey: BILLING_KEYS.claims() });
@@ -337,8 +347,8 @@ export const useCheckEligibility = () => {
       return billingService.checkEligibility(currentTenant.id, currentUser.id, request);
     },
     onSuccess: (_, request) => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['eligibility-history', currentTenant?.id, request.patientId] 
+      queryClient.invalidateQueries({
+        queryKey: ['eligibility-history', currentTenant?.id, request.patientId],
       });
       toast.success('Eligibility check completed');
     },

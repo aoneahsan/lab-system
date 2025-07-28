@@ -28,7 +28,7 @@ export function usePatientResults(patientId: string) {
       );
 
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         resultDate: doc.data().resultDate.toDate(),

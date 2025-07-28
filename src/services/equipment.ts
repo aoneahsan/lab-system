@@ -41,7 +41,7 @@ export const equipmentService = {
   // Get equipment logs
   async getLogs(equipmentId: string, days: number = 7): Promise<any[]> {
     const response = await api.get(`/api/equipment/${equipmentId}/logs`, {
-      params: { days }
+      params: { days },
     });
     return response.data;
   },
@@ -55,5 +55,5 @@ export const equipmentService = {
   async processData(data: EquipmentData): Promise<any> {
     const response = await api.post('/api/equipment/process', data);
     return response.data;
-  }
+  },
 };

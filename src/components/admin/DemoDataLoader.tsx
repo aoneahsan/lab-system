@@ -21,12 +21,14 @@ const DemoDataLoader: React.FC = () => {
       const response = await fetch('/src/data/demo.json');
       const demoData = await response.json();
 
-      setStatus(`Loaded ${demoData.metadata.counts.patients} patients, ${demoData.metadata.counts.orders} orders, and ${demoData.metadata.counts.results} results`);
+      setStatus(
+        `Loaded ${demoData.metadata.counts.patients} patients, ${demoData.metadata.counts.orders} orders, and ${demoData.metadata.counts.results} results`
+      );
 
       // In a real implementation, you would upload this data to Firebase
       // For now, we'll store it in localStorage for demo purposes
       localStorage.setItem('labflow_demo_data', JSON.stringify(demoData));
-      
+
       setStatus('Demo data loaded successfully! Refresh the page to see the data.');
     } catch (error) {
       console.error('Error loading demo data:', error);
@@ -41,9 +43,7 @@ const DemoDataLoader: React.FC = () => {
       <div className="text-center">
         <BeakerIcon className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">Demo Data</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Load sample data for testing and demonstration
-        </p>
+        <p className="mt-1 text-sm text-gray-500">Load sample data for testing and demonstration</p>
         <div className="mt-6">
           <button
             onClick={loadDemoData}
@@ -63,9 +63,7 @@ const DemoDataLoader: React.FC = () => {
             )}
           </button>
         </div>
-        {status && (
-          <p className="mt-4 text-sm text-gray-600">{status}</p>
-        )}
+        {status && <p className="mt-4 text-sm text-gray-600">{status}</p>}
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ const InvoiceDetailPage: React.FC = () => {
   const { invoiceId } = useParams<{ invoiceId: string }>();
   const navigate = useNavigate();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  
+
   const { data: invoice, isLoading: invoiceLoading } = useInvoice(invoiceId!);
   const { data: payments = [], isLoading: paymentsLoading } = usePayments(invoiceId);
   const recordPaymentMutation = useRecordPayment();
@@ -67,14 +67,16 @@ const InvoiceDetailPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Billing
         </button>
-        
+
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Invoice #{invoice.invoiceNumber}
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">Invoice #{invoice.invoiceNumber}</h1>
             <div className="flex items-center gap-4 mt-2">
-              <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(invoice.status)}`}>
+              <span
+                className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
+                  invoice.status
+                )}`}
+              >
                 {invoice.status}
               </span>
               <span className="text-gray-600">
@@ -82,7 +84,7 @@ const InvoiceDetailPage: React.FC = () => {
               </span>
             </div>
           </div>
-          
+
           <div className="flex gap-3">
             <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2">
               <Download className="h-4 w-4" />
@@ -158,9 +160,7 @@ const InvoiceDetailPage: React.FC = () => {
                       <td className="py-4">
                         <div>
                           <p className="font-medium">{item.description}</p>
-                          {item.code && (
-                            <p className="text-sm text-gray-500">Code: {item.code}</p>
-                          )}
+                          {item.code && <p className="text-sm text-gray-500">Code: {item.code}</p>}
                         </div>
                       </td>
                       <td className="text-right py-4">{item.quantity}</td>
@@ -173,7 +173,7 @@ const InvoiceDetailPage: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            
+
             {/* Totals */}
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between text-sm">
@@ -205,9 +205,7 @@ const InvoiceDetailPage: React.FC = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
               </div>
             ) : payments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No payments recorded yet
-              </div>
+              <div className="text-center py-8 text-gray-500">No payments recorded yet</div>
             ) : (
               <div className="space-y-4">
                 {payments.map((payment) => (
@@ -221,18 +219,12 @@ const InvoiceDetailPage: React.FC = () => {
                           {payment.paymentDate.toDate().toLocaleDateString()}
                         </p>
                         {payment.referenceNumber && (
-                          <p className="text-sm text-gray-500">
-                            Ref: {payment.referenceNumber}
-                          </p>
+                          <p className="text-sm text-gray-500">Ref: {payment.referenceNumber}</p>
                         )}
                       </div>
-                      <span className="text-sm text-gray-500">
-                        by {payment.createdBy}
-                      </span>
+                      <span className="text-sm text-gray-500">by {payment.createdBy}</span>
                     </div>
-                    {payment.notes && (
-                      <p className="text-sm text-gray-600 mt-2">{payment.notes}</p>
-                    )}
+                    {payment.notes && <p className="text-sm text-gray-600 mt-2">{payment.notes}</p>}
                   </div>
                 ))}
               </div>
@@ -252,28 +244,22 @@ const InvoiceDetailPage: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Amount Paid</span>
-                <span className="font-medium text-green-600">
-                  ${invoice.paidAmount.toFixed(2)}
-                </span>
+                <span className="font-medium text-green-600">${invoice.paidAmount.toFixed(2)}</span>
               </div>
               <div className="border-t pt-3">
                 <div className="flex justify-between">
                   <span className="font-medium">Balance Due</span>
-                  <span className="font-bold text-lg">
-                    ${invoice.balanceDue.toFixed(2)}
-                  </span>
+                  <span className="font-bold text-lg">${invoice.balanceDue.toFixed(2)}</span>
                 </div>
               </div>
             </div>
-            
+
             {invoice.paymentStatus === 'overdue' && (
               <div className="mt-4 p-3 bg-red-50 rounded-lg flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-red-800">Payment Overdue</p>
-                  <p className="text-sm text-red-600">
-                    This invoice is past its due date
-                  </p>
+                  <p className="text-sm text-red-600">This invoice is past its due date</p>
                 </div>
               </div>
             )}

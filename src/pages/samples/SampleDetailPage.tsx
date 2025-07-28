@@ -11,7 +11,7 @@ import ChainOfCustody from '@/components/samples/ChainOfCustody';
 const SampleDetailPage: React.FC = () => {
   const { sampleId } = useParams<{ sampleId: string }>();
   const navigate = useNavigate();
-  
+
   const { data: sample, isLoading: sampleLoading, error: sampleError } = useSample(sampleId!);
   const { data: patient, isLoading: patientLoading } = usePatient(sample?.patientId || '');
   const { data: order, isLoading: orderLoading } = useTestOrder(sample?.orderId || '');
@@ -36,7 +36,9 @@ const SampleDetailPage: React.FC = () => {
   }
 
   if (sampleError || !sample) {
-    return <ErrorState error="Failed to load sample details" onRetry={() => navigate('/samples')} />;
+    return (
+      <ErrorState error="Failed to load sample details" onRetry={() => navigate('/samples')} />
+    );
   }
 
   return (
@@ -50,19 +52,27 @@ const SampleDetailPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Samples
         </button>
-        
+
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Sample {sample.sampleNumber}</h1>
             <div className="mt-2 flex items-center gap-4">
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(sample.status)}`}>
+              <span
+                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                  sample.status
+                )}`}
+              >
                 {sample.status.replace(/_/g, ' ').toUpperCase()}
               </span>
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                sample.priority === 'stat' ? 'bg-red-100 text-red-800' : 
-                sample.priority === 'asap' ? 'bg-orange-100 text-orange-800' : 
-                'bg-gray-100 text-gray-800'
-              }`}>
+              <span
+                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                  sample.priority === 'stat'
+                    ? 'bg-red-100 text-red-800'
+                    : sample.priority === 'asap'
+                      ? 'bg-orange-100 text-orange-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}
+              >
                 {sample.priority.toUpperCase()}
               </span>
             </div>
@@ -81,7 +91,9 @@ const SampleDetailPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Name</p>
-                  <p className="font-medium">{patient.firstName} {patient.lastName}</p>
+                  <p className="font-medium">
+                    {patient.firstName} {patient.lastName}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">MRN</p>
@@ -89,7 +101,9 @@ const SampleDetailPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Date of Birth</p>
-                  <p className="font-medium">{new Date(patient.dateOfBirth).toLocaleDateString()}</p>
+                  <p className="font-medium">
+                    {new Date(patient.dateOfBirth).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Gender</p>
@@ -116,7 +130,9 @@ const SampleDetailPage: React.FC = () => {
               {sample.volume && (
                 <div>
                   <p className="text-sm text-gray-600">Volume</p>
-                  <p className="font-medium">{sample.volume} {sample.volumeUnit || 'ml'}</p>
+                  <p className="font-medium">
+                    {sample.volume} {sample.volumeUnit || 'ml'}
+                  </p>
                 </div>
               )}
               <div>
@@ -132,7 +148,10 @@ const SampleDetailPage: React.FC = () => {
             {order && order.tests && order.tests.length > 0 ? (
               <div className="space-y-3">
                 {order.tests.map((test, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                  >
                     <div>
                       <p className="font-medium">{test.testName}</p>
                       <p className="text-sm text-gray-500">{test.testCode}</p>
@@ -162,7 +181,11 @@ const SampleDetailPage: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Collection Date/Time</p>
                 <p className="font-medium">
-                  {(sample.collectionDate instanceof Date ? sample.collectionDate : sample.collectionDate.toDate()).toLocaleDateString()} at {sample.collectionTime}
+                  {(sample.collectionDate instanceof Date
+                    ? sample.collectionDate
+                    : sample.collectionDate.toDate()
+                  ).toLocaleDateString()}{' '}
+                  at {sample.collectionTime}
                 </p>
               </div>
               <div>
@@ -192,13 +215,17 @@ const SampleDetailPage: React.FC = () => {
                 {sample.storageTemperature && (
                   <div>
                     <p className="text-sm text-gray-600">Storage Temperature</p>
-                    <p className="font-medium capitalize">{sample.storageTemperature.replace(/_/g, ' ')}</p>
+                    <p className="font-medium capitalize">
+                      {sample.storageTemperature.replace(/_/g, ' ')}
+                    </p>
                   </div>
                 )}
                 {sample.expirationDate && (
                   <div>
                     <p className="text-sm text-gray-600">Expiration Date</p>
-                    <p className="font-medium">{new Date(sample.expirationDate.toDate()).toLocaleDateString()}</p>
+                    <p className="font-medium">
+                      {new Date(sample.expirationDate.toDate()).toLocaleDateString()}
+                    </p>
                   </div>
                 )}
               </div>
@@ -211,7 +238,9 @@ const SampleDetailPage: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-2">Barcode</p>
-                <p className="font-mono text-lg bg-gray-100 p-3 rounded text-center">{sample.barcode}</p>
+                <p className="font-mono text-lg bg-gray-100 p-3 rounded text-center">
+                  {sample.barcode}
+                </p>
               </div>
               {sample.qrCode && (
                 <div>
@@ -247,7 +276,7 @@ const SampleDetailPage: React.FC = () => {
                 <QrCode className="h-4 w-4 inline mr-2" />
                 Print Label
               </button>
-              <button 
+              <button
                 onClick={() => navigate(`/tests/orders/${sample.orderId}`)}
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
               >

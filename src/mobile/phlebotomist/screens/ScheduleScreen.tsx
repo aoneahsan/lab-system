@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
+import {
+  Calendar,
+  Clock,
+  MapPin,
   User,
   AlertCircle,
   CheckCircle,
   ChevronLeft,
   ChevronRight,
   Filter,
-  Package
+  Package,
 } from 'lucide-react';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ export const ScheduleScreen: React.FC = () => {
       tests: ['CBC', 'Chemistry Panel'],
       status: 'completed',
       priority: 'routine',
-      fastingRequired: true
+      fastingRequired: true,
     },
     {
       id: '2',
@@ -53,7 +53,7 @@ export const ScheduleScreen: React.FC = () => {
       location: 'Ward A - Room 105',
       tests: ['Lipid Panel', 'HbA1c'],
       status: 'completed',
-      priority: 'routine'
+      priority: 'routine',
     },
     {
       id: '3',
@@ -64,7 +64,7 @@ export const ScheduleScreen: React.FC = () => {
       tests: ['Blood Culture', 'CBC'],
       status: 'in-progress',
       priority: 'stat',
-      notes: 'Patient on antibiotics'
+      notes: 'Patient on antibiotics',
     },
     {
       id: '4',
@@ -75,7 +75,7 @@ export const ScheduleScreen: React.FC = () => {
       tests: ['Glucose', 'Insulin'],
       status: 'pending',
       priority: 'routine',
-      fastingRequired: true
+      fastingRequired: true,
     },
     {
       id: '5',
@@ -86,7 +86,7 @@ export const ScheduleScreen: React.FC = () => {
       tests: ['PT/INR'],
       status: 'pending',
       priority: 'urgent',
-      notes: 'Pre-surgery collection'
+      notes: 'Pre-surgery collection',
     },
     {
       id: '6',
@@ -96,8 +96,8 @@ export const ScheduleScreen: React.FC = () => {
       location: 'ER - Bed 5',
       tests: ['Troponin', 'BNP', 'CBC'],
       status: 'pending',
-      priority: 'stat'
-    }
+      priority: 'stat',
+    },
   ]);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
@@ -105,7 +105,7 @@ export const ScheduleScreen: React.FC = () => {
     return addDays(start, i);
   });
 
-  const filteredCollections = collections.filter(collection => {
+  const filteredCollections = collections.filter((collection) => {
     if (filterStatus !== 'all' && collection.status !== filterStatus) {
       return false;
     }
@@ -144,10 +144,10 @@ export const ScheduleScreen: React.FC = () => {
     const [hours, minutes] = time.split(':').map(Number);
     const scheduledTime = new Date();
     scheduledTime.setHours(hours, minutes, 0, 0);
-    
+
     const now = new Date();
     const diff = (scheduledTime.getTime() - now.getTime()) / (1000 * 60);
-    
+
     if (status === 'completed') return null;
     if (status === 'in-progress') return 'In Progress';
     if (diff < 0) return 'Overdue';
@@ -162,29 +162,20 @@ export const ScheduleScreen: React.FC = () => {
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold text-gray-900">Schedule</h1>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="p-2 text-gray-600"
-            >
+            <button onClick={() => setShowFilters(!showFilters)} className="p-2 text-gray-600">
               <Filter className="h-5 w-5" />
             </button>
           </div>
 
           {/* Week Calendar */}
           <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={() => setSelectedDate(addDays(selectedDate, -7))}
-              className="p-1"
-            >
+            <button onClick={() => setSelectedDate(addDays(selectedDate, -7))} className="p-1">
               <ChevronLeft className="h-5 w-5 text-gray-600" />
             </button>
             <span className="text-sm font-medium text-gray-900">
               {format(weekDays[0], 'MMM d')} - {format(weekDays[6], 'MMM d, yyyy')}
             </span>
-            <button
-              onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-              className="p-1"
-            >
+            <button onClick={() => setSelectedDate(addDays(selectedDate, 7))} className="p-1">
               <ChevronRight className="h-5 w-5 text-gray-600" />
             </button>
           </div>
@@ -198,8 +189,8 @@ export const ScheduleScreen: React.FC = () => {
                   isSameDay(day, selectedDate)
                     ? 'bg-indigo-600 text-white'
                     : isSameDay(day, new Date())
-                    ? 'bg-indigo-100 text-indigo-600'
-                    : 'hover:bg-gray-100'
+                      ? 'bg-indigo-100 text-indigo-600'
+                      : 'hover:bg-gray-100'
                 }`}
               >
                 <p className="text-xs font-medium">{format(day, 'EEE')}</p>
@@ -234,33 +225,30 @@ export const ScheduleScreen: React.FC = () => {
       {/* Schedule List */}
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="font-medium text-gray-900">
-            {format(selectedDate, 'EEEE, MMMM d')}
-          </h2>
-          <span className="text-sm text-gray-500">
-            {filteredCollections.length} collections
-          </span>
+          <h2 className="font-medium text-gray-900">{format(selectedDate, 'EEEE, MMMM d')}</h2>
+          <span className="text-sm text-gray-500">{filteredCollections.length} collections</span>
         </div>
 
         {filteredCollections.map((collection) => {
           const timeStatus = getTimeStatus(collection.time, collection.status);
-          
+
           return (
-            <div
-              key={collection.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden"
-            >
+            <div key={collection.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start space-x-3">
                     <div className="text-center">
                       <p className="text-sm font-semibold text-gray-900">{collection.time}</p>
                       {timeStatus && (
-                        <p className={`text-xs mt-1 ${
-                          timeStatus === 'Overdue' ? 'text-red-600' :
-                          timeStatus === 'Due Soon' ? 'text-yellow-600' :
-                          'text-blue-600'
-                        }`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            timeStatus === 'Overdue'
+                              ? 'text-red-600'
+                              : timeStatus === 'Due Soon'
+                                ? 'text-yellow-600'
+                                : 'text-blue-600'
+                          }`}
+                        >
                           {timeStatus}
                         </p>
                       )}
@@ -273,7 +261,11 @@ export const ScheduleScreen: React.FC = () => {
                       <p className="text-sm text-gray-500">ID: {collection.patientId}</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(collection.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      collection.status
+                    )}`}
+                  >
                     {collection.status}
                   </span>
                 </div>

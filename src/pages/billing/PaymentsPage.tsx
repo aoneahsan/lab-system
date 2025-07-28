@@ -8,7 +8,7 @@ const PaymentsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMethod, setFilterMethod] = useState<string>('all');
-  
+
   const { data: payments = [], isLoading } = usePayments();
 
   const getPaymentMethodLabel = (method: string) => {
@@ -37,13 +37,14 @@ const PaymentsPage: React.FC = () => {
     return icons[method] || '📄';
   };
 
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.amount.toString().includes(searchTerm);
-    
+  const filteredPayments = payments.filter((payment) => {
+    const matchesSearch =
+      payment.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.amount.toString().includes(searchTerm);
+
     const matchesMethod = filterMethod === 'all' || payment.method === filterMethod;
-    
+
     return matchesSearch && matchesMethod;
   });
 
@@ -60,13 +61,13 @@ const PaymentsPage: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Billing
         </button>
-        
+
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Payment History</h1>
             <p className="text-gray-600 mt-2">View and manage all payment transactions</p>
           </div>
-          
+
           <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2">
             <Download className="h-4 w-4" />
             Export
@@ -99,9 +100,13 @@ const PaymentsPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Today's Payments</p>
               <p className="text-2xl font-bold text-gray-900">
-                {filteredPayments.filter(p => 
-                  format(p.paymentDate.toDate(), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-                ).length}
+                {
+                  filteredPayments.filter(
+                    (p) =>
+                      format(p.paymentDate.toDate(), 'yyyy-MM-dd') ===
+                      format(new Date(), 'yyyy-MM-dd')
+                  ).length
+                }
               </p>
             </div>
             <DollarSign className="h-8 w-8 text-purple-500" />
@@ -112,7 +117,10 @@ const PaymentsPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">Average Payment</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${filteredPayments.length > 0 ? (totalAmount / filteredPayments.length).toFixed(2) : '0.00'}
+                $
+                {filteredPayments.length > 0
+                  ? (totalAmount / filteredPayments.length).toFixed(2)
+                  : '0.00'}
               </p>
             </div>
             <DollarSign className="h-8 w-8 text-orange-500" />
@@ -225,9 +233,7 @@ const PaymentsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {payment.referenceNumber || '-'}
-                      </div>
+                      <div className="text-sm text-gray-900">{payment.referenceNumber || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="text-sm font-medium text-gray-900">
@@ -240,9 +246,7 @@ const PaymentsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {payment.createdBy}
-                      </div>
+                      <div className="text-sm text-gray-500">{payment.createdBy}</div>
                     </td>
                   </tr>
                 ))}

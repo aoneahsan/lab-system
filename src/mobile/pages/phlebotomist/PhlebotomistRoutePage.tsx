@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Navigation, 
-  Phone, 
+import {
+  MapPin,
+  Navigation,
+  Phone,
   Clock,
   CheckCircle,
   Circle,
   AlertCircle,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
@@ -31,7 +31,7 @@ const PhlebotomistRoutePage: React.FC = () => {
   const navigate = useNavigate();
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedStop, setSelectedStop] = useState<string | null>(null);
-  
+
   // Mock route data - in real app would come from API/local DB
   const [routeStops, setRouteStops] = useState<RouteStop[]>([
     {
@@ -90,7 +90,7 @@ const PhlebotomistRoutePage: React.FC = () => {
       const position = await Geolocation.getCurrentPosition();
       setCurrentLocation({
         lat: position.coords.latitude,
-        lng: position.coords.longitude
+        lng: position.coords.longitude,
       });
     } catch (error) {
       console.error('Failed to get location:', error);
@@ -102,10 +102,11 @@ const PhlebotomistRoutePage: React.FC = () => {
     if (Capacitor.isNativePlatform()) {
       // On mobile, open native maps app
       const encodedAddress = encodeURIComponent(address);
-      const url = Capacitor.getPlatform() === 'ios' 
-        ? `maps://maps.apple.com/?q=${encodedAddress}`
-        : `geo:0,0?q=${encodedAddress}`;
-      
+      const url =
+        Capacitor.getPlatform() === 'ios'
+          ? `maps://maps.apple.com/?q=${encodedAddress}`
+          : `geo:0,0?q=${encodedAddress}`;
+
       window.open(url, '_system');
     } else {
       // On web, open Google Maps
@@ -114,19 +115,15 @@ const PhlebotomistRoutePage: React.FC = () => {
   };
 
   const markAsCompleted = (stopId: string) => {
-    setRouteStops(stops => 
-      stops.map(stop => 
-        stop.id === stopId ? { ...stop, status: 'completed' } : stop
-      )
+    setRouteStops((stops) =>
+      stops.map((stop) => (stop.id === stopId ? { ...stop, status: 'completed' } : stop))
     );
     toast.success('Stop marked as completed');
   };
 
   const markAsSkipped = (stopId: string) => {
-    setRouteStops(stops => 
-      stops.map(stop => 
-        stop.id === stopId ? { ...stop, status: 'skipped' } : stop
-      )
+    setRouteStops((stops) =>
+      stops.map((stop) => (stop.id === stopId ? { ...stop, status: 'skipped' } : stop))
     );
     toast.info('Stop marked as skipped');
   };
@@ -142,15 +139,15 @@ const PhlebotomistRoutePage: React.FC = () => {
     }
   };
 
-  const pendingStops = routeStops.filter(stop => stop.status === 'pending').length;
-  const completedStops = routeStops.filter(stop => stop.status === 'completed').length;
+  const pendingStops = routeStops.filter((stop) => stop.status === 'pending').length;
+  const completedStops = routeStops.filter((stop) => stop.status === 'completed').length;
 
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Today's Route</h1>
-        
+
         {/* Stats */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-6">
@@ -196,14 +193,10 @@ const PhlebotomistRoutePage: React.FC = () => {
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="mt-1">
-                    {getStatusIcon(stop.status)}
-                  </div>
+                  <div className="mt-1">{getStatusIcon(stop.status)}</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-gray-900">
-                        {stop.patientName}
-                      </h3>
+                      <h3 className="font-medium text-gray-900">{stop.patientName}</h3>
                       {stop.priority === 'urgent' && (
                         <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
                           Urgent
@@ -228,9 +221,11 @@ const PhlebotomistRoutePage: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <ChevronRight className={`h-5 w-5 text-gray-400 transition-transform ${
-                  selectedStop === stop.id ? 'rotate-90' : ''
-                }`} />
+                <ChevronRight
+                  className={`h-5 w-5 text-gray-400 transition-transform ${
+                    selectedStop === stop.id ? 'rotate-90' : ''
+                  }`}
+                />
               </div>
             </div>
 
@@ -259,7 +254,11 @@ const PhlebotomistRoutePage: React.FC = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/collection?patientName=${encodeURIComponent(stop.patientName)}&address=${encodeURIComponent(stop.address)}`);
+                      navigate(
+                        `/collection?patientName=${encodeURIComponent(
+                          stop.patientName
+                        )}&address=${encodeURIComponent(stop.address)}`
+                      );
                     }}
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg"
                   >

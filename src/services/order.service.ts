@@ -11,7 +11,7 @@ import {
   where,
   orderBy,
   Timestamp,
-  limit
+  limit,
 } from 'firebase/firestore';
 import type { TestOrder, OrderedTest, Specimen } from '@/types/order';
 import { getCurrentUser } from './auth.service';
@@ -25,7 +25,7 @@ export const orderService = {
     const user = await getCurrentUser();
     const orderNumber = `ORD-${Date.now()}`;
     const barcode = this.generateBarcode();
-    
+
     const docRef = await addDoc(collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS), {
       ...data,
       id: generateId(),
@@ -34,15 +34,15 @@ export const orderService = {
       status: 'pending',
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-      createdBy: user?.uid
+      createdBy: user?.uid,
     });
-    
+
     return docRef.id;
   },
 
   async getTestOrders(filters?: any): Promise<TestOrder[]> {
     const constraints = [];
-    
+
     if (filters?.status) {
       constraints.push(where('status', '==', filters.status));
     }
@@ -58,34 +58,34 @@ export const orderService = {
     if (filters?.dateTo) {
       constraints.push(where('orderDate', '<=', Timestamp.fromDate(filters.dateTo)));
     }
-    
+
     constraints.push(orderBy('orderDate', 'desc'));
-    
+
     if (filters?.limit) {
       constraints.push(limit(filters.limit));
     }
-    
-    const q = query(
-      collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
-      ...constraints
-    );
-    
+
+    const q = query(collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS), ...constraints);
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as TestOrder));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as TestOrder
+    );
   },
 
   async getTestOrder(id: string): Promise<TestOrder | null> {
     const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS, id);
     const snapshot = await getDoc(docRef);
-    
+
     if (!snapshot.exists()) return null;
-    
+
     return {
       id: snapshot.id,
-      ...snapshot.data()
+      ...snapshot.data(),
     } as TestOrder;
   },
 
@@ -93,18 +93,22 @@ export const orderService = {
     const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS, id);
     await updateDoc(docRef, {
       ...data,
-      updatedAt: Timestamp.now()
+      updatedAt: Timestamp.now(),
     });
   },
 
-  async updateTestStatus(orderId: string, testId: string, status: OrderedTest['status']): Promise<void> {
+  async updateTestStatus(
+    orderId: string,
+    testId: string,
+    status: OrderedTest['status']
+  ): Promise<void> {
     const order = await this.getTestOrder(orderId);
     if (!order) throw new Error('Order not found');
-    
-    const updatedTests = order.tests.map(test => 
+
+    const updatedTests = order.tests.map((test) =>
       test.testId === testId ? { ...test, status } : test
     );
-    
+
     await this.updateTestOrder(orderId, { tests: updatedTests });
   },
 
@@ -113,7 +117,7 @@ export const orderService = {
     const user = await getCurrentUser();
     const specimenNumber = `SPC-${Date.now()}`;
     const barcode = this.generateBarcode();
-    
+
     const docRef = await addDoc(collection(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS), {
       ...data,
       id: generateId(),
@@ -122,38 +126,38 @@ export const orderService = {
       status: 'collected',
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
-      createdBy: user?.uid
+      createdBy: user?.uid,
     });
-    
+
     return docRef.id;
   },
 
   async getSpecimens(orderId?: string): Promise<Specimen[]> {
     const constraints = [];
-    
+
     if (orderId) {
       constraints.push(where('orderId', '==', orderId));
     }
-    
+
     constraints.push(orderBy('collectionDate', 'desc'));
-    
-    const q = query(
-      collection(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS),
-      ...constraints
-    );
-    
+
+    const q = query(collection(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS), ...constraints);
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Specimen));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as Specimen
+    );
   },
 
   async updateSpecimen(id: string, data: Partial<Specimen>): Promise<void> {
     const docRef = doc(db, SHARED_COLLECTIONS.LABFLOW_SPECIMENS, id);
     await updateDoc(docRef, {
       ...data,
-      updatedAt: Timestamp.now()
+      updatedAt: Timestamp.now(),
     });
   },
 
@@ -161,7 +165,7 @@ export const orderService = {
     await this.updateSpecimen(id, {
       status: 'received',
       receivedDate: Timestamp.now(),
-      receivedBy
+      receivedBy,
     });
   },
 
@@ -184,7 +188,7 @@ export const orderService = {
         limit(10)
       )
     );
-    
+
     const ordersByPatient = await getDocs(
       query(
         collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
@@ -193,17 +197,17 @@ export const orderService = {
         limit(10)
       )
     );
-    
+
     const orders = [
-      ...ordersByNumber.docs.map(doc => ({ id: doc.id, ...doc.data() } as TestOrder)),
-      ...ordersByPatient.docs.map(doc => ({ id: doc.id, ...doc.data() } as TestOrder))
+      ...ordersByNumber.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as TestOrder),
+      ...ordersByPatient.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as TestOrder),
     ];
-    
+
     // Remove duplicates
-    const uniqueOrders = orders.filter((order, index, self) =>
-      index === self.findIndex((o) => o.id === order.id)
+    const uniqueOrders = orders.filter(
+      (order, index, self) => index === self.findIndex((o) => o.id === order.id)
     );
-    
+
     return uniqueOrders;
   },
 
@@ -211,7 +215,7 @@ export const orderService = {
   async getPendingCollections(): Promise<TestOrder[]> {
     return this.getTestOrders({
       status: 'pending',
-      limit: 50
+      limit: 50,
     });
   },
 
@@ -219,13 +223,13 @@ export const orderService = {
   async getTodayOrders(): Promise<TestOrder[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     return this.getTestOrders({
       dateFrom: today,
-      dateTo: tomorrow
+      dateTo: tomorrow,
     });
-  }
+  },
 };

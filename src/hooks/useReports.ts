@@ -80,7 +80,13 @@ export const useUpdateReportTemplate = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ templateId, data }: { templateId: string; data: Partial<ReportTemplateFormData> }) => {
+    mutationFn: ({
+      templateId,
+      data,
+    }: {
+      templateId: string;
+      data: Partial<ReportTemplateFormData>;
+    }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return reportService.updateReportTemplate(currentTenant.id, currentUser.id, templateId, data);
     },
@@ -282,7 +288,13 @@ export const useUpdateDashboard = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ dashboardId, data }: { dashboardId: string; data: Partial<AnalyticsDashboard> }) => {
+    mutationFn: ({
+      dashboardId,
+      data,
+    }: {
+      dashboardId: string;
+      data: Partial<AnalyticsDashboard>;
+    }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return reportService.updateDashboard(currentTenant.id, currentUser.id, dashboardId, data);
     },

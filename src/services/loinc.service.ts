@@ -141,13 +141,13 @@ export const loincService = {
     if (USE_LOINC_API) {
       return loincApiService.searchLOINCCodes(searchTerm);
     }
-    
+
     // Otherwise use mock data
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     const searchLower = searchTerm.toLowerCase();
     return mockLOINCDatabase.filter(
-      code =>
+      (code) =>
         code.code.includes(searchTerm) ||
         code.displayName.toLowerCase().includes(searchLower) ||
         code.longCommonName?.toLowerCase().includes(searchLower) ||
@@ -160,11 +160,11 @@ export const loincService = {
     if (USE_LOINC_API) {
       return loincApiService.getLOINCByCode(code);
     }
-    
+
     // Otherwise use mock data
-    await new Promise(resolve => setTimeout(resolve, 50));
-    
-    return mockLOINCDatabase.find(loinc => loinc.code === code) || null;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    return mockLOINCDatabase.find((loinc) => loinc.code === code) || null;
   },
 
   async getCommonTests(): Promise<LOINCCode[]> {
@@ -172,27 +172,27 @@ export const loincService = {
     if (USE_LOINC_API) {
       return loincApiService.getCommonTests();
     }
-    
+
     // Otherwise return mock common tests
     return mockLOINCDatabase.slice(0, 10);
   },
-  
+
   // Additional methods that use the API service
   async searchByCategory(category: string, limit?: number): Promise<LOINCCode[]> {
     if (USE_LOINC_API) {
       return loincApiService.searchByCategory(category, limit);
     }
-    
+
     // Mock implementation
-    return mockLOINCDatabase.filter(code => code.class === category).slice(0, limit || 50);
+    return mockLOINCDatabase.filter((code) => code.class === category).slice(0, limit || 50);
   },
-  
+
   async validateLOINCCode(code: string): Promise<boolean> {
     if (USE_LOINC_API) {
       return loincApiService.validateLOINCCode(code);
     }
-    
+
     // Mock implementation
-    return mockLOINCDatabase.some(loinc => loinc.code === code);
+    return mockLOINCDatabase.some((loinc) => loinc.code === code);
   },
 };

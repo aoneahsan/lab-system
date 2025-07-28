@@ -37,7 +37,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
   const checkPermission = async () => {
     try {
       const status = await CapacitorBarcodeScanner.checkPermission({ force: false });
-      
+
       if (status.granted) {
         setHasPermission(true);
         startScan();
@@ -65,7 +65,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
     try {
       // Hide background for camera view
       document.body.classList.add('scanner-active');
-      
+
       await CapacitorBarcodeScanner.hideBackground();
       setIsScanning(true);
 
@@ -126,14 +126,11 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">Scan Barcode</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-6 w-6" />
             </button>
           </div>
-          
+
           <div className="text-center py-8">
             <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 mb-4">
@@ -184,9 +181,9 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                 >
                   <X className="h-6 w-6" />
                 </button>
-                
+
                 <h3 className="text-white text-lg font-medium">Scan Barcode</h3>
-                
+
                 <button
                   onClick={toggleTorch}
                   className="text-white p-2 rounded-full hover:bg-white hover:bg-opacity-20"
@@ -209,7 +206,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                     <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
                     <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
                     <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-lg"></div>
-                    
+
                     {/* Scanning line animation */}
                     <div className="absolute inset-x-0 h-0.5 bg-red-500 animate-scan"></div>
                   </div>
@@ -235,10 +232,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
               <p className="text-sm opacity-75 mb-4">
                 Please enable camera access in your device settings to scan barcodes
               </p>
-              <button
-                onClick={handleClose}
-                className="px-4 py-2 bg-white text-black rounded-md"
-              >
+              <button onClick={handleClose} className="px-4 py-2 bg-white text-black rounded-md">
                 Close
               </button>
             </div>

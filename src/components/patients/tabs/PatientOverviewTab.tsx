@@ -6,10 +6,10 @@ interface PatientOverviewTabProps {
 }
 
 export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
-  const primaryPhone = patient.phoneNumbers.find(p => p.isPrimary) || patient.phoneNumbers[0];
-  const defaultAddress = patient.addresses.find(a => a.isDefault) || patient.addresses[0];
+  const primaryPhone = patient.phoneNumbers.find((p) => p.isPrimary) || patient.phoneNumbers[0];
+  const defaultAddress = patient.addresses.find((a) => a.isDefault) || patient.addresses[0];
   const primaryEmergencyContact = patient.emergencyContacts[0];
-  
+
   return (
     <div className="space-y-6">
       {/* Contact Information */}
@@ -33,23 +33,24 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
               Email Address
             </label>
-            <p className="mt-1 text-gray-900 dark:text-white">
-              {patient.email || 'Not provided'}
-            </p>
+            <p className="mt-1 text-gray-900 dark:text-white">{patient.email || 'Not provided'}</p>
           </div>
         </div>
       </div>
-      
+
       {/* Address */}
       {defaultAddress && (
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            Address
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Address</h3>
           <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
             <p className="text-gray-900 dark:text-white">
               {defaultAddress.line1}
-              {defaultAddress.line2 && <><br />{defaultAddress.line2}</>}
+              {defaultAddress.line2 && (
+                <>
+                  <br />
+                  {defaultAddress.line2}
+                </>
+              )}
               <br />
               {defaultAddress.city}, {defaultAddress.state} {defaultAddress.postalCode}
               <br />
@@ -58,7 +59,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
           </div>
         </div>
       )}
-      
+
       {/* Personal Information */}
       <div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -77,17 +78,13 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
               Gender
             </label>
-            <p className="mt-1 text-gray-900 dark:text-white capitalize">
-              {patient.gender}
-            </p>
+            <p className="mt-1 text-gray-900 dark:text-white capitalize">{patient.gender}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
               Blood Group
             </label>
-            <p className="mt-1 text-gray-900 dark:text-white">
-              {patient.bloodGroup || 'Unknown'}
-            </p>
+            <p className="mt-1 text-gray-900 dark:text-white">{patient.bloodGroup || 'Unknown'}</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -115,7 +112,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
           </div>
         </div>
       </div>
-      
+
       {/* Emergency Contact */}
       {primaryEmergencyContact && (
         <div>
@@ -128,9 +125,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                   Name
                 </label>
-                <p className="mt-1 text-gray-900 dark:text-white">
-                  {primaryEmergencyContact.name}
-                </p>
+                <p className="mt-1 text-gray-900 dark:text-white">{primaryEmergencyContact.name}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -152,7 +147,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
           </div>
         </div>
       )}
-      
+
       {/* Insurances */}
       {patient.insurances.length > 0 && (
         <div>
@@ -161,10 +156,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
           </h3>
           <div className="space-y-4">
             {patient.insurances.map((insurance, index) => (
-              <div
-                key={insurance.id}
-                className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg"
-              >
+              <div key={insurance.id} className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-medium text-gray-900 dark:text-white">
                     {insurance.provider}
@@ -182,7 +174,9 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
                   </div>
                   <div>
                     <span className="text-gray-600 dark:text-gray-400">Group #:</span>
-                    <p className="text-gray-900 dark:text-white">{insurance.groupNumber || 'N/A'}</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {insurance.groupNumber || 'N/A'}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600 dark:text-gray-400">Valid From:</span>
@@ -204,7 +198,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
           </div>
         </div>
       )}
-      
+
       {/* Additional Notes */}
       {patient.notes && (
         <div>
@@ -212,13 +206,11 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
             Additional Notes
           </h3>
           <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
-              {patient.notes}
-            </p>
+            <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{patient.notes}</p>
           </div>
         </div>
       )}
-      
+
       {/* Record Information */}
       <div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -226,9 +218,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
-            <label className="block font-medium text-gray-600 dark:text-gray-400">
-              Created On
-            </label>
+            <label className="block font-medium text-gray-600 dark:text-gray-400">Created On</label>
             <p className="mt-1 text-gray-900 dark:text-white">
               {format(patient.createdAt, 'MMM dd, yyyy hh:mm a')}
             </p>
@@ -245,9 +235,7 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
             <label className="block font-medium text-gray-600 dark:text-gray-400">
               Total Visits
             </label>
-            <p className="mt-1 text-gray-900 dark:text-white">
-              {patient.totalVisits}
-            </p>
+            <p className="mt-1 text-gray-900 dark:text-white">{patient.totalVisits}</p>
           </div>
         </div>
       </div>

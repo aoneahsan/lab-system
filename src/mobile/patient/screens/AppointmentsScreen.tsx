@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
+import {
+  Calendar,
+  Clock,
+  MapPin,
   User,
   Plus,
   ChevronRight,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format, isPast, isFuture, isToday } from 'date-fns';
@@ -48,7 +48,7 @@ export const AppointmentsScreen: React.FC = () => {
       preparationInstructions: 'Fast for 12 hours before the test. Water is allowed.',
       confirmationCode: 'LF-2024-1027',
       canReschedule: true,
-      canCancel: true
+      canCancel: true,
     },
     {
       id: '2',
@@ -62,7 +62,7 @@ export const AppointmentsScreen: React.FC = () => {
       status: 'completed',
       confirmationCode: 'LF-2024-1025',
       canReschedule: false,
-      canCancel: false
+      canCancel: false,
     },
     {
       id: '3',
@@ -76,16 +76,16 @@ export const AppointmentsScreen: React.FC = () => {
       status: 'cancelled',
       confirmationCode: 'LF-2024-1020',
       canReschedule: false,
-      canCancel: false
-    }
+      canCancel: false,
+    },
   ];
 
   const upcomingAppointments = appointments.filter(
-    apt => apt.status === 'scheduled' && isFuture(apt.date)
+    (apt) => apt.status === 'scheduled' && isFuture(apt.date)
   );
 
   const pastAppointments = appointments.filter(
-    apt => apt.status !== 'scheduled' || isPast(apt.date)
+    (apt) => apt.status !== 'scheduled' || isPast(apt.date)
   );
 
   const getStatusColor = (status: string) => {
@@ -135,16 +135,18 @@ export const AppointmentsScreen: React.FC = () => {
             Next Appointment
           </div>
         )}
-        
+
         <div className="p-4">
           <div className="flex justify-between items-start mb-3">
             <div>
               <h3 className="font-medium text-gray-900">{appointment.testName}</h3>
               <p className="text-sm text-gray-500">Code: {appointment.testCode}</p>
             </div>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-              getStatusColor(appointment.status)
-            }`}>
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
+                appointment.status
+              )}`}
+            >
               {getStatusIcon(appointment.status)}
               {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
             </span>
@@ -172,9 +174,7 @@ export const AppointmentsScreen: React.FC = () => {
           {appointment.preparationInstructions && isUpcoming && (
             <div className="mt-3 p-3 bg-amber-50 rounded-lg">
               <p className="text-sm text-amber-800 font-medium">Preparation Required</p>
-              <p className="text-xs text-amber-700 mt-1">
-                {appointment.preparationInstructions}
-              </p>
+              <p className="text-xs text-amber-700 mt-1">{appointment.preparationInstructions}</p>
             </div>
           )}
 
@@ -223,9 +223,7 @@ export const AppointmentsScreen: React.FC = () => {
             <button
               onClick={() => setActiveTab('upcoming')}
               className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                activeTab === 'upcoming' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600'
+                activeTab === 'upcoming' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
               Upcoming ({upcomingAppointments.length})
@@ -233,9 +231,7 @@ export const AppointmentsScreen: React.FC = () => {
             <button
               onClick={() => setActiveTab('past')}
               className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                activeTab === 'past' 
-                  ? 'bg-white text-gray-900 shadow-sm' 
-                  : 'text-gray-600'
+                activeTab === 'past' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
               Past ({pastAppointments.length})
@@ -254,9 +250,7 @@ export const AppointmentsScreen: React.FC = () => {
               <div className="bg-white rounded-lg p-8 text-center">
                 <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500 font-medium">No upcoming appointments</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Book a test to get started
-                </p>
+                <p className="text-sm text-gray-400 mt-1">Book a test to get started</p>
                 <button
                   onClick={() => navigate('/patient/appointments/new')}
                   className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium"

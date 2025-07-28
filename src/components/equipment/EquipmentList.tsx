@@ -10,15 +10,26 @@ import { CpuChipIcon } from '@heroicons/react/24/outline';
 const EquipmentList: React.FC = () => {
   const user = useAuthStore((state) => state.currentUser);
 
-  const { data: equipment, isLoading, error, refetch } = useQuery({
+  const {
+    data: equipment,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['equipment'],
     queryFn: equipmentService.getEquipment,
     enabled: !!user,
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error instanceof Error ? error.message : 'Failed to load equipment'} onRetry={refetch} />;
+  if (error)
+    return (
+      <ErrorAlert
+        message={error instanceof Error ? error.message : 'Failed to load equipment'}
+        onRetry={refetch}
+      />
+    );
   if (!equipment || equipment.length === 0) {
     return (
       <div className="text-center py-12">

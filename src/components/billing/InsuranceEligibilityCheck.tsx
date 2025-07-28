@@ -10,18 +10,18 @@ interface InsuranceEligibilityCheckProps {
 
 const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
   patientId,
-  onClose
+  onClose,
 }) => {
   const [selectedInsurance, setSelectedInsurance] = useState<string>('');
   const { data: patientInsurance = [] } = usePatientInsurance(patientId);
   const checkEligibilityMutation = useCheckEligibility();
-  
+
   const [eligibilityResult, setEligibilityResult] = useState<InsuranceEligibility | null>(null);
 
   const handleCheckEligibility = async () => {
     if (!selectedInsurance) return;
-    
-    const insurance = patientInsurance.find(i => i.id === selectedInsurance);
+
+    const insurance = patientInsurance.find((i) => i.id === selectedInsurance);
     if (!insurance) return;
 
     const request: EligibilityCheckRequest = {
@@ -29,7 +29,7 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
       insuranceProviderId: insurance.providerId,
       memberNumber: insurance.policyNumber,
       groupNumber: insurance.groupNumber,
-      dateOfService: new Date()
+      dateOfService: new Date(),
     };
 
     const result = await checkEligibilityMutation.mutateAsync(request);
@@ -57,10 +57,7 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
           <h2 className="text-xl font-semibold">Insurance Eligibility Verification</h2>
         </div>
         {onClose && (
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             ×
           </button>
         )}
@@ -142,12 +139,18 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                   <div className="space-y-1">
                     <div className="flex justify-between">
                       <span>Effective:</span>
-                      <span>{new Date(eligibilityResult.effectiveDate.toDate()).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(eligibilityResult.effectiveDate.toDate()).toLocaleDateString()}
+                      </span>
                     </div>
                     {eligibilityResult.terminationDate && (
                       <div className="flex justify-between">
                         <span>Termination:</span>
-                        <span>{new Date(eligibilityResult.terminationDate.toDate()).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(
+                            eligibilityResult.terminationDate.toDate()
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -162,13 +165,18 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                     <div>
                       <p className="text-sm text-gray-600">Individual</p>
                       <p className="font-medium">
-                        ${eligibilityResult.deductible.individualMet} / ${eligibilityResult.deductible.individual}
+                        ${eligibilityResult.deductible.individualMet} / $
+                        {eligibilityResult.deductible.individual}
                       </p>
                       <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                         <div
                           className="bg-blue-600 h-2 rounded-full"
                           style={{
-                            width: `${(eligibilityResult.deductible.individualMet / eligibilityResult.deductible.individual) * 100}%`
+                            width: `${
+                              (eligibilityResult.deductible.individualMet /
+                                eligibilityResult.deductible.individual) *
+                              100
+                            }%`,
                           }}
                         />
                       </div>
@@ -177,13 +185,18 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                       <div>
                         <p className="text-sm text-gray-600">Family</p>
                         <p className="font-medium">
-                          ${eligibilityResult.deductible.familyMet} / ${eligibilityResult.deductible.family}
+                          ${eligibilityResult.deductible.familyMet} / $
+                          {eligibilityResult.deductible.family}
                         </p>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                           <div
                             className="bg-blue-600 h-2 rounded-full"
                             style={{
-                              width: `${(eligibilityResult.deductible.familyMet / eligibilityResult.deductible.family) * 100}%`
+                              width: `${
+                                (eligibilityResult.deductible.familyMet /
+                                  eligibilityResult.deductible.family) *
+                                100
+                              }%`,
                             }}
                           />
                         </div>
@@ -198,13 +211,18 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                     <div>
                       <p className="text-sm text-gray-600">Individual</p>
                       <p className="font-medium">
-                        ${eligibilityResult.outOfPocketMax.individualMet} / ${eligibilityResult.outOfPocketMax.individual}
+                        ${eligibilityResult.outOfPocketMax.individualMet} / $
+                        {eligibilityResult.outOfPocketMax.individual}
                       </p>
                       <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                         <div
                           className="bg-green-600 h-2 rounded-full"
                           style={{
-                            width: `${(eligibilityResult.outOfPocketMax.individualMet / eligibilityResult.outOfPocketMax.individual) * 100}%`
+                            width: `${
+                              (eligibilityResult.outOfPocketMax.individualMet /
+                                eligibilityResult.outOfPocketMax.individual) *
+                              100
+                            }%`,
                           }}
                         />
                       </div>
@@ -213,13 +231,18 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                       <div>
                         <p className="text-sm text-gray-600">Family</p>
                         <p className="font-medium">
-                          ${eligibilityResult.outOfPocketMax.familyMet} / ${eligibilityResult.outOfPocketMax.family}
+                          ${eligibilityResult.outOfPocketMax.familyMet} / $
+                          {eligibilityResult.outOfPocketMax.family}
                         </p>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                           <div
                             className="bg-green-600 h-2 rounded-full"
                             style={{
-                              width: `${(eligibilityResult.outOfPocketMax.familyMet / eligibilityResult.outOfPocketMax.family) * 100}%`
+                              width: `${
+                                (eligibilityResult.outOfPocketMax.familyMet /
+                                  eligibilityResult.outOfPocketMax.family) *
+                                100
+                              }%`,
                             }}
                           />
                         </div>
@@ -236,7 +259,9 @@ const InsuranceEligibilityCheck: React.FC<InsuranceEligibilityCheckProps> = ({
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {Object.entries(eligibilityResult.copay).map(([type, amount]) => (
                       <div key={type}>
-                        <p className="text-sm text-gray-600 capitalize">{type.replace(/([A-Z])/g, ' $1').trim()}</p>
+                        <p className="text-sm text-gray-600 capitalize">
+                          {type.replace(/([A-Z])/g, ' $1').trim()}
+                        </p>
                         <p className="font-medium">${amount}</p>
                       </div>
                     ))}

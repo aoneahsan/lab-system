@@ -7,7 +7,7 @@ import {
   ArrowPathIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  ClockIcon
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 
 interface EquipmentCardProps {
@@ -26,7 +26,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
     },
     onError: () => {
       setIsSyncing(false);
-    }
+    },
   });
 
   const handleSync = () => {
@@ -49,10 +49,14 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
 
   const getStatusColor = () => {
     switch (equipment.status) {
-      case 'online': return 'bg-green-100 text-green-800';
-      case 'offline': return 'bg-gray-100 text-gray-800';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
-      case 'error': return 'bg-red-100 text-red-800';
+      case 'online':
+        return 'bg-green-100 text-green-800';
+      case 'offline':
+        return 'bg-gray-100 text-gray-800';
+      case 'maintenance':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'error':
+        return 'bg-red-100 text-red-800';
     }
   };
 
@@ -67,7 +71,9 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
               <p className="text-sm text-gray-500">{equipment.model}</p>
             </div>
           </div>
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor()}`}>
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor()}`}
+          >
             {getStatusIcon()}
             <span className="ml-1">{equipment.status}</span>
           </span>
@@ -92,9 +98,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Last Sync:</span>
-            <span className="font-medium">
-              {new Date(equipment.lastSync).toLocaleString()}
-            </span>
+            <span className="font-medium">{new Date(equipment.lastSync).toLocaleString()}</span>
           </div>
         </div>
 
@@ -117,7 +121,9 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
             )}
           </button>
           <button
-            onClick={() => {/* View logs */}}
+            onClick={() => {
+              /* View logs */
+            }}
             className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             View Logs

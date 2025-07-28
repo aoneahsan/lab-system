@@ -14,7 +14,7 @@ export function useAcknowledgeResult() {
       if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const resultRef = doc(db, `${currentTenant.id}_results`, resultId);
-      
+
       await updateDoc(resultRef, {
         acknowledged: true,
         acknowledgedBy: currentUser.displayName || currentUser.email || 'Unknown',

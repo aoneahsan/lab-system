@@ -10,9 +10,9 @@ import { performance } from '@/config/firebase';
 const WEB_VITALS_THRESHOLDS = {
   FCP: { good: 1800, needs_improvement: 3000 }, // First Contentful Paint
   LCP: { good: 2500, needs_improvement: 4000 }, // Largest Contentful Paint
-  FID: { good: 100, needs_improvement: 300 },    // First Input Delay
-  CLS: { good: 0.1, needs_improvement: 0.25 },   // Cumulative Layout Shift
-  TTFB: { good: 800, needs_improvement: 1800 }  // Time to First Byte
+  FID: { good: 100, needs_improvement: 300 }, // First Input Delay
+  CLS: { good: 0.1, needs_improvement: 0.25 }, // Cumulative Layout Shift
+  TTFB: { good: 800, needs_improvement: 1800 }, // Time to First Byte
 } as const;
 
 class PerformanceMonitor {
@@ -85,7 +85,9 @@ class PerformanceMonitor {
     // Track initial load time
     if (typeof window !== 'undefined') {
       window.addEventListener('load', () => {
-        const nav = window.performance?.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        const nav = window.performance?.getEntriesByType(
+          'navigation'
+        )[0] as PerformanceNavigationTiming;
         if (nav) {
           const loadTime = nav.loadEventEnd - nav.fetchStart;
           this.recordMetric('pageLoadTime', loadTime);
@@ -100,15 +102,15 @@ class PerformanceMonitor {
   startTrace(name: string, attributes?: Record<string, any>): void {
     try {
       if (!performance) return;
-      
+
       const customTrace = trace(performance, name);
-      
+
       if (attributes) {
         Object.entries(attributes).forEach(([key, value]) => {
           customTrace.putAttribute(key, String(value));
         });
       }
-      
+
       customTrace.start();
       this.traces.set(name, customTrace);
     } catch (error) {
@@ -132,7 +134,7 @@ class PerformanceMonitor {
           customTrace.putMetric(key, value);
         });
       }
-      
+
       customTrace.stop();
       this.traces.delete(name);
     } catch (error) {
@@ -145,13 +147,13 @@ class PerformanceMonitor {
    */
   recordMetric(name: string, value: number): void {
     this.metrics.set(name, value);
-    
+
     // Log to console in development
     if (import.meta.env.DEV) {
       const threshold = WEB_VITALS_THRESHOLDS[name as keyof typeof WEB_VITALS_THRESHOLDS];
       if (threshold) {
-        const rating = value <= threshold.good ? '🟢' : 
-                      value <= threshold.needs_improvement ? '🟡' : '🔴';
+        const rating =
+          value <= threshold.good ? '🟢' : value <= threshold.needs_improvement ? '🟡' : '🔴';
         console.log(`${rating} ${name}: ${value.toFixed(2)}ms`);
       } else {
         console.log(`📊 ${name}: ${value}`);
@@ -164,11 +166,11 @@ class PerformanceMonitor {
    */
   trackInteraction(name: string, metadata?: Record<string, any>): void {
     const startTime = window.performance?.now() || 0;
-    
+
     return (() => {
       const endTime = window.performance?.now() || 0;
       const duration = endTime - startTime;
-      
+
       this.startTrace(`interaction_${name}`, metadata);
       this.stopTrace(`interaction_${name}`, { duration });
     }) as any;
@@ -177,33 +179,30 @@ class PerformanceMonitor {
   /**
    * Track API call performance
    */
-  async trackApiCall<T>(
-    name: string,
-    apiCall: () => Promise<T>
-  ): Promise<T> {
+  async trackApiCall<T>(name: string, apiCall: () => Promise<T>): Promise<T> {
     const startTime = window.performance?.now() || 0;
     this.startTrace(`api_${name}`);
-    
+
     try {
       const result = await apiCall();
       const endTime = window.performance?.now() || 0;
       const duration = endTime - startTime;
-      
-      this.stopTrace(`api_${name}`, { 
+
+      this.stopTrace(`api_${name}`, {
         duration: Math.round(duration),
-        status: 1 // 1 for success
+        status: 1, // 1 for success
       });
-      
+
       return result;
     } catch (error) {
       const endTime = window.performance?.now() || 0;
       const duration = endTime - startTime;
-      
-      this.stopTrace(`api_${name}`, { 
+
+      this.stopTrace(`api_${name}`, {
         duration: Math.round(duration),
-        status: 0 // 0 for error
+        status: 0, // 0 for error
       });
-      
+
       throw error;
     }
   }
@@ -213,11 +212,11 @@ class PerformanceMonitor {
    */
   trackComponentRender(componentName: string): () => void {
     const startTime = window.performance?.now() || 0;
-    
+
     return () => {
       const endTime = window.performance?.now() || 0;
       const renderTime = endTime - startTime;
-      
+
       this.recordMetric(`component_${componentName}_render`, renderTime);
     };
   }
@@ -243,9 +242,9 @@ export const performanceMonitor = new PerformanceMonitor();
 // React hook for tracking component performance
 export function usePerformanceTracking(componentName: string) {
   if (typeof window === 'undefined') return;
-  
+
   const cleanup = performanceMonitor.trackComponentRender(componentName);
-  
+
   // Call cleanup when component unmounts
   if (typeof window !== 'undefined') {
     window.requestAnimationFrame(() => {
@@ -256,11 +255,11 @@ export function usePerformanceTracking(componentName: string) {
 
 // Utility to track route changes
 export function trackRouteChange(pathname: string) {
-  performanceMonitor.startTrace('route_change', { 
+  performanceMonitor.startTrace('route_change', {
     path: pathname,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   // Stop trace after route is loaded
   setTimeout(() => {
     performanceMonitor.stopTrace('route_change');
@@ -271,9 +270,9 @@ export function trackRouteChange(pathname: string) {
 export function trackUserAction(action: string, metadata?: Record<string, any>) {
   performanceMonitor.startTrace(`user_action_${action}`, {
     ...metadata,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   return () => {
     performanceMonitor.stopTrace(`user_action_${action}`);
   };

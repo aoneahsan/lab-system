@@ -142,11 +142,14 @@ class InventoryService {
     return response.data;
   }
 
-  async adjustStock(itemId: string, adjustment: {
-    quantity: number;
-    reason: string;
-    notes?: string;
-  }): Promise<StockMovement> {
+  async adjustStock(
+    itemId: string,
+    adjustment: {
+      quantity: number;
+      reason: string;
+      notes?: string;
+    }
+  ): Promise<StockMovement> {
     const response = await api.post(`/api/inventory/${itemId}/adjust`, adjustment);
     return response.data;
   }
@@ -174,7 +177,10 @@ class InventoryService {
     return response.data;
   }
 
-  async updatePurchaseOrder(orderId: string, updates: Partial<PurchaseOrder>): Promise<PurchaseOrder> {
+  async updatePurchaseOrder(
+    orderId: string,
+    updates: Partial<PurchaseOrder>
+  ): Promise<PurchaseOrder> {
     const response = await api.put(`/api/inventory/purchase-orders/${orderId}`, updates);
     return response.data;
   }
@@ -184,15 +190,18 @@ class InventoryService {
     return response.data;
   }
 
-  async receivePurchaseOrder(orderId: string, receipt: {
-    items: Array<{
-      itemId: string;
-      received: number;
-      lot?: string;
-      expiryDate?: Date;
-    }>;
-    notes?: string;
-  }): Promise<PurchaseOrder> {
+  async receivePurchaseOrder(
+    orderId: string,
+    receipt: {
+      items: Array<{
+        itemId: string;
+        received: number;
+        lot?: string;
+        expiryDate?: Date;
+      }>;
+      notes?: string;
+    }
+  ): Promise<PurchaseOrder> {
     const response = await api.post(`/api/inventory/purchase-orders/${orderId}/receive`, receipt);
     return response.data;
   }
@@ -226,16 +235,12 @@ class InventoryService {
 
   async getExpiryReport(days: number = 30): Promise<InventoryItem[]> {
     const response = await api.get('/api/inventory/reports/expiry', {
-      params: { days }
+      params: { days },
     });
     return response.data;
   }
 
-  async getUsageReport(period: {
-    startDate: Date;
-    endDate: Date;
-    itemId?: string;
-  }): Promise<{
+  async getUsageReport(period: { startDate: Date; endDate: Date; itemId?: string }): Promise<{
     items: Array<{
       itemId: string;
       name: string;
@@ -251,7 +256,7 @@ class InventoryService {
   // Barcode
   async scanBarcode(barcode: string): Promise<InventoryItem | null> {
     const response = await api.get('/api/inventory/barcode', {
-      params: { barcode }
+      params: { barcode },
     });
     return response.data;
   }
@@ -265,7 +270,7 @@ class InventoryService {
   async exportInventory(format: 'csv' | 'excel' | 'pdf'): Promise<Blob> {
     const response = await api.get('/api/inventory/export', {
       params: { format },
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   }

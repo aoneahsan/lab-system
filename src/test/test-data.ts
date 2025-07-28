@@ -10,22 +10,26 @@ export const createMockPatient = (overrides = {}) => ({
   dateOfBirth: new Date('1990-01-01'),
   gender: 'male' as const,
   email: 'john.doe@example.com',
-  phoneNumbers: [{
-    type: 'mobile' as const,
-    value: '+1234567890',
-    isPrimary: true,
-    isVerified: true
-  }],
-  addresses: [{
-    type: 'home' as const,
-    line1: '123 Main St',
-    line2: '',
-    city: 'Anytown',
-    state: 'CA',
-    country: 'USA',
-    postalCode: '12345',
-    isDefault: true
-  }],
+  phoneNumbers: [
+    {
+      type: 'mobile' as const,
+      value: '+1234567890',
+      isPrimary: true,
+      isVerified: true,
+    },
+  ],
+  addresses: [
+    {
+      type: 'home' as const,
+      line1: '123 Main St',
+      line2: '',
+      city: 'Anytown',
+      state: 'CA',
+      country: 'USA',
+      postalCode: '12345',
+      isDefault: true,
+    },
+  ],
   insurances: [],
   emergencyContacts: [],
   allergies: [],

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  Package, 
-  CheckCircle, 
+import {
+  Package,
+  CheckCircle,
   Clock,
   AlertCircle,
   User,
@@ -11,7 +11,7 @@ import {
   ChevronRight,
   MoreVertical,
   Droplet,
-  TestTube
+  TestTube,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -52,11 +52,17 @@ export const CollectionsScreen: React.FC = () => {
       location: 'Outpatient Lab',
       tests: [
         { name: 'CBC', tubeType: 'EDTA', tubeColor: 'purple', volume: 3, collected: false },
-        { name: 'Chemistry Panel', tubeType: 'SST', tubeColor: 'gold', volume: 5, collected: false }
+        {
+          name: 'Chemistry Panel',
+          tubeType: 'SST',
+          tubeColor: 'gold',
+          volume: 5,
+          collected: false,
+        },
       ],
       status: 'pending',
       priority: 'routine',
-      specialInstructions: 'Patient has difficult veins'
+      specialInstructions: 'Patient has difficult veins',
     },
     {
       id: '2',
@@ -65,12 +71,18 @@ export const CollectionsScreen: React.FC = () => {
       patientId: 'P12347',
       location: 'ICU - Bed 3',
       tests: [
-        { name: 'Blood Culture', tubeType: 'Culture Bottle', tubeColor: 'blue', volume: 10, collected: true },
-        { name: 'CBC', tubeType: 'EDTA', tubeColor: 'purple', volume: 3, collected: false }
+        {
+          name: 'Blood Culture',
+          tubeType: 'Culture Bottle',
+          tubeColor: 'blue',
+          volume: 10,
+          collected: true,
+        },
+        { name: 'CBC', tubeType: 'EDTA', tubeColor: 'purple', volume: 3, collected: false },
       ],
       status: 'in-progress',
       priority: 'stat',
-      notes: 'Collect from central line'
+      notes: 'Collect from central line',
     },
     {
       id: '3',
@@ -80,11 +92,11 @@ export const CollectionsScreen: React.FC = () => {
       location: 'Ward A - Room 101',
       tests: [
         { name: 'Lipid Panel', tubeType: 'SST', tubeColor: 'gold', volume: 5, collected: true },
-        { name: 'HbA1c', tubeType: 'EDTA', tubeColor: 'purple', volume: 3, collected: true }
+        { name: 'HbA1c', tubeType: 'EDTA', tubeColor: 'purple', volume: 3, collected: true },
       ],
       status: 'collected',
       priority: 'routine',
-      collectionTime: new Date(Date.now() - 2 * 60 * 60 * 1000)
+      collectionTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
     },
     {
       id: '4',
@@ -93,15 +105,21 @@ export const CollectionsScreen: React.FC = () => {
       patientId: 'P12346',
       location: 'Ward B - Room 205',
       tests: [
-        { name: 'PT/INR', tubeType: 'Citrate', tubeColor: 'light-blue', volume: 2.7, collected: true }
+        {
+          name: 'PT/INR',
+          tubeType: 'Citrate',
+          tubeColor: 'light-blue',
+          volume: 2.7,
+          collected: true,
+        },
       ],
       status: 'sent-to-lab',
       priority: 'urgent',
-      collectionTime: new Date(Date.now() - 30 * 60 * 1000)
-    }
+      collectionTime: new Date(Date.now() - 30 * 60 * 1000),
+    },
   ]);
 
-  const filteredCollections = collections.filter(collection => {
+  const filteredCollections = collections.filter((collection) => {
     if (activeFilter !== 'all' && collection.status !== activeFilter) {
       return false;
     }
@@ -133,13 +151,13 @@ export const CollectionsScreen: React.FC = () => {
 
   const getTubeColorClass = (color: string) => {
     const colorMap: Record<string, string> = {
-      'purple': 'bg-purple-500',
-      'gold': 'bg-yellow-500',
+      purple: 'bg-purple-500',
+      gold: 'bg-yellow-500',
       'light-blue': 'bg-blue-300',
-      'blue': 'bg-blue-600',
-      'red': 'bg-red-500',
-      'green': 'bg-green-500',
-      'gray': 'bg-gray-500'
+      blue: 'bg-blue-600',
+      red: 'bg-red-500',
+      green: 'bg-green-500',
+      gray: 'bg-gray-500',
     };
     return colorMap[color] || 'bg-gray-400';
   };
@@ -156,7 +174,7 @@ export const CollectionsScreen: React.FC = () => {
   };
 
   const getCompletedTests = (tests: Collection['tests']) => {
-    const completed = tests.filter(t => t.collected).length;
+    const completed = tests.filter((t) => t.collected).length;
     return `${completed}/${tests.length}`;
   };
 
@@ -174,7 +192,7 @@ export const CollectionsScreen: React.FC = () => {
       <div className="bg-white shadow-sm">
         <div className="p-4">
           <h1 className="text-xl font-semibold text-gray-900 mb-4">Collections</h1>
-          
+
           {/* Search Bar */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -194,15 +212,13 @@ export const CollectionsScreen: React.FC = () => {
               { id: 'pending', label: 'Pending' },
               { id: 'in-progress', label: 'In Progress' },
               { id: 'collected', label: 'Collected' },
-              { id: 'sent-to-lab', label: 'Sent' }
+              { id: 'sent-to-lab', label: 'Sent' },
             ].map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => setActiveFilter(filter.id)}
                 className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                  activeFilter === filter.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600'
+                  activeFilter === filter.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
                 }`}
               >
                 {filter.label}
@@ -228,7 +244,11 @@ export const CollectionsScreen: React.FC = () => {
                   <div>
                     <div className="flex items-center space-x-2">
                       <p className="font-medium text-gray-900">{collection.patientName}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${getPriorityBadge(collection.priority)}`}>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${getPriorityBadge(
+                          collection.priority
+                        )}`}
+                      >
                         {collection.priority.toUpperCase()}
                       </span>
                     </div>
@@ -264,14 +284,15 @@ export const CollectionsScreen: React.FC = () => {
                 </div>
                 <div className="flex space-x-2">
                   {collection.tests.map((test, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-1"
-                    >
-                      <div className={`h-3 w-3 rounded-full ${getTubeColorClass(test.tubeColor)} ${
-                        test.collected ? '' : 'opacity-40'
-                      }`} />
-                      <span className={`text-xs ${test.collected ? 'text-gray-700' : 'text-gray-400'}`}>
+                    <div key={index} className="flex items-center space-x-1">
+                      <div
+                        className={`h-3 w-3 rounded-full ${getTubeColorClass(test.tubeColor)} ${
+                          test.collected ? '' : 'opacity-40'
+                        }`}
+                      />
+                      <span
+                        className={`text-xs ${test.collected ? 'text-gray-700' : 'text-gray-400'}`}
+                      >
                         {test.name}
                       </span>
                     </div>

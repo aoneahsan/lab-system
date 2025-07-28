@@ -26,7 +26,7 @@ export const reportService = {
   // Generate a report
   async generateReport(request: ReportGenerationRequest): Promise<Blob> {
     const response = await api.post('/api/reports/generate', request, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   },
@@ -56,5 +56,5 @@ export const reportService = {
   }): Promise<any> {
     const response = await api.post('/api/reports/schedule', schedule);
     return response.data;
-  }
+  },
 };

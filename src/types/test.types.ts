@@ -22,7 +22,14 @@ export interface TestDefinition {
   name: string;
   code: string; // Internal lab code
   loincCode?: LOINCCode;
-  category: 'chemistry' | 'hematology' | 'microbiology' | 'immunology' | 'pathology' | 'genetics' | 'other';
+  category:
+    | 'chemistry'
+    | 'hematology'
+    | 'microbiology'
+    | 'immunology'
+    | 'pathology'
+    | 'genetics'
+    | 'other';
   department?: string;
   specimen: {
     type: 'blood' | 'urine' | 'stool' | 'sputum' | 'csf' | 'tissue' | 'swab' | 'other';
@@ -110,7 +117,15 @@ export interface TestOrder {
   fasting?: boolean;
   collectionDateTime?: Date | Timestamp;
   specimenId?: string;
-  status: 'pending' | 'awaiting_approval' | 'approved' | 'specimen_collected' | 'in_progress' | 'resulted' | 'cancelled' | 'rejected';
+  status:
+    | 'pending'
+    | 'awaiting_approval'
+    | 'approved'
+    | 'specimen_collected'
+    | 'in_progress'
+    | 'resulted'
+    | 'cancelled'
+    | 'rejected';
   cancelReason?: string;
   rejectionReason?: string;
   requiresApproval?: boolean;

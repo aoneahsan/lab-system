@@ -7,11 +7,7 @@ interface DisplaySettingsProps {
   isSaving: boolean;
 }
 
-const DisplaySettings: React.FC<DisplaySettingsProps> = ({
-  settings,
-  onSave,
-  isSaving
-}) => {
+const DisplaySettings: React.FC<DisplaySettingsProps> = ({ settings, onSave, isSaving }) => {
   const [formData, setFormData] = useState<DisplaySettingsType>(settings);
 
   useEffect(() => {
@@ -31,12 +27,10 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Theme Settings</h3>
-        
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Application Theme
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Application Theme</label>
             <select
               value={formData.theme}
               onChange={(e) => handleChange('theme', e.target.value as 'light' | 'dark' | 'system')}
@@ -49,9 +43,7 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Primary Color
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Primary Color</label>
             <div className="mt-1 flex items-center space-x-3">
               <input
                 type="color"
@@ -73,12 +65,10 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Layout Options</h3>
-        
+
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Logo Position
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Logo Position</label>
             <select
               value={formData.logoPosition}
               onChange={(e) => handleChange('logoPosition', e.target.value as 'left' | 'center')}
@@ -103,12 +93,12 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Default Landing Page
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Default Landing Page</label>
             <select
               value={formData.defaultView}
-              onChange={(e) => handleChange('defaultView', e.target.value as 'dashboard' | 'worklist' | 'patients')}
+              onChange={(e) =>
+                handleChange('defaultView', e.target.value as 'dashboard' | 'worklist' | 'patients')
+              }
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="dashboard">Dashboard</option>
@@ -118,9 +108,7 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Items Per Page
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Items Per Page</label>
             <select
               value={formData.itemsPerPage}
               onChange={(e) => handleChange('itemsPerPage', parseInt(e.target.value))}
@@ -137,7 +125,7 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Display Preferences</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -169,12 +157,10 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Value Colors</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Critical Value Color
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Critical Value Color</label>
             <div className="mt-1 flex items-center space-x-3">
               <input
                 type="color"
@@ -194,9 +180,7 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Abnormal Value Color
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Abnormal Value Color</label>
             <div className="mt-1 flex items-center space-x-3">
               <input
                 type="color"
@@ -220,7 +204,8 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({
       <div className="bg-yellow-50 p-4 rounded-lg">
         <h4 className="text-sm font-medium text-yellow-800 mb-2">Preview Note</h4>
         <p className="text-sm text-yellow-700">
-          Some display changes may require a page refresh to take full effect. Theme changes will apply immediately to new sessions.
+          Some display changes may require a page refresh to take full effect. Theme changes will
+          apply immediately to new sessions.
         </p>
       </div>
 

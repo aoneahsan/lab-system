@@ -7,11 +7,7 @@ interface SecuritySettingsProps {
   isSaving: boolean;
 }
 
-const SecuritySettings: React.FC<SecuritySettingsProps> = ({
-  settings,
-  onSave,
-  isSaving
-}) => {
+const SecuritySettings: React.FC<SecuritySettingsProps> = ({ settings, onSave, isSaving }) => {
   const [formData, setFormData] = useState<SecuritySettingsType>(settings);
   const [newIpAddress, setNewIpAddress] = useState('');
 
@@ -23,14 +19,14 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
     const keys = path.split('.');
     const newData = { ...formData };
     let current: any = newData;
-    
+
     for (let i = 0; i < keys.length - 1; i++) {
       if (!current[keys[i]]) {
         current[keys[i]] = {};
       }
       current = current[keys[i]];
     }
-    
+
     current[keys[keys.length - 1]] = value;
     setFormData(newData);
   };
@@ -39,7 +35,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
     if (newIpAddress && /^(\d{1,3}\.){3}\d{1,3}$/.test(newIpAddress)) {
       setFormData({
         ...formData,
-        ipWhitelist: [...formData.ipWhitelist, newIpAddress]
+        ipWhitelist: [...formData.ipWhitelist, newIpAddress],
       });
       setNewIpAddress('');
     }
@@ -48,13 +44,13 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
   const handleRemoveIpAddress = (ip: string) => {
     setFormData({
       ...formData,
-      ipWhitelist: formData.ipWhitelist.filter(addr => addr !== ip)
+      ipWhitelist: formData.ipWhitelist.filter((addr) => addr !== ip),
     });
   };
 
   const handleMfaMethodToggle = (method: 'totp' | 'sms' | 'email' | 'biometric') => {
     const methods = formData.mfaMethods.includes(method)
-      ? formData.mfaMethods.filter(m => m !== method)
+      ? formData.mfaMethods.filter((m) => m !== method)
       : [...formData.mfaMethods, method];
     handleChange('mfaMethods', methods);
   };
@@ -68,7 +64,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Password Policy</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -91,7 +87,9 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
             <input
               type="number"
               value={formData.passwordPolicy.expirationDays}
-              onChange={(e) => handleChange('passwordPolicy.expirationDays', parseInt(e.target.value))}
+              onChange={(e) =>
+                handleChange('passwordPolicy.expirationDays', parseInt(e.target.value))
+              }
               min="0"
               max="365"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -100,24 +98,26 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password History
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Password History</label>
             <input
               type="number"
               value={formData.passwordPolicy.preventReuse}
-              onChange={(e) => handleChange('passwordPolicy.preventReuse', parseInt(e.target.value))}
+              onChange={(e) =>
+                handleChange('passwordPolicy.preventReuse', parseInt(e.target.value))
+              }
               min="0"
               max="24"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
-            <p className="mt-1 text-sm text-gray-500">Number of previous passwords to prevent reuse</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Number of previous passwords to prevent reuse
+            </p>
           </div>
         </div>
 
         <div className="mt-4 space-y-2">
           <label className="block text-sm font-medium text-gray-700">Password Requirements</label>
-          
+
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -174,7 +174,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Multi-Factor Authentication</h3>
-        
+
         <div className="space-y-4">
           <div className="flex items-center">
             <input
@@ -190,7 +190,9 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Allowed MFA Methods</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Allowed MFA Methods
+            </label>
             <div className="grid grid-cols-2 gap-2">
               <div className="flex items-center">
                 <input
@@ -250,7 +252,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Session Management</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -284,7 +286,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">IP Whitelist</h3>
-        
+
         <div className="space-y-2">
           <div className="flex gap-2">
             <input
@@ -324,7 +326,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Security</h3>
-        
+
         <div className="space-y-2">
           <div className="flex items-center">
             <input

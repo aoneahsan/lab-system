@@ -2,7 +2,14 @@ import { create } from 'zustand';
 import { inventoryService } from '@/services/inventory.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { auth } from '@/config/firebase.config';
-import type { InventoryItem, StockTransaction, PurchaseOrder, Vendor, StockTransactionFormData, InventoryItemFormData } from '@/types/inventory.types';
+import type {
+  InventoryItem,
+  StockTransaction,
+  PurchaseOrder,
+  Vendor,
+  StockTransactionFormData,
+  InventoryItemFormData,
+} from '@/types/inventory.types';
 
 interface InventoryStore {
   items: InventoryItem[];
@@ -19,18 +26,20 @@ interface InventoryStore {
   createInventoryItem: (data: InventoryItemFormData) => Promise<void>;
   updateInventoryItem: (id: string, data: Partial<InventoryItem>) => Promise<void>;
   deleteInventoryItem: (id: string) => Promise<void>;
-  
+
   recordStockTransaction: (data: StockTransactionFormData) => Promise<void>;
   fetchStockTransactions: (itemId?: string) => Promise<void>;
-  
+
   fetchPurchaseOrders: (filters?: any) => Promise<void>;
-  createPurchaseOrder: (data: Omit<PurchaseOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  createPurchaseOrder: (
+    data: Omit<PurchaseOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'updatedAt'>
+  ) => Promise<void>;
   updatePurchaseOrder: (id: string, data: Partial<PurchaseOrder>) => Promise<void>;
-  
+
   fetchVendors: () => Promise<void>;
   createVendor: (data: Partial<Vendor>) => Promise<void>;
   updateVendor: (id: string, data: Partial<Vendor>) => Promise<void>;
-  
+
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }

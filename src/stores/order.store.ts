@@ -17,16 +17,16 @@ interface OrderStore {
   fetchTestOrder: (id: string) => Promise<void>;
   updateTestOrder: (id: string, data: Partial<TestOrder>) => Promise<void>;
   updateTestStatus: (orderId: string, testId: string, status: string) => Promise<void>;
-  
+
   createSpecimen: (data: Partial<Specimen>) => Promise<string>;
   fetchSpecimens: (orderId?: string) => Promise<void>;
   updateSpecimen: (id: string, data: Partial<Specimen>) => Promise<void>;
   receiveSpecimen: (id: string, receivedBy: string) => Promise<void>;
-  
+
   searchOrders: (query: string) => Promise<void>;
   fetchPendingCollections: () => Promise<void>;
   fetchTodayOrders: () => Promise<void>;
-  
+
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }

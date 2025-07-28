@@ -12,7 +12,9 @@ interface PaymentModalProps {
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice }) => {
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [amount, setAmount] = useState(invoice.balanceDue.toString());
-  const [method, setMethod] = useState<'cash' | 'credit_card' | 'debit_card' | 'check' | 'insurance' | 'eft' | 'other'>('cash');
+  const [method, setMethod] = useState<
+    'cash' | 'credit_card' | 'debit_card' | 'check' | 'insurance' | 'eft' | 'other'
+  >('cash');
   const [referenceNumber, setReferenceNumber] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -20,7 +22,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const paymentAmount = parseFloat(amount);
     if (isNaN(paymentAmount) || paymentAmount <= 0) {
       return;
@@ -47,14 +49,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice })
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-30" onClick={onClose} />
-        
+
         <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
           <div className="px-6 py-4 border-b flex items-center justify-between">
             <h2 className="text-xl font-semibold">Record Payment</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -135,9 +134,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice })
 
             {/* Notes */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Notes
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

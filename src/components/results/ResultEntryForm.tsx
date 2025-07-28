@@ -27,7 +27,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
   const [showCriticalWarning, setShowCriticalWarning] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
-  
+
   const { data: sample } = useSample(sampleId);
   const { data: test } = useTest(testId);
   const { data: patient } = usePatient(sample?.patientId || '');
@@ -43,13 +43,15 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     defaultValues: {
       orderId,
       sampleId,
-      tests: [{
-        testId,
-        testName: test?.name || '',
-        value: '',
-        unit: test?.unit || '',
-        flag: 'normal',
-      }],
+      tests: [
+        {
+          testId,
+          testName: test?.name || '',
+          value: '',
+          unit: test?.unit || '',
+          flag: 'normal',
+        },
+      ],
     },
   });
 
@@ -81,23 +83,25 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           testId,
           value,
           patientId: patient.id,
-          referenceRange: test.referenceRanges?.[0] ? {
-            min: test.referenceRanges[0].normalMin,
-            max: test.referenceRanges[0].normalMax
-          } : undefined
+          referenceRange: test.referenceRanges?.[0]
+            ? {
+                min: test.referenceRanges[0].normalMin,
+                max: test.referenceRanges[0].normalMax,
+              }
+            : undefined,
         });
 
         setValidationErrors(result.errors);
         setValidationWarnings(result.warnings);
-        
+
         // Auto-set flag based on validation
         if (result.flags.length > 0) {
           setValue('tests.0.flag', result.flags[0] as ResultFlag);
         }
-        
+
         setShowCriticalWarning(result.isCritical);
       };
-      
+
       validateAsync();
     }
   }, [value, test, patient, testId, flag, setValue, validateResult]);
@@ -109,14 +113,16 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         testId,
         value: data.tests[0].value,
         patientId: patient.id,
-        referenceRange: test.referenceRanges?.[0] ? { min: test.referenceRanges[0].normalMin, max: test.referenceRanges[0].normalMax } : undefined
+        referenceRange: test.referenceRanges?.[0]
+          ? { min: test.referenceRanges[0].normalMin, max: test.referenceRanges[0].normalMax }
+          : undefined,
       });
-      
+
       if (!result.isValid) {
         return; // Don't submit if validation fails
       }
     }
-    
+
     onSubmit(data);
   };
 
@@ -137,17 +143,21 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           <FlaskRound className="h-5 w-5" />
           Test Information
         </h3>
-        
+
         {test && sample && (
           <div className="bg-blue-50 p-4 rounded-md">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="font-medium text-gray-700">Test:</p>
-                <p>{test.name} ({test.code})</p>
+                <p>
+                  {test.name} ({test.code})
+                </p>
               </div>
               <div>
                 <p className="font-medium text-gray-700">Sample:</p>
-                <p>{sample.sampleNumber} - {sample.type}</p>
+                <p>
+                  {sample.sampleNumber} - {sample.type}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-gray-700">Specimen Type:</p>
@@ -165,12 +175,10 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
       {/* Result Entry */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Result Entry</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Result Value *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Result Value *</label>
             <input
               type="text"
               {...register('tests.0.value', { required: 'Result value is required' })}
@@ -183,9 +191,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Unit
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Unit</label>
             <input
               type="text"
               {...register('tests.0.unit')}
@@ -195,14 +201,12 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Flag *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Flag *</label>
             <select
               {...register('tests.0.flag')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
-              {resultFlags.map(f => (
+              {resultFlags.map((f) => (
                 <option key={f.value} value={f.value}>
                   {f.label}
                 </option>
@@ -211,9 +215,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
           </div>
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Comments
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Comments</label>
             <textarea
               {...register('tests.0.comments')}
               rows={3}
@@ -274,7 +276,8 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
             <div>
               <p className="text-sm font-medium text-red-800">Critical Value Alert</p>
               <p className="text-sm text-red-700 mt-1">
-                This result has been flagged as critical. Immediate notification to the ordering physician is required.
+                This result has been flagged as critical. Immediate notification to the ordering
+                physician is required.
               </p>
             </div>
           </div>

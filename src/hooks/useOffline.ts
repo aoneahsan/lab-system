@@ -16,7 +16,7 @@ export function useOffline() {
     isOffline: false,
     pendingChanges: 0,
     lastSyncTime: 0,
-    syncInProgress: false
+    syncInProgress: false,
   });
 
   // Initialize offline services
@@ -25,11 +25,11 @@ export function useOffline() {
       try {
         await offlineSyncService.initialize();
         const status = await offlineSyncService.getSyncStatus();
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           isOffline: status.isOffline,
           pendingChanges: status.pendingChanges,
-          lastSyncTime: status.lastSyncTime
+          lastSyncTime: status.lastSyncTime,
         }));
       } catch (error) {
         console.error('Failed to initialize offline services:', error);
@@ -40,21 +40,21 @@ export function useOffline() {
 
     // Subscribe to sync progress
     const unsubscribe = offlineSyncService.onSyncProgress((progress) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         syncInProgress: progress.inProgress,
-        syncProgress: progress
+        syncProgress: progress,
       }));
     });
 
     // Check sync status periodically
     const interval = setInterval(async () => {
       const status = await offlineSyncService.getSyncStatus();
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isOffline: status.isOffline,
         pendingChanges: status.pendingChanges,
-        lastSyncTime: status.lastSyncTime
+        lastSyncTime: status.lastSyncTime,
       }));
     }, 10000); // Every 10 seconds
 
@@ -75,32 +75,27 @@ export function useOffline() {
   }, []);
 
   // Queue operation for offline sync
-  const queueOperation = useCallback(async (
-    collection: string,
-    operation: 'create' | 'update' | 'delete',
-    data: any
-  ) => {
-    try {
-      await offlineDbService.queueOperation(collection, operation, data);
-      
-      // Update pending changes count
-      const status = await offlineSyncService.getSyncStatus();
-      setState(prev => ({
-        ...prev,
-        pendingChanges: status.pendingChanges
-      }));
-    } catch (error) {
-      console.error('Failed to queue operation:', error);
-      throw error;
-    }
-  }, []);
+  const queueOperation = useCallback(
+    async (collection: string, operation: 'create' | 'update' | 'delete', data: any) => {
+      try {
+        await offlineDbService.queueOperation(collection, operation, data);
+
+        // Update pending changes count
+        const status = await offlineSyncService.getSyncStatus();
+        setState((prev) => ({
+          ...prev,
+          pendingChanges: status.pendingChanges,
+        }));
+      } catch (error) {
+        console.error('Failed to queue operation:', error);
+        throw error;
+      }
+    },
+    []
+  );
 
   // Get cached data
-  const getCachedData = useCallback(async (
-    collection: string,
-    tenantId: string,
-    filters?: any
-  ) => {
+  const getCachedData = useCallback(async (collection: string, tenantId: string, filters?: any) => {
     try {
       return await offlineDbService.getCachedData(collection, tenantId, filters);
     } catch (error) {
@@ -110,10 +105,7 @@ export function useOffline() {
   }, []);
 
   // Get cached record
-  const getCachedRecord = useCallback(async (
-    collection: string,
-    id: string
-  ) => {
+  const getCachedRecord = useCallback(async (collection: string, id: string) => {
     try {
       return await offlineDbService.getCachedRecord(collection, id);
     } catch (error) {
@@ -123,11 +115,7 @@ export function useOffline() {
   }, []);
 
   // Update cached record
-  const updateCachedRecord = useCallback(async (
-    collection: string,
-    id: string,
-    updates: any
-  ) => {
+  const updateCachedRecord = useCallback(async (collection: string, id: string, updates: any) => {
     try {
       await offlineDbService.updateCachedRecord(collection, id, updates);
     } catch (error) {
@@ -140,10 +128,10 @@ export function useOffline() {
   const clearOfflineData = useCallback(async () => {
     try {
       await offlineSyncService.clearOfflineData();
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         pendingChanges: 0,
-        lastSyncTime: 0
+        lastSyncTime: 0,
       }));
     } catch (error) {
       console.error('Failed to clear offline data:', error);
@@ -159,6 +147,6 @@ export function useOffline() {
     getCachedRecord,
     updateCachedRecord,
     clearOfflineData,
-    isOfflineSupported: offlineDbService.isOfflineSupported()
+    isOfflineSupported: offlineDbService.isOfflineSupported(),
   };
 }

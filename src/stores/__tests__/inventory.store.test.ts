@@ -49,7 +49,7 @@ describe('Inventory Store', () => {
       loading: false,
       error: null,
     });
-    
+
     // Reset all mocks
     vi.clearAllMocks();
   });
@@ -75,14 +75,14 @@ describe('Inventory Store', () => {
         unit: 'pcs',
       },
     ];
-    
+
     vi.mocked(inventoryService.getInventoryItems).mockResolvedValue(mockItems);
 
     const { fetchInventoryItems } = useInventoryStore.getState();
     await fetchInventoryItems({ category: 'reagent' });
 
     expect(inventoryService.getInventoryItems).toHaveBeenCalledWith({ category: 'reagent' });
-    
+
     const state = useInventoryStore.getState();
     expect(state.items).toEqual(mockItems);
     expect(state.loading).toBe(false);
@@ -98,14 +98,14 @@ describe('Inventory Store', () => {
       minQuantity: 20,
       unit: 'mL',
     };
-    
+
     vi.mocked(inventoryService.getInventoryItem).mockResolvedValue(mockItem);
 
     const { fetchInventoryItem } = useInventoryStore.getState();
     await fetchInventoryItem('item-1');
 
     expect(inventoryService.getInventoryItem).toHaveBeenCalledWith('item-1');
-    
+
     const state = useInventoryStore.getState();
     expect(state.currentItem).toEqual(mockItem);
     expect(state.loading).toBe(false);
@@ -132,7 +132,7 @@ describe('Inventory Store', () => {
       minQuantity: 10,
       unit: 'mL',
     });
-    
+
     const state = useInventoryStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -156,7 +156,7 @@ describe('Inventory Store', () => {
       reason: 'Purchase Order',
       referenceId: 'PO-123',
     });
-    
+
     const state = useInventoryStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -180,14 +180,14 @@ describe('Inventory Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(inventoryService.getStockMovements).mockResolvedValue(mockMovements);
 
     const { fetchStockMovements } = useInventoryStore.getState();
     await fetchStockMovements('item-1');
 
     expect(inventoryService.getStockMovements).toHaveBeenCalledWith('item-1');
-    
+
     const state = useInventoryStore.getState();
     expect(state.stockMovements).toEqual(mockMovements);
     expect(state.loading).toBe(false);
@@ -205,14 +205,14 @@ describe('Inventory Store', () => {
         createdAt: new Date(),
       },
     ];
-    
+
     vi.mocked(inventoryService.getPurchaseOrders).mockResolvedValue(mockOrders);
 
     const { fetchPurchaseOrders } = useInventoryStore.getState();
     await fetchPurchaseOrders({ status: 'pending' });
 
     expect(inventoryService.getPurchaseOrders).toHaveBeenCalledWith({ status: 'pending' });
-    
+
     const state = useInventoryStore.getState();
     expect(state.purchaseOrders).toEqual(mockOrders);
     expect(state.loading).toBe(false);
@@ -224,14 +224,12 @@ describe('Inventory Store', () => {
     const { createPurchaseOrder } = useInventoryStore.getState();
     await createPurchaseOrder({
       supplierId: 'supplier-1',
-      items: [
-        { itemId: 'item-1', quantity: 100, unitPrice: 5 },
-      ],
+      items: [{ itemId: 'item-1', quantity: 100, unitPrice: 5 }],
       expectedDelivery: new Date(),
     });
 
     expect(inventoryService.createPurchaseOrder).toHaveBeenCalled();
-    
+
     const state = useInventoryStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -247,14 +245,14 @@ describe('Inventory Store', () => {
         active: true,
       },
     ];
-    
+
     vi.mocked(inventoryService.getSuppliers).mockResolvedValue(mockSuppliers);
 
     const { fetchSuppliers } = useInventoryStore.getState();
     await fetchSuppliers();
 
     expect(inventoryService.getSuppliers).toHaveBeenCalled();
-    
+
     const state = useInventoryStore.getState();
     expect(state.suppliers).toEqual(mockSuppliers);
     expect(state.loading).toBe(false);
@@ -266,7 +264,7 @@ describe('Inventory Store', () => {
 
     const { fetchInventoryItems } = useInventoryStore.getState();
     await fetchInventoryItems();
-    
+
     const state = useInventoryStore.getState();
     expect(state.error).toBe('Failed to fetch items');
     expect(state.loading).toBe(false);

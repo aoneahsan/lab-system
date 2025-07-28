@@ -17,9 +17,7 @@ const mockTemplates: ReportTemplate[] = [
       { id: 's3', type: 'test_results', title: 'Test Results', order: 3, visible: true },
       { id: 's4', type: 'signature', title: 'Authorization', order: 4, visible: true },
     ],
-    parameters: [
-      { name: 'orderId', label: 'Order ID', type: 'text', required: true },
-    ],
+    parameters: [{ name: 'orderId', label: 'Order ID', type: 'text', required: true }],
     layout: {
       pageSize: 'A4',
       orientation: 'portrait',
@@ -49,12 +47,16 @@ const mockTemplates: ReportTemplate[] = [
     ],
     parameters: [
       { name: 'month', label: 'Month', type: 'date', required: true },
-      { name: 'department', label: 'Department', type: 'select', required: false,
+      {
+        name: 'department',
+        label: 'Department',
+        type: 'select',
+        required: false,
         options: [
           { value: 'all', label: 'All Departments' },
           { value: 'chemistry', label: 'Chemistry' },
           { value: 'hematology', label: 'Hematology' },
-        ]
+        ],
       },
     ],
     layout: {
@@ -91,8 +93,8 @@ export default function ReportTemplates() {
     json: { label: 'JSON', color: 'text-purple-600' },
   };
 
-  const filteredTemplates = templates.filter(template =>
-    selectedCategory === 'all' || template.category === selectedCategory
+  const filteredTemplates = templates.filter(
+    (template) => selectedCategory === 'all' || template.category === selectedCategory
   );
 
   return (
@@ -108,13 +110,12 @@ export default function ReportTemplates() {
             >
               <option value="all">All Categories</option>
               {Object.entries(categoryConfig).map(([key, config]) => (
-                <option key={key} value={key}>{config.label}</option>
+                <option key={key} value={key}>
+                  {config.label}
+                </option>
               ))}
             </select>
-            <button
-              onClick={() => setShowTemplateForm(true)}
-              className="btn btn-primary btn-sm"
-            >
+            <button onClick={() => setShowTemplateForm(true)} className="btn btn-primary btn-sm">
               <Plus className="h-4 w-4" />
               New Template
             </button>
@@ -127,7 +128,7 @@ export default function ReportTemplates() {
           {filteredTemplates.map((template) => {
             const categoryConf = categoryConfig[template.category];
             const formatConf = formatConfig[template.format];
-            
+
             return (
               <div
                 key={template.id}
@@ -143,9 +144,13 @@ export default function ReportTemplates() {
                       )}
                     </div>
                   </div>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    template.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                      template.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {template.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -155,7 +160,9 @@ export default function ReportTemplates() {
                 )}
 
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${categoryConf.color}`}>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${categoryConf.color}`}
+                  >
                     {categoryConf.label}
                   </span>
                   <span className={`text-sm font-medium ${formatConf.color}`}>
@@ -170,10 +177,7 @@ export default function ReportTemplates() {
 
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                   <div className="flex items-center space-x-1">
-                    <button
-                      className="p-1 text-gray-600 hover:text-gray-700"
-                      title="Edit Template"
-                    >
+                    <button className="p-1 text-gray-600 hover:text-gray-700" title="Edit Template">
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
@@ -182,16 +186,11 @@ export default function ReportTemplates() {
                     >
                       <Copy className="h-4 w-4" />
                     </button>
-                    <button
-                      className="p-1 text-red-600 hover:text-red-700"
-                      title="Delete Template"
-                    >
+                    <button className="p-1 text-red-600 hover:text-red-700" title="Delete Template">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                  <button
-                    className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                  >
+                  <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
                     Preview
                   </button>
                 </div>
@@ -201,9 +200,7 @@ export default function ReportTemplates() {
         </div>
 
         {filteredTemplates.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No templates found in this category
-          </div>
+          <div className="text-center py-8 text-gray-500">No templates found in this category</div>
         )}
       </div>
     </div>

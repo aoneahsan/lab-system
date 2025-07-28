@@ -20,14 +20,11 @@ export interface ImportOptions {
 
 class DataExportService {
   // Export data from a specific collection
-  async exportData(
-    collection: string,
-    options: ExportOptions
-  ): Promise<void> {
+  async exportData(collection: string, options: ExportOptions): Promise<void> {
     try {
       const response = await api.post(`/api/export/${collection}`, {
         ...options,
-        format: options.format === 'pdf' || options.format === 'excel' ? 'json' : options.format
+        format: options.format === 'pdf' || options.format === 'excel' ? 'json' : options.format,
       });
 
       const data = response.data;
@@ -55,14 +52,10 @@ class DataExportService {
   }
 
   // Import data into a specific collection
-  async importData(
-    collection: string,
-    file: File,
-    options: ImportOptions
-  ): Promise<ImportResult> {
+  async importData(collection: string, file: File, options: ImportOptions): Promise<ImportResult> {
     try {
       const data = await this.parseFile(file, options.format);
-      
+
       // Validate data if required
       if (options.validation) {
         const validationResult = await this.validateData(collection, data);
@@ -71,22 +64,17 @@ class DataExportService {
             success: false,
             errors: validationResult.errors,
             imported: 0,
-            failed: data.length
+            failed: data.length,
           };
         }
       }
 
       // Apply field mapping if provided
-      const mappedData = options.mapping ? 
-        this.applyMapping(data, options.mapping) : data;
+      const mappedData = options.mapping ? this.applyMapping(data, options.mapping) : data;
 
       // Import in batches
       const batchSize = options.batchSize || 100;
-      const results = await this.importInBatches(
-        collection, 
-        mappedData, 
-        batchSize
-      );
+      const results = await this.importInBatches(collection, mappedData, batchSize);
 
       return results;
     } catch (error) {
@@ -112,14 +100,14 @@ class DataExportService {
   // CSV parsing
   private async parseCSV(file: File): Promise<any[]> {
     const text = await file.text();
-    const lines = text.split('\n').filter(line => line.trim());
+    const lines = text.split('\n').filter((line) => line.trim());
     if (lines.length < 2) return [];
 
-    const headers = lines[0].split(',').map(h => h.trim());
+    const headers = lines[0].split(',').map((h) => h.trim());
     const data = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(v => v.trim());
+      const values = lines[i].split(',').map((v) => v.trim());
       const record: Record<string, any> = {};
       headers.forEach((header, index) => {
         record[header] = values[index] || '';
@@ -146,11 +134,8 @@ class DataExportService {
   }
 
   // Apply field mapping
-  private applyMapping(
-    data: any[],
-    mapping: Record<string, string>
-  ): any[] {
-    return data.map(record => {
+  private applyMapping(data: any[], mapping: Record<string, string>): any[] {
+    return data.map((record) => {
       const mappedRecord: Record<string, any> = {};
       Object.entries(mapping).forEach(([from, to]) => {
         if (Object.prototype.hasOwnProperty.call(record, from)) {
@@ -162,10 +147,7 @@ class DataExportService {
   }
 
   // Validate data
-  private async validateData(
-    collection: string,
-    data: any[]
-  ): Promise<ValidationResult> {
+  private async validateData(collection: string, data: any[]): Promise<ValidationResult> {
     const response = await api.post(`/api/validate/${collection}`, { data });
     return response.data;
   }
@@ -180,16 +162,16 @@ class DataExportService {
       success: true,
       imported: 0,
       failed: 0,
-      errors: []
+      errors: [],
     };
 
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
       try {
         const response = await api.post(`/api/import/${collection}`, {
-          data: batch
+          data: batch,
         });
-        
+
         results.imported += response.data.imported;
         results.failed += response.data.failed;
         if (response.data.errors) {
@@ -199,7 +181,7 @@ class DataExportService {
         results.failed += batch.length;
         results.errors.push({
           batch: Math.floor(i / batchSize),
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -220,10 +202,10 @@ class DataExportService {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
     const excelBuffer = XLSX.write(workbook, {
       bookType: 'xlsx',
-      type: 'array'
+      type: 'array',
     });
     const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
     saveAs(blob, `${filename}.xlsx`);
   }
@@ -236,11 +218,11 @@ class DataExportService {
 
   private downloadPDF(data: any[], filename: string, title: string): void {
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(16);
     doc.text(title.charAt(0).toUpperCase() + title.slice(1) + ' Export', 14, 15);
-    
+
     // Add metadata
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 25);
@@ -249,9 +231,7 @@ class DataExportService {
     // Prepare table data
     if (data.length > 0) {
       const headers = Object.keys(data[0]);
-      const rows = data.map(item =>
-        headers.map(header => String(item[header] || ''))
-      );
+      const rows = data.map((item) => headers.map((header) => String(item[header] || '')));
 
       // Add table
       (doc as any).autoTable({
@@ -260,7 +240,7 @@ class DataExportService {
         startY: 40,
         theme: 'striped',
         headStyles: { fillColor: [66, 139, 202] },
-        styles: { fontSize: 8, cellPadding: 2 }
+        styles: { fontSize: 8, cellPadding: 2 },
       });
     }
 
@@ -268,16 +248,13 @@ class DataExportService {
   }
 
   // Batch export multiple collections
-  async exportMultiple(
-    collections: string[],
-    options: ExportOptions
-  ): Promise<void> {
+  async exportMultiple(collections: string[], options: ExportOptions): Promise<void> {
     const allData: Record<string, any[]> = {};
-    
+
     for (const collection of collections) {
       const response = await api.post(`/api/export/${collection}`, {
         ...options,
-        format: 'json'
+        format: 'json',
       });
       allData[collection] = response.data;
     }
@@ -297,12 +274,9 @@ class DataExportService {
     }
   }
 
-  private downloadMultiSheetExcel(
-    data: Record<string, any[]>,
-    filename: string
-  ): void {
+  private downloadMultiSheetExcel(data: Record<string, any[]>, filename: string): void {
     const workbook = XLSX.utils.book_new();
-    
+
     Object.entries(data).forEach(([sheetName, sheetData]) => {
       const worksheet = XLSX.utils.json_to_sheet(sheetData);
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
@@ -310,11 +284,11 @@ class DataExportService {
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: 'xlsx',
-      type: 'array'
+      type: 'array',
     });
-    
+
     const blob = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
     saveAs(blob, `${filename}.xlsx`);
   }

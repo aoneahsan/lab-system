@@ -60,9 +60,7 @@ const SampleListTable: React.FC<SampleListTableProps> = ({
     columnHelper.accessor('sampleNumber', {
       header: 'Sample #',
       cell: (info) => (
-        <div className="font-medium text-blue-600 hover:text-blue-800">
-          {info.getValue()}
-        </div>
+        <div className="font-medium text-blue-600 hover:text-blue-800">{info.getValue()}</div>
       ),
     }),
     columnHelper.accessor('barcode', {
@@ -73,14 +71,16 @@ const SampleListTable: React.FC<SampleListTableProps> = ({
     }),
     columnHelper.accessor('type', {
       header: 'Type',
-      cell: (info) => (
-        <span className="capitalize">{info.getValue().replace('_', ' ')}</span>
-      ),
+      cell: (info) => <span className="capitalize">{info.getValue().replace('_', ' ')}</span>,
     }),
     columnHelper.accessor('priority', {
       header: 'Priority',
       cell: (info) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(info.getValue())}`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+            info.getValue()
+          )}`}
+        >
           {info.getValue().toUpperCase()}
         </span>
       ),
@@ -88,7 +88,11 @@ const SampleListTable: React.FC<SampleListTableProps> = ({
     columnHelper.accessor('status', {
       header: 'Status',
       cell: (info) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(info.getValue())}`}>
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+            info.getValue()
+          )}`}
+        >
           {info.getValue().replace('_', ' ')}
         </span>
       ),
@@ -239,7 +243,8 @@ const SampleListTable: React.FC<SampleListTableProps> = ({
               to{' '}
               <span className="font-medium">
                 {Math.min(
-                  (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                  (table.getState().pagination.pageIndex + 1) *
+                    table.getState().pagination.pageSize,
                   samples.length
                 )}
               </span>{' '}

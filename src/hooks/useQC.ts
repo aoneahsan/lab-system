@@ -22,9 +22,11 @@ const QC_KEYS = {
   run: (filter?: QCFilter) => [...QC_KEYS.runs(), filter] as const,
   runDetail: (id: string) => [...QC_KEYS.runs(), id] as const,
   statistics: () => [...QC_KEYS.all, 'statistics'] as const,
-  statistic: (materialId: string, testCode: string) => [...QC_KEYS.statistics(), materialId, testCode] as const,
+  statistic: (materialId: string, testCode: string) =>
+    [...QC_KEYS.statistics(), materialId, testCode] as const,
   dashboard: () => [...QC_KEYS.all, 'dashboard'] as const,
-  leveyJennings: (materialId: string, testCode: string) => [...QC_KEYS.all, 'levey-jennings', materialId, testCode] as const,
+  leveyJennings: (materialId: string, testCode: string) =>
+    [...QC_KEYS.all, 'levey-jennings', materialId, testCode] as const,
 };
 
 // QC Materials
@@ -153,7 +155,15 @@ export const useReviewQCRun = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ runId, accept, comments }: { runId: string; accept: boolean; comments?: string }) => {
+    mutationFn: ({
+      runId,
+      accept,
+      comments,
+    }: {
+      runId: string;
+      accept: boolean;
+      comments?: string;
+    }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return qcService.reviewQCRun(currentTenant.id, currentUser.id, runId, accept, comments);
     },
@@ -207,22 +217,22 @@ export const useLeveyJenningsData = (materialId: string, testCode: string) => {
     queryKey: QC_KEYS.leveyJennings(materialId, testCode),
     queryFn: async () => {
       if (!currentTenant) throw new Error('No tenant selected');
-      
+
       // Get material and statistics
       const [material, statistics] = await Promise.all([
         qcService.getQCMaterial(currentTenant.id, materialId),
         qcService.getQCStatistics(currentTenant.id, materialId, testCode),
       ]);
-      
+
       if (!material || !statistics) {
         throw new Error('Material or statistics not found');
       }
-      
-      const analyte = material.analytes.find(a => a.testCode === testCode);
+
+      const analyte = material.analytes.find((a) => a.testCode === testCode);
       if (!analyte) {
         throw new Error('Test not found in material');
       }
-      
+
       // Convert data points for chart
       const chartData: LeveyJenningsData = {
         testName: analyte.testName,
@@ -233,7 +243,7 @@ export const useLeveyJenningsData = (materialId: string, testCode: string) => {
         uwl: statistics.mean + 2 * statistics.sd,
         lcl: statistics.mean - 3 * statistics.sd,
         lwl: statistics.mean - 2 * statistics.sd,
-        points: statistics.dataPoints.map(dp => ({
+        points: statistics.dataPoints.map((dp) => ({
           date: dp.runDate.toDate(),
           value: dp.value,
           status: dp.status,
@@ -241,7 +251,7 @@ export const useLeveyJenningsData = (materialId: string, testCode: string) => {
           violatedRules: [], // TODO: Get from run details
         })),
       };
-      
+
       return chartData;
     },
     enabled: !!currentTenant && !!materialId && !!testCode,

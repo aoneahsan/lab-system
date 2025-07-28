@@ -32,7 +32,7 @@ export const financialReportsService = {
 
     const [invoicesSnapshot, paymentsSnapshot] = await Promise.all([
       getDocs(invoicesQuery),
-      getDocs(paymentsQuery)
+      getDocs(paymentsQuery),
     ]);
 
     let totalRevenue = 0;
@@ -40,7 +40,7 @@ export const financialReportsService = {
     const revenueByCategory: Record<string, number> = {};
     const dailyRevenue: Record<string, number> = {};
 
-    invoicesSnapshot.docs.forEach(doc => {
+    invoicesSnapshot.docs.forEach((doc) => {
       const invoice = doc.data();
       totalRevenue += invoice.totalAmount;
       pendingRevenue += invoice.balanceDue;
@@ -57,10 +57,10 @@ export const financialReportsService = {
     let collectedRevenue = 0;
     const revenueByPaymentMethod: Record<string, number> = {};
 
-    paymentsSnapshot.docs.forEach(doc => {
+    paymentsSnapshot.docs.forEach((doc) => {
       const payment = doc.data();
       collectedRevenue += payment.amount;
-      revenueByPaymentMethod[payment.method] = 
+      revenueByPaymentMethod[payment.method] =
         (revenueByPaymentMethod[payment.method] || 0) + payment.amount;
     });
 
@@ -72,14 +72,12 @@ export const financialReportsService = {
       revenueByPaymentMethod,
       dailyRevenue: Object.entries(dailyRevenue)
         .map(([date, amount]) => ({ date, amount }))
-        .sort((a, b) => a.date.localeCompare(b.date))
+        .sort((a, b) => a.date.localeCompare(b.date)),
     };
   },
 
   // Aging Report
-  async getAgingReport(
-    tenantId: string
-  ): Promise<{
+  async getAgingReport(tenantId: string): Promise<{
     current: { count: number; amount: number };
     thirtyDays: { count: number; amount: number };
     sixtyDays: { count: number; amount: number };
@@ -106,10 +104,10 @@ export const financialReportsService = {
       sixtyDays: { count: 0, amount: 0 },
       ninetyDays: { count: 0, amount: 0 },
       overNinetyDays: { count: 0, amount: 0 },
-      totalOutstanding: 0
+      totalOutstanding: 0,
     };
 
-    snapshot.docs.forEach(doc => {
+    snapshot.docs.forEach((doc) => {
       const invoice = doc.data();
       const invoiceDate = invoice.invoiceDate.toDate();
       const balanceDue = invoice.balanceDue;
@@ -146,12 +144,15 @@ export const financialReportsService = {
     pendingAmount: number;
     approvalRate: number;
     averageProcessingDays: number;
-    claimsByProvider: Record<string, {
-      count: number;
-      totalAmount: number;
-      approvedAmount: number;
-      approvalRate: number;
-    }>;
+    claimsByProvider: Record<
+      string,
+      {
+        count: number;
+        totalAmount: number;
+        approvedAmount: number;
+        approvalRate: number;
+      }
+    >;
   }> {
     const claimsQuery = query(
       collection(db, COLLECTIONS.INSURANCE_CLAIMS),
@@ -173,7 +174,7 @@ export const financialReportsService = {
 
     const claimsByProvider: Record<string, any> = {};
 
-    snapshot.docs.forEach(doc => {
+    snapshot.docs.forEach((doc) => {
       const claim = doc.data();
       totalClaims++;
       totalClaimAmount += claim.totalCharges;
@@ -184,7 +185,7 @@ export const financialReportsService = {
           count: 0,
           totalAmount: 0,
           approvedAmount: 0,
-          approvedCount: 0
+          approvedCount: 0,
         };
       }
 
@@ -203,18 +204,18 @@ export const financialReportsService = {
       }
 
       if (claim.processedDate && claim.claimDate) {
-        const processingTime = claim.processedDate.toDate().getTime() - claim.claimDate.toDate().getTime();
+        const processingTime =
+          claim.processedDate.toDate().getTime() - claim.claimDate.toDate().getTime();
         totalProcessingDays += processingTime / (1000 * 60 * 60 * 24);
         processedCount++;
       }
     });
 
     // Calculate approval rates
-    Object.keys(claimsByProvider).forEach(providerId => {
+    Object.keys(claimsByProvider).forEach((providerId) => {
       const provider = claimsByProvider[providerId];
-      provider.approvalRate = provider.count > 0 
-        ? (provider.approvedCount / provider.count) * 100 
-        : 0;
+      provider.approvalRate =
+        provider.count > 0 ? (provider.approvedCount / provider.count) * 100 : 0;
     });
 
     return {
@@ -225,7 +226,7 @@ export const financialReportsService = {
       pendingAmount,
       approvalRate: totalClaims > 0 ? (approvedCount / totalClaims) * 100 : 0,
       averageProcessingDays: processedCount > 0 ? totalProcessingDays / processedCount : 0,
-      claimsByProvider
+      claimsByProvider,
     };
   },
 
@@ -258,13 +259,13 @@ export const financialReportsService = {
     // Get revenue data
     const revenueData = await this.getRevenueReport(tenantId, {
       start: monthStart,
-      end: monthEnd
+      end: monthEnd,
     });
 
     // Get insurance data
     const insuranceData = await this.getInsuranceAnalysisReport(tenantId, {
       start: monthStart,
-      end: monthEnd
+      end: monthEnd,
     });
 
     // Get test data from invoices
@@ -276,18 +277,18 @@ export const financialReportsService = {
     );
 
     const invoicesSnapshot = await getDocs(invoicesQuery);
-    
+
     const testCounts: Record<string, { count: number; revenue: number }> = {};
     const testsByCategory: Record<string, number> = {};
     const patientSpending: Record<string, { name: string; amount: number }> = {};
     let totalTests = 0;
 
-    invoicesSnapshot.docs.forEach(doc => {
+    invoicesSnapshot.docs.forEach((doc) => {
       const invoice = doc.data();
-      
+
       invoice.items.forEach((item: any) => {
         totalTests++;
-        
+
         // Track test counts and revenue
         if (!testCounts[item.testName]) {
           testCounts[item.testName] = { count: 0, revenue: 0 };
@@ -304,7 +305,7 @@ export const financialReportsService = {
       if (!patientSpending[invoice.patientId]) {
         patientSpending[invoice.patientId] = {
           name: invoice.patientName || 'Unknown',
-          amount: 0
+          amount: 0,
         };
       }
       patientSpending[invoice.patientId].amount += invoice.totalAmount;
@@ -315,16 +316,16 @@ export const financialReportsService = {
       .map(([testName, data]) => ({
         testName,
         count: data.count,
-        revenue: data.revenue
+        revenue: data.revenue,
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 10);
 
     // Get top patients
     const topPatients = Object.values(patientSpending)
-      .map(patient => ({
+      .map((patient) => ({
         patientName: patient.name,
-        totalSpent: patient.amount
+        totalSpent: patient.amount,
       }))
       .sort((a, b) => b.totalSpent - a.totalSpent)
       .slice(0, 10);
@@ -333,20 +334,20 @@ export const financialReportsService = {
       revenue: {
         invoiced: revenueData.totalRevenue,
         collected: revenueData.collectedRevenue,
-        outstanding: revenueData.pendingRevenue
+        outstanding: revenueData.pendingRevenue,
       },
       tests: {
         totalPerformed: totalTests,
-        byCategory: testsByCategory
+        byCategory: testsByCategory,
       },
       insurance: {
         claimsSubmitted: insuranceData.totalClaims,
-        claimsApproved: Math.round(insuranceData.totalClaims * insuranceData.approvalRate / 100),
+        claimsApproved: Math.round((insuranceData.totalClaims * insuranceData.approvalRate) / 100),
         totalClaimAmount: insuranceData.totalClaimAmount,
-        totalApprovedAmount: insuranceData.approvedAmount
+        totalApprovedAmount: insuranceData.approvedAmount,
       },
       topTests,
-      topPatients
+      topPatients,
     };
-  }
+  },
 };

@@ -25,7 +25,7 @@ const TestOrdersPage: React.FC = () => {
       cancelReason = prompt('Please provide a reason for cancellation:');
       if (!cancelReason) return;
     }
-    
+
     await updateStatusMutation.mutateAsync({
       orderId: order.id,
       status: newStatus,
@@ -241,20 +241,31 @@ const TestOrdersPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(order.priority)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                        order.priority
+                      )}`}
+                    >
                       {order.priority.toUpperCase()}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(order.status)}
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                          order.status
+                        )}`}
+                      >
                         {order.status.replace('_', ' ')}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {(order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate()).toLocaleDateString()}
+                    {(order.orderDate instanceof Date
+                      ? order.orderDate
+                      : order.orderDate.toDate()
+                    ).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {order.status === 'awaiting_approval' ? (
@@ -267,9 +278,15 @@ const TestOrdersPage: React.FC = () => {
                     ) : (
                       <select
                         value={order.status}
-                        onChange={(e) => handleStatusChange(order, e.target.value as TestOrder['status'])}
+                        onChange={(e) =>
+                          handleStatusChange(order, e.target.value as TestOrder['status'])
+                        }
                         className="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        disabled={order.status === 'cancelled' || order.status === 'resulted' || order.status === 'rejected'}
+                        disabled={
+                          order.status === 'cancelled' ||
+                          order.status === 'resulted' ||
+                          order.status === 'rejected'
+                        }
                       >
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>

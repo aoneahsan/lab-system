@@ -21,7 +21,8 @@ const SAMPLE_KEYS = {
   byOrder: (orderId: string) => [...SAMPLE_KEYS.all, 'order', orderId] as const,
   statistics: () => [...SAMPLE_KEYS.all, 'statistics'] as const,
   collections: () => [...SAMPLE_KEYS.all, 'collections'] as const,
-  collection: (filter?: { status?: string; phlebotomistId?: string }) => [...SAMPLE_KEYS.collections(), filter] as const,
+  collection: (filter?: { status?: string; phlebotomistId?: string }) =>
+    [...SAMPLE_KEYS.collections(), filter] as const,
 };
 
 // Get samples
@@ -198,7 +199,10 @@ export const useCreateSampleCollection = () => {
 
   return useMutation({
     mutationFn: (
-      data: Omit<SampleCollection, 'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>
+      data: Omit<
+        SampleCollection,
+        'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
+      >
     ) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return sampleService.createSampleCollection(currentTenant.id, currentUser.id, data);
@@ -254,13 +258,7 @@ export const useBatchUpdateSamples = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({
-      sampleIds,
-      updates,
-    }: {
-      sampleIds: string[];
-      updates: Partial<Sample>;
-    }) => {
+    mutationFn: ({ sampleIds, updates }: { sampleIds: string[]; updates: Partial<Sample> }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return sampleService.batchUpdateSamples(currentTenant.id, currentUser.id, sampleIds, updates);
     },

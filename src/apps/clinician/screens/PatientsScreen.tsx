@@ -3,24 +3,16 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  Search, 
-  User,
-  Calendar,
-  Phone,
-  ChevronRight,
-  Activity,
-  FileText
-} from 'lucide-react';
+import { Search, User, Calendar, Phone, ChevronRight, Activity, FileText } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { format, differenceInYears } from 'date-fns';
 
 export function PatientsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: patientsData, isLoading } = usePatients({ 
-    searchTerm: searchQuery 
+  const { data: patientsData, isLoading } = usePatients({
+    searchTerm: searchQuery,
   });
-  
+
   const patients = Array.isArray(patientsData) ? patientsData : patientsData?.patients || [];
 
   const calculateAge = (dateOfBirth: string) => {
@@ -73,9 +65,7 @@ export function PatientsScreen() {
                         <h3 className="font-semibold text-gray-900">
                           {patient.fullName || `${patient.firstName} ${patient.lastName}`}
                         </h3>
-                        <p className="text-sm text-gray-600">
-                          MRN: {patient.mrn}
-                        </p>
+                        <p className="text-sm text-gray-600">MRN: {patient.mrn}</p>
                       </div>
                     </div>
 

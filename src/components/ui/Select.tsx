@@ -44,7 +44,11 @@ export const SelectItem: React.FC<React.OptionHTMLAttributes<HTMLOptionElement>>
 
 export const SelectValue: React.FC<{ placeholder?: string }> = ({ placeholder }) => {
   if (placeholder) {
-    return <option value="" disabled>{placeholder}</option>;
+    return (
+      <option value="" disabled>
+        {placeholder}
+      </option>
+    );
   }
   return null;
 };

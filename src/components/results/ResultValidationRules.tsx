@@ -66,18 +66,16 @@ export default function ResultValidationRules() {
     notify: { label: 'Notify', color: 'bg-blue-100 text-blue-800' },
   };
 
-  const filteredRules = rules.filter(rule => 
-    filter === 'all' || rule.ruleType === filter
-  );
+  const filteredRules = rules.filter((rule) => filter === 'all' || rule.ruleType === filter);
 
   const handleToggleRule = (ruleId: string) => {
-    setRules(rules.map(rule => 
-      rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
-    ));
+    setRules(
+      rules.map((rule) => (rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule))
+    );
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    setRules(rules.filter(rule => rule.id !== ruleId));
+    setRules(rules.filter((rule) => rule.id !== ruleId));
   };
 
   return (
@@ -93,13 +91,12 @@ export default function ResultValidationRules() {
             >
               <option value="all">All Types</option>
               {Object.entries(ruleTypeConfig).map(([type, config]) => (
-                <option key={type} value={type}>{config.label}</option>
+                <option key={type} value={type}>
+                  {config.label}
+                </option>
               ))}
             </select>
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn btn-primary btn-sm"
-            >
+            <button onClick={() => setShowForm(true)} className="btn btn-primary btn-sm">
               <Plus className="h-4 w-4" />
               Add Rule
             </button>
@@ -112,7 +109,7 @@ export default function ResultValidationRules() {
           {filteredRules.map((rule) => {
             const typeConfig = ruleTypeConfig[rule.ruleType];
             const Icon = typeConfig.icon;
-            
+
             return (
               <div
                 key={rule.id}
@@ -127,18 +124,18 @@ export default function ResultValidationRules() {
                       <h4 className="font-medium text-gray-900">{rule.testName}</h4>
                       <span className="text-sm text-gray-500">→</span>
                       <span className="text-sm text-gray-700">{rule.ruleName}</span>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        actionConfig[rule.action].color
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          actionConfig[rule.action].color
+                        }`}
+                      >
                         {actionConfig[rule.action].label}
                       </span>
                     </div>
-                    
+
                     <div className="mt-2 space-y-1">
-                      <p className="text-sm text-gray-600">
-                        Type: {typeConfig.label}
-                      </p>
-                      
+                      <p className="text-sm text-gray-600">Type: {typeConfig.label}</p>
+
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         {Object.entries(rule.parameters).map(([key, value]) => (
                           <span key={key}>
@@ -146,15 +143,13 @@ export default function ResultValidationRules() {
                           </span>
                         ))}
                       </div>
-                      
+
                       {rule.message && (
-                        <p className="text-sm text-gray-500 italic">
-                          Message: {rule.message}
-                        </p>
+                        <p className="text-sm text-gray-500 italic">Message: {rule.message}</p>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -165,7 +160,7 @@ export default function ResultValidationRules() {
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
-                    
+
                     <button
                       onClick={() => {
                         setEditingRule(rule);
@@ -175,7 +170,7 @@ export default function ResultValidationRules() {
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
-                    
+
                     <button
                       onClick={() => handleDeleteRule(rule.id)}
                       className="text-red-600 hover:text-red-700"
@@ -187,11 +182,9 @@ export default function ResultValidationRules() {
               </div>
             );
           })}
-          
+
           {filteredRules.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              No validation rules found
-            </div>
+            <div className="text-center py-8 text-gray-500">No validation rules found</div>
           )}
         </div>
       </div>

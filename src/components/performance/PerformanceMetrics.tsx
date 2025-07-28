@@ -40,17 +40,14 @@ export function PerformanceMetrics() {
       {isVisible && (
         <div className="fixed bottom-16 right-4 z-50 bg-gray-900 text-white p-4 rounded-lg shadow-lg max-w-sm font-mono text-xs">
           <h3 className="text-sm font-semibold mb-2">Performance Metrics</h3>
-          
+
           {vitals.length > 0 && (
             <div className="mb-3">
               <h4 className="text-xs opacity-75 mb-1">Web Vitals</h4>
               {vitals.map(([key, value]) => (
                 <div key={key} className="flex justify-between mb-1">
                   <span>{key}:</span>
-                  <span className={cn(
-                    'ml-2',
-                    getVitalColor(key, value)
-                  )}>
+                  <span className={cn('ml-2', getVitalColor(key, value))}>
                     {key === 'CLS' ? value.toFixed(3) : `${Math.round(value)}ms`}
                   </span>
                 </div>

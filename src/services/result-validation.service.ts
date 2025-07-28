@@ -1,25 +1,21 @@
-import { 
-  collection, 
-  doc, 
+import {
+  collection,
+  doc,
   getDocs,
-  query, 
-  where, 
-  orderBy, 
+  query,
+  where,
+  orderBy,
   limit,
   addDoc,
   updateDoc,
   deleteDoc,
-  serverTimestamp 
+  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
-import type { 
-  ResultValidationRule, 
-  TestResult,
-  ResultFlag 
-} from '@/types/result.types';
+import type { ResultValidationRule, TestResult, ResultFlag } from '@/types/result.types';
 
 interface ValidationResult {
   isValid: boolean;
@@ -46,13 +42,18 @@ export const resultValidationService = {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as ResultValidationRule));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as ResultValidationRule
+    );
   },
 
-  async createValidationRule(data: Omit<ResultValidationRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  async createValidationRule(
+    data: Omit<ResultValidationRule, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<string> {
     const tenantId = useTenantStore.getState().currentTenant?.id;
     const user = useAuthStore.getState().currentUser;
     if (!tenantId || !user) throw new Error('Authentication required');
@@ -63,13 +64,10 @@ export const resultValidationService = {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       createdBy: user.id,
-      updatedBy: user.id
+      updatedBy: user.id,
     };
 
-    const docRef = await addDoc(
-      collection(db, COLLECTIONS.VALIDATION_RULES),
-      ruleData
-    );
+    const docRef = await addDoc(collection(db, COLLECTIONS.VALIDATION_RULES), ruleData);
 
     return docRef.id;
   },
@@ -81,13 +79,10 @@ export const resultValidationService = {
     const updateData = {
       ...data,
       updatedAt: serverTimestamp(),
-      updatedBy: user.id
+      updatedBy: user.id,
     };
 
-    await updateDoc(
-      doc(db, COLLECTIONS.VALIDATION_RULES, id),
-      updateData
-    );
+    await updateDoc(doc(db, COLLECTIONS.VALIDATION_RULES, id), updateData);
   },
 
   async deleteValidationRule(id: string): Promise<void> {
@@ -95,8 +90,8 @@ export const resultValidationService = {
   },
 
   async validateResult(
-    testId: string, 
-    value: string | number, 
+    testId: string,
+    value: string | number,
     patientId: string,
     referenceRange?: { min?: number; max?: number }
   ): Promise<ValidationResult> {
@@ -106,12 +101,12 @@ export const resultValidationService = {
       errors: [],
       flags: [],
       requiresReview: false,
-      isCritical: false
+      isCritical: false,
     };
 
     // Get validation rules for this test
     const rules = await this.getValidationRules(testId);
-    
+
     // Convert value to number if possible
     const numericValue = typeof value === 'string' ? parseFloat(value) : value;
     const isNumeric = !isNaN(numericValue);
@@ -124,7 +119,11 @@ export const resultValidationService = {
         case 'range':
           if (isNumeric && rule.minValue !== undefined && rule.maxValue !== undefined) {
             if (numericValue < rule.minValue || numericValue > rule.maxValue) {
-              this.handleRuleViolation(rule, `Value ${numericValue} is outside acceptable range (${rule.minValue}-${rule.maxValue})`, result);
+              this.handleRuleViolation(
+                rule,
+                `Value ${numericValue} is outside acceptable range (${rule.minValue}-${rule.maxValue})`,
+                result
+              );
             }
           }
           break;
@@ -132,10 +131,18 @@ export const resultValidationService = {
         case 'absurd':
           if (isNumeric) {
             if (rule.absurdLow !== undefined && numericValue < rule.absurdLow) {
-              this.handleRuleViolation(rule, `Value ${numericValue} is absurdly low (< ${rule.absurdLow})`, result);
+              this.handleRuleViolation(
+                rule,
+                `Value ${numericValue} is absurdly low (< ${rule.absurdLow})`,
+                result
+              );
             }
             if (rule.absurdHigh !== undefined && numericValue > rule.absurdHigh) {
-              this.handleRuleViolation(rule, `Value ${numericValue} is absurdly high (> ${rule.absurdHigh})`, result);
+              this.handleRuleViolation(
+                rule,
+                `Value ${numericValue} is absurdly high (> ${rule.absurdHigh})`,
+                result
+              );
             }
           }
           break;
@@ -145,34 +152,45 @@ export const resultValidationService = {
             if (rule.criticalLow !== undefined && numericValue < rule.criticalLow) {
               result.isCritical = true;
               result.flags.push('critical_low');
-              this.handleRuleViolation(rule, `Critical low value: ${numericValue} (< ${rule.criticalLow})`, result);
+              this.handleRuleViolation(
+                rule,
+                `Critical low value: ${numericValue} (< ${rule.criticalLow})`,
+                result
+              );
             }
             if (rule.criticalHigh !== undefined && numericValue > rule.criticalHigh) {
               result.isCritical = true;
               result.flags.push('critical_high');
-              this.handleRuleViolation(rule, `Critical high value: ${numericValue} (> ${rule.criticalHigh})`, result);
+              this.handleRuleViolation(
+                rule,
+                `Critical high value: ${numericValue} (> ${rule.criticalHigh})`,
+                result
+              );
             }
           }
           break;
 
         case 'delta':
           if (isNumeric && previousResult && rule.deltaThreshold !== undefined) {
-            const previousValue = typeof previousResult.value === 'string' 
-              ? parseFloat(previousResult.value) 
-              : previousResult.value;
-            
+            const previousValue =
+              typeof previousResult.value === 'string'
+                ? parseFloat(previousResult.value)
+                : previousResult.value;
+
             if (!isNaN(previousValue)) {
-              const delta = rule.deltaType === 'percentage'
-                ? Math.abs((numericValue - previousValue) / previousValue * 100)
-                : Math.abs(numericValue - previousValue);
-              
+              const delta =
+                rule.deltaType === 'percentage'
+                  ? Math.abs(((numericValue - previousValue) / previousValue) * 100)
+                  : Math.abs(numericValue - previousValue);
+
               if (delta > rule.deltaThreshold) {
-                const deltaMsg = rule.deltaType === 'percentage'
-                  ? `${delta.toFixed(1)}% change`
-                  : `${delta} change`;
+                const deltaMsg =
+                  rule.deltaType === 'percentage'
+                    ? `${delta.toFixed(1)}% change`
+                    : `${delta} change`;
                 this.handleRuleViolation(
-                  rule, 
-                  `Significant delta from previous result: ${deltaMsg} (previous: ${previousValue}, current: ${numericValue})`, 
+                  rule,
+                  `Significant delta from previous result: ${deltaMsg} (previous: ${previousValue}, current: ${numericValue})`,
                   result
                 );
               }
@@ -242,7 +260,7 @@ export const resultValidationService = {
 
     return {
       id: snapshot.docs[0].id,
-      ...snapshot.docs[0].data()
+      ...snapshot.docs[0].data(),
     } as TestResult;
   },
 
@@ -256,5 +274,5 @@ export const resultValidationService = {
       return 'high';
     }
     return 'normal';
-  }
+  },
 };

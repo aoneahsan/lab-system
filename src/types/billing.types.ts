@@ -1,14 +1,8 @@
 import type { Timestamp } from 'firebase/firestore';
 
-export type PaymentStatus = 
-  | 'pending'
-  | 'partial'
-  | 'paid'
-  | 'overdue'
-  | 'cancelled'
-  | 'refunded';
+export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
 
-export type PaymentMethod = 
+export type PaymentMethod =
   | 'cash'
   | 'credit_card'
   | 'debit_card'
@@ -17,7 +11,7 @@ export type PaymentMethod =
   | 'eft'
   | 'other';
 
-export type InvoiceStatus = 
+export type InvoiceStatus =
   | 'draft'
   | 'sent'
   | 'viewed'
@@ -26,7 +20,7 @@ export type InvoiceStatus =
   | 'overdue'
   | 'cancelled';
 
-export type ClaimStatus = 
+export type ClaimStatus =
   | 'draft'
   | 'submitted'
   | 'pending'
@@ -42,37 +36,37 @@ export interface Invoice {
   invoiceNumber: string;
   patientId: string;
   orderId?: string;
-  
+
   // Dates
   invoiceDate: Timestamp;
   dueDate: Timestamp;
-  
+
   // Financial
   subtotal: number;
   taxAmount: number;
   discountAmount: number;
   totalAmount: number;
   balanceDue: number;
-  
+
   // Status
   status: InvoiceStatus;
   paymentStatus: PaymentStatus;
-  
+
   // Line Items
   items: InvoiceItem[];
-  
+
   // Payment Information
   payments: string[]; // Array of payment IDs
-  
+
   // Insurance
   insuranceClaimId?: string;
   insuranceCoveredAmount?: number;
   patientResponsibility?: number;
-  
+
   // Notes
   notes?: string;
   internalNotes?: string;
-  
+
   // Audit
   createdAt: Timestamp;
   createdBy: string;
@@ -100,26 +94,26 @@ export interface Payment {
   tenantId: string;
   invoiceId: string;
   patientId: string;
-  
+
   paymentDate: Timestamp;
   amount: number;
   method: PaymentMethod;
   referenceNumber?: string;
-  
+
   // Credit Card Details (encrypted)
   cardLastFour?: string;
   cardType?: string;
-  
+
   // Check Details
   checkNumber?: string;
   bankName?: string;
-  
+
   // Insurance Details
   insuranceClaimId?: string;
   eobNumber?: string; // Explanation of Benefits
-  
+
   notes?: string;
-  
+
   createdAt: Timestamp;
   createdBy: string;
 }
@@ -127,16 +121,16 @@ export interface Payment {
 export interface InsuranceProvider {
   id: string;
   tenantId: string;
-  
+
   name: string;
   payerId: string;
-  
+
   // Contact Information
   phone: string;
   fax?: string;
   email?: string;
   website?: string;
-  
+
   // Address
   address: {
     street: string;
@@ -145,7 +139,7 @@ export interface InsuranceProvider {
     zipCode: string;
     country: string;
   };
-  
+
   // Billing Information
   billingAddress?: {
     street: string;
@@ -154,14 +148,14 @@ export interface InsuranceProvider {
     zipCode: string;
     country: string;
   };
-  
+
   // Configuration
   requiresAuth: boolean;
   requiresReferral: boolean;
   electronicClaims: boolean;
-  
+
   active: boolean;
-  
+
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -170,24 +164,24 @@ export interface InsurancePlan {
   id: string;
   tenantId: string;
   providerId: string;
-  
+
   planName: string;
   planType: 'PPO' | 'HMO' | 'EPO' | 'POS' | 'HDHP' | 'Other';
   groupNumber?: string;
-  
+
   // Coverage
   coveragePercentage: number;
   deductible: number;
   deductibleMet: number;
   outOfPocketMax: number;
   outOfPocketMet: number;
-  
+
   // Co-pay/Co-insurance
   copayAmount?: number;
   coinsurancePercentage?: number;
-  
+
   active: boolean;
-  
+
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -196,31 +190,31 @@ export interface PatientInsurance {
   id: string;
   tenantId: string;
   patientId: string;
-  
+
   insuranceType: 'primary' | 'secondary' | 'tertiary';
   providerId: string;
   planId?: string;
-  
+
   // Policy Information
   policyNumber: string;
   groupNumber?: string;
-  
+
   // Subscriber Information
   subscriberName: string;
   subscriberDOB: Date;
   subscriberRelation: 'self' | 'spouse' | 'child' | 'other';
-  
+
   // Coverage Dates
   effectiveDate: Date;
   expirationDate?: Date;
-  
+
   // Verification
   verified: boolean;
   verifiedDate?: Timestamp;
   verifiedBy?: string;
-  
+
   active: boolean;
-  
+
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -231,49 +225,49 @@ export interface InsuranceClaim {
   invoiceId: string;
   patientId: string;
   insuranceId: string;
-  
+
   claimNumber: string;
   claimDate: Timestamp;
   serviceDate: Timestamp;
-  
+
   // Provider Information
   providerId: string;
   renderingProvider: string;
   npiNumber: string;
   taxId: string;
-  
+
   // Diagnosis
   primaryDiagnosis: string;
   secondaryDiagnoses?: string[];
-  
+
   // Services
   services: ClaimService[];
-  
+
   // Financial
   totalCharges: number;
   allowedAmount?: number;
   paidAmount?: number;
   patientResponsibility?: number;
   writeOffAmount?: number;
-  
+
   // Status
   status: ClaimStatus;
   submittedDate?: Timestamp;
   processedDate?: Timestamp;
-  
+
   // Response
   payerClaimNumber?: string;
   denialReason?: string;
   denialCode?: string;
   eobReceived?: boolean;
-  
+
   // Appeal
   appealDate?: Timestamp;
   appealReason?: string;
   appealStatus?: 'pending' | 'approved' | 'denied';
-  
+
   notes?: string;
-  
+
   createdAt: Timestamp;
   createdBy: string;
   updatedAt: Timestamp;
@@ -312,14 +306,14 @@ export interface BillingStatistics {
   totalRevenue: number;
   pendingPayments: number;
   overdueAmount: number;
-  
+
   todaysCharges: number;
   todaysPayments: number;
-  
+
   invoicesByStatus: Record<InvoiceStatus, number>;
   paymentsByMethod: Record<PaymentMethod, number>;
   claimsByStatus: Record<ClaimStatus, number>;
-  
+
   averagePaymentTime: number; // in days
   collectionRate: number; // percentage
 }

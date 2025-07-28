@@ -32,7 +32,7 @@ describe('Sample Store', () => {
       loading: false,
       error: null,
     });
-    
+
     // Reset all mocks
     vi.clearAllMocks();
   });
@@ -56,14 +56,14 @@ describe('Sample Store', () => {
         collectedAt: new Date(),
       },
     ];
-    
+
     vi.mocked(sampleService.getSamples).mockResolvedValue(mockSamples);
 
     const { fetchSamples } = useSampleStore.getState();
     await fetchSamples('tenant-123', { status: 'collected' });
 
     expect(sampleService.getSamples).toHaveBeenCalledWith('tenant-123', { status: 'collected' });
-    
+
     const state = useSampleStore.getState();
     expect(state.samples).toEqual(mockSamples);
     expect(state.loading).toBe(false);
@@ -78,14 +78,14 @@ describe('Sample Store', () => {
       patientId: 'patient-123',
       collectedAt: new Date(),
     };
-    
+
     vi.mocked(sampleService.getSample).mockResolvedValue(mockSample);
 
     const { fetchSample } = useSampleStore.getState();
     await fetchSample('tenant-123', 'sample-1');
 
     expect(sampleService.getSample).toHaveBeenCalledWith('tenant-123', 'sample-1');
-    
+
     const state = useSampleStore.getState();
     expect(state.currentSample).toEqual(mockSample);
     expect(state.loading).toBe(false);
@@ -100,7 +100,7 @@ describe('Sample Store', () => {
       patientId: 'patient-123',
       collectedAt: new Date(),
     };
-    
+
     // Set sample in store
     useSampleStore.setState({ samples: [mockSample] });
 
@@ -134,17 +134,24 @@ describe('Sample Store', () => {
     vi.mocked(sampleService.updateSampleStatus).mockResolvedValue(undefined);
 
     const { updateSampleStatus } = useSampleStore.getState();
-    await updateSampleStatus('tenant-123', 'user-123', 'sample-1', 'processed', 'Sample processed successfully', 'Lab A');
-
-    expect(sampleService.updateSampleStatus).toHaveBeenCalledWith(
-      'tenant-123', 
-      'user-123', 
-      'sample-1', 
-      'processed', 
+    await updateSampleStatus(
+      'tenant-123',
+      'user-123',
+      'sample-1',
+      'processed',
       'Sample processed successfully',
       'Lab A'
     );
-    
+
+    expect(sampleService.updateSampleStatus).toHaveBeenCalledWith(
+      'tenant-123',
+      'user-123',
+      'sample-1',
+      'processed',
+      'Sample processed successfully',
+      'Lab A'
+    );
+
     const state = useSampleStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -159,14 +166,16 @@ describe('Sample Store', () => {
         status: 'scheduled',
       },
     ];
-    
+
     vi.mocked(sampleService.getSampleCollections).mockResolvedValue(mockCollections);
 
     const { fetchSampleCollections } = useSampleStore.getState();
     await fetchSampleCollections('tenant-123', { status: 'scheduled' });
 
-    expect(sampleService.getSampleCollections).toHaveBeenCalledWith('tenant-123', { status: 'scheduled' });
-    
+    expect(sampleService.getSampleCollections).toHaveBeenCalledWith('tenant-123', {
+      status: 'scheduled',
+    });
+
     const state = useSampleStore.getState();
     expect(state.sampleCollections).toEqual(mockCollections);
     expect(state.loading).toBe(false);
@@ -205,7 +214,7 @@ describe('Sample Store', () => {
     await updateBatchStatus('tenant-123', 'user-123', updates);
 
     expect(sampleService.updateBatchStatus).toHaveBeenCalledWith('tenant-123', 'user-123', updates);
-    
+
     const state = useSampleStore.getState();
     expect(state.loading).toBe(false);
   });
@@ -216,7 +225,7 @@ describe('Sample Store', () => {
 
     const { fetchSamples } = useSampleStore.getState();
     await fetchSamples('tenant-123');
-    
+
     const state = useSampleStore.getState();
     expect(state.error).toBe('Failed to fetch samples');
     expect(state.loading).toBe(false);

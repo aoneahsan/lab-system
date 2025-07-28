@@ -7,7 +7,7 @@ export default function QCStatistics() {
   const [selectedTest, setSelectedTest] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('monthly');
-  
+
   const { qcTests, statistics, fetchQCTests, calculateStatistics } = useQualityControlStore();
 
   useEffect(() => {
@@ -20,15 +20,28 @@ export default function QCStatistics() {
     }
   }, [selectedTest, selectedLevel, period, calculateStatistics]);
 
-  const selectedQCTest = qcTests.find(t => t.id === selectedTest);
+  const selectedQCTest = qcTests.find((t) => t.id === selectedTest);
   const levels = selectedQCTest?.levels || [];
 
-  const sdDistributionData = statistics ? [
-    { name: 'Within ±1SD', value: (statistics.withinSDCount.oneSD / statistics.n) * 100, expected: 68.27 },
-    { name: 'Within ±2SD', value: (statistics.withinSDCount.twoSD / statistics.n) * 100, expected: 95.45 },
-    { name: 'Within ±3SD', value: (statistics.withinSDCount.threeSD / statistics.n) * 100, expected: 99.73 },
-  ] : [];
-
+  const sdDistributionData = statistics
+    ? [
+        {
+          name: 'Within ±1SD',
+          value: (statistics.withinSDCount.oneSD / statistics.n) * 100,
+          expected: 68.27,
+        },
+        {
+          name: 'Within ±2SD',
+          value: (statistics.withinSDCount.twoSD / statistics.n) * 100,
+          expected: 95.45,
+        },
+        {
+          name: 'Within ±3SD',
+          value: (statistics.withinSDCount.threeSD / statistics.n) * 100,
+          expected: 99.73,
+        },
+      ]
+    : [];
 
   return (
     <div className="space-y-6">
@@ -36,9 +49,7 @@ export default function QCStatistics() {
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              QC Test
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">QC Test</label>
             <select
               value={selectedTest}
               onChange={(e) => {
@@ -57,9 +68,7 @@ export default function QCStatistics() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Level
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
             <select
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
@@ -76,9 +85,7 @@ export default function QCStatistics() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Period
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Period</label>
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value as any)}
@@ -165,8 +172,8 @@ export default function QCStatistics() {
                     <span className="font-medium">{statistics.bias.toFixed(2)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${Math.min(Math.abs(statistics.bias), 100)}%` }}
                     ></div>
                   </div>
@@ -178,10 +185,13 @@ export default function QCStatistics() {
                     <span className="font-medium">{statistics.cv.toFixed(2)}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className={`h-2 rounded-full ${
-                        statistics.cv <= 5 ? 'bg-green-600' : 
-                        statistics.cv <= 10 ? 'bg-yellow-600' : 'bg-red-600'
+                        statistics.cv <= 5
+                          ? 'bg-green-600'
+                          : statistics.cv <= 10
+                            ? 'bg-yellow-600'
+                            : 'bg-red-600'
                       }`}
                       style={{ width: `${Math.min(statistics.cv * 10, 100)}%` }}
                     ></div>
@@ -192,24 +202,42 @@ export default function QCStatistics() {
                   <h4 className="font-medium text-gray-900 mb-2">Performance Assessment</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        statistics.cv <= 5 ? 'bg-green-500' : 
-                        statistics.cv <= 10 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
-                      <span>Precision: {
-                        statistics.cv <= 5 ? 'Excellent' : 
-                        statistics.cv <= 10 ? 'Acceptable' : 'Needs Improvement'
-                      }</span>
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          statistics.cv <= 5
+                            ? 'bg-green-500'
+                            : statistics.cv <= 10
+                              ? 'bg-yellow-500'
+                              : 'bg-red-500'
+                        }`}
+                      ></div>
+                      <span>
+                        Precision:{' '}
+                        {statistics.cv <= 5
+                          ? 'Excellent'
+                          : statistics.cv <= 10
+                            ? 'Acceptable'
+                            : 'Needs Improvement'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${
-                        Math.abs(statistics.bias) <= 5 ? 'bg-green-500' : 
-                        Math.abs(statistics.bias) <= 10 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
-                      <span>Accuracy: {
-                        Math.abs(statistics.bias) <= 5 ? 'Excellent' : 
-                        Math.abs(statistics.bias) <= 10 ? 'Acceptable' : 'Needs Improvement'
-                      }</span>
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          Math.abs(statistics.bias) <= 5
+                            ? 'bg-green-500'
+                            : Math.abs(statistics.bias) <= 10
+                              ? 'bg-yellow-500'
+                              : 'bg-red-500'
+                        }`}
+                      ></div>
+                      <span>
+                        Accuracy:{' '}
+                        {Math.abs(statistics.bias) <= 5
+                          ? 'Excellent'
+                          : Math.abs(statistics.bias) <= 10
+                            ? 'Acceptable'
+                            : 'Needs Improvement'}
+                      </span>
                     </div>
                   </div>
                 </div>

@@ -15,7 +15,7 @@ import {
   MapPin,
   Star,
   Clock,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +49,7 @@ export const ProfileScreen: React.FC = () => {
     avgResponseTime: 2.5,
     patientSatisfaction: 94,
     criticalResultsHandled: 42,
-    continuingEducationHours: 18
+    continuingEducationHours: 18,
   });
 
   const [credentials] = useState<Credential[]>([
@@ -58,7 +58,7 @@ export const ProfileScreen: React.FC = () => {
       title: 'MD - Doctor of Medicine',
       issuer: 'Harvard Medical School',
       issueDate: new Date('2015-05-15'),
-      status: 'active'
+      status: 'active',
     },
     {
       id: '2',
@@ -66,7 +66,7 @@ export const ProfileScreen: React.FC = () => {
       issuer: 'American Board of Internal Medicine',
       issueDate: new Date('2018-07-20'),
       expiryDate: new Date('2028-07-20'),
-      status: 'active'
+      status: 'active',
     },
     {
       id: '3',
@@ -74,8 +74,8 @@ export const ProfileScreen: React.FC = () => {
       issuer: 'California Medical Board',
       issueDate: new Date('2018-01-10'),
       expiryDate: new Date('2025-01-10'),
-      status: 'expiring'
-    }
+      status: 'expiring',
+    },
   ]);
 
   const menuItems = [
@@ -85,7 +85,7 @@ export const ProfileScreen: React.FC = () => {
     { icon: Award, label: 'Certifications & CME', action: '/clinician/certifications' },
     { icon: BarChart3, label: 'Performance Metrics', action: '/clinician/metrics' },
     { icon: Calendar, label: 'Schedule Preferences', action: '/clinician/schedule-preferences' },
-    { icon: Settings, label: 'App Settings', action: '/clinician/settings' }
+    { icon: Settings, label: 'App Settings', action: '/clinician/settings' },
   ];
 
   const handleLogout = () => {
@@ -198,7 +198,7 @@ export const ProfileScreen: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-900">Credentials</h3>
-            {credentials.some(c => c.status === 'expiring') && (
+            {credentials.some((c) => c.status === 'expiring') && (
               <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">
                 1 expiring soon
               </span>
@@ -216,7 +216,11 @@ export const ProfileScreen: React.FC = () => {
                     </p>
                   )}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getCredentialColor(credential.status)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${getCredentialColor(
+                    credential.status
+                  )}`}
+                >
                   {credential.status === 'expiring' ? 'Renew Soon' : credential.status}
                 </span>
               </div>
@@ -238,7 +242,7 @@ export const ProfileScreen: React.FC = () => {
           </div>
           <div className="mt-3">
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
                 style={{ width: `${(stats.continuingEducationHours / 20) * 100}%` }}
               />

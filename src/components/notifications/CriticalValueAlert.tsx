@@ -12,7 +12,7 @@ interface CriticalValueAlertProps {
 const CriticalValueAlert: React.FC<CriticalValueAlertProps> = ({
   notification,
   onAcknowledge,
-  onClose
+  onClose,
 }) => {
   const [notes, setNotes] = useState('');
   const [isAcknowledging, setIsAcknowledging] = useState(false);
@@ -51,13 +51,21 @@ const CriticalValueAlert: React.FC<CriticalValueAlertProps> = ({
                 </h3>
                 <div className="mt-2">
                   <div className="text-sm text-gray-700 space-y-2">
-                    <p><strong>Patient:</strong> {notification.patientName}</p>
-                    <p><strong>Test:</strong> {notification.testName}</p>
+                    <p>
+                      <strong>Patient:</strong> {notification.patientName}
+                    </p>
+                    <p>
+                      <strong>Test:</strong> {notification.testName}
+                    </p>
                     <p className="text-red-600 font-semibold">
                       <strong>Value:</strong> {notification.value}
                     </p>
-                    <p><strong>Critical Range:</strong> {notification.criticalRange}</p>
-                    <p><strong>Ordering Provider:</strong> {notification.orderingProvider}</p>
+                    <p>
+                      <strong>Critical Range:</strong> {notification.criticalRange}
+                    </p>
+                    <p>
+                      <strong>Ordering Provider:</strong> {notification.orderingProvider}
+                    </p>
                   </div>
                 </div>
               </div>

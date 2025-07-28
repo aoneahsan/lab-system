@@ -1,15 +1,15 @@
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
   limit,
-  Timestamp 
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
@@ -61,12 +61,15 @@ class OfflineSyncService {
 
   // Start periodic sync
   private startPeriodicSync(): void {
-    this.syncInterval = setInterval(async () => {
-      const status = await Network.getStatus();
-      if (status.connected && !this.syncInProgress) {
-        await this.performSync();
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    this.syncInterval = setInterval(
+      async () => {
+        const status = await Network.getStatus();
+        if (status.connected && !this.syncInProgress) {
+          await this.performSync();
+        }
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   // Stop periodic sync
@@ -80,7 +83,7 @@ class OfflineSyncService {
   // Subscribe to sync progress
   onSyncProgress(callback: (progress: SyncProgress) => void): () => void {
     this.syncProgressCallbacks.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.syncProgressCallbacks.indexOf(callback);
@@ -92,7 +95,7 @@ class OfflineSyncService {
 
   // Notify progress subscribers
   private notifyProgress(progress: SyncProgress): void {
-    this.syncProgressCallbacks.forEach(callback => callback(progress));
+    this.syncProgressCallbacks.forEach((callback) => callback(progress));
   }
 
   // Perform sync
@@ -113,24 +116,24 @@ class OfflineSyncService {
       success: true,
       synced: 0,
       failed: 0,
-      errors: []
+      errors: [],
     };
 
     try {
       // Get pending operations
       const pendingOps = await offlineDbService.getPendingOperations();
       const total = pendingOps.length;
-      
+
       this.notifyProgress({
         total,
         completed: 0,
-        inProgress: true
+        inProgress: true,
       });
 
       // Process each operation
       for (let i = 0; i < pendingOps.length; i++) {
         const op = pendingOps[i];
-        
+
         try {
           await this.syncOperation(op);
           await offlineDbService.markAsSynced(op.id);
@@ -147,7 +150,8 @@ class OfflineSyncService {
           total,
           completed: i + 1,
           inProgress: true,
-          lastError: result.errors.length > 0 ? result.errors[result.errors.length - 1].error : undefined
+          lastError:
+            result.errors.length > 0 ? result.errors[result.errors.length - 1].error : undefined,
         });
       }
 
@@ -157,20 +161,19 @@ class OfflineSyncService {
 
       // Fetch latest data from server
       await this.fetchLatestData();
-
     } catch (error: any) {
       console.error('Sync failed:', error);
       result.success = false;
-      result.errors.push({ 
-        operation: {} as OfflineQueueItem, 
-        error: error.message 
+      result.errors.push({
+        operation: {} as OfflineQueueItem,
+        error: error.message,
       });
     } finally {
       this.syncInProgress = false;
       this.notifyProgress({
         total: result.synced + result.failed,
         completed: result.synced + result.failed,
-        inProgress: false
+        inProgress: false,
       });
     }
 
@@ -203,7 +206,7 @@ class OfflineSyncService {
       await setDoc(doc(db, collectionName, data.id), {
         ...data,
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       });
     } else {
       // Use addDoc for auto-generated ID
@@ -211,7 +214,7 @@ class OfflineSyncService {
       await setDoc(doc(collection(db, collectionName)), {
         ...dataWithoutId,
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       });
     }
   }
@@ -225,7 +228,7 @@ class OfflineSyncService {
     const { id, ...updates } = data;
     await updateDoc(doc(db, collectionName, id), {
       ...updates,
-      updatedAt: Timestamp.now()
+      updatedAt: Timestamp.now(),
     });
   }
 
@@ -248,7 +251,7 @@ class OfflineSyncService {
       { name: COLLECTIONS.PATIENTS, limit: 100 },
       { name: COLLECTIONS.TESTS, limit: 200 },
       { name: COLLECTIONS.ORDERS, limit: 50 },
-      { name: COLLECTIONS.RESULTS, limit: 100 }
+      { name: COLLECTIONS.RESULTS, limit: 100 },
     ];
 
     for (const { name, limit: fetchLimit } of collectionsToSync) {
@@ -261,9 +264,9 @@ class OfflineSyncService {
         );
 
         const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(doc => ({
+        const data = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
 
         await offlineDbService.cacheData(name, tenantId, data);
@@ -294,11 +297,11 @@ class OfflineSyncService {
   }> {
     const isOffline = await this.isOffline();
     const metadata = await offlineDbService.getMetadata();
-    
+
     return {
       isOffline,
       pendingChanges: metadata.pendingChanges,
-      lastSyncTime: metadata.lastSyncTime
+      lastSyncTime: metadata.lastSyncTime,
     };
   }
 
@@ -316,12 +319,12 @@ class OfflineSyncService {
   // Cleanup
   async cleanup(): Promise<void> {
     this.stopPeriodicSync();
-    
+
     if (this.networkListener) {
       await this.networkListener.remove();
       this.networkListener = null;
     }
-    
+
     await offlineDbService.close();
   }
 }

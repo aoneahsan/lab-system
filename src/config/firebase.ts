@@ -1,11 +1,11 @@
 // Re-export commonly used Firebase services
-export { 
-  auth, 
+export {
+  auth,
   firestore as db, // Alias firestore as db for shorter imports
-  storage, 
+  storage,
   functions,
   performance,
-  analytics
+  analytics,
 } from './firebase.config';
 
 export { default as app } from './firebase.config';

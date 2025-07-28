@@ -13,7 +13,7 @@ interface QCRunFormProps {
 const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = false }) => {
   const [selectedMaterial, setSelectedMaterial] = useState<QCMaterial | null>(null);
   const { data: materials = [] } = useQCMaterials();
-  
+
   const {
     register,
     handleSubmit,
@@ -35,18 +35,19 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
     if (material) {
       setSelectedMaterial(material);
       // Initialize results for all analytes
-      setValue('results', material.analytes.map(analyte => ({
-        testCode: analyte.testCode,
-        value: 0,
-      })));
+      setValue(
+        'results',
+        material.analytes.map((analyte) => ({
+          testCode: analyte.testCode,
+          value: 0,
+        }))
+      );
     }
   }, [material, setValue]);
 
   const updateResult = (testCode: string, value: number) => {
     const results = watch('results');
-    const updatedResults = results.map(r => 
-      r.testCode === testCode ? { ...r, value } : r
-    );
+    const updatedResults = results.map((r) => (r.testCode === testCode ? { ...r, value } : r));
     setValue('results', updatedResults);
   };
 
@@ -62,18 +63,16 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
       {/* Material Selection */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">QC Material</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Material *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Material *</label>
             <select
               {...register('materialId', { required: 'Material is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Select material...</option>
-              {materials.map(material => (
+              {materials.map((material) => (
                 <option key={material.id} value={material.id}>
                   {material.name} - {material.lotNumber} (Level {material.level})
                 </option>
@@ -85,12 +84,10 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Run Date/Time *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Run Date/Time *</label>
             <input
               type="datetime-local"
-              {...register('runDate', { 
+              {...register('runDate', {
                 required: 'Run date is required',
                 valueAsDate: true,
               })}
@@ -108,9 +105,7 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Shift *
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Shift *</label>
             <select
               {...register('shift', { required: 'Shift is required' })}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -129,7 +124,7 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
             <input
               type="number"
               step="0.1"
-              {...register('temperature', { 
+              {...register('temperature', {
                 min: { value: 15, message: 'Temperature too low' },
                 max: { value: 30, message: 'Temperature too high' },
               })}
@@ -169,7 +164,7 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
             <Activity className="h-5 w-5" />
             QC Results
           </h3>
-          
+
           <div className="space-y-4">
             {selectedMaterial.analytes.map((analyte) => (
               <div key={analyte.testCode} className="border rounded-lg p-4">
@@ -182,11 +177,9 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
                       Target: {analyte.targetMean} ± {analyte.targetSD} {analyte.unit}
                     </p>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Result *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700">Result *</label>
                     <div className="mt-1 flex items-center gap-2">
                       <input
                         type="number"
@@ -198,13 +191,13 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
                       <span className="text-sm text-gray-500">{analyte.unit}</span>
                     </div>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm text-gray-600">
                       Range: {analyte.acceptableRange.min} - {analyte.acceptableRange.max}
                     </p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm text-gray-600">
                       CV: {analyte.targetCV ? `${analyte.targetCV}%` : 'N/A'}
@@ -220,9 +213,7 @@ const QCRunForm: React.FC<QCRunFormProps> = ({ onSubmit, onCancel, isLoading = f
       {/* Comments */}
       <div className="bg-white shadow rounded-lg p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Comments
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Comments</label>
           <textarea
             {...register('comments')}
             rows={3}

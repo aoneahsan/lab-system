@@ -17,17 +17,36 @@ export interface AuditLog {
   errorMessage?: string;
 }
 
-export type AuditAction = 
-  | 'CREATE' | 'READ' | 'UPDATE' | 'DELETE'
-  | 'LOGIN' | 'LOGOUT' | 'LOGIN_FAILED'
-  | 'EXPORT' | 'IMPORT' | 'PRINT'
-  | 'APPROVE' | 'REJECT' | 'VERIFY'
-  | 'ACKNOWLEDGE' | 'ACCESS_DENIED';
+export type AuditAction =
+  | 'CREATE'
+  | 'READ'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'LOGIN_FAILED'
+  | 'EXPORT'
+  | 'IMPORT'
+  | 'PRINT'
+  | 'APPROVE'
+  | 'REJECT'
+  | 'VERIFY'
+  | 'ACKNOWLEDGE'
+  | 'ACCESS_DENIED';
 
-export type AuditResource = 
-  | 'patient' | 'test' | 'sample' | 'result'
-  | 'order' | 'billing' | 'report' | 'user'
-  | 'settings' | 'qc' | 'inventory' | 'equipment';
+export type AuditResource =
+  | 'patient'
+  | 'test'
+  | 'sample'
+  | 'result'
+  | 'order'
+  | 'billing'
+  | 'report'
+  | 'user'
+  | 'settings'
+  | 'qc'
+  | 'inventory'
+  | 'equipment';
 
 class AuditService {
   // Log an audit event
@@ -54,7 +73,7 @@ class AuditService {
         timestamp: new Date(),
         success,
         errorMessage,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
       };
 
       await api.post('/api/audit', auditLog);
@@ -88,7 +107,7 @@ class AuditService {
   // Get user activity
   async getUserActivity(userId: string, days: number = 30): Promise<AuditLog[]> {
     const response = await api.get(`/api/audit/user/${userId}`, {
-      params: { days }
+      params: { days },
     });
     return response.data;
   }
@@ -103,7 +122,7 @@ class AuditService {
   async export(filters: any, format: 'csv' | 'pdf' | 'excel'): Promise<Blob> {
     const response = await api.post('/api/audit/export', filters, {
       params: { format },
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   }
@@ -148,7 +167,7 @@ class AuditService {
     await this.log(action, resource, resourceId, {
       ...details,
       critical: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }

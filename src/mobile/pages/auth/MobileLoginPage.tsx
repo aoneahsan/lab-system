@@ -13,7 +13,10 @@ import { toast } from '@/hooks/useToast';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  password: yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
 });
 
 type LoginFormData = yup.InferType<typeof schema>;
@@ -70,7 +73,7 @@ const MobileLoginPage: React.FC = () => {
         // Get saved credentials
         const { value: email } = await Preferences.get({ key: 'user_email' });
         const { value: token } = await Preferences.get({ key: 'auth_token' });
-        
+
         if (email && token) {
           // Restore session
           await login(email, ''); // Token-based auth
@@ -86,15 +89,15 @@ const MobileLoginPage: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      
+
       // Save credentials for biometric login
       await Preferences.set({ key: 'user_email', value: data.email });
-      
+
       // Ask to enable biometric
       if (biometricAvailable) {
         await Preferences.set({ key: 'biometric_enabled', value: 'true' });
       }
-      
+
       navigate('/home');
     } catch (error) {
       toast.error('Invalid email or password');
@@ -118,9 +121,7 @@ const MobileLoginPage: React.FC = () => {
       <div className="flex-1 px-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               {...register('email')}
               type="email"
@@ -128,15 +129,11 @@ const MobileLoginPage: React.FC = () => {
               placeholder="Enter your email"
               autoComplete="email"
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <div className="relative">
               <input
                 {...register('password')}
@@ -150,11 +147,7 @@ const MobileLoginPage: React.FC = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
               >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
             {errors.password && (

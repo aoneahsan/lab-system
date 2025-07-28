@@ -7,7 +7,7 @@ import {
   DocumentArrowDownIcon,
   DocumentArrowUpIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
 
 const collections = [
@@ -18,7 +18,7 @@ const collections = [
   { value: 'orders', label: 'Orders' },
   { value: 'billing', label: 'Billing' },
   { value: 'inventory', label: 'Inventory' },
-  { value: 'users', label: 'Users' }
+  { value: 'users', label: 'Users' },
 ];
 
 const DataImportExport: React.FC = () => {
@@ -43,7 +43,7 @@ const DataImportExport: React.FC = () => {
     try {
       const options: ExportOptions = {
         format: exportFormat,
-        includeMetadata: true
+        includeMetadata: true,
       };
 
       if (selectedCollections.length === 1) {
@@ -54,12 +54,12 @@ const DataImportExport: React.FC = () => {
 
       setResult({
         success: true,
-        message: `Successfully exported ${selectedCollections.length} collection(s)`
+        message: `Successfully exported ${selectedCollections.length} collection(s)`,
       });
     } catch (error: any) {
       setResult({
         success: false,
-        message: error.message || 'Export failed'
+        message: error.message || 'Export failed',
       });
     } finally {
       setIsProcessing(false);
@@ -79,7 +79,7 @@ const DataImportExport: React.FC = () => {
       const options: ImportOptions = {
         format: importFormat,
         validation: true,
-        batchSize: 100
+        batchSize: 100,
       };
 
       const importResult = await dataExportService.importData(
@@ -92,7 +92,7 @@ const DataImportExport: React.FC = () => {
     } catch (error: any) {
       setResult({
         success: false,
-        message: error.message || 'Import failed'
+        message: error.message || 'Import failed',
       });
     } finally {
       setIsProcessing(false);
@@ -112,10 +112,8 @@ const DataImportExport: React.FC = () => {
   };
 
   const toggleCollection = (collection: string) => {
-    setSelectedCollections(prev =>
-      prev.includes(collection)
-        ? prev.filter(c => c !== collection)
-        : [...prev, collection]
+    setSelectedCollections((prev) =>
+      prev.includes(collection) ? prev.filter((c) => c !== collection) : [...prev, collection]
     );
   };
 
@@ -157,7 +155,7 @@ const DataImportExport: React.FC = () => {
                   Select Collections to Export
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {collections.map(collection => (
+                  {collections.map((collection) => (
                     <label
                       key={collection.value}
                       className="flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50"
@@ -168,9 +166,7 @@ const DataImportExport: React.FC = () => {
                         onChange={() => toggleCollection(collection.value)}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {collection.label}
-                      </span>
+                      <span className="ml-2 text-sm text-gray-700">{collection.label}</span>
                     </label>
                   ))}
                 </div>
@@ -231,15 +227,11 @@ const DataImportExport: React.FC = () => {
                       </label>
                       <p className="pl-1">or drag and drop</p>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      CSV, Excel, or JSON up to 10MB
-                    </p>
+                    <p className="text-xs text-gray-500">CSV, Excel, or JSON up to 10MB</p>
                   </div>
                 </div>
                 {importFile && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Selected: {importFile.name}
-                  </p>
+                  <p className="mt-2 text-sm text-gray-600">Selected: {importFile.name}</p>
                 )}
               </div>
 
@@ -253,7 +245,7 @@ const DataImportExport: React.FC = () => {
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 >
                   <option value="">Select a collection</option>
-                  {collections.map(collection => (
+                  {collections.map((collection) => (
                     <option key={collection.value} value={collection.value}>
                       {collection.label}
                     </option>
@@ -282,9 +274,7 @@ const DataImportExport: React.FC = () => {
           )}
 
           {result && (
-            <div className={`mt-6 p-4 rounded-md ${
-              result.success ? 'bg-green-50' : 'bg-red-50'
-            }`}>
+            <div className={`mt-6 p-4 rounded-md ${result.success ? 'bg-green-50' : 'bg-red-50'}`}>
               <div className="flex">
                 {result.success ? (
                   <CheckCircleIcon className="h-5 w-5 text-green-400" />
@@ -292,14 +282,16 @@ const DataImportExport: React.FC = () => {
                   <XCircleIcon className="h-5 w-5 text-red-400" />
                 )}
                 <div className="ml-3">
-                  <h3 className={`text-sm font-medium ${
-                    result.success ? 'text-green-800' : 'text-red-800'
-                  }`}>
+                  <h3
+                    className={`text-sm font-medium ${
+                      result.success ? 'text-green-800' : 'text-red-800'
+                    }`}
+                  >
                     {result.success ? 'Success' : 'Error'}
                   </h3>
-                  <div className={`mt-2 text-sm ${
-                    result.success ? 'text-green-700' : 'text-red-700'
-                  }`}>
+                  <div
+                    className={`mt-2 text-sm ${result.success ? 'text-green-700' : 'text-red-700'}`}
+                  >
                     {result.message || (
                       <>
                         {result.imported && `Imported: ${result.imported} records`}

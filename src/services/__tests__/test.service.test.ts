@@ -36,20 +36,18 @@ describe('TestService', () => {
 
   describe('getTests', () => {
     it('should fetch tests for a tenant', async () => {
-      const mockTests = [
-        { id: 'test-1', name: 'Blood Glucose', tenantId: 'tenant-1' },
-      ];
-      
+      const mockTests = [{ id: 'test-1', name: 'Blood Glucose', tenantId: 'tenant-1' }];
+
       const { getDocs } = vi.mocked(await import('firebase/firestore'));
       vi.mocked(getDocs).mockResolvedValue({
-        docs: mockTests.map(test => ({
+        docs: mockTests.map((test) => ({
           id: test.id,
           data: () => test,
         })),
       } as any);
 
       const result = await testService.getTests('tenant-1');
-      
+
       expect(getDocs).toHaveBeenCalled();
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Blood Glucose');

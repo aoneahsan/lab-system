@@ -10,7 +10,7 @@ const InsuranceClaimsPage: React.FC = () => {
   const [filters] = useState<ClaimFilter>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState<InsuranceClaim | null>(null);
-  
+
   const { data: claims = [], isLoading } = useClaims(filters);
   const { data: statistics } = useClaimStatistics();
 
@@ -97,7 +97,9 @@ const InsuranceClaimsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Accepted Amount</p>
-                <p className="text-2xl font-bold text-gray-900">${statistics.acceptedAmount.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${statistics.acceptedAmount.toFixed(2)}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -106,7 +108,9 @@ const InsuranceClaimsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Rejection Rate</p>
-                <p className="text-2xl font-bold text-gray-900">{statistics.rejectionRate.toFixed(1)}%</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {statistics.rejectionRate.toFixed(1)}%
+                </p>
               </div>
               <XCircle className="h-8 w-8 text-red-500" />
             </div>
@@ -119,7 +123,7 @@ const InsuranceClaimsPage: React.FC = () => {
         <div className="px-6 py-4 border-b">
           <h2 className="text-lg font-medium text-gray-900">Claims List</h2>
         </div>
-        
+
         {isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -169,9 +173,7 @@ const InsuranceClaimsPage: React.FC = () => {
                   <tr key={claim.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{claim.claimNumber}</div>
-                      <div className="text-sm text-gray-500">
-                        Invoice #{claim.invoiceNumber}
-                      </div>
+                      <div className="text-sm text-gray-500">Invoice #{claim.invoiceNumber}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">Patient Name</div>
@@ -192,13 +194,19 @@ const InsuranceClaimsPage: React.FC = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${getStatusColor(claim.status)}`}>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded ${getStatusColor(
+                          claim.status
+                        )}`}
+                      >
                         {getStatusIcon(claim.status)}
                         {claim.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {claim.submittedDate ? claim.submittedDate.toDate().toLocaleDateString() : 'Not submitted'}
+                      {claim.submittedDate
+                        ? claim.submittedDate.toDate().toLocaleDateString()
+                        : 'Not submitted'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
@@ -228,10 +236,7 @@ const InsuranceClaimsPage: React.FC = () => {
       </div>
 
       {/* Create Claim Modal */}
-      <CreateClaimModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
+      <CreateClaimModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
     </div>
   );
 };

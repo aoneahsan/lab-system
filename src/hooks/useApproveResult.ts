@@ -14,7 +14,7 @@ export function useApproveResult() {
       if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const resultRef = doc(db, `${currentTenant.id}_results`, resultId);
-      
+
       await updateDoc(resultRef, {
         status: 'final',
         approvedBy: currentUser.displayName || currentUser.email || 'Unknown',

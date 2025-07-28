@@ -12,7 +12,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
   templateId,
   filters,
   onGenerate,
-  isGenerating
+  isGenerating,
 }) => {
   return (
     <div className="space-y-4">
@@ -53,9 +53,7 @@ const ReportPreview: React.FC<ReportPreviewProps> = ({
         {!templateId ? (
           <div className="text-center py-12">
             <DocumentArrowDownIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-500">
-              Select a report template to preview
-            </p>
+            <p className="mt-2 text-sm text-gray-500">Select a report template to preview</p>
           </div>
         ) : isGenerating ? (
           <div className="text-center py-12">

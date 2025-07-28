@@ -17,7 +17,7 @@ export const getFirestoreCollectionName = (collectionName: string, tenantId?: st
   if (tenantId) {
     return `${PROJECT_PREFIX}_${tenantId}_${collectionName}`;
   }
-  
+
   // Otherwise, get from tenant store
   const currentTenant = useTenantStore.getState().currentTenant;
   if (!currentTenant?.id) {
@@ -25,7 +25,7 @@ export const getFirestoreCollectionName = (collectionName: string, tenantId?: st
     // Return with just project prefix as fallback
     return `${PROJECT_PREFIX}_${collectionName}`;
   }
-  
+
   return `${PROJECT_PREFIX}_${currentTenant.id}_${collectionName}`;
 };
 
@@ -37,14 +37,14 @@ export const getFirestoreStoragePath = (path: string, tenantId?: string): string
   if (tenantId) {
     return `${PROJECT_PREFIX}_${tenantId}/${path}`;
   }
-  
+
   // Otherwise, get from tenant store
   const currentTenant = useTenantStore.getState().currentTenant;
   if (!currentTenant?.id) {
     console.warn('No tenant ID available for storage path:', path);
     return `${PROJECT_PREFIX}/${path}`;
   }
-  
+
   return `${PROJECT_PREFIX}_${currentTenant.id}/${path}`;
 };
 
@@ -55,21 +55,21 @@ export const COLLECTION_NAMES = {
   TESTS: 'tests',
   SAMPLES: 'samples',
   RESULTS: 'results',
-  
+
   // Inventory
   INVENTORY_ITEMS: 'inventory_items',
   STOCK_TRANSACTIONS: 'stock_transactions',
   LOTS: 'lots',
   PURCHASE_ORDERS: 'purchase_orders',
   INVENTORY_ALERTS: 'inventory_alerts',
-  
+
   // Quality Control
   QC_TESTS: 'qc_tests',
   QC_RESULTS: 'qc_results',
   QC_MATERIALS: 'qc_materials',
   QC_RUNS: 'qc_runs',
   QC_STATISTICS: 'qc_statistics',
-  
+
   // Billing
   INVOICES: 'invoices',
   PAYMENTS: 'payments',
@@ -77,13 +77,13 @@ export const COLLECTION_NAMES = {
   INSURANCE_PROVIDERS: 'insurance_providers',
   PATIENT_INSURANCE: 'patient_insurance',
   INSURANCE_ELIGIBILITY: 'insurance_eligibility',
-  
+
   // Reports
   REPORTS: 'reports',
   REPORT_TEMPLATES: 'report_templates',
   SCHEDULED_REPORTS: 'scheduled_reports',
   ANALYTICS_DASHBOARDS: 'analytics_dashboards',
-  
+
   // Other
   USERS: 'users',
   AUDIT_LOGS: 'audit_logs',

@@ -2,8 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -13,7 +13,7 @@ import {
   Printer,
   Download,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
 } from 'lucide-react';
 import { useResult } from '@/hooks/useResult';
 import { useApproveResult } from '@/hooks/useApproveResult';
@@ -35,7 +35,7 @@ export function ResultDetailScreen() {
       },
       onError: () => {
         toast.error('Failed to approve result');
-      }
+      },
     });
   };
 
@@ -70,7 +70,8 @@ export function ResultDetailScreen() {
   const StatusIcon = status.icon;
 
   // Determine if value is abnormal
-  const isAbnormal = result.flag && (result.flag === 'H' || result.flag === 'L' || result.flag === 'C');
+  const isAbnormal =
+    result.flag && (result.flag === 'H' || result.flag === 'L' || result.flag === 'C');
   const TrendIcon = result.flag === 'H' ? TrendingUp : TrendingDown;
 
   return (
@@ -117,9 +118,7 @@ export function ResultDetailScreen() {
       <Card className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {result.testName}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">{result.testName}</h1>
             <p className="text-sm text-gray-600 mt-1">
               {result.testCode} • {result.category}
             </p>
@@ -136,7 +135,9 @@ export function ResultDetailScreen() {
             <div>
               <p className="text-sm text-gray-600">Result</p>
               <div className="flex items-baseline space-x-2 mt-1">
-                <p className={`text-3xl font-bold ${isAbnormal ? 'text-red-600' : 'text-gray-900'}`}>
+                <p
+                  className={`text-3xl font-bold ${isAbnormal ? 'text-red-600' : 'text-gray-900'}`}
+                >
                   {result.value}
                 </p>
                 <p className="text-lg text-gray-600">{result.unit}</p>
@@ -147,9 +148,7 @@ export function ResultDetailScreen() {
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Reference Range: {result.referenceRange}
-              </p>
+              <p className="text-sm text-gray-600 mt-2">Reference Range: {result.referenceRange}</p>
             </div>
           </div>
         </div>
@@ -210,7 +209,9 @@ export function ResultDetailScreen() {
                   <span className="text-gray-600">
                     {format(new Date(item.date), 'MMM d, yyyy')}
                   </span>
-                  <span className={`font-medium ${item.abnormal ? 'text-red-600' : 'text-gray-900'}`}>
+                  <span
+                    className={`font-medium ${item.abnormal ? 'text-red-600' : 'text-gray-900'}`}
+                  >
                     {item.value} {result.unit}
                   </span>
                 </div>
@@ -265,11 +266,7 @@ export function ResultDetailScreen() {
       {/* Actions */}
       {result.status === 'entered' && (
         <Card className="p-4">
-          <Button 
-            variant="primary" 
-            className="w-full"
-            onClick={handleApprove}
-          >
+          <Button variant="primary" className="w-full" onClick={handleApprove}>
             <CheckCircle className="h-4 w-4 mr-2" />
             Approve Result
           </Button>

@@ -60,10 +60,7 @@ export default function PurchaseOrders() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Purchase Orders</h2>
-        <button 
-          onClick={() => setShowCreateOrder(true)}
-          className="btn btn-primary"
-        >
+        <button onClick={() => setShowCreateOrder(true)} className="btn btn-primary">
           <Plus className="h-4 w-4" />
           Create Order
         </button>
@@ -139,7 +136,11 @@ export default function PurchaseOrders() {
                     ${order.total.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
                       {order.status}
                     </span>
                   </td>
@@ -147,13 +148,9 @@ export default function PurchaseOrders() {
                     {order.createdAt.toDate().toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                      View
-                    </button>
+                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">View</button>
                     {order.status === 'draft' && (
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        Edit
-                      </button>
+                      <button className="text-indigo-600 hover:text-indigo-900">Edit</button>
                     )}
                   </td>
                 </tr>
@@ -163,9 +160,7 @@ export default function PurchaseOrders() {
         </table>
 
         {purchaseOrders.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            No purchase orders found
-          </div>
+          <div className="text-center py-12 text-gray-500">No purchase orders found</div>
         )}
       </div>
     </div>
