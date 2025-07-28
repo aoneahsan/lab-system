@@ -61,18 +61,26 @@ class PatientOfflineService {
           patientId,
           tenantId,
           isActive: true,
-          phoneNumbers: data.phoneNumbers || [],
-          addresses: data.addresses || [],
-          emergencyContacts: data.emergencyContacts || [],
-          allergies: data.allergies || [],
-          medications: data.medications || [],
-          medicalHistory: data.medicalHistory || [],
-          insurances: data.insurances || [],
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
-          createdBy: data.createdBy || 'system',
-          updatedBy: data.updatedBy || 'system',
-        } as Patient;
+          phoneNumbers: data.phoneNumber ? [{
+            type: 'mobile' as const,
+            value: data.phoneNumber,
+            isPrimary: true,
+            isVerified: false
+          }] : [],
+          addresses: data.address ? [{
+            ...data.address,
+            isDefault: true
+          }] : [],
+          emergencyContacts: data.emergencyContact ? [data.emergencyContact] : [],
+          allergies: [],
+          medications: [],
+          medicalHistory: [],
+          insurances: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: 'system',
+          updatedBy: 'system',
+        } as unknown as Patient;
         return createdPatient;
       },
     });
@@ -203,7 +211,10 @@ class PatientOfflineService {
 
   // Soft delete (deactivate) patient with offline support
   async deactivatePatient(tenantId: string, patientId: string): Promise<void> {
-    return this.updatePatient(tenantId, patientId, { isActive: false });
+    return this.updatePatient(tenantId, patientId, { 
+      isActive: false,
+      updatedBy: 'system'
+    });
   }
 
   // Get patient statistics with offline support
@@ -274,18 +285,26 @@ class PatientOfflineService {
           patientId: patientData.patientId,
           tenantId,
           isActive: true,
-          phoneNumbers: data.phoneNumbers || [],
-          addresses: data.addresses || [],
-          emergencyContacts: data.emergencyContacts || [],
-          allergies: data.allergies || [],
-          medications: data.medications || [],
-          medicalHistory: data.medicalHistory || [],
-          insurances: data.insurances || [],
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
-          createdBy: data.createdBy || 'system',
-          updatedBy: data.updatedBy || 'system',
-        } as Patient;
+          phoneNumbers: data.phoneNumber ? [{
+            type: 'mobile' as const,
+            value: data.phoneNumber,
+            isPrimary: true,
+            isVerified: false
+          }] : [],
+          addresses: data.address ? [{
+            ...data.address,
+            isDefault: true
+          }] : [],
+          emergencyContacts: data.emergencyContact ? [data.emergencyContact] : [],
+          allergies: [],
+          medications: [],
+          medicalHistory: [],
+          insurances: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: 'system',
+          updatedBy: 'system',
+        } as unknown as Patient;
         return createdPatient;
       },
     }));

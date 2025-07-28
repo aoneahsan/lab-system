@@ -403,6 +403,7 @@ export const billingService = {
       pending: 0,
       approved: 0,
       denied: 0,
+      rejected: 0,
       partial: 0,
       paid: 0,
       appealed: 0,
@@ -783,8 +784,8 @@ export const billingService = {
     });
   },
 
-  // Appeal denied claim
-  async appealClaim(
+  // Appeal denied claim with detailed data
+  async appealClaimWithDetails(
     tenantId: string,
     userId: string,
     claimId: string,
@@ -976,7 +977,13 @@ export const billingService = {
       }
 
       const payment = paymentDoc.data() as Payment;
-      if (payment.reconciledDate) {
+      // Check if payment is already reconciled by checking reconciliation records
+      const reconQuery = query(
+        collection(db, COLLECTIONS.PAYMENT_RECONCILIATIONS),
+        where('paymentIds', 'array-contains', paymentId)
+      );
+      const reconSnapshot = await getDocs(reconQuery);
+      if (!reconSnapshot.empty) {
         throw new Error(`Payment ${paymentId} is already reconciled`);
       }
 

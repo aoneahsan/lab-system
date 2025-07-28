@@ -2,15 +2,17 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 
 let sqlite: typeof CapacitorSQLite;
+let sqliteConnection: SQLiteConnection | null = null;
 let db: SQLiteDBConnection | null = null;
 
 // Initialize SQLite plugin
 if (Capacitor.isNativePlatform()) {
   sqlite = CapacitorSQLite;
+  sqliteConnection = new SQLiteConnection(sqlite);
 }
 
 interface OfflineCollection {
@@ -52,30 +54,36 @@ interface OfflineState {
 const initializeOfflineDB = async () => {
   try {
     // Check if platform supports SQLite
-    if (!Capacitor.isNativePlatform() || !sqlite) {
+    if (!Capacitor.isNativePlatform() || !sqlite || !sqliteConnection) {
       console.warn('SQLite not available on this platform');
       return;
     }
 
     try {
       // Check if connection exists
-      const checkConnection = await sqlite.isConnection('labflow_offline');
+      const checkConnection = await sqliteConnection.checkConnectionsConsistency();
       
-      if (checkConnection.result) {
-        // Connection exists, retrieve it
-        const retrieveConnection = await sqlite.retrieveConnection('labflow_offline');
-        db = retrieveConnection;
-      } else {
-        // Create new connection
-        const newConnection = await sqlite.createConnection('labflow_offline');
-        db = newConnection;
+      // Create new connection
+      try {
+        db = await sqliteConnection.createConnection(
+          'labflow_offline',
+          false, // encrypted
+          'no-encryption', // mode
+          1, // version
+          false // readonly
+        );
+      } catch (connError) {
+        console.error('Failed to create SQLite connection:', connError);
+        return;
       }
     } catch (error) {
       console.error('Error setting up SQLite connection:', error);
       return;
     }
 
-    await db.open();
+    if (db) {
+      await db.open();
+    }
 
     // Create tables
     const createTableQuery = `

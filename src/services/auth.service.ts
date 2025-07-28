@@ -42,6 +42,7 @@ export async function register(data: RegisterData): Promise<User> {
 
   const userData: User = {
     id: user.uid,
+    uid: user.uid,
     email: data.email,
     displayName,
     firstName: data.firstName,

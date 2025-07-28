@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, currentUser } = useAuthStore();
   const { tenant, isLoading } = useTenant();
 
   if (!isAuthenticated) {
@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
   }
 
   // Check role-based access
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && currentUser && !allowedRoles.includes(currentUser.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 

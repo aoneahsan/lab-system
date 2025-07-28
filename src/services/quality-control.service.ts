@@ -1,4 +1,4 @@
-import { db } from '@/config/firebase';
+import { db, auth } from '@/config/firebase';
 import {
   collection,
   doc,
@@ -277,6 +277,12 @@ export const qualityControlService = {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const median = values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
+    const totalError = bias + 2 * cv; // Simplified total error calculation
+    const sigma = (100 - Math.abs(bias)) / cv; // Simplified sigma calculation
+
     return {
       testId: qcTestId,
       levelId,
@@ -285,10 +291,18 @@ export const qualityControlService = {
       sd,
       cv,
       n,
+      min,
+      max,
+      median,
       withinSDCount,
       bias,
+      totalError,
+      sigma,
+      dataPoints: [], // Would need to populate this with actual data points
       startDate: Timestamp.fromDate(startDate),
       endDate: Timestamp.now(),
+      calculatedAt: Timestamp.now(),
+      calculatedBy: auth.currentUser?.uid || 'system',
     };
   },
 

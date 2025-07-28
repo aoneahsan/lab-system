@@ -26,6 +26,7 @@ export interface Sample {
   expirationDate?: Timestamp;
   rejectionReason?: string;
   notes?: string;
+  batchId?: string; // Collection batch ID
   chainOfCustody: ChainOfCustodyEntry[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -206,4 +207,16 @@ export interface LabelTemplate {
   includeQRCode: boolean;
   includeBarcode: boolean;
   customFields?: string[];
+}
+
+export interface CollectionBatch {
+  id: string;
+  tenantId: string;
+  date: Timestamp;
+  totalSamples: number;
+  completedSamples: number;
+  status: 'pending' | 'in_progress' | 'completed';
+  createdBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }

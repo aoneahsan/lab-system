@@ -10,17 +10,7 @@ import { firestore } from '@/config/firebase.config';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import BatchCollectionModal from '@/components/samples/BatchCollectionModal';
 import BatchBarcodesPrint from '@/components/samples/BatchBarcodesPrint';
-import type { SampleFormData, Sample } from '@/types/sample.types';
-
-interface CollectionBatch {
-  id: string;
-  date: Date;
-  totalSamples: number;
-  completedSamples: number;
-  status: 'pending' | 'in_progress' | 'completed';
-  createdBy: string;
-  createdAt: Date;
-}
+import type { SampleFormData, Sample, CollectionBatch } from '@/types/sample.types';
 
 const SampleCollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,26 +24,7 @@ const SampleCollectionsPage: React.FC = () => {
   const { currentUser } = useAuthStore();
 
   // Mock data for now - will be replaced with actual hooks
-  const mockBatches: CollectionBatch[] = [
-    {
-      id: '1',
-      date: new Date(),
-      totalSamples: 25,
-      completedSamples: 15,
-      status: 'in_progress',
-      createdBy: 'John Doe',
-      createdAt: new Date(),
-    },
-    {
-      id: '2',
-      date: new Date(Date.now() - 86400000),
-      totalSamples: 30,
-      completedSamples: 30,
-      status: 'completed',
-      createdBy: 'Jane Smith',
-      createdAt: new Date(Date.now() - 86400000),
-    },
-  ];
+  const mockBatches: CollectionBatch[] = [];
 
   const handleCreateBatch = () => {
     setShowBatchModal(true);
@@ -86,7 +57,8 @@ const SampleCollectionsPage: React.FC = () => {
             collectionDate: new Date(),
             collectionTime: new Date().toLocaleTimeString('en-US', { hour12: false }),
             collectedBy: currentUser?.displayName || currentUser?.email || 'Unknown',
-          };
+            batchId: batchRef.id,
+          } as SampleFormData & { batchId: string };
 
           const newSample = await createSampleMutation.mutateAsync(formData);
           if (newSample) {
@@ -238,7 +210,7 @@ const SampleCollectionsPage: React.FC = () => {
                   {getStatusIcon(batch.status)}
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      Batch #{batch.id} - {batch.date.toLocaleDateString()}
+                      Batch #{batch.id} - {batch.date instanceof Date ? batch.date.toLocaleDateString() : batch.date.toDate().toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-500">Created by {batch.createdBy}</p>
                   </div>

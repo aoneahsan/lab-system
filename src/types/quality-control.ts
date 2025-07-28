@@ -8,7 +8,7 @@ export interface QCTest {
   levels: QCLevel[];
   manufacturer: string;
   expirationDate: Timestamp;
-  status: 'active' | 'expired' | 'discontinued';
+  status: 'active' | 'inactive' | 'expired' | 'discontinued';
   notes?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;

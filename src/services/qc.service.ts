@@ -330,6 +330,7 @@ export const qcService = {
 
       return {
         id: `result-${Date.now()}-${Math.random()}`,
+        runDate: now,
         testCode: result.testCode,
         testName: analyte.testName,
         value: result.value,

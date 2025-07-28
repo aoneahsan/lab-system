@@ -14,6 +14,7 @@ import {
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import type { TestResult, ResultStatus, ResultFlag } from '@/types/result.types';
+import type { TestOrder } from '@/types/test.types';
 
 export const resultService = {
   // Get single result
@@ -349,23 +350,32 @@ export const resultService = {
     const batch = [];
     const timestamp = Timestamp.now();
 
+    // Get the test order to retrieve patientId
+    const orderDoc = await getDoc(doc(db, COLLECTIONS.TEST_ORDERS, orderId));
+    if (!orderDoc.exists()) {
+      throw new Error('Test order not found');
+    }
+    const orderData = orderDoc.data() as TestOrder;
+    const patientId = orderData.patientId;
+
     for (const result of results) {
       const newResult: Partial<TestResult> = {
         tenantId,
         orderId,
         testId: result.testId,
-        patientId: result.patientId || '',
+        patientId,
+        sampleId: '', // To be filled when sample is linked
         testName: result.testName,
-        testCode: result.testCode || '',
-        result: result.value,
+        category: '', // To be determined from test
+        value: result.value,
         unit: result.unit,
-        referenceRange: result.referenceRange,
+        referenceRange: result.referenceRange ? { normal: result.referenceRange } : undefined,
         flag: result.flag,
         status: 'preliminary',
+        enteredBy,
+        enteredAt: timestamp,
         createdAt: timestamp,
         updatedAt: timestamp,
-        createdBy: enteredBy,
-        updatedBy: enteredBy,
       };
 
       batch.push(addDoc(collection(db, COLLECTIONS.RESULTS), newResult));

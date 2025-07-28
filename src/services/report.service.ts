@@ -125,6 +125,7 @@ export const reportService = {
     const templateData: Omit<ReportTemplate, 'id'> = {
       tenantId,
       ...data,
+      format: 'pdf', // Default format
       isActive: true,
       createdAt: now,
       createdBy: userId,

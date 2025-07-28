@@ -168,7 +168,7 @@ const SampleDetailPage: React.FC = () => {
           {/* Chain of Custody */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Chain of Custody</h2>
-            <ChainOfCustody entries={sample.chainOfCustody || []} />
+            <ChainOfCustody entries={sample.chainOfCustody || []} sampleNumber={sample.sampleNumber} />
           </div>
         </div>
 

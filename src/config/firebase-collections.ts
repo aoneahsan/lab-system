@@ -141,6 +141,24 @@ export const COLLECTIONS = {
   get SETTINGS() {
     return getCollectionName('settings');
   },
+  get EMR_CONNECTIONS() {
+    return getCollectionName('emr_connections');
+  },
+  get EMR_MESSAGES() {
+    return getCollectionName('emr_messages');
+  },
+  get EMR_INTEGRATION_LOGS() {
+    return getCollectionName('emr_integration_logs');
+  },
+  get PAYMENT_RECONCILIATIONS() {
+    return getCollectionName('payment_reconciliations');
+  },
+  get PAYMENT_PLANS() {
+    return getCollectionName('payment_plans');
+  },
+  get ORDERS() {
+    return getCollectionName('orders');
+  },
   // Root collections (no tenant prefix)
   TENANTS: 'tenants',
   TENANT_USERS: 'tenant_users',

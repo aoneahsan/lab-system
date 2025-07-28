@@ -1,5 +1,5 @@
 import { api } from './api';
-import { Test } from '../types';
+import type { Test } from '@/types/test.types';
 
 export interface EMRPatient {
   mrn: string;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QrCode, Camera, X, Scan } from 'lucide-react';
-import { qrcodeService } from '@/services/qrcode.service';
+import { barcodeScannerService } from '@/services/barcode-scanner.service';
 import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';
 import BarcodeScanner from '@/components/samples/BarcodeScanner';
@@ -22,20 +22,21 @@ const SampleScanPage: React.FC = () => {
     }
     return () => {
       if (isScanning) {
-        qrcodeService.stopScanning();
+        barcodeScannerService.stopScan();
       }
     };
   }, [isScanning]);
 
   const startScanning = async () => {
     try {
-      const result = await qrcodeService.scanQRCode((data) => {
-        handleScanResult(data);
+      const result = await barcodeScannerService.startScan();
+      if (result && result.hasContent) {
+        handleScanResult(result.content);
         setIsScanning(false);
-      });
+      }
 
-      if (!result.success) {
-        toast.error('Scanner Error', result.error || 'Failed to start scanner');
+      if (!result) {
+        toast.error('Scanner Error', 'Failed to start scanner');
         setIsScanning(false);
       }
     } catch {
@@ -134,7 +135,7 @@ const SampleScanPage: React.FC = () => {
             <button
               onClick={() => {
                 setIsScanning(false);
-                qrcodeService.stopScanning();
+                barcodeScannerService.stopScan();
               }}
               className="absolute top-4 right-4 p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
             >

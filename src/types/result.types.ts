@@ -50,7 +50,7 @@ export type ResultFlag =
   | 'critical_low'
   | 'critical_high';
 
-export type ResultStatus = 'pending' | 'entered' | 'verified' | 'amended' | 'cancelled';
+export type ResultStatus = 'pending' | 'entered' | 'preliminary' | 'final' | 'verified' | 'amended' | 'cancelled';
 
 export interface ResultValidation {
   id: string;
@@ -59,9 +59,21 @@ export interface ResultValidation {
   ruleName: string;
   ruleType: ValidationRuleType;
   enabled: boolean;
+  active?: boolean;
+  requiresReview?: boolean;
+  notifyOnTrigger?: boolean;
   parameters: ValidationParameters;
   action: ValidationAction;
   message?: string;
+  // Direct properties for backward compatibility
+  minValue?: number;
+  maxValue?: number;
+  deltaThreshold?: number;
+  deltaType?: 'percent' | 'absolute';
+  criticalLow?: number;
+  criticalHigh?: number;
+  absurdLow?: number;
+  absurdHigh?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -72,7 +84,8 @@ export type ValidationRuleType =
   | 'critical'
   | 'absurd'
   | 'consistency'
-  | 'calculated';
+  | 'calculated'
+  | 'custom';
 
 export interface ValidationParameters {
   min?: number;

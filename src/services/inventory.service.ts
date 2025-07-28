@@ -545,7 +545,15 @@ class InventoryServiceWrapper extends InventoryService {
     const tenantId = useTenantStore.getState().currentTenant?.id;
     const userId = auth.currentUser?.uid;
     if (!tenantId || !userId) throw new Error('No tenant or user');
-    return this.updateItem(tenantId, id, { isActive: false }, userId);
+    
+    // Directly update the item to mark it as inactive
+    const itemRef = doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId), id);
+    await updateDoc(itemRef, {
+      isActive: false,
+      discontinuedDate: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      updatedBy: userId
+    });
   }
 
   async recordStockMovement(data: StockTransactionFormData) {
@@ -569,10 +577,11 @@ class InventoryServiceWrapper extends InventoryService {
 
   async updatePurchaseOrder(id: string, data: any) {
     const tenantId = useTenantStore.getState().currentTenant?.id;
-    if (!tenantId) throw new Error('No tenant selected');
+    const userId = auth.currentUser?.uid;
+    if (!tenantId || !userId) throw new Error('No tenant or user');
     // For now, update status if provided
     if (data.status) {
-      return this.updatePurchaseOrderStatus(tenantId, id, data.status);
+      return this.updatePurchaseOrderStatus(tenantId, id, data.status, userId);
     }
   }
 

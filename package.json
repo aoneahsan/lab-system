@@ -64,6 +64,7 @@
     "capacitor-native-update": "^1.4.0",
     "chart.js": "^4.5.0",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "firebase": "^12.0.0",
     "jsbarcode": "^3.12.1",
     "jspdf": "^3.0.1",
@@ -84,6 +85,7 @@
     "ts-buildkit": "^1.1.0",
     "unified-error-handling": "^1.2.0",
     "unified-tracking": "^1.5.0",
+    "xlsx": "^0.18.5",
     "yup": "^1.6.1",
     "zustand": "^5.0.6"
   },
@@ -103,6 +105,7 @@
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/file-saver": "^2.0.7",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",

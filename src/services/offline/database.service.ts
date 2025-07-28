@@ -144,7 +144,7 @@ class OfflineDatabaseService {
       VALUES (?, ?, ?, ?, ?, ?, 0)
     `;
 
-    await this.db.execute(sql, [
+    await this.db.run(sql, [
       id,
       operation.collection,
       operation.documentId,
@@ -178,13 +178,13 @@ class OfflineDatabaseService {
   async markSynced(id: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execute('UPDATE offline_queue SET synced = 1 WHERE id = ?', [id]);
+    await this.db.run('UPDATE offline_queue SET synced = 1 WHERE id = ?', [id]);
   }
 
   async markSyncError(id: string, error: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execute('UPDATE offline_queue SET sync_error = ? WHERE id = ?', [error, id]);
+    await this.db.run('UPDATE offline_queue SET sync_error = ? WHERE id = ?', [error, id]);
   }
 
   // Cache management methods
@@ -220,7 +220,7 @@ class OfflineDatabaseService {
       ...(additionalFields ? Object.values(additionalFields) : []),
     ];
 
-    await this.db.execute(sql, values);
+    await this.db.run(sql, values);
   }
 
   async getCachedData(collection: string, id?: string): Promise<any[]> {
@@ -291,7 +291,7 @@ class OfflineDatabaseService {
   async updateSyncMetadata(collection: string, status: string, error?: string): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
-    await this.db.execute(
+    await this.db.run(
       `INSERT OR REPLACE INTO sync_metadata (collection, last_sync_timestamp, sync_status, sync_error)
        VALUES (?, ?, ?, ?)`,
       [collection, Date.now(), status, error || null]

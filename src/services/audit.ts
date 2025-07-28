@@ -1,5 +1,5 @@
 import { api } from './api';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 
 export interface AuditLog {
   id: string;
@@ -59,7 +59,7 @@ class AuditService {
     errorMessage?: string
   ): Promise<void> {
     try {
-      const user = useAuthStore.getState().user;
+      const user = useAuthStore.getState().currentUser;
       if (!user) return;
 
       const auditLog: Partial<AuditLog> = {

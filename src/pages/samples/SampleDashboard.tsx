@@ -147,7 +147,7 @@ export default function SampleDashboard() {
                         <p className="text-xs text-gray-600 capitalize">
                           {status.replace('_', ' ')}
                         </p>
-                        <p className="text-xl font-semibold text-gray-900">{count}</p>
+                        <p className="text-xl font-semibold text-gray-900">{String(count)}</p>
                       </div>
                     ))}
                 </div>
@@ -161,7 +161,7 @@ export default function SampleDashboard() {
                     Object.entries(statistics.samplesByType).map(([type, count]) => (
                       <div key={type} className="bg-white p-3 rounded border border-gray-200">
                         <p className="text-xs text-gray-600 capitalize">{type}</p>
-                        <p className="text-xl font-semibold text-gray-900">{count}</p>
+                        <p className="text-xl font-semibold text-gray-900">{String(count)}</p>
                       </div>
                     ))}
                 </div>

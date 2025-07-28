@@ -256,10 +256,10 @@ export const ResultDetailScreen: React.FC = () => {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`font-semibold ${getFlagColor(param.flag)}`}>
+                    <span className={`font-semibold ${('flag' in param && param.flag) ? getFlagColor(param.flag as string) : ''}`}>
                       {param.value} {param.unit}
                     </span>
-                    {param.flag && getFlagIcon(param.flag)}
+                    {'flag' in param && param.flag && getFlagIcon(param.flag as string)}
                   </div>
                 </div>
 

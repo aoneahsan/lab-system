@@ -22,6 +22,7 @@ import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
 import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
 import type { ResultFilter, TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
+import type { Patient } from '@/types/patient.types';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -90,12 +91,36 @@ const ResultsPage: React.FC = () => {
       const doc = pdfService.generateResultReport({
         result,
         sample,
-        patient,
+        patient: {
+          ...patient,
+          phoneNumbers: [],
+          addresses: [],
+          emergencyContacts: [],
+          allergies: [],
+          medications: [],
+          medicalHistory: [],
+          insurances: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: 'system',
+          updatedBy: 'system',
+          tenantId: tenant.id,
+          firstName: patient.fullName.split(' ')[0] || '',
+          lastName: patient.fullName.split(' ').slice(1).join(' ') || '',
+        } as Patient,
         test,
         tenant: {
           name: tenant.name,
-          address: tenant.settings.branding.companyAddress || '',
-          contact: tenant.settings.branding.companyPhone || '',
+          address: {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: ''
+          },
+          contact: {
+            phone: tenant.settings.branding.companyPhone || '',
+            email: tenant.settings.branding.companyEmail || ''
+          },
         },
       });
 
@@ -123,12 +148,36 @@ const ResultsPage: React.FC = () => {
       const doc = pdfService.generateResultReport({
         result,
         sample,
-        patient,
+        patient: {
+          ...patient,
+          phoneNumbers: [],
+          addresses: [],
+          emergencyContacts: [],
+          allergies: [],
+          medications: [],
+          medicalHistory: [],
+          insurances: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          createdBy: 'system',
+          updatedBy: 'system',
+          tenantId: tenant.id,
+          firstName: patient.fullName.split(' ')[0] || '',
+          lastName: patient.fullName.split(' ').slice(1).join(' ') || '',
+        } as Patient,
         test,
         tenant: {
           name: tenant.name,
-          address: tenant.settings.branding.companyAddress || '',
-          contact: tenant.settings.branding.companyPhone || '',
+          address: {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: ''
+          },
+          contact: {
+            phone: tenant.settings.branding.companyPhone || '',
+            email: tenant.settings.branding.companyEmail || ''
+          },
         },
       });
 
