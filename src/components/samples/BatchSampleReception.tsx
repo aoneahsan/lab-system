@@ -1,16 +1,16 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { CheckCircle, XCircle, Package, Loader2, AlertCircle, Scan } from 'lucide-react';
+import { CheckCircle, XCircle, Package, Loader2, Scan } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Alert, AlertDescription } from '@/components/ui/Alert';
+// import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
-import { Badge } from '@/components/ui/Badge';
-import { BarcodeScanner } from './BarcodeScanner';
+// import { Badge } from '@/components/ui/Badge';
+import BarcodeScanner from './BarcodeScanner';
 import { useSampleStore } from '@/stores/sample.store';
 import { useAnalyzerStore } from '@/stores/analyzer.store';
 import { useDepartmentStore } from '@/stores/department.store';
 import { toast } from 'sonner';
-import { Sample, SampleStatus } from '@/types';
+import type { Sample, SampleStatus } from '@/types/sample.types';
 
 interface ScannedSample {
   barcode: string;
@@ -28,9 +28,9 @@ export const BatchSampleReception: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [continuousMode, setContinuousMode] = useState(true);
   const lastScanRef = useRef<string>('');
-  const audioRef = useRef<HTMLAudioElement>();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const { getSampleByBarcode, updateSampleStatus, updateBatchSamples } = useSampleStore();
+  const { getSampleByBarcode, updateBatchSamples } = useSampleStore();
   const { analyzers } = useAnalyzerStore();
   const { departments } = useDepartmentStore();
 
@@ -178,7 +178,7 @@ export const BatchSampleReception: React.FC = () => {
         <CardContent className="space-y-4">
           {/* Controls */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+            <Select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Department (Optional)" />
               </SelectTrigger>
@@ -191,7 +191,7 @@ export const BatchSampleReception: React.FC = () => {
               </SelectContent>
             </Select>
 
-            <Select value={selectedAnalyzer} onValueChange={setSelectedAnalyzer}>
+            <Select value={selectedAnalyzer} onChange={(e) => setSelectedAnalyzer(e.target.value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Analyzer (Optional)" />
               </SelectTrigger>
@@ -224,8 +224,9 @@ export const BatchSampleReception: React.FC = () => {
           {isScanning ? (
             <div className="border rounded-lg p-4">
               <BarcodeScanner
+                isOpen={isScanning}
+                onClose={() => setIsScanning(false)}
                 onScan={handleScan}
-                onError={(error) => toast.error(error)}
               />
               <Button
                 variant="outline"
@@ -304,7 +305,7 @@ export const BatchSampleReception: React.FC = () => {
                       <p className="font-mono text-sm">{scan.barcode}</p>
                       {scan.sample && (
                         <p className="text-xs text-muted-foreground">
-                          {scan.sample.patientName} - {scan.sample.testName}
+                          Sample #{scan.sample.sampleNumber}
                         </p>
                       )}
                       {scan.error && (

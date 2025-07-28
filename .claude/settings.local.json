@@ -510,7 +510,8 @@
       "Bash(firebase use:*)",
       "Bash(firebase emulators:exec:*)",
       "Bash(firebase functions:shell:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(do sed -i '' 's/\\buser\\./currentUser./g' \"$file\")"
     ],
     "deny": []
   }

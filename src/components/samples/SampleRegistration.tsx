@@ -3,7 +3,7 @@ import { Save, X, User, TestTube, Calendar, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSampleStore } from '@/stores/sample.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { SampleFormData, SampleType, ContainerType, StorageTemperature } from '@/types/sample.types';
+import type { SampleFormData, SampleType, ContainerType, StorageTemperature } from '@/types/sample.types';
 
 export default function SampleRegistration() {
   const navigate = useNavigate();

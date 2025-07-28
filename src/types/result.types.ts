@@ -102,6 +102,29 @@ export interface ResultEntryFormData {
   tests: ResultEntryTest[];
 }
 
-export interface ResultValidationRule extends ResultValidation {
-  // Additional properties that might be needed
+export type ResultValidationRule = ResultValidation;
+
+export interface ResultFilter {
+  status?: ResultStatus;
+  flag?: ResultFlag;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  patientId?: string;
+  orderId?: string;
+  testId?: string;
+  clinicianId?: string;
+}
+
+export interface BatchResultEntryData {
+  orderId: string;
+  results: Array<{
+    sampleId: string;
+    testId: string;
+    value: string | number;
+    unit?: string;
+    flag?: ResultFlag;
+    comments?: string;
+  }>;
 }

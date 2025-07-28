@@ -34,10 +34,11 @@ export const receiveHL7Message = functions.https.onRequest(async (req, res) => {
       case 'ADT': // Admit/Discharge/Transfer
         await processADTMessage(parsedMessage, integration.tenantId);
         break;
-      case 'QRY': // Query
+      case 'QRY': { // Query
         const response = await processQueryMessage(parsedMessage, integration.tenantId);
         res.status(200).send(createHL7Message('RSP', response));
         return;
+      }
       default:
         res.status(400).send('Unsupported message type');
         return;

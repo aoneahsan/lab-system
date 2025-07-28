@@ -140,7 +140,7 @@ class NotificationService {
   }
 
   // Check if critical value requires notification
-  checkCriticalValue(testName: string, value: number, referenceRange: { min: number; max: number }): boolean {
+  checkCriticalValue(testName: string, value: number, _referenceRange: { min: number; max: number }): boolean {
     // Define critical ranges for common tests
     const criticalRanges: Record<string, { low?: number; high?: number }> = {
       'Glucose': { low: 40, high: 500 },

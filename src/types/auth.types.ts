@@ -3,6 +3,7 @@ import type { SystemRole } from '@/constants/tenant.constants';
 
 export interface User {
 	id: string;
+	uid: string; // Firebase UID
 	email: string;
 	displayName: string;
 	firstName: string;

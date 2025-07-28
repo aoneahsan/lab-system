@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IntegrationSettings as IntegrationSettingsType } from '../../services/settings';
+import type { IntegrationSettings as IntegrationSettingsType } from '../../services/settings';
 
 interface IntegrationSettingsProps {
   settings: IntegrationSettingsType;

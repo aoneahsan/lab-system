@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DisplaySettings as DisplaySettingsType } from '../../services/settings';
+import type { DisplaySettings as DisplaySettingsType } from '../../services/settings';
 
 interface DisplaySettingsProps {
   settings: DisplaySettingsType;

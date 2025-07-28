@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { settingsService, SystemSettings } from '../../services/settings';
+import { settingsService } from '../../services/settings';
+import type { SystemSettings } from '../../services/settings';
 import GeneralSettings from './GeneralSettings';
 import LaboratorySettings from './LaboratorySettings';
 import BillingSettings from './BillingSettings';

@@ -9,6 +9,7 @@ import {
   orderBy,
   Timestamp,
   serverTimestamp,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
@@ -19,6 +20,47 @@ import type {
 } from '@/types/result.types';
 
 export const resultService = {
+  // Get single result
+  async getResult(tenantId: string, resultId: string): Promise<TestResult | null> {
+    const docRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data(),
+      } as TestResult;
+    }
+    return null;
+  },
+
+  // Get results with filters
+  async getResults(tenantId: string, filter?: any): Promise<{ items: TestResult[]; total: number }> {
+    let q = query(collection(db, COLLECTIONS.RESULTS));
+    
+    if (filter?.status) {
+      q = query(q, where('status', '==', filter.status));
+    }
+    if (filter?.patientId) {
+      q = query(q, where('patientId', '==', filter.patientId));
+    }
+    if (filter?.orderId) {
+      q = query(q, where('orderId', '==', filter.orderId));
+    }
+    
+    q = query(q, orderBy('createdAt', 'desc'));
+    
+    const snapshot = await getDocs(q);
+    const items = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as TestResult));
+    
+    return {
+      items,
+      total: items.length
+    };
+  },
   // Get results for an order
   async getResultsByOrder(tenantId: string, orderId: string): Promise<TestResult[]> {
     const q = query(
@@ -314,9 +356,9 @@ export const resultService = {
         testName: result.testName,
         value: result.value,
         unit: result.unit,
-        referenceRange: result.referenceRange,
+        referenceRange: typeof result.referenceRange === 'string' ? { normal: result.referenceRange } : result.referenceRange,
         flag: result.flag,
-        status: 'preliminary',
+        status: 'entered' as ResultStatus,
         enteredBy,
         enteredByName,
         enteredAt: timestamp,
@@ -367,5 +409,165 @@ export const resultService = {
         notifiedPersonnel: criticalInfo.notifiedPersonnel,
       },
     });
+  },
+
+  // Create batch results
+  async createBatchResults(
+    tenantId: string,
+    userId: string,
+    data: any
+  ): Promise<void> {
+    const batch = [];
+    const timestamp = Timestamp.now();
+    
+    for (const result of data.results || []) {
+      batch.push(addDoc(collection(db, COLLECTIONS.RESULTS), {
+        ...result,
+        tenantId,
+        createdBy: userId,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }));
+    }
+    
+    await Promise.all(batch);
+  },
+
+  // Delete result
+  async deleteResult(tenantId: string, resultId: string): Promise<void> {
+    const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    await updateDoc(resultRef, {
+      deleted: true,
+      deletedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  },
+
+  // Approve result
+  async approveResult(
+    tenantId: string,
+    userId: string,
+    resultId: string,
+    comments?: string
+  ): Promise<void> {
+    const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    await updateDoc(resultRef, {
+      status: 'approved',
+      approvedBy: userId,
+      approvedAt: serverTimestamp(),
+      approvalComments: comments,
+      updatedAt: serverTimestamp(),
+    });
+  },
+
+  // Reject result  
+  async rejectResult(
+    tenantId: string,
+    userId: string,
+    resultId: string,
+    reason: string
+  ): Promise<void> {
+    const resultRef = doc(db, COLLECTIONS.RESULTS, resultId);
+    await updateDoc(resultRef, {
+      status: 'rejected',
+      rejectedBy: userId,
+      rejectedAt: serverTimestamp(),
+      rejectionReason: reason,
+      updatedAt: serverTimestamp(),
+    });
+  },
+
+  // Get result groups
+  async getResultGroups(
+    tenantId: string,
+    orderId: string
+  ): Promise<any[]> {
+    const q = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('orderId', '==', orderId),
+      orderBy('testName')
+    );
+    
+    const snapshot = await getDocs(q);
+    const results = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    
+    // Group results by panel/category
+    const groups: any[] = [];
+    const ungrouped: any[] = [];
+    
+    results.forEach(result => {
+      if (result.panelId) {
+        let group = groups.find(g => g.panelId === result.panelId);
+        if (!group) {
+          group = {
+            panelId: result.panelId,
+            panelName: result.panelName || 'Panel',
+            results: []
+          };
+          groups.push(group);
+        }
+        group.results.push(result);
+      } else {
+        ungrouped.push(result);
+      }
+    });
+    
+    if (ungrouped.length > 0) {
+      groups.push({
+        panelId: 'ungrouped',
+        panelName: 'Individual Tests',
+        results: ungrouped
+      });
+    }
+    
+    return groups;
+  },
+
+  // Create result report
+  async createResultReport(
+    tenantId: string,
+    userId: string,
+    orderId: string,
+    resultIds: string[]
+  ): Promise<string> {
+    // Create report document
+    const reportRef = await addDoc(collection(db, COLLECTIONS.REPORTS), {
+      tenantId,
+      orderId,
+      resultIds,
+      reportType: 'results',
+      status: 'generated',
+      createdBy: userId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    
+    return reportRef.id;
+  },
+
+  // Get result statistics
+  async getResultStatistics(tenantId: string): Promise<any> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const q = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
+      where('createdAt', '>=', Timestamp.fromDate(today))
+    );
+    
+    const snapshot = await getDocs(q);
+    const results = snapshot.docs.map(doc => doc.data());
+    
+    return {
+      total: results.length,
+      pending: results.filter(r => r.status === 'pending').length,
+      verified: results.filter(r => r.status === 'verified').length,
+      critical: results.filter(r => r.isCritical).length,
+      todayCount: results.length,
+    };
   },
 };

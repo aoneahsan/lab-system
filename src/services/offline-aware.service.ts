@@ -1,7 +1,5 @@
 import { Network } from '@capacitor/network';
 import { offlineDbService } from './offline-db.service';
-import { offlineSyncService } from './offline-sync.service';
-import { COLLECTIONS } from '@/config/firebase-collections';
 
 export interface OfflineAwareOptions {
   collection: string;

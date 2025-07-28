@@ -841,7 +841,7 @@ export const billingService = {
       try {
         await this.submitClaim(tenantId, userId, claimId);
         submitted.push(claimId);
-      } catch (error) {
+      } catch {
         failed.push(claimId);
       }
     }
@@ -872,8 +872,8 @@ export const billingService = {
 
   // Check claim status with insurance
   async checkClaimStatus(
-    tenantId: string,
-    claimId: string
+    _tenantId: string,
+    _claimId: string
   ): Promise<{
     status: string;
     lastChecked: Date;

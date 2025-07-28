@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { startOfDay, endOfDay } from 'date-fns';
 
 interface Stats {
@@ -16,13 +16,13 @@ interface Stats {
 }
 
 export function useStats() {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: ['clinician-stats', user?.uid],
+    queryKey: ['clinician-stats', currentUser?.uid],
     queryFn: async () => {
-      if (!user || !currentTenant) return null;
+      if (!currentUser || !currentTenant) return null;
 
       const today = new Date();
       const startOfToday = startOfDay(today);
@@ -32,7 +32,7 @@ export function useStats() {
       const resultsRef = collection(db, `${currentTenant.id}_results`);
       const resultsQuery = query(
         resultsRef,
-        where('clinicianId', '==', user.uid),
+        where('clinicianId', '==', currentUser.uid),
         where('status', '==', 'preliminary')
       );
       const resultsSnapshot = await getDocs(resultsQuery);
@@ -42,7 +42,7 @@ export function useStats() {
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
       const patientsQuery = query(
         ordersRef,
-        where('clinicianId', '==', user.uid),
+        where('clinicianId', '==', currentUser.uid),
         where('createdAt', '>=', startOfToday)
       );
       const patientsSnapshot = await getDocs(patientsQuery);
@@ -57,7 +57,7 @@ export function useStats() {
       // Get recent activity
       const activityQuery = query(
         ordersRef,
-        where('clinicianId', '==', user.uid),
+        where('clinicianId', '==', currentUser.uid),
         orderBy('createdAt', 'desc'),
         limit(5)
       );
@@ -74,6 +74,6 @@ export function useStats() {
         recentActivity,
       } as Stats;
     },
-    enabled: !!user && !!currentTenant,
+    enabled: !!currentUser && !!currentTenant,
   });
 }

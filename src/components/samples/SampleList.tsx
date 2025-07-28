@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Vial, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, Clock, CheckCircle, AlertCircle, TestTubes } from 'lucide-react';
 import { useSampleStore } from '@/stores/sample.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { Sample } from '@/types/sample.types';
+import type { Sample } from '@/types/sample.types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function SampleList() {
@@ -42,7 +42,7 @@ export default function SampleList() {
       case 'rejected':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Vial className="h-4 w-4 text-gray-500" />;
+        return <TestTubes className="h-4 w-4 text-gray-500" />;
     }
   };
 

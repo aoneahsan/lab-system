@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Network } from '@capacitor/network';
-import { syncService, SyncStatus } from '@/services/offline/sync.service';
+import { syncService } from '@/services/offline/sync.service';
+import type { SyncStatus } from '@/services/offline/sync.service';
 import { offlineDatabase } from '@/services/offline/database.service';
 
 export interface OfflineState {

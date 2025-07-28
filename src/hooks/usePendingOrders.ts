@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface PendingOrder {
   id: string;
@@ -23,18 +23,18 @@ interface PendingOrder {
 }
 
 export function usePendingOrders() {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: ['pending-orders', user?.uid],
+    queryKey: ['pending-orders', currentUser?.uid],
     queryFn: async () => {
-      if (!user || !currentTenant) return [];
+      if (!currentUser || !currentTenant) return [];
 
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
       const q = query(
         ordersRef,
-        where('clinicianId', '==', user.uid),
+        where('clinicianId', '==', currentUser.uid),
         where('status', '==', 'pending'),
         orderBy('createdAt', 'desc')
       );
@@ -46,6 +46,6 @@ export function usePendingOrders() {
         createdAt: doc.data().createdAt.toDate(),
       })) as PendingOrder[];
     },
-    enabled: !!user && !!currentTenant,
+    enabled: !!currentUser && !!currentTenant,
   });
 }

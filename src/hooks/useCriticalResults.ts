@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface CriticalResult {
   id: string;
@@ -31,19 +31,19 @@ interface UseCriticalResultsParams {
 }
 
 export function useCriticalResults(params?: UseCriticalResultsParams) {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
   const filter = params?.filter || 'pending';
 
   return useQuery({
-    queryKey: ['critical-results', filter, user?.uid],
+    queryKey: ['critical-results', filter, currentUser?.uid],
     queryFn: async () => {
-      if (!user || !currentTenant) return [];
+      if (!currentUser || !currentTenant) return [];
 
       const resultsRef = collection(db, `${currentTenant.id}_results`);
       let q = query(
         resultsRef,
-        where('clinicianId', '==', user.uid),
+        where('clinicianId', '==', currentUser.uid),
         where('isCritical', '==', true),
         orderBy('resultDate', 'desc')
       );
@@ -62,6 +62,6 @@ export function useCriticalResults(params?: UseCriticalResultsParams) {
         acknowledgedAt: doc.data().acknowledgedAt?.toDate(),
       })) as CriticalResult[];
     },
-    enabled: !!user && !!currentTenant,
+    enabled: !!currentUser && !!currentTenant,
   });
 }

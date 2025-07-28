@@ -12,7 +12,7 @@ interface UseOfflineDataOptions {
   enableOffline?: boolean;
 }
 
-export const useOfflineData = <T = any>({
+export const useOfflineData = <T extends { id: string } = any>({
   collection,
   queryKey,
   onlineQuery,
@@ -65,7 +65,7 @@ interface UseOfflineMutationOptions {
   operation: 'create' | 'update' | 'delete';
 }
 
-export const useOfflineMutation = <TData = any, TVariables = any>({
+export const useOfflineMutation = <TData extends { id: string } = any, TVariables = any>({
   collection,
   mutationKey,
   onlineMutation,

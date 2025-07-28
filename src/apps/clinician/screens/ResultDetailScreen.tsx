@@ -27,7 +27,7 @@ export function ResultDetailScreen() {
   const { mutate: approveResult } = useApproveResult();
 
   const handleApprove = () => {
-    if (!result || result.status === 'final') return;
+    if (!result || result.status === 'verified') return;
 
     approveResult(resultId!, {
       onSuccess: () => {
@@ -263,7 +263,7 @@ export function ResultDetailScreen() {
       </Card>
 
       {/* Actions */}
-      {result.status === 'preliminary' && (
+      {result.status === 'entered' && (
         <Card className="p-4">
           <Button 
             variant="primary" 

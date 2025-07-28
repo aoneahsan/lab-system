@@ -19,7 +19,7 @@ const ReportBuilder: React.FC<ReportBuilderProps> = ({ onSubmit, onCancel, isLoa
     handleSubmit,
     formState: { errors },
     watch,
-    setValue,
+    // setValue,
   } = useForm<ReportFormData>({
     defaultValues: {
       type: 'patient_results',

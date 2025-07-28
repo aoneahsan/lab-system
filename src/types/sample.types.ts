@@ -19,6 +19,8 @@ export interface Sample {
   status: SampleStatus;
   priority: 'routine' | 'stat' | 'asap';
   tests: string[]; // Test IDs
+  departmentId?: string; // Department assignment
+  analyzerId?: string; // Analyzer assignment
   storageLocation?: string;
   storageTemperature?: StorageTemperature;
   expirationDate?: Timestamp;

@@ -3,10 +3,11 @@ import { X } from 'lucide-react';
 import { useTests } from '@/hooks/useTests';
 import { useCreateValidationRule, useUpdateValidationRule } from '@/hooks/useResultValidation';
 import ValidationRuleForm from './ValidationRuleForm';
-import type { ResultValidationRule } from '@/types/result.types';
+import type { ResultValidation } from '@/types/result.types';
+import type { ValidationRuleFormData } from './ValidationRuleForm';
 
 interface ValidationRuleModalProps {
-  rule?: ResultValidationRule | null;
+  rule?: ResultValidation | null;
   onClose: () => void;
 }
 
@@ -15,14 +16,32 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
   const createRuleMutation = useCreateValidationRule();
   const updateRuleMutation = useUpdateValidationRule();
 
-  const handleSubmit = async (data: Omit<ResultValidationRule, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSubmit = async (formData: ValidationRuleFormData) => {
+    // Map form data to ResultValidation
+    const validationData: Omit<ResultValidation, 'id' | 'createdAt' | 'updatedAt'> = {
+      tenantId: '', // This should come from context/store
+      testId: formData.testId,
+      ruleName: `${formData.ruleType} rule`,
+      ruleType: formData.ruleType as any,
+      enabled: formData.active,
+      parameters: {
+        min: formData.minValue,
+        max: formData.maxValue,
+        deltaPercent: formData.deltaType === 'percentage' ? formData.deltaThreshold : undefined,
+        deltaValue: formData.deltaType === 'absolute' ? formData.deltaThreshold : undefined,
+        criticalLow: formData.criticalLow,
+        criticalHigh: formData.criticalHigh,
+      },
+      action: formData.action === 'flag' ? 'warn' : formData.action,
+      message: formData.customMessage,
+    };
     if (rule) {
       await updateRuleMutation.mutateAsync({
         id: rule.id,
-        data
+        data: validationData
       });
     } else {
-      await createRuleMutation.mutateAsync(data);
+      await createRuleMutation.mutateAsync(validationData);
     }
     onClose();
   };
@@ -50,7 +69,21 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
         
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
           <ValidationRuleForm
-            initialData={rule || undefined}
+            initialData={rule ? {
+              testId: rule.testId,
+              ruleType: rule.ruleType === 'consistency' || rule.ruleType === 'calculated' ? 'custom' : rule.ruleType,
+              minValue: rule.parameters.min,
+              maxValue: rule.parameters.max,
+              deltaThreshold: rule.parameters.deltaPercent || rule.parameters.deltaValue,
+              deltaType: rule.parameters.deltaPercent ? 'percentage' : 'absolute',
+              criticalLow: rule.parameters.criticalLow,
+              criticalHigh: rule.parameters.criticalHigh,
+              customMessage: rule.message,
+              action: rule.action === 'notify' ? 'warn' : rule.action,
+              requiresReview: false,
+              notifyOnTrigger: rule.action === 'notify',
+              active: rule.enabled,
+            } : undefined}
             testOptions={testOptions}
             onSubmit={handleSubmit}
             onCancel={onClose}

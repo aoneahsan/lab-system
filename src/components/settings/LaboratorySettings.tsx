@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LaboratorySettings as LaboratorySettingsType } from '../../services/settings';
+import type { LaboratorySettings as LaboratorySettingsType } from '../../services/settings';
 
 interface LaboratorySettingsProps {
   settings: LaboratorySettingsType;

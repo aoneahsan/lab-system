@@ -26,7 +26,7 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
   const { data: patientsData } = usePatients();
   const { data: testsData } = useTests();
   const patients = patientsData?.patients || [];
-  const tests = testsData?.tests || [];
+  const tests = testsData || [];
   
   const [samples, setSamples] = useState<BatchSample[]>([
     {
@@ -162,7 +162,7 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         size={3}
                       >
-                        {tests.map((test) => (
+                        {tests.map((test: any) => (
                           <option key={test.id} value={test.id}>
                             {test.name} ({test.code})
                           </option>

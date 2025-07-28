@@ -10,7 +10,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { User } from '@/types/auth.types';
+import type { User } from '@/types/auth.types';
 import { SystemRole } from '@/constants/tenant.constants';
 
 interface RegisterData {

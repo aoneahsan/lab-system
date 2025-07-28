@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NotificationSettings as NotificationSettingsType } from '../../services/settings';
+import type { NotificationSettings as NotificationSettingsType } from '../../services/settings';
 
 interface NotificationSettingsProps {
   settings: NotificationSettingsType;

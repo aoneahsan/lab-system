@@ -10,7 +10,7 @@ import {
   FileText,
   User
 } from 'lucide-react';
-import { BarcodeScanner } from '@capacitor/barcode-scanner';
+import { QRCodeScanner } from 'qrcode-studio';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { useOfflineStore } from '@/mobile/stores/offline.store';

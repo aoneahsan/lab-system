@@ -5,15 +5,13 @@ import {
   getDocs,
   getDoc,
   addDoc,
-  updateDoc,
   query,
   where,
   orderBy,
-  Timestamp,
-  limit
+  Timestamp
 } from 'firebase/firestore';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import { QCTest, QCResult, QCRule, QCStatistics } from '@/types/quality-control';
+import type { QCTest, QCResult, QCRule, QCStatistics } from '@/types/quality-control';
 import { getCurrentUser } from './auth.service';
 import { generateId } from '@/utils/helpers';
 

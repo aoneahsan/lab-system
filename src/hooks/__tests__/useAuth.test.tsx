@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useLogin, useRegister, useLogout, useResetPassword } from '../useAuth';
 import * as authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
@@ -36,6 +36,7 @@ const createWrapper = () => {
 describe('Auth Hooks', () => {
   const mockUser = {
     id: 'test-uid',
+    uid: 'test-uid',
     email: 'test@example.com',
     displayName: 'Test User',
     firstName: 'Test',
@@ -60,7 +61,7 @@ describe('Auth Hooks', () => {
       } as any);
 
       vi.mocked(authService.login).mockResolvedValue(mockUser);
-      vi.mocked(toast.success).mockImplementation(() => {});
+      vi.mocked(toast.success).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useLogin(), {
         wrapper: createWrapper(),
@@ -80,7 +81,7 @@ describe('Auth Hooks', () => {
 
     it('should handle login error', async () => {
       vi.mocked(authService.login).mockRejectedValue(new Error('Invalid credentials'));
-      vi.mocked(toast.error).mockImplementation(() => {});
+      vi.mocked(toast.error).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useLogin(), {
         wrapper: createWrapper(),
@@ -112,7 +113,7 @@ describe('Auth Hooks', () => {
       } as any);
 
       vi.mocked(authService.register).mockResolvedValue(mockUser);
-      vi.mocked(toast.success).mockImplementation(() => {});
+      vi.mocked(toast.success).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useRegister(), {
         wrapper: createWrapper(),
@@ -138,7 +139,7 @@ describe('Auth Hooks', () => {
 
     it('should handle registration error', async () => {
       vi.mocked(authService.register).mockRejectedValue(new Error('Email already exists'));
-      vi.mocked(toast.error).mockImplementation(() => {});
+      vi.mocked(toast.error).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useRegister(), {
         wrapper: createWrapper(),
@@ -173,7 +174,7 @@ describe('Auth Hooks', () => {
         logout,
       } as any);
 
-      vi.mocked(toast.success).mockImplementation(() => {});
+      vi.mocked(toast.success).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useLogout(), {
         wrapper: createWrapper(),
@@ -196,7 +197,7 @@ describe('Auth Hooks', () => {
         logout,
       } as any);
 
-      vi.mocked(toast.error).mockImplementation(() => {});
+      vi.mocked(toast.error).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useLogout(), {
         wrapper: createWrapper(),
@@ -217,7 +218,7 @@ describe('Auth Hooks', () => {
   describe('useResetPassword', () => {
     it('should send reset password email successfully', async () => {
       vi.mocked(authService.resetPassword).mockResolvedValue(undefined);
-      vi.mocked(toast.success).mockImplementation(() => {});
+      vi.mocked(toast.success).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useResetPassword(), {
         wrapper: createWrapper(),
@@ -233,7 +234,7 @@ describe('Auth Hooks', () => {
 
     it('should handle reset password error', async () => {
       vi.mocked(authService.resetPassword).mockRejectedValue(new Error('User not found'));
-      vi.mocked(toast.error).mockImplementation(() => {});
+      vi.mocked(toast.error).mockImplementation(() => 'toast-id');
 
       const { result } = renderHook(() => useResetPassword(), {
         wrapper: createWrapper(),

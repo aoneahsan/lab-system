@@ -24,7 +24,7 @@ export function CriticalResultsScreen() {
   const { mutate: acknowledgeResult } = useAcknowledgeResult();
 
   const handleAcknowledge = (resultId: string) => {
-    acknowledgeResult(resultId, {
+    acknowledgeResult({ resultId }, {
       onSuccess: () => {
         toast.success('Critical result acknowledged');
         refetch();

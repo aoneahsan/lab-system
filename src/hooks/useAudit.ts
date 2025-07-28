@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { auditService, AuditAction, AuditResource } from '../services/audit';
+import { auditService } from '../services/audit';
+import type { AuditAction, AuditResource } from '../services/audit';
 
 export const useAudit = () => {
   const logAction = useCallback(

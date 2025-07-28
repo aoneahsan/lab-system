@@ -581,12 +581,12 @@ class InventoryServiceWrapper extends InventoryService {
 		return [];
 	}
 
-	async createSupplier(data: any) {
+	async createSupplier(_data: any) {
 		// This needs to be implemented
 		return '';
 	}
 
-	async updateSupplier(id: string, data: any) {
+	async updateSupplier(_id: string, _data: any) {
 		// This needs to be implemented
 		return;
 	}

@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useTenantStore } from '@/stores/tenantStore';
-import { useAuthStore } from '@/stores/authStore';
+import { useTenantStore } from '@/stores/tenant.store';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function useApproveResult() {
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (resultId: string, comments?: string) => {
-      if (!currentTenant || !user) throw new Error('Not authenticated');
+      if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const resultRef = doc(db, `${currentTenant.id}_results`, resultId);
       
       await updateDoc(resultRef, {
         status: 'final',
-        approvedBy: user.name || user.email || 'Unknown',
+        approvedBy: currentUser.displayName || currentUser.email || 'Unknown',
         approvedAt: serverTimestamp(),
         approvalComments: comments || '',
       });

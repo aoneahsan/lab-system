@@ -1,4 +1,16 @@
-import type { Test, TestResult, ValidationRule } from '@/types';
+import type { TestDefinition } from '@/types/test.types';
+type Test = TestDefinition;
+import type { TestResult, ResultValidation } from '@/types/result.types';
+
+interface ValidationRule {
+  testId: string;
+  normalLow?: number;
+  normalHigh?: number;
+  criticalLow?: number;
+  criticalHigh?: number;
+  absoluteLow?: number;
+  absoluteHigh?: number;
+}
 
 export interface ValidationError {
   field: string;
@@ -44,7 +56,7 @@ export class ValidationService {
     }
 
     // Check if numeric test requires numeric value
-    if (test.valueType === 'numeric' && value) {
+    if (test.resultType === 'numeric' && value) {
       const numValue = parseFloat(value);
       if (isNaN(numValue)) {
         errors.push({
@@ -57,7 +69,7 @@ export class ValidationService {
           errors,
           warnings,
           flag,
-          status: 'preliminary',
+          status: 'entered',
           isCritical,
           criticalType
         };
@@ -118,8 +130,8 @@ export class ValidationService {
       }
 
       // Simple reference range parsing if no rules
-      if (!rule && test.referenceRange) {
-        const refRange = test.referenceRange;
+      if (!rule && test.referenceRanges?.[0]?.normal) {
+        const refRange = test.referenceRanges?.[0]?.normal;
         const rangeMatch = refRange.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
         
         if (rangeMatch) {
@@ -179,7 +191,7 @@ export class ValidationService {
       errors,
       warnings,
       flag,
-      status: errors.length > 0 ? 'preliminary' : 'final',
+      status: errors.length > 0 ? 'entered' : 'final',
       isCritical,
       criticalType
     };

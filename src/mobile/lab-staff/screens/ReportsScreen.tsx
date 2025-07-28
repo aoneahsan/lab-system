@@ -13,7 +13,8 @@ import {
   AlertCircle,
   ChevronRight,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  CheckCircle
 } from 'lucide-react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useNavigate } from 'react-router-dom';

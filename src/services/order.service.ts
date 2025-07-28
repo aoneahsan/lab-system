@@ -13,7 +13,7 @@ import {
   Timestamp,
   limit
 } from 'firebase/firestore';
-import { TestOrder, OrderedTest, Specimen } from '@/types/order';
+import type { TestOrder, OrderedTest, Specimen } from '@/types/order';
 import { getCurrentUser } from './auth.service';
 import { generateId } from '@/utils/helpers';
 

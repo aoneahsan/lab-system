@@ -2,7 +2,7 @@
 
 // API Configuration
 const LABFLOW_API_URL = 'http://localhost:5173'; // Change to production URL
-const API_KEY = ''; // Will be set by user
+// API_KEY will be set by user configuration
 
 // Extension state
 let connectionStatus = 'disconnected';
@@ -76,7 +76,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 // EMR Detection
 async function handleEMRDetection(data, sender, sendResponse) {
-  const { url, title, content } = data;
+  const { url, title } = data;
   
   // Detect EMR system based on URL patterns
   const emrPatterns = {
@@ -167,7 +167,7 @@ async function handleSendToLabFlow(data, sender, sendResponse) {
 }
 
 // Parse patient data based on EMR system
-function parsePatientData(data, emrSystem) {
+function parsePatientData(data, _emrSystem) {
   // This would contain EMR-specific parsing logic
   // For now, return a generic structure
   return {
@@ -183,7 +183,7 @@ function parsePatientData(data, emrSystem) {
 }
 
 // Parse order data based on EMR system
-function parseOrderData(data, emrSystem) {
+function parseOrderData(data, _emrSystem) {
   // This would contain EMR-specific parsing logic
   return {
     orderNumber: data.orderNumber || extractOrderNumber(data.content),
@@ -237,7 +237,7 @@ function extractEmail(content) {
   return emailMatch ? emailMatch[1] : null;
 }
 
-function extractAddress(content) {
+function extractAddress(_content) {
   // Basic extraction - would need EMR-specific parsing
   return null;
 }

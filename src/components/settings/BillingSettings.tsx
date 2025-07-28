@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BillingSettings as BillingSettingsType } from '../../services/settings';
+import type { BillingSettings as BillingSettingsType } from '../../services/settings';
 
 interface BillingSettingsProps {
   settings: BillingSettingsType;

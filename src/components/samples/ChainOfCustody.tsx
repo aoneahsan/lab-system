@@ -1,6 +1,6 @@
-import React from 'react';
+// import React from 'react';
 import { MapPin, User, Calendar, Clock, Activity } from 'lucide-react';
-import { ChainOfCustodyEntry, CustodyAction } from '@/types/sample.types';
+import type { ChainOfCustodyEntry, CustodyAction } from '@/types/sample.types';
 
 interface ChainOfCustodyProps {
   entries: ChainOfCustodyEntry[];

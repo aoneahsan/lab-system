@@ -35,7 +35,7 @@ interface ProfileSection {
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, signOut } = useAuthStore();
+  const { currentUser, logout } = useAuthStore();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Mock user data - replace with actual user data
@@ -199,7 +199,7 @@ export const ProfileScreen: React.FC = () => {
   ];
 
   const handleLogout = async () => {
-    await signOut();
+    await logout();
     navigate('/patient/login');
   };
 

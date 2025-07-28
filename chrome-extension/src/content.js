@@ -353,7 +353,7 @@ function showNotification(message, type = 'success') {
 
 // Set up mutation observer for dynamic content
 function setupMutationObserver() {
-  observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver((_mutations) => {
     // Re-run EMR-specific handlers when DOM changes
     if (emrSystem) {
       setupEMRSpecificHandlers();
@@ -367,20 +367,21 @@ function setupMutationObserver() {
 }
 
 // Handle messages from background script
-function handleMessage(request, sender, sendResponse) {
+function handleMessage(request, _sender, _sendResponse) {
   switch (request.action) {
     case 'statusUpdate':
       updateStatus();
       break;
       
-    case 'extractPatientFromSelection':
+    case 'extractPatientFromSelection': {
       const selectedText = window.getSelection().toString();
       if (selectedText) {
         extractAndSendPatientData();
       }
       break;
+    }
       
-    case 'extractOrderFromSelection':
+    case 'extractOrderFromSelection': {
       const selection = window.getSelection();
       if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
@@ -388,6 +389,7 @@ function handleMessage(request, sender, sendResponse) {
         extractAndSendOrderData(container);
       }
       break;
+    }
   }
 }
 

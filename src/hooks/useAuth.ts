@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import * as authService from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
-import { SystemRole } from '@/constants/tenant.constants';
+import type { SystemRole } from '@/constants/tenant.constants';
 
 interface LoginCredentials {
   email: string;

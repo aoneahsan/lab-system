@@ -192,6 +192,65 @@ export interface TrendItem {
   value: number;
 }
 
+// Alias for GeneratedReport
+export type Report = GeneratedReport;
+
+export interface ReportQueryFilter {
+  type?: ReportType;
+  category?: ReportCategory;
+  status?: ReportStatus;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  generatedBy?: string;
+  templateId?: string;
+}
+
+export interface ReportTemplateFormData {
+  name: string;
+  description?: string;
+  category: ReportCategory;
+  type: ReportType;
+  sections: ReportSection[];
+  parameters: ReportParameter[];
+  layout: ReportLayout;
+}
+
+export interface AnalyticsDashboard {
+  id: string;
+  tenantId: string;
+  name: string;
+  description?: string;
+  widgets: DashboardWidget[];
+  refreshInterval?: number;
+  isDefault?: boolean;
+  createdBy: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface DashboardWidget {
+  id: string;
+  type: 'metric' | 'chart' | 'table' | 'summary';
+  title: string;
+  dataSource: string;
+  configuration: Record<string, any>;
+  position: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
+export interface DashboardFormData {
+  name: string;
+  description?: string;
+  widgets: DashboardWidget[];
+  refreshInterval?: number;
+}
+
 export interface AnalyticsMetrics {
   totalTests: number;
   totalPatients: number;

@@ -152,7 +152,7 @@ class OfflineSyncService {
       }
 
       // Update last sync time
-      const metadata = await offlineDbService.getMetadata();
+      await offlineDbService.getMetadata();
       await offlineDbService['updateMetadata']({ lastSyncTime: Date.now() });
 
       // Fetch latest data from server
@@ -207,7 +207,7 @@ class OfflineSyncService {
       });
     } else {
       // Use addDoc for auto-generated ID
-      const { id, ...dataWithoutId } = data;
+      const { ...dataWithoutId } = data;
       await setDoc(doc(collection(db, collectionName)), {
         ...dataWithoutId,
         createdAt: Timestamp.now(),

@@ -10,7 +10,7 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react';
-import { BarcodeScanner } from '@capacitor/barcode-scanner';
+import { QRCodeScanner } from 'qrcode-studio';
 import { toast } from '@/hooks/useToast';
 
 interface ScanResult {

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { X, Printer } from 'lucide-react';
-import QRCode from 'qrcode';
+// import QRCode from 'qrcode';
 import type { Sample } from '@/types/sample.types';
 
 interface BatchBarcodesPrintProps {
@@ -16,18 +16,18 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
 
-  const generateQRCode = async (data: string): Promise<string> => {
-    try {
-      return await QRCode.toDataURL(data, {
-        width: 150,
-        margin: 1,
-        errorCorrectionLevel: 'M',
-      });
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-      return '';
-    }
-  };
+  // const generateQRCode = async (data: string): Promise<string> => {
+  //   try {
+  //     return await QRCode.toDataURL(data, {
+  //       width: 150,
+  //       margin: 1,
+  //       errorCorrectionLevel: 'M',
+  //     });
+  //   } catch (error) {
+  //     console.error('Error generating QR code:', error);
+  //     return '';
+  //   }
+  // };
 
   const handlePrint = () => {
     const printContent = printRef.current;

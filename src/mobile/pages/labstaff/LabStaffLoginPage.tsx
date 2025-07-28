@@ -17,7 +17,7 @@ type LoginFormData = yup.InferType<typeof schema>;
 
 const LabStaffLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, isLoading } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
@@ -35,8 +35,8 @@ const LabStaffLoginPage: React.FC = () => {
 
   const checkBiometricAvailability = async () => {
     try {
-      const { isAvailable } = await BiometricAuth.isAvailable();
-      setBiometricAvailable(isAvailable);
+      const { available } = await BiometricAuth.available();
+      setBiometricAvailable(available);
     } catch (error) {
       console.error('Biometric check failed:', error);
     }
@@ -44,7 +44,7 @@ const LabStaffLoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
       navigate('/home');
     } catch (error) {
       toast.error('Invalid email or password');
@@ -53,7 +53,7 @@ const LabStaffLoginPage: React.FC = () => {
 
   const handleBiometricLogin = async () => {
     try {
-      const verified = await BiometricAuth.verify({
+      const verified = await BiometricAuth.authenticate({
         reason: 'Authenticate to access LabFlow Lab Staff',
         title: 'Biometric Authentication',
         subtitle: 'Use your fingerprint or face ID',

@@ -48,7 +48,9 @@
     "@capacitor/network": "^7.0.1",
     "@capacitor/preferences": "^7.0.1",
     "@capacitor/push-notifications": "^7.0.1",
+    "@capacitor/share": "^7.0.1",
     "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.2.0",
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-table": "^8.21.3",
     "@types/jspdf": "^2.0.0",
@@ -82,6 +84,7 @@
     "ts-buildkit": "^1.1.0",
     "unified-error-handling": "^1.2.0",
     "unified-tracking": "^1.5.0",
+    "yup": "^1.6.1",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

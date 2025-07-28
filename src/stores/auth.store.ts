@@ -127,6 +127,7 @@ export const useAuthStore = create<AuthStore>()(
 					// Create user document in Firestore
 					const userData: User = {
 						id: userCredential.user.uid,
+						uid: userCredential.user.uid,
 						email: data.email,
 						displayName: `${data.firstName} ${data.lastName}`,
 						firstName: data.firstName,
@@ -256,6 +257,7 @@ export const useAuthStore = create<AuthStore>()(
 
 					const userData = {
 						id: userDoc.id,
+						uid: userDoc.id,
 						...userDoc.data(),
 						createdAt: userDoc.data().createdAt?.toDate() || new Date(),
 						updatedAt: userDoc.data().updatedAt?.toDate() || new Date(),

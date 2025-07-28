@@ -4,7 +4,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { doc, updateDoc, serverTimestamp, addDoc, collection } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { useTenant } from '@/hooks/useTenant';
+// import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
 
 interface CriticalResultModalProps {

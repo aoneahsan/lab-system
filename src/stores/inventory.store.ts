@@ -114,14 +114,14 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
   fetchStockTransactions: async (itemId) => {
     set({ loading: true, error: null });
     try {
-      const transactions = await inventoryService.getStockMovements(itemId);
+      const transactions = await inventoryService.getStockMovements(itemId || '');
       set({ stockTransactions: transactions, loading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
-  fetchPurchaseOrders: async (filters) => {
+  fetchPurchaseOrders: async (_filters) => {
     set({ loading: true, error: null });
     try {
       const orders = await inventoryService.getPurchaseOrders();
@@ -167,7 +167,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
     }
   },
 
-  createVendor: async (data) => {
+  createVendor: async (_data) => {
     set({ loading: true, error: null });
     try {
       // TODO: Implement vendor service methods
@@ -179,7 +179,7 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
     }
   },
 
-  updateVendor: async (id, data) => {
+  updateVendor: async (_id, _data) => {
     set({ loading: true, error: null });
     try {
       // TODO: Implement vendor service methods

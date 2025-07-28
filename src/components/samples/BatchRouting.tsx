@@ -7,6 +7,8 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Badge } from '@/components/ui/Badge';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 import { useSampleStore } from '@/stores/sample.store';
+import { useDepartmentStore } from '@/stores/department.store';
+import { useAnalyzerStore } from '@/stores/analyzer.store';
 import { useTests } from '@/hooks/useTests';
 import { toast } from 'sonner';
 import type { Sample } from '@/types/sample.types';
@@ -33,7 +35,7 @@ export const BatchRouting: React.FC = () => {
   const [autoRoute, setAutoRoute] = useState(true);
 
   const { samples, updateBatchSamples } = useSampleStore();
-  const { tests } = useTestStore();
+  const { data: tests = [] } = useTests();
   const { departments } = useDepartmentStore();
   const { analyzers } = useAnalyzerStore();
 
@@ -44,10 +46,10 @@ export const BatchRouting: React.FC = () => {
 
   useEffect(() => {
     // Load default routing rules based on test types
-    const defaultRules: RoutingRule[] = tests.map(test => ({
+    const defaultRules: RoutingRule[] = tests.map((test: TestDefinition) => ({
       testId: test.id,
-      departmentId: test.departmentId || '',
-      analyzerId: test.defaultAnalyzerId
+      departmentId: test.department || '',
+      analyzerId: undefined
     })).filter(rule => rule.departmentId);
 
     setRoutingRules(defaultRules);
@@ -76,13 +78,13 @@ export const BatchRouting: React.FC = () => {
 
     // Auto-route based on test type
     if (autoRoute) {
-      const rule = routingRules.find(r => r.testId === sample.testId);
+      const rule = routingRules.find(r => sample.tests.includes(r.testId));
       if (rule && rule.departmentId) {
         return {
           sampleId: sample.id,
           departmentId: rule.departmentId,
           analyzerId: rule.analyzerId,
-          priority: sample.priority || 'routine'
+          priority: (sample.priority === 'asap' ? 'urgent' : sample.priority) || 'routine'
         };
       }
     }
@@ -203,7 +205,7 @@ export const BatchRouting: React.FC = () => {
                 <Checkbox
                   id="autoRoute"
                   checked={autoRoute}
-                  onCheckedChange={(checked) => setAutoRoute(checked as boolean)}
+                  onChange={(e) => setAutoRoute(e.target.checked)}
                 />
                 <label htmlFor="autoRoute" className="text-sm">
                   Auto-route based on test type
@@ -252,12 +254,12 @@ export const BatchRouting: React.FC = () => {
                                   <div className="flex items-center space-x-3">
                                     <Checkbox
                                       checked={isSelected}
-                                      onCheckedChange={() => handleSampleSelect(sample.id)}
+                                      onChange={() => handleSampleSelect(sample.id)}
                                     />
                                     <div>
                                       <p className="font-mono text-sm">{sample.sampleNumber}</p>
                                       <p className="text-xs text-muted-foreground">
-                                        {sample.patientName} - {sample.testName}
+                                        Sample ID: {sample.id}
                                       </p>
                                     </div>
                                   </div>
@@ -265,7 +267,9 @@ export const BatchRouting: React.FC = () => {
                                   {deptId === 'unassigned' && (
                                     <div className="flex items-center space-x-2">
                                       <Select
-                                        onValueChange={(value) => {
+                                        value=""
+                                        onChange={(e) => {
+                                          const value = e.target.value;
                                           const [deptId, analyzerId] = value.split('|');
                                           handleManualRoute(sample.id, deptId, analyzerId || undefined);
                                         }}

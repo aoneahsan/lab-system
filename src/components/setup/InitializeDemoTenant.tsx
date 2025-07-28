@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { COLLECTIONS } from '@/config/firebase-collections';
+// import { COLLECTIONS } from '@/config/firebase-collections';
 
 const InitializeDemoTenant = () => {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  // const [isInitialized, setIsInitialized] = useState(false);
+  // const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const initializeDemoTenant = async () => {
@@ -251,11 +251,11 @@ const InitializeDemoTenant = () => {
           }
         }
         
-        setIsInitialized(true);
+        // setIsInitialized(true);
       } catch (error) {
         console.error('Error initializing DEMO tenant:', error);
       } finally {
-        setIsChecking(false);
+        // setIsChecking(false);
       }
     };
 

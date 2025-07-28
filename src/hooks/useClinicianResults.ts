@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs, QueryConstraint } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface ClinicianResult {
   id: string;
@@ -31,20 +31,20 @@ interface UseClinicianResultsParams {
 }
 
 export function useClinicianResults(params?: UseClinicianResultsParams) {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
 
   return useQuery({
     queryKey: ['clinician-results', params],
     queryFn: async () => {
-      if (!user || !currentTenant) return [];
+      if (!currentUser || !currentTenant) return [];
 
       const resultsRef = collection(db, `${currentTenant.id}_results`);
       const constraints: QueryConstraint[] = [];
 
       // Add clinician filter
       if (params?.clinicianId === 'current') {
-        constraints.push(where('clinicianId', '==', user.uid));
+        constraints.push(where('clinicianId', '==', currentUser.uid));
       } else if (params?.clinicianId) {
         constraints.push(where('clinicianId', '==', params.clinicianId));
       }
@@ -79,6 +79,6 @@ export function useClinicianResults(params?: UseClinicianResultsParams) {
         collectionDate: doc.data().collectionDate.toDate(),
       })) as ClinicianResult[];
     },
-    enabled: !!user && !!currentTenant,
+    enabled: !!currentUser && !!currentTenant,
   });
 }

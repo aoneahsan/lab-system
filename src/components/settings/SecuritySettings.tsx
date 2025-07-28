@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SecuritySettings as SecuritySettingsType } from '../../services/settings';
+import type { SecuritySettings as SecuritySettingsType } from '../../services/settings';
 
 interface SecuritySettingsProps {
   settings: SecuritySettingsType;

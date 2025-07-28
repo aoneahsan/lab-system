@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs, QueryConstraint } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface Order {
   id: string;
@@ -38,20 +38,20 @@ interface UseOrdersParams {
 }
 
 export function useOrders(params?: UseOrdersParams) {
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
 
   return useQuery({
     queryKey: ['orders', params],
     queryFn: async () => {
-      if (!user || !currentTenant) return [];
+      if (!currentUser || !currentTenant) return [];
 
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
       const constraints: QueryConstraint[] = [];
 
       // Add clinician filter
       if (params?.clinicianId === 'current') {
-        constraints.push(where('clinicianId', '==', user.uid));
+        constraints.push(where('clinicianId', '==', currentUser.uid));
       } else if (params?.clinicianId) {
         constraints.push(where('clinicianId', '==', params.clinicianId));
       }
@@ -82,6 +82,6 @@ export function useOrders(params?: UseOrdersParams) {
         })),
       })) as Order[];
     },
-    enabled: !!user && !!currentTenant,
+    enabled: !!currentUser && !!currentTenant,
   });
 }

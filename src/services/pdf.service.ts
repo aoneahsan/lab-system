@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { TestResult, Sample, Patient, Test, Invoice, InvoiceItem, Payment, QCRun, QCMaterial, QCStatistics } from '@/types';
+import type { TestResult, Sample, Patient, Test, Invoice, Payment, QCRun, QCMaterial, QCStatistics } from '@/types';
 
 interface ReportData {
   result: TestResult;
@@ -514,8 +514,6 @@ export class PDFService {
 
     const tableData = qcRun.results.map(result => {
       const analyte = material.analytes.find(a => a.testCode === result.testCode);
-      const statusColor = result.status === 'pass' ? '#008000' : 
-                         result.status === 'warning' ? '#FFA500' : '#FF0000';
       
       return [
         result.testName,

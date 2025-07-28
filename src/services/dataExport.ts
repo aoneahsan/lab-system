@@ -153,7 +153,7 @@ class DataExportService {
     return data.map(record => {
       const mappedRecord: Record<string, any> = {};
       Object.entries(mapping).forEach(([from, to]) => {
-        if (record.hasOwnProperty(from)) {
+        if (Object.prototype.hasOwnProperty.call(record, from)) {
           mappedRecord[to] = record[from];
         }
       });

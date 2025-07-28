@@ -107,11 +107,6 @@ export function TestCatalogScreen() {
                         <Badge variant="outline" size="sm">
                           {test.code}
                         </Badge>
-                        {false && (
-                          <Badge className="bg-purple-100 text-purple-800" size="sm">
-                            Panel
-                          </Badge>
-                        )}
                       </div>
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span className="flex items-center">

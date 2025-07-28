@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useTenantStore } from '@/stores/tenantStore';
+import { useTenantStore } from '@/stores/tenant.store';
 
 interface Order {
   id: string;

@@ -4,11 +4,11 @@ import { PhlebotomistApp } from './PhlebotomistApp';
 import { LabStaffApp } from './LabStaffApp';
 import { ClinicianApp } from '@/apps/clinician/ClinicianApp';
 import { Preferences } from '@capacitor/preferences';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth.store';
 
 export const MobileAppSelector: React.FC = () => {
   const [appType, setAppType] = React.useState<'patient' | 'phlebotomist' | 'labstaff' | 'clinician' | null>(null);
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
 
   React.useEffect(() => {
     // Check for app type stored in preferences
@@ -18,15 +18,15 @@ export const MobileAppSelector: React.FC = () => {
         setAppType(value as any);
       } else {
         // Determine app type based on user role
-        if (user) {
-          switch (user.role) {
+        if (currentUser) {
+          switch (currentUser.role) {
             case 'patient':
               setAppType('patient');
               break;
             case 'phlebotomist':
               setAppType('phlebotomist');
               break;
-            case 'lab_staff':
+            case 'lab_technician':
               setAppType('labstaff');
               break;
             case 'clinician':
@@ -43,7 +43,7 @@ export const MobileAppSelector: React.FC = () => {
     };
     
     checkAppType();
-  }, [user]);
+  }, [currentUser]);
 
   // In production, each app would be a separate build
   // This is for development/demo purposes

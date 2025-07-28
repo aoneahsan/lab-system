@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GeneralSettings as GeneralSettingsType } from '../../services/settings';
+import type { GeneralSettings as GeneralSettingsType } from '../../services/settings';
 
 interface GeneralSettingsProps {
   settings: GeneralSettingsType;

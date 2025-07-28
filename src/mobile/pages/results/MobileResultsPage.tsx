@@ -11,21 +11,21 @@ import {
   AlertCircle,
   Clock
 } from 'lucide-react';
-import { useResults } from '@/hooks/useResults';
+import { useTestResults } from '@/hooks/useTestResults';
 import { useAuthStore } from '@/stores/auth.store';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { toast } from '@/hooks/useToast';
-import type { Result } from '@/types/result.types';
+import type { TestTestResult } from '@/types/result.types';
 
-const MobileResultsPage: React.FC = () => {
+const MobileTestResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
   // In real app, would filter by patient ID
-  const { data: results = [], isLoading } = useResults();
+  const { data: results = [], isLoading } = useTestResults();
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -53,7 +53,7 @@ const MobileResultsPage: React.FC = () => {
     }
   };
 
-  const downloadReport = async (result: Result) => {
+  const downloadReport = async (result: TestResult) => {
     try {
       // In real app, would fetch PDF from server
       const pdfBase64 = 'mock-pdf-content';
@@ -73,7 +73,7 @@ const MobileResultsPage: React.FC = () => {
     }
   };
 
-  const shareReport = async (result: Result) => {
+  const shareReport = async (result: TestResult) => {
     try {
       await Share.share({
         title: `Lab Report - ${result.testName}`,
@@ -86,26 +86,26 @@ const MobileResultsPage: React.FC = () => {
     }
   };
 
-  const filteredResults = results.filter(result => {
+  const filteredTestResults = results.filter(result => {
     const matchesSearch = result.testName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || result.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const groupedResults = filteredResults.reduce((groups, result) => {
+  const groupedTestResults = filteredTestResults.reduce((groups, result) => {
     const date = new Date(result.resultedAt).toLocaleDateString();
     if (!groups[date]) {
       groups[date] = [];
     }
     groups[date].push(result);
     return groups;
-  }, {} as Record<string, Result[]>);
+  }, {} as Record<string, TestResult[]>);
 
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm px-6 pt-12 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Test Results</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Test TestResults</h1>
         
         {/* Search and Filter */}
         <div className="space-y-3">
@@ -138,24 +138,24 @@ const MobileResultsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Results List */}
+      {/* TestResults List */}
       <div className="flex-1 px-6 py-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
-        ) : Object.keys(groupedResults).length === 0 ? (
+        ) : Object.keys(groupedTestResults).length === 0 ? (
           <div className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No results found</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {Object.entries(groupedResults).map(([date, dateResults]) => (
+            {Object.entries(groupedTestResults).map(([date, dateTestResults]) => (
               <div key={date}>
                 <h3 className="text-sm font-medium text-gray-500 mb-3">{date}</h3>
                 <div className="space-y-3">
-                  {dateResults.map((result) => (
+                  {dateTestResults.map((result) => (
                     <div
                       key={result.id}
                       className="bg-white rounded-lg shadow-sm p-4"
@@ -175,11 +175,11 @@ const MobileResultsPage: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* Result Value */}
+                      {/* TestResult Value */}
                       {result.value && (
                         <div className="bg-gray-50 rounded-lg p-3 mb-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Result</span>
+                            <span className="text-sm text-gray-600">TestResult</span>
                             <span className="font-medium text-gray-900">
                               {result.value.numeric} {result.value.unit}
                             </span>
@@ -226,4 +226,4 @@ const MobileResultsPage: React.FC = () => {
   );
 };
 
-export default MobileResultsPage;
+export default MobileTestResultsPage;

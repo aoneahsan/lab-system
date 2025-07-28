@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { AlertTriangle } from 'lucide-react';
 
-interface ValidationRuleFormData {
+export interface ValidationRuleFormData {
   testId: string;
   ruleType: 'range' | 'delta' | 'absurd' | 'critical' | 'custom';
   minValue?: number;

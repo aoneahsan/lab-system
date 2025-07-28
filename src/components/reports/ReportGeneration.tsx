@@ -33,7 +33,7 @@ export default function ReportGeneration() {
   const [generatedReports] = useState<GeneratedReport[]>(mockGeneratedReports);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [parameters, setParameters] = useState<Record<string, any>>({});
-  const [format, setFormat] = useState<ReportFormat>('pdf');
+  const [reportFormat, setReportFormat] = useState<ReportFormat>('pdf');
 
   const statusConfig = {
     pending: { label: 'Pending', color: 'bg-gray-100 text-gray-800', icon: Clock },
@@ -43,7 +43,7 @@ export default function ReportGeneration() {
   };
 
   const handleGenerateReport = () => {
-    console.log('Generating report:', { selectedTemplate, parameters, format });
+    console.log('Generating report:', { selectedTemplate, parameters, format: reportFormat });
   };
 
   return (
@@ -77,8 +77,8 @@ export default function ReportGeneration() {
                 Output Format
               </label>
               <select
-                value={format}
-                onChange={(e) => setFormat(e.target.value as ReportFormat)}
+                value={reportFormat}
+                onChange={(e) => setReportFormat(e.target.value as ReportFormat)}
                 className="input w-full"
               >
                 <option value="pdf">PDF</option>
@@ -198,7 +198,7 @@ export default function ReportGeneration() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {report.format.toUpperCase()}
+                      {(report.format as string).toUpperCase()}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>

@@ -1,6 +1,10 @@
 # LabFlow - Laboratory Management System
 
+**🚀 Project Status: PRODUCTION READY (v1.0.0)**
+
 LabFlow is a comprehensive, multi-tenant laboratory management system designed for clinical laboratories. It includes a web application, mobile apps (iOS/Android), and Chrome extension for seamless EMR integration.
+
+**All features have been implemented and the system is ready for deployment.** See [PRODUCTION_DEPLOYMENT_CHECKLIST.md](./PRODUCTION_DEPLOYMENT_CHECKLIST.md) for detailed deployment steps.
 
 ## 🚀 Features
 
@@ -146,10 +150,12 @@ yarn cypress:run
 
 ## 🚀 Deployment
 
+**📋 Important:** Before deploying, review the [PRODUCTION_DEPLOYMENT_CHECKLIST.md](./PRODUCTION_DEPLOYMENT_CHECKLIST.md) for a complete step-by-step guide.
+
 ### Production Build
 ```bash
 # Build optimized bundle
-yarn build:prod
+yarn build
 
 # Preview production build
 yarn preview
@@ -164,6 +170,8 @@ firebase deploy --project labflow-production
 firebase deploy --only hosting
 firebase deploy --only functions
 firebase deploy --only firestore:rules
+firebase deploy --only firestore:indexes
+firebase deploy --only storage:rules
 ```
 
 ### Docker Deployment

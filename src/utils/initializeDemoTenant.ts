@@ -51,7 +51,7 @@ export const initializeDemoTenant = async () => {
       
       console.log('✅ DEMO tenant created successfully');
     }
-  } catch (error) {
+  } catch {
     // Silently fail if no permissions - this is expected for regular users
     console.log('Could not initialize DEMO tenant - this is normal for non-admin users');
   }

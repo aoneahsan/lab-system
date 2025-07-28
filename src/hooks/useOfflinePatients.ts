@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { patientOfflineService } from '@/services/patient-offline.service';
-import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { useOffline } from './useOffline';
 import type {
   Patient,
@@ -10,7 +10,7 @@ import type {
 } from '@/types/patient.types';
 
 export const useOfflinePatients = (filters?: PatientSearchFilters) => {
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { isOffline } = useOffline();
   const tenantId = currentTenant?.id || '';
 
@@ -24,7 +24,7 @@ export const useOfflinePatients = (filters?: PatientSearchFilters) => {
 };
 
 export const useOfflinePatient = (patientId: string) => {
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { isOffline } = useOffline();
   const tenantId = currentTenant?.id || '';
 
@@ -39,7 +39,7 @@ export const useOfflinePatient = (patientId: string) => {
 
 export const useCreateOfflinePatient = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { queueOperation } = useOffline();
   const tenantId = currentTenant?.id || '';
 
@@ -64,7 +64,7 @@ export const useCreateOfflinePatient = () => {
 
 export const useUpdateOfflinePatient = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const tenantId = currentTenant?.id || '';
 
   return useMutation({
@@ -84,7 +84,7 @@ export const useUpdateOfflinePatient = () => {
 
 export const useDeleteOfflinePatient = () => {
   const queryClient = useQueryClient();
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const tenantId = currentTenant?.id || '';
 
   return useMutation({
@@ -108,7 +108,7 @@ export const useDeleteOfflinePatient = () => {
 };
 
 export const useOfflinePatientStats = () => {
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { isOffline } = useOffline();
   const tenantId = currentTenant?.id || '';
 

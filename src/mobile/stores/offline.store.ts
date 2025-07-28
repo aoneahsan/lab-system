@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
-import { sqlite } from '@capacitor-community/sqlite';
+import { CapacitorSQLite } from '@capacitor-community/sqlite';
 
 interface OfflineCollection {
   id: string;

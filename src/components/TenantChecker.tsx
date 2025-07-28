@@ -8,7 +8,7 @@ interface TenantCheckerProps {
 
 export const TenantChecker = ({ children }: TenantCheckerProps) => {
   const { currentUser } = useAuthStore();
-  const { loadTenant, currentTenant, isLoading } = useTenantStore();
+  const { fetchTenant, currentTenant, isLoading } = useTenantStore();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export const TenantChecker = ({ children }: TenantCheckerProps) => {
       }
 
       try {
-        await loadTenant(currentUser.tenantId);
+        await fetchTenant(currentUser.tenantId);
       } catch (err) {
         console.error('Error loading tenant:', err);
         setError('Unable to load tenant information. Please contact support.');
@@ -29,7 +29,7 @@ export const TenantChecker = ({ children }: TenantCheckerProps) => {
     if (currentUser && !currentTenant) {
       checkTenant();
     }
-  }, [currentUser, currentTenant, loadTenant]);
+  }, [currentUser, currentTenant, fetchTenant]);
 
   if (isLoading) {
     return (

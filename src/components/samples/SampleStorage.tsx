@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Package, Thermometer, Calendar, AlertCircle, Grid3X3 } from 'lucide-react';
-import { Sample, StorageTemperature } from '@/types/sample.types';
+import { useState } from 'react';
+import { Package, Thermometer, AlertCircle, Grid3X3 } from 'lucide-react';
+import type { Sample, StorageTemperature } from '@/types/sample.types';
 
 interface StorageLocationProps {
   locationId: string;

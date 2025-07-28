@@ -18,7 +18,7 @@ type LoginFormData = yup.InferType<typeof schema>;
 
 const PhlebotomistLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, isLoading } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const { initializeDatabase, setOnlineStatus, isOnline } = useOfflineStore();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -61,7 +61,7 @@ const PhlebotomistLoginPage: React.FC = () => {
         return;
       }
 
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
       navigate('/home');
     } catch (error) {
       toast.error('Invalid email or password');

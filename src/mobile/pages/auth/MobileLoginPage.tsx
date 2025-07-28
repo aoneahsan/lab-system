@@ -5,7 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Fingerprint, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
-import { BiometricAuth } from '@capacitor-community/biometric-auth';
+import type { BiometricAuthPlugin } from 'capacitor-biometric-authentication';
+import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { Preferences } from '@capacitor/preferences';
 import { App } from '@capacitor/app';
 import { toast } from '@/hooks/useToast';
@@ -19,7 +20,7 @@ type LoginFormData = yup.InferType<typeof schema>;
 
 const MobileLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, isLoading } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
@@ -72,7 +73,7 @@ const MobileLoginPage: React.FC = () => {
         
         if (email && token) {
           // Restore session
-          await signIn(email, ''); // Token-based auth
+          await login(email, ''); // Token-based auth
           navigate('/home');
         }
       }
@@ -84,7 +85,7 @@ const MobileLoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
       
       // Save credentials for biometric login
       await Preferences.set({ key: 'user_email', value: data.email });

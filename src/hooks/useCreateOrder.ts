@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useTenantStore } from '@/stores/tenantStore';
-import { useAuthStore } from '@/stores/authStore';
+import { useTenantStore } from '@/stores/tenant.store';
+import { useAuthStore } from '@/stores/auth.store';
 
 interface CreateOrderData {
   patientId: string;
@@ -22,12 +22,12 @@ interface CreateOrderData {
 
 export function useCreateOrder() {
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
+  const { currentUser } = useAuthStore();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: CreateOrderData) => {
-      if (!currentTenant || !user) throw new Error('Not authenticated');
+      if (!currentTenant || !currentUser) throw new Error('Not authenticated');
 
       const ordersRef = collection(db, `${currentTenant.id}_orders`);
       
@@ -41,14 +41,14 @@ export function useCreateOrder() {
         ...data,
         orderNumber,
         patientAge,
-        clinicianId: user.uid,
+        clinicianId: currentUser.uid,
         status: 'pending',
         createdAt: serverTimestamp(),
-        createdBy: user.uid,
+        createdBy: currentUser.uid,
         timeline: [{
           action: 'Order created',
           timestamp: new Date(),
-          user: user.name || user.email || 'Unknown',
+          user: currentUser.displayName || currentUser.email || 'Unknown',
         }],
       };
 
