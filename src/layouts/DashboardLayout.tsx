@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
+import { useImpersonationStore } from '@/stores/impersonation.store';
+import { toast } from '@/stores/toast.store';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊', roles: 'all' },
@@ -78,18 +80,51 @@ const navigation = [
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { currentUser, logout } = useAuthStore();
   const { tenant } = useTenant();
+  const { isImpersonating, impersonatedUser, endImpersonation } = useImpersonationStore();
+
+  const handleEndImpersonation = () => {
+    endImpersonation();
+    toast.success('Impersonation ended', 'Returning to admin panel');
+    navigate('/admin');
+  };
+
+  // Use impersonated user's role for navigation if impersonating
+  const effectiveUser = isImpersonating && impersonatedUser ? impersonatedUser : currentUser;
 
   const filteredNavigation = navigation.filter((item) => {
+    // During impersonation, hide admin panel
+    if (isImpersonating && item.href === '/admin') return false;
+    
     if (item.roles === 'all') return true;
-    return item.roles.includes(currentUser?.role || '');
+    return item.roles.includes(effectiveUser?.role || '');
   });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Impersonation Banner */}
+      {isImpersonating && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-purple-600 text-white p-2">
+          <div className="flex items-center justify-between container mx-auto px-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                Impersonating: {impersonatedUser?.email} ({impersonatedUser?.role})
+              </span>
+            </div>
+            <button
+              onClick={handleEndImpersonation}
+              className="px-3 py-1 bg-white text-purple-600 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors"
+            >
+              End Impersonation
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile sidebar toggle */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className={`lg:hidden fixed left-4 z-50 ${isImpersonating ? 'top-14' : 'top-4'}`}>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md"
@@ -102,7 +137,7 @@ export const DashboardLayout = () => {
       <div
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 transition-transform duration-300`}
+        } lg:translate-x-0 transition-transform duration-300 ${isImpersonating ? 'top-10' : 'top-0'}`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -145,8 +180,11 @@ export const DashboardLayout = () => {
               >
                 <span className="text-xl">👤</span>
                 <div className="flex-1">
-                  <p className="font-medium">{currentUser?.displayName}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser?.role}</p>
+                  <p className="font-medium">{effectiveUser?.displayName}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{effectiveUser?.role}</p>
+                  {isImpersonating && (
+                    <p className="text-xs text-purple-600 dark:text-purple-400">Impersonating</p>
+                  )}
                 </div>
               </Link>
               <button
@@ -162,7 +200,7 @@ export const DashboardLayout = () => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className={`lg:pl-64 ${isImpersonating ? 'pt-10' : ''}`}>
         <main className="min-h-screen p-4 lg:p-8">
           <Outlet />
         </main>

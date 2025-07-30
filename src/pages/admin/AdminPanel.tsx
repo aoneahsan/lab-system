@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { Shield, Users, Building2, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useImpersonationStore } from '@/stores/impersonation.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -30,6 +32,8 @@ interface Tenant {
 
 const AdminPanel = () => {
   const { currentUser } = useAuthStore();
+  const { startImpersonation } = useImpersonationStore();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'users' | 'tenants'>('users');
   const [users, setUsers] = useState<User[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -135,6 +139,31 @@ const AdminPanel = () => {
     } finally {
       setUpdating(null);
     }
+  };
+
+  const handleImpersonateUser = (user: User) => {
+    if (!currentUser || user.role === 'super_admin') {
+      toast.error('Cannot impersonate', 'You cannot impersonate another super admin');
+      return;
+    }
+
+    const impersonatedUser = {
+      id: user.id,
+      email: user.email,
+      displayName: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      tenantId: user.tenantId || '',
+      isActive: user.isActive,
+      settings: {},
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    startImpersonation(impersonatedUser, currentUser);
+    toast.success('Impersonation started', `Now impersonating ${user.email}`);
+    navigate('/dashboard');
   };
 
   if (!isSuperAdmin) {
@@ -253,19 +282,32 @@ const AdminPanel = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => toggleUserStatus(user.id, user.isActive)}
-                      disabled={updating === user.id || user.id === currentUser?.id}
-                      className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {updating === user.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : user.isActive ? (
-                        <XCircle className="h-4 w-4" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4" />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleUserStatus(user.id, user.isActive)}
+                        disabled={updating === user.id || user.id === currentUser?.id}
+                        className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={user.isActive ? 'Deactivate' : 'Activate'}
+                      >
+                        {updating === user.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : user.isActive ? (
+                          <XCircle className="h-4 w-4" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4" />
+                        )}
+                      </button>
+                      {user.role !== 'super_admin' && user.id !== currentUser?.id && (
+                        <button
+                          onClick={() => handleImpersonateUser(user)}
+                          disabled={!user.isActive}
+                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Impersonate User"
+                        >
+                          <UserCheck className="h-4 w-4" />
+                        </button>
                       )}
-                    </button>
+                    </div>
                   </td>
                 </tr>
               ))}

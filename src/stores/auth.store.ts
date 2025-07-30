@@ -15,6 +15,7 @@ import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import type { User, LoginCredentials, RegisterData, AuthState } from '@/types/auth.types';
 import { biometricService } from '@/services/biometric.service';
 import type { BiometricAuthResult } from '@/types/biometric.types';
+import { useImpersonationStore } from './impersonation.store';
 
 interface AuthStore extends AuthState {
   setFirebaseUser: (user: FirebaseUser | null) => void;
@@ -207,6 +208,10 @@ export const useAuthStore = create<AuthStore>()(
 
           // Clear biometric data on logout
           await biometricService.clearBiometricData();
+
+          // Clear impersonation state on logout
+          const { clearImpersonation } = useImpersonationStore.getState();
+          clearImpersonation();
 
           await signOut(auth);
           setFirebaseUser(null);

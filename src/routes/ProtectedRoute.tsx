@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { useImpersonationStore } from '@/stores/impersonation.store';
 
 interface ProtectedRouteProps {
   allowedRoles?: string[];
@@ -11,18 +12,52 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
   const { isAuthenticated, currentUser } = useAuthStore();
   const { tenant, isLoading } = useTenant();
   const location = useLocation();
+  const { isImpersonating, impersonatedUser } = useImpersonationStore();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // During impersonation, use the impersonated user for role checks
+  const effectiveUser = isImpersonating && impersonatedUser ? impersonatedUser : currentUser;
+
   // Check role-based access
-  if (allowedRoles && currentUser && !allowedRoles.includes(currentUser.role)) {
+  if (allowedRoles && effectiveUser && !allowedRoles.includes(effectiveUser.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Super admins don't need a tenant - they have system-wide access
-  if (currentUser?.role === 'super_admin') {
+  // Super admins who are NOT impersonating should be redirected to admin panel
+  // when trying to access end-user routes
+  if (currentUser?.role === 'super_admin' && !isImpersonating) {
+    const endUserRoutes = [
+      '/dashboard',
+      '/patients',
+      '/tests',
+      '/samples',
+      '/results',
+      '/billing',
+      '/inventory',
+      '/quality-control',
+      '/reports',
+      '/settings',
+      '/profile',
+      '/onboarding',
+      '/clinician',
+      '/equipment',
+      '/emr',
+      '/analytics'
+    ];
+
+    // Check if current path starts with any end-user route
+    const isEndUserRoute = endUserRoutes.some(route => 
+      location.pathname.startsWith(route)
+    );
+
+    if (isEndUserRoute) {
+      return <Navigate to="/admin" replace />;
+    }
+
+    // Super admins don't need a tenant when accessing admin routes
     return <Outlet />;
   }
 

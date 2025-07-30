@@ -4,6 +4,7 @@ import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { DefaultRedirect } from '@/components/routing/DefaultRedirect';
+import { AdminRouteGuard } from '@/components/routing/AdminRouteGuard';
 
 // Lazy load pages for better performance
 import { lazy, Suspense } from 'react';
@@ -125,7 +126,11 @@ export const AppRouter = () => {
 
         {/* Admin Panel Route */}
         <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/*" element={
+            <AdminRouteGuard>
+              <AdminPanel />
+            </AdminRouteGuard>
+          } />
         </Route>
 
         {/* Clinician App Routes */}
