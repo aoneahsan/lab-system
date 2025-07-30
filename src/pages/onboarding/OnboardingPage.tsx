@@ -36,8 +36,15 @@ const OnboardingPage = () => {
     navigate('/dashboard');
   };
 
+  // If user is not authenticated, redirect to login
   if (!user) {
     navigate('/login');
+    return null;
+  }
+
+  // If user already has a tenant, redirect to dashboard
+  if (user.tenantId) {
+    navigate('/dashboard');
     return null;
   }
 
