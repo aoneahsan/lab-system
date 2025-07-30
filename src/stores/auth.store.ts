@@ -31,6 +31,7 @@ interface AuthStore extends AuthState {
   fetchUserData: (uid: string) => Promise<User | null>;
   updateUserProfile: (userId: string, data: Partial<User>) => Promise<void>;
   refreshUser: () => Promise<void>;
+  joinLaboratory: (tenantCode: string) => Promise<User>;
 
   initializeAuth: () => void;
 }
@@ -94,10 +95,12 @@ export const useAuthStore = create<AuthStore>()(
           setLoading(true);
           setError(null);
 
-          // First check if tenant exists
-          const tenantDoc = await getDoc(doc(firestore, 'tenants', data.tenantCode.toLowerCase()));
-          if (!tenantDoc.exists()) {
-            throw new Error('Invalid laboratory code. Please check and try again.');
+          // Only check tenant if code is provided
+          if (data.tenantCode) {
+            const tenantDoc = await getDoc(doc(firestore, 'tenants', data.tenantCode.toLowerCase()));
+            if (!tenantDoc.exists()) {
+              throw new Error('Invalid laboratory code. Please check and try again.');
+            }
           }
 
           // Create Firebase Auth user
@@ -122,7 +125,7 @@ export const useAuthStore = create<AuthStore>()(
             lastName: data.lastName,
             phoneNumber: data.phoneNumber,
             role: data.role || 'patient',
-            tenantId: data.tenantCode.toLowerCase(),
+            tenantId: data.tenantCode ? data.tenantCode.toLowerCase() : '', // Empty if no tenant
             permissions: [],
             isActive: true,
             isEmailVerified: false,
@@ -136,17 +139,19 @@ export const useAuthStore = create<AuthStore>()(
             updatedAt: serverTimestamp(),
           });
 
-          // Create tenant_users entry
-          const tenantUserId = `${userData.id}_${data.tenantCode.toLowerCase()}`;
-          await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
-            userId: userData.id,
-            tenantId: data.tenantCode.toLowerCase(),
-            role: userData.role,
-            permissions: [],
-            isActive: true,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          });
+          // Only create tenant_users entry if tenant code is provided
+          if (data.tenantCode) {
+            const tenantUserId = `${userData.id}_${data.tenantCode.toLowerCase()}`;
+            await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+              userId: userData.id,
+              tenantId: data.tenantCode.toLowerCase(),
+              role: userData.role,
+              permissions: [],
+              isActive: true,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            });
+          }
 
           setCurrentUser(userData);
           return userData;
@@ -281,6 +286,52 @@ export const useAuthStore = create<AuthStore>()(
 
         if (firebaseUser) {
           await fetchUserData(firebaseUser.uid);
+        }
+      },
+
+      joinLaboratory: async (tenantCode: string) => {
+        const { currentUser, setCurrentUser, setError } = get();
+
+        if (!currentUser) {
+          throw new Error('No authenticated user found');
+        }
+
+        try {
+          // Check if tenant exists
+          const tenantDoc = await getDoc(doc(firestore, 'tenants', tenantCode.toLowerCase()));
+          if (!tenantDoc.exists()) {
+            throw new Error('Invalid laboratory code. Please check and try again.');
+          }
+
+          // Create tenant_users entry
+          const tenantUserId = `${currentUser.id}_${tenantCode.toLowerCase()}`;
+          await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+            userId: currentUser.id,
+            tenantId: tenantCode.toLowerCase(),
+            role: 'patient', // Default role when joining
+            permissions: [],
+            isActive: true,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+
+          // Update user's tenantId
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, currentUser.id), {
+            tenantId: tenantCode.toLowerCase(),
+            updatedAt: serverTimestamp(),
+          });
+
+          // Update local user state
+          const updatedUser = {
+            ...currentUser,
+            tenantId: tenantCode.toLowerCase(),
+          };
+          setCurrentUser(updatedUser);
+
+          return updatedUser;
+        } catch (error) {
+          setError(error as Error);
+          throw error;
         }
       },
 

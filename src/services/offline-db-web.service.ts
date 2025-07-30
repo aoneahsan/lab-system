@@ -8,7 +8,7 @@ interface QueueRecord {
   operation: 'create' | 'update' | 'delete';
   data: any;
   timestamp: number;
-  synced: boolean;
+  synced: number; // 0 = false, 1 = true (IndexedDB doesn't index booleans well)
   retryCount: number;
   lastError?: string;
 }
@@ -87,7 +87,7 @@ export class OfflineDbWebService {
       operation,
       data,
       timestamp: Date.now(),
-      synced: false,
+      synced: 0, // 0 = false
       retryCount: 0,
     });
 
@@ -98,7 +98,7 @@ export class OfflineDbWebService {
   async getPendingOperations(): Promise<OfflineQueueItem[]> {
     const records = await this.db.offlineQueue
       .where('synced')
-      .equals(false)
+      .equals(0) // 0 = false
       .sortBy('timestamp');
 
     return records.map((record) => ({
@@ -107,7 +107,7 @@ export class OfflineDbWebService {
       operation: record.operation,
       data: record.data,
       timestamp: record.timestamp,
-      synced: record.synced,
+      synced: record.synced === 1, // Convert back to boolean
       retryCount: record.retryCount,
       lastError: record.lastError,
     }));
@@ -115,7 +115,7 @@ export class OfflineDbWebService {
 
   // Mark operation as synced
   async markAsSynced(id: string): Promise<void> {
-    await this.db.offlineQueue.update(id, { synced: true });
+    await this.db.offlineQueue.update(id, { synced: 1 }); // 1 = true
     await this.updatePendingCount();
   }
 
@@ -167,7 +167,7 @@ export class OfflineDbWebService {
     const table = this.getTable(collection);
     if (!table) return [];
 
-    let query = table.where('tenantId').equals(tenantId);
+    const query = table.where('tenantId').equals(tenantId);
 
     // Apply filters if provided
     const records = await query.toArray();
@@ -242,7 +242,7 @@ export class OfflineDbWebService {
 
   // Update pending count
   private async updatePendingCount(): Promise<void> {
-    const count = await this.db.offlineQueue.where('synced').equals(false).count();
+    const count = await this.db.offlineQueue.where('synced').equals(0).count(); // 0 = false
     await this.updateMetadata({ pendingChanges: count });
   }
 

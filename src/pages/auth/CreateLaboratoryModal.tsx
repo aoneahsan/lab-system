@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { X, Building2, Loader2 } from 'lucide-react';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
+import { useAuthStore } from '@/stores/auth.store';
+import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 
 interface CreateLaboratoryModalProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ interface CreateLaboratoryModalProps {
 }
 
 const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryModalProps) => {
+  const { currentUser } = useAuthStore();
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
     code: '',
@@ -136,6 +139,30 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
       };
 
       await setDoc(doc(firestore, 'tenants', formData.code.toLowerCase()), tenantData);
+
+      // If user is authenticated, create tenant_user entry and update user record
+      if (currentUser) {
+        // Create tenant_users entry with lab_admin role
+        const tenantUserId = `${currentUser.id}_${formData.code.toLowerCase()}`;
+        await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+          userId: currentUser.id,
+          tenantId: formData.code.toLowerCase(),
+          role: 'lab_admin', // User who creates the lab becomes lab_admin
+          permissions: [],
+          isActive: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+
+        // Update user's tenantId
+        await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, currentUser.id), {
+          tenantId: formData.code.toLowerCase(),
+          updatedAt: serverTimestamp(),
+        });
+
+        // Update the auth store
+        await useAuthStore.getState().refreshUser();
+      }
 
       toast.success('Laboratory created!', `Your laboratory code is: ${formData.code}`);
       onSuccess(formData.code);

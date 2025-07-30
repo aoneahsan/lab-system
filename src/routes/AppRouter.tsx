@@ -11,6 +11,7 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
+const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));
 const PatientDetailPage = lazy(() => import('@/pages/patients/PatientDetailPage'));
@@ -77,6 +78,9 @@ export const AppRouter = () => {
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
+          {/* Onboarding route - outside dashboard layout */}
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />

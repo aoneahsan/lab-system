@@ -4,13 +4,11 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { CheckCircle, XCircle, AlertCircle, Plus } from 'lucide-react';
-import CreateLaboratoryModal from './CreateLaboratoryModal';
+import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register, isLoading } = useAuthStore();
-  const [showCreateLabModal, setShowCreateLabModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -84,8 +82,9 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!tenantValidation.isValid) {
-      toast.error('Invalid laboratory code', 'Please enter a valid laboratory code');
+    // Only validate tenant code if one was provided
+    if (formData.tenantCode && !tenantValidation.isValid) {
+      toast.error('Invalid laboratory code', 'Please enter a valid laboratory code or leave empty');
       return;
     }
 
@@ -106,11 +105,17 @@ const RegisterPage = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phoneNumber: formData.phoneNumber,
-        tenantCode: formData.tenantCode,
+        tenantCode: formData.tenantCode || undefined, // Pass undefined if no tenant code
       });
 
       toast.success('Registration successful', 'Welcome to LabFlow!');
-      navigate('/dashboard');
+      
+      // Navigate to onboarding if no tenant code, otherwise to dashboard
+      if (!formData.tenantCode) {
+        navigate('/onboarding');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unable to create account';
       toast.error('Registration failed', errorMessage);
@@ -221,13 +226,12 @@ const RegisterPage = () => {
 
         <div>
           <label htmlFor="tenantCode" className="label">
-            Laboratory code
+            Laboratory code (optional)
           </label>
           <div className="relative">
             <input
               id="tenantCode"
               type="text"
-              required
               className={`input pr-10 ${
                 formData.tenantCode && !tenantValidation.isChecking
                   ? tenantValidation.isValid
@@ -239,7 +243,7 @@ const RegisterPage = () => {
               onChange={(e) =>
                 setFormData({ ...formData, tenantCode: e.target.value.toUpperCase() })
               }
-              placeholder="Enter DEMO or your lab code"
+              placeholder="Enter DEMO or leave empty to create new"
             />
             {formData.tenantCode && (
               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -262,19 +266,10 @@ const RegisterPage = () => {
               {tenantValidation.message}
             </p>
           )}
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2">
             <p className="text-xs text-gray-500">
-              Try <span className="font-semibold">DEMO</span> for testing
+              Leave empty to create a new laboratory after registration, or use <span className="font-semibold">DEMO</span> for testing
             </p>
-            <span className="text-xs text-gray-400">or</span>
-            <button
-              type="button"
-              onClick={() => setShowCreateLabModal(true)}
-              className="inline-flex items-center text-xs text-primary-600 hover:text-primary-500"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Create new laboratory
-            </button>
           </div>
         </div>
 
@@ -416,15 +411,6 @@ const RegisterPage = () => {
           </Link>
         </p>
       </div>
-
-      <CreateLaboratoryModal
-        isOpen={showCreateLabModal}
-        onClose={() => setShowCreateLabModal(false)}
-        onSuccess={(code) => {
-          setFormData({ ...formData, tenantCode: code });
-          setShowCreateLabModal(false);
-        }}
-      />
     </div>
   );
 };
