@@ -37,26 +37,31 @@ class OfflineSyncService {
   private networkListener: any = null;
 
   async initialize(): Promise<void> {
-    // Initialize offline database
-    await offlineDbService.initialize();
+    try {
+      // Initialize offline database
+      await offlineDbService.initialize();
 
-    // Set up network listener
-    this.networkListener = await Network.addListener('networkStatusChange', async (status) => {
+      // Set up network listener
+      this.networkListener = await Network.addListener('networkStatusChange', async (status) => {
+        if (status.connected) {
+          console.log('Network connection restored, initiating sync...');
+          await this.performSync();
+        }
+      });
+
+      // Check current network status
+      const status = await Network.getStatus();
       if (status.connected) {
-        console.log('Network connection restored, initiating sync...');
+        // Perform initial sync
         await this.performSync();
       }
-    });
 
-    // Check current network status
-    const status = await Network.getStatus();
-    if (status.connected) {
-      // Perform initial sync
-      await this.performSync();
+      // Set up periodic sync (every 5 minutes when online)
+      this.startPeriodicSync();
+    } catch (error) {
+      console.error('Failed to initialize offline sync service:', error);
+      // Don't throw error to prevent app from crashing
     }
-
-    // Set up periodic sync (every 5 minutes when online)
-    this.startPeriodicSync();
   }
 
   // Start periodic sync
@@ -157,7 +162,7 @@ class OfflineSyncService {
 
       // Update last sync time
       await offlineDbService.getMetadata();
-      await offlineDbService['updateMetadata']({ lastSyncTime: Date.now() });
+      await offlineDbService.updateMetadata({ lastSyncTime: Date.now() });
 
       // Fetch latest data from server
       await this.fetchLatestData();
