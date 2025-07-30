@@ -21,7 +21,8 @@ const firestore = admin.firestore();
 
 async function createSuperAdmin() {
   const email = 'aoneahsan@gmail.com';
-  const password = 'Ahsan6553665201!';
+  // Generate a secure random password
+  const password = require('crypto').randomBytes(16).toString('hex') + 'Aa1!';
   const firstName = 'Super';
   const lastName = 'Admin';
 
@@ -74,10 +75,13 @@ async function createSuperAdmin() {
     await firestore.collection('users').doc(userRecord.uid).set(userData, { merge: true });
     console.log('User document created/updated in Firestore');
 
+    // Send email with credentials (requires SendGrid configuration)
     console.log('\n✅ Super admin account created successfully!');
     console.log('Email:', email);
     console.log('Password:', password);
     console.log('Role: super_admin');
+    console.log('\n⚠️  IMPORTANT: Save this password securely!');
+    console.log('For production, configure SendGrid to email credentials instead of displaying them.');
     console.log('\nYou can now login and access the admin panel at /admin');
 
   } catch (error) {

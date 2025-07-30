@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth, firestore } from '@/config/firebase.config';
 import { Shield, Loader2 } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
@@ -14,23 +15,34 @@ const CreateSuperAdmin = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
   
-  // Pre-filled super admin credentials
+  // Pre-filled super admin data
   const superAdminData = {
     email: 'aoneahsan@gmail.com',
-    password: 'Ahsan6553665201!',
     firstName: 'Super',
     lastName: 'Admin',
   };
 
   const handleCreateSuperAdmin = async () => {
     setIsCreating(true);
+    
+    // Generate a secure random password
+    const generatePassword = () => {
+      const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+      let password = '';
+      for (let i = 0; i < 16; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      return password + 'Aa1!'; // Ensure it meets Firebase requirements
+    };
+    
+    const password = generatePassword();
 
     try {
       // Create auth user
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         superAdminData.email,
-        superAdminData.password
+        password
       );
 
       const user = userCredential.user;
@@ -70,20 +82,38 @@ const CreateSuperAdmin = () => {
 
       await setDoc(doc(firestore, COLLECTION_NAMES.USERS, user.uid), userData);
 
-      toast.success(
-        'Super Admin Created!',
-        'You can now login with the super admin credentials'
-      );
+      // Send email with credentials
+      try {
+        const functions = getFunctions();
+        const sendCredentials = httpsCallable(functions, 'sendSuperAdminCredentials');
+        await sendCredentials({
+          email: superAdminData.email,
+          password: password,
+          firstName: superAdminData.firstName,
+          lastName: superAdminData.lastName
+        });
+        
+        toast.success(
+          'Super Admin Created!',
+          'Credentials have been sent to your email'
+        );
+      } catch (emailError) {
+        console.error('Failed to send email:', emailError);
+        // Still show success but warn about email
+        toast.warning(
+          'Account Created',
+          'Account created but email sending failed. Please use password reset.'
+        );
+      }
 
       // Show success message
       alert(`
         ✅ Super Admin Account Created Successfully!
         
         Email: ${superAdminData.email}
-        Password: ${superAdminData.password}
         
-        Please save these credentials securely.
-        You can now login and access the admin panel at /admin
+        Please check your email for the login credentials.
+        If you don't receive the email, use the "Forgot Password" option.
       `);
 
       navigate('/login');
@@ -143,15 +173,14 @@ const CreateSuperAdmin = () => {
                 </h3>
                 <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                   <p>Email: {superAdminData.email}</p>
-                  <p>Password: {superAdminData.password}</p>
                   <p>Role: super_admin</p>
                 </div>
               </div>
 
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  ⚠️ Save these credentials securely. This page should be removed
-                  after initial setup.
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  ℹ️ After creation, credentials will be sent to your email.
+                  If email fails, use the "Forgot Password" option.
                 </p>
               </div>
 

@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { emailService } from '../services/emailService';
 
 const db = admin.firestore();
 
@@ -95,5 +96,74 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
   } catch (error) {
     console.error('Error deactivating user:', error);
     throw new functions.https.HttpsError('internal', 'Failed to deactivate user');
+  }
+});
+
+export const sendSuperAdminCredentials = functions.https.onCall(async (data, context) => {
+  const { email, password, firstName, lastName } = data;
+
+  try {
+    // Email template
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #4f46e5; color: white; padding: 20px; text-align: center; }
+            .content { background-color: #f9fafb; padding: 30px; margin-top: 20px; }
+            .credentials { background-color: white; padding: 20px; margin: 20px 0; border: 1px solid #e5e7eb; }
+            .important { color: #dc2626; font-weight: bold; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>LabFlow Super Admin Account Created</h1>
+            </div>
+            <div class="content">
+              <p>Hello ${firstName} ${lastName},</p>
+              
+              <p>Your super admin account has been successfully created. Below are your login credentials:</p>
+              
+              <div class="credentials">
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p><strong>Role:</strong> Super Admin</p>
+              </div>
+              
+              <p class="important">⚠️ Important Security Notice:</p>
+              <ul>
+                <li>Please save these credentials securely</li>
+                <li>We recommend changing your password after first login</li>
+                <li>Do not share these credentials with anyone</li>
+              </ul>
+              
+              <p>You can now access the admin panel at: <strong>/admin</strong></p>
+              
+              <p>If you didn't request this account, please ignore this email and contact support immediately.</p>
+            </div>
+            <div class="footer">
+              <p>This is an automated message from LabFlow</p>
+              <p>© ${new Date().getFullYear()} LabFlow. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Send email
+    await emailService.send(
+      email,
+      'Your LabFlow Super Admin Credentials',
+      emailHtml
+    );
+
+    return { success: true, message: 'Credentials sent successfully' };
+  } catch (error) {
+    console.error('Error sending super admin credentials:', error);
+    throw new functions.https.HttpsError('internal', 'Failed to send credentials email');
   }
 });
