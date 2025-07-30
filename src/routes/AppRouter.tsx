@@ -46,7 +46,9 @@ const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const BiometricSettingsPage = lazy(() => import('@/pages/settings/BiometricSettingsPage'));
 const ValidationRulesPage = lazy(() => import('@/pages/settings/ValidationRulesPage'));
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
+const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
+const AdminPanel = lazy(() => import('@/pages/admin/AdminPanel'));
 
 // Clinician App
 const ClinicianApp = lazy(() =>
@@ -74,6 +76,7 @@ export const AppRouter = () => {
             element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPasswordPage />}
           />
           <Route path="/setup-demo" element={<SetupDemoPage />} />
+          <Route path="/setup-super-admin" element={<CreateSuperAdmin />} />
         </Route>
 
         {/* Protected routes */}
@@ -117,6 +120,11 @@ export const AppRouter = () => {
             <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
+        </Route>
+
+        {/* Admin Panel Route */}
+        <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
+          <Route path="/admin" element={<AdminPanel />} />
         </Route>
 
         {/* Clinician App Routes */}

@@ -134,6 +134,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
           status: 'active',
           validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days trial
         },
+        isActive: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -164,7 +165,6 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
         await useAuthStore.getState().refreshUser();
       }
 
-      toast.success('Laboratory created!', `Your laboratory code is: ${formData.code}`);
       onSuccess(formData.code);
     } catch (error) {
       console.error('Error creating laboratory:', error);

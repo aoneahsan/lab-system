@@ -67,6 +67,12 @@ const navigation = [
     icon: '⚙️',
     roles: ['super_admin', 'lab_admin'],
   },
+  {
+    name: 'Admin Panel',
+    href: '/admin',
+    icon: '🛡️',
+    roles: ['super_admin'],
+  },
 ];
 
 export const DashboardLayout = () => {
