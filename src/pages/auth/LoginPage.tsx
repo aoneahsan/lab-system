@@ -34,7 +34,9 @@ const LoginPage = () => {
 
       if (result.success) {
         toast.success('Login successful', 'Welcome back to LabFlow!');
-        navigate('/dashboard');
+        // Redirect based on user role
+        const user = useAuthStore.getState().currentUser;
+        navigate(user?.role === 'super_admin' ? '/admin' : '/dashboard');
       }
     } catch (error) {
       console.error('Biometric login error:', error);
@@ -54,7 +56,9 @@ const LoginPage = () => {
       });
 
       toast.success('Login successful', 'Welcome back to LabFlow!');
-      navigate('/dashboard');
+      // Redirect based on user role
+      const user = useAuthStore.getState().currentUser;
+      navigate(user?.role === 'super_admin' ? '/admin' : '/dashboard');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Invalid email or password';
       toast.error('Login failed', errorMessage);

@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import { DefaultRedirect } from '@/components/routing/DefaultRedirect';
 
 // Lazy load pages for better performance
 import { lazy, Suspense } from 'react';
@@ -65,15 +66,15 @@ export const AppRouter = () => {
         <Route element={<AuthLayout />}>
           <Route
             path="/login"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+            element={isAuthenticated ? <DefaultRedirect /> : <LoginPage />}
           />
           <Route
             path="/register"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />}
+            element={isAuthenticated ? <DefaultRedirect /> : <RegisterPage />}
           />
           <Route
             path="/forgot-password"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPasswordPage />}
+            element={isAuthenticated ? <DefaultRedirect /> : <ForgotPasswordPage />}
           />
           <Route path="/setup-demo" element={<SetupDemoPage />} />
           <Route path="/setup-super-admin" element={<CreateSuperAdmin />} />
@@ -133,7 +134,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Default redirect */}
-        <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
+        <Route path="/" element={<DefaultRedirect />} />
 
         {/* 404 page */}
         <Route

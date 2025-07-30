@@ -21,6 +21,11 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Super admins don't need a tenant - they have system-wide access
+  if (currentUser?.role === 'super_admin') {
+    return <Outlet />;
+  }
+
   // Allow onboarding page to be accessed without a tenant
   if (location.pathname === '/onboarding') {
     return <Outlet />;
