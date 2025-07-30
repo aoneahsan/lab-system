@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Users, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import CreateLaboratoryModal from '@/pages/auth/CreateLaboratoryModal';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { currentUser, isLoading } = useAuthStore();
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [tenantCode, setTenantCode] = useState('');
@@ -36,15 +37,24 @@ const OnboardingPage = () => {
     navigate('/dashboard');
   };
 
-  // If user is not authenticated, redirect to login
-  if (!user) {
-    navigate('/login');
-    return null;
+  // Use effect to handle navigation after component mounts
+  useEffect(() => {
+    if (!isLoading) {
+      if (!currentUser) {
+        navigate('/login');
+      } else if (currentUser.tenantId) {
+        navigate('/dashboard');
+      }
+    }
+  }, [currentUser, isLoading, navigate]);
+
+  // Show loading screen while checking auth state
+  if (isLoading) {
+    return <LoadingScreen />;
   }
 
-  // If user already has a tenant, redirect to dashboard
-  if (user.tenantId) {
-    navigate('/dashboard');
+  // If still loading or no user, don't render the page yet
+  if (!currentUser) {
     return null;
   }
 
@@ -53,7 +63,7 @@ const OnboardingPage = () => {
       <div className="max-w-2xl w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome to LabFlow, {user.firstName}!
+            Welcome to LabFlow, {currentUser.firstName}!
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Let's get you set up with a laboratory
