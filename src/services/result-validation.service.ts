@@ -231,9 +231,6 @@ export const resultValidationService = {
         result.errors.push(message);
         result.isValid = false;
         break;
-      case 'warn':
-        result.warnings.push(message);
-        break;
     }
 
     // Mark as requiring review for critical or blocked results

@@ -28,7 +28,7 @@ const SampleDetailPage = lazy(() => import('@/pages/samples/SampleDetailPage'));
 const SampleCollectionsPage = lazy(() => import('@/pages/samples/SampleCollectionsPage'));
 const SampleScanPage = lazy(() => import('@/pages/samples/SampleScanPage'));
 const SampleRegistrationPage = lazy(() => import('@/components/samples/SampleRegistration'));
-const ResultsPage = lazy(() => import('@/pages/results/ResultDashboard'));
+const ResultsPage = lazy(() => import('@/pages/results/ResultsPage'));
 const ResultEntryPage = lazy(() => import('@/pages/results/ResultEntryPage'));
 const ResultReviewPage = lazy(() => import('@/pages/results/ResultReviewPage'));
 const BillingPage = lazy(() => import('@/pages/billing/BillingPage'));
@@ -47,6 +47,7 @@ const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const BiometricSettingsPage = lazy(() => import('@/pages/settings/BiometricSettingsPage'));
 const ValidationRulesPage = lazy(() => import('@/pages/settings/ValidationRulesPage'));
+const ResultValidationRulesPage = lazy(() => import('@/pages/results/ValidationRulesPage'));
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
@@ -104,6 +105,7 @@ export const AppRouter = () => {
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/results/entry" element={<ResultEntryPage />} />
             <Route path="/results/review" element={<ResultReviewPage />} />
+            <Route path="/results/validation-rules" element={<ResultValidationRulesPage />} />
             <Route path="/billing" element={<BillingPage />} />
             <Route path="/billing/invoices/:invoiceId" element={<InvoiceDetailPage />} />
             <Route path="/billing/payments" element={<PaymentsPage />} />

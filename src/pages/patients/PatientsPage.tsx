@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePatients, usePatientStats } from '@/hooks/usePatients';
 import { PatientSearchFilters } from '@/components/patients/PatientSearchFilters';
 import { PatientListTable } from '@/components/patients/PatientListTable';
@@ -8,11 +8,23 @@ import type { PatientSearchFilters as Filters } from '@/types/patient.types';
 
 const PatientsPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
 
   const { data: patientsData, isLoading } = usePatients(filters);
   const { data: stats } = usePatientStats();
+
+  // Check URL params on mount
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'new') {
+      setShowRegistrationForm(true);
+      // Remove the action param after opening the form
+      searchParams.delete('action');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSearch = () => {
     // Trigger re-fetch with new filters

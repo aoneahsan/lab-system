@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useTestOrders, useCreateTestOrder, useUpdateTestOrderStatus } from '@/hooks/useTests';
 import TestOrderForm from '@/components/tests/TestOrderForm';
+import QuickTestOrder from '@/components/tests/QuickTestOrder';
 import type { TestOrder, TestOrderFormData, TestOrderFilter } from '@/types/test.types';
 
 const TestOrdersPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
   const [filter, setFilter] = useState<TestOrderFilter>({});
 
   const { data: orders = [], isLoading } = useTestOrders(filter);
   const createOrderMutation = useCreateTestOrder();
   const updateStatusMutation = useUpdateTestOrderStatus();
+
+  // Check URL params on mount
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'new') {
+      setShowAddForm(true);
+      // Remove the action param after opening the form
+      searchParams.delete('action');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleCreateOrder = async (data: TestOrderFormData) => {
     await createOrderMutation.mutateAsync(data);
@@ -115,13 +128,16 @@ const TestOrdersPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900">Test Orders</h1>
             <p className="text-gray-600 mt-2">Manage laboratory test orders</p>
           </div>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            New Order
-          </button>
+          <div className="flex items-center gap-3">
+            <QuickTestOrder />
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              New Order
+            </button>
+          </div>
         </div>
       </div>
 

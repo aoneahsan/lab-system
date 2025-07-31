@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, updateDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck } from 'lucide-react';
+import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route } from 'react-router-dom';
+import AdminDashboard from './AdminDashboard';
 
 interface User {
   id: string;
@@ -34,7 +35,7 @@ const AdminPanel = () => {
   const { currentUser } = useAuthStore();
   const { startImpersonation } = useImpersonationStore();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'tenants'>('users');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue'>('dashboard');
   const [users, setUsers] = useState<User[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,10 +196,21 @@ const AdminPanel = () => {
 
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-8 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              activeTab === 'dashboard'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+          >
+            <BarChart3 className="h-5 w-5 inline-block mr-2" />
+            Dashboard
+          </button>
           <button
             onClick={() => setActiveTab('users')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
               activeTab === 'users'
                 ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
@@ -209,7 +221,7 @@ const AdminPanel = () => {
           </button>
           <button
             onClick={() => setActiveTab('tenants')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
               activeTab === 'tenants'
                 ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
@@ -218,11 +230,35 @@ const AdminPanel = () => {
             <Building2 className="h-5 w-5 inline-block mr-2" />
             Tenants
           </button>
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              activeTab === 'reports'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+          >
+            <FileText className="h-5 w-5 inline-block mr-2" />
+            Reports
+          </button>
+          <button
+            onClick={() => setActiveTab('revenue')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              activeTab === 'revenue'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+          >
+            <CreditCard className="h-5 w-5 inline-block mr-2" />
+            Revenue
+          </button>
         </nav>
       </div>
 
       {/* Content */}
-      {loading ? (
+      {activeTab === 'dashboard' ? (
+        <AdminDashboard />
+      ) : loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
         </div>
@@ -314,7 +350,7 @@ const AdminPanel = () => {
             </tbody>
           </table>
         </div>
-      ) : (
+      ) : activeTab === 'tenants' ? (
         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -389,7 +425,83 @@ const AdminPanel = () => {
             </tbody>
           </table>
         </div>
-      )}
+      ) : activeTab === 'reports' ? (
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg p-6">
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              System Reports
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              Generate and view comprehensive reports across all tenants
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-3xl mx-auto">
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                User Activity Report
+              </button>
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Test Volume Report
+              </button>
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Revenue Summary
+              </button>
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Patient Demographics
+              </button>
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Lab Performance
+              </button>
+              <button className="btn btn-outline">
+                <FileText className="h-4 w-4 mr-2" />
+                Compliance Report
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === 'revenue' ? (
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg p-6">
+          <div className="text-center py-12">
+            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Revenue Management
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              Track revenue, subscriptions, and billing across all tenants
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="text-3xl mb-2">💰</div>
+                <h4 className="font-medium text-gray-900 dark:text-white">Total Revenue</h4>
+                <p className="text-2xl font-bold text-success-600 dark:text-success-400 mt-2">
+                  $0.00
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All time</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="text-3xl mb-2">📊</div>
+                <h4 className="font-medium text-gray-900 dark:text-white">Monthly Revenue</h4>
+                <p className="text-2xl font-bold text-primary-600 dark:text-primary-400 mt-2">
+                  $0.00
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current month</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="text-3xl mb-2">🔄</div>
+                <h4 className="font-medium text-gray-900 dark:text-white">Active Subscriptions</h4>
+                <p className="text-2xl font-bold text-info-600 dark:text-info-400 mt-2">
+                  0
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Recurring revenue</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

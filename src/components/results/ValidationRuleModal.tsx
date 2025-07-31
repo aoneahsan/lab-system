@@ -2,24 +2,27 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { useTests } from '@/hooks/useTests';
 import { useCreateValidationRule, useUpdateValidationRule } from '@/hooks/useResultValidation';
+import { useTenant } from '@/hooks/useTenant';
 import ValidationRuleForm from './ValidationRuleForm';
-import type { ResultValidation } from '@/types/result.types';
+import type { ResultValidationRule } from '@/types/result.types';
 import type { ValidationRuleFormData } from './ValidationRuleForm';
 
 interface ValidationRuleModalProps {
-  rule?: ResultValidation | null;
+  isOpen: boolean;
+  rule?: ResultValidationRule | null;
   onClose: () => void;
 }
 
-const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose }) => {
+const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ isOpen, rule, onClose }) => {
   const { data: tests } = useTests();
+  const { tenant } = useTenant();
   const createRuleMutation = useCreateValidationRule();
   const updateRuleMutation = useUpdateValidationRule();
 
   const handleSubmit = async (formData: ValidationRuleFormData) => {
-    // Map form data to ResultValidation
-    const validationData: Omit<ResultValidation, 'id' | 'createdAt' | 'updatedAt'> = {
-      tenantId: '', // This should come from context/store
+    // Map form data to ResultValidationRule
+    const validationData: Omit<ResultValidationRule, 'id' | 'createdAt' | 'updatedAt'> = {
+      tenantId: tenant?.id || '',
       testId: formData.testId,
       ruleName: `${formData.ruleType} rule`,
       ruleType: formData.ruleType as any,
@@ -52,6 +55,8 @@ const ValidationRuleModal: React.FC<ValidationRuleModalProps> = ({ rule, onClose
       name: test.name,
       code: test.code,
     })) || [];
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

@@ -15,6 +15,7 @@ import { useTestOrder, useApproveTestOrder, useRejectTestOrder } from '@/hooks/u
 import { usePatient } from '@/hooks/usePatients';
 import { useSampleByOrderId } from '@/hooks/useSamples';
 import TestOrderReview from '@/components/tests/TestOrderReview';
+import SampleBarcode from '@/components/tests/SampleBarcode';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 
@@ -284,6 +285,14 @@ const TestOrderDetailPage: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Sample Barcode - show only if order is approved */}
+          {order.status !== 'awaiting_approval' && order.status !== 'pending' && patient && (
+            <SampleBarcode 
+              order={order} 
+              patientName={`${patient.firstName} ${patient.lastName}`}
+            />
+          )}
+
           {/* Order Details */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Details</h2>

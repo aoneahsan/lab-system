@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Plus,
   AlertCircle,
@@ -9,6 +9,8 @@ import {
   Printer,
   Edit,
   History,
+  Settings,
+  CheckCircle,
 } from 'lucide-react';
 import { useResults, useResultStatistics } from '@/hooks/useResults';
 import { useTenant } from '@/hooks/useTenant';
@@ -20,14 +22,17 @@ import { toast } from '@/stores/toast.store';
 import CriticalResultsDashboard from '@/components/results/CriticalResultsDashboard';
 import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
 import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
+import BatchResultApproval from '@/components/results/BatchResultApproval';
 import type { ResultFilter, TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
 import type { Patient } from '@/types/patient.types';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filters] = useState<ResultFilter>({});
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
+  const [showBatchApproval, setShowBatchApproval] = useState(false);
   const [amendmentModal, setAmendmentModal] = useState<{
     isOpen: boolean;
     result: TestResult | null;
@@ -49,6 +54,31 @@ const ResultsPage: React.FC = () => {
   const patients = patientsData?.patients || [];
   const samples = samplesData || [];
   const tests = testsData || [];
+
+  // Handle URL query parameters
+  useEffect(() => {
+    const action = searchParams.get('action');
+    const view = searchParams.get('view');
+    
+    if (action === 'enter') {
+      navigate('/results/entry');
+    } else if (action === 'review') {
+      navigate('/results/review');
+    } else if (view === 'critical') {
+      // Scroll to critical results section
+      const element = document.getElementById('critical-results');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    
+    // Clean up the URL
+    if (action || view) {
+      searchParams.delete('action');
+      searchParams.delete('view');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams, navigate]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -234,14 +264,31 @@ const ResultsPage: React.FC = () => {
           </div>
           <div className="flex gap-3">
             {selectedResults.length > 0 && (
-              <button
-                onClick={handleBatchPDF}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download ({selectedResults.length})
-              </button>
+              <>
+                <button
+                  onClick={() => setShowBatchApproval(!showBatchApproval)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Batch Approve ({selectedResults.length})
+                </button>
+                <button
+                  onClick={handleBatchPDF}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download ({selectedResults.length})
+                </button>
+              </>
             )}
+            <button
+              onClick={() => navigate('/results/validation-rules')}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+              title="Manage validation rules"
+            >
+              <Settings className="h-4 w-4" />
+              Validation Rules
+            </button>
             <button
               onClick={() => navigate('/results/review')}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
@@ -303,8 +350,22 @@ const ResultsPage: React.FC = () => {
 
       {/* Critical Results Dashboard */}
       {statistics && statistics.criticalResults > 0 && (
-        <div className="mb-6">
+        <div id="critical-results" className="mb-6">
           <CriticalResultsDashboard />
+        </div>
+      )}
+
+      {/* Batch Approval */}
+      {showBatchApproval && selectedResults.length > 0 && (
+        <div className="mb-6">
+          <BatchResultApproval
+            results={results.filter(r => selectedResults.includes(r.id))}
+            onComplete={() => {
+              setShowBatchApproval(false);
+              setSelectedResults([]);
+            }}
+            onCancel={() => setShowBatchApproval(false)}
+          />
         </div>
       )}
 

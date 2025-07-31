@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Download, Upload, TestTube, BarChart3 } from 'lucide-react';
 import {
   useTests,
@@ -15,6 +15,7 @@ import type { TestDefinition, TestDefinitionFormData, TestFilter } from '@/types
 
 const TestsPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<TestFilter>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTest, setEditingTest] = useState<TestDefinition | null>(null);
@@ -24,6 +25,17 @@ const TestsPage: React.FC = () => {
   const createTestMutation = useCreateTest();
   const updateTestMutation = useUpdateTest();
   const deleteTestMutation = useDeleteTest();
+
+  // Check URL params on mount
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'new') {
+      setShowAddForm(true);
+      // Remove the action param after opening the form
+      searchParams.delete('action');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleAddTest = async (data: TestDefinitionFormData) => {
     await createTestMutation.mutateAsync(data);

@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import react from 'eslint-plugin-react'
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'build/**', 'node_modules/**', '*.config.js', '*.config.ts', 'vite.config.*.ts', 'cypress.config.ts', 'android/**', 'ios/**', 'chrome-extension/dist/**', '.firebase/**'] },
+  { ignores: ['dist/**', 'dev-dist/**', 'build/**', 'node_modules/**', '*.config.js', '*.config.ts', 'vite.config.*.ts', 'cypress.config.ts', 'android/**', 'ios/**', 'chrome-extension/dist/**', '.firebase/**', 'functions/lib/**'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx,js,jsx}'],
