@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { formatCurrency } from '@/utils/formatters';
 import { formatDate } from '@/utils/date-utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 interface AdminStats {
   totalTenants: number;
@@ -29,7 +29,34 @@ interface TenantSummary {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'year'>('month');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get period from URL or default to 'month'
+  const selectedPeriod = (searchParams.get('period') || 'month') as 'today' | 'week' | 'month' | 'year';
+  
+  // Get pagination params
+  const currentPage = parseInt(searchParams.get('page') || '1');
+  const pageSize = parseInt(searchParams.get('pageSize') || '10');
+  const sortBy = searchParams.get('sortBy') || 'revenue';
+  const sortOrder = searchParams.get('sortOrder') || 'desc';
+  
+  // Update URL parameters
+  const updateURLParams = (updates: Record<string, string | undefined>) => {
+    const params = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined || value === '') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    setSearchParams(params);
+  };
+  
+  // Update URL when period changes
+  const setSelectedPeriod = (period: 'today' | 'week' | 'month' | 'year') => {
+    updateURLParams({ period });
+  };
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['adminStats', selectedPeriod],
@@ -132,10 +159,44 @@ const AdminDashboard = () => {
         });
       }
 
-      return summaries.sort((a, b) => b.revenue - a.revenue);
+      // Sort summaries based on URL params
+      const sorted = [...summaries];
+      sorted.sort((a, b) => {
+        let compareValue = 0;
+        switch (sortBy) {
+          case 'name':
+            compareValue = a.name.localeCompare(b.name);
+            break;
+          case 'userCount':
+            compareValue = a.userCount - b.userCount;
+            break;
+          case 'patientCount':
+            compareValue = a.patientCount - b.patientCount;
+            break;
+          case 'testCount':
+            compareValue = a.testCount - b.testCount;
+            break;
+          case 'revenue':
+            compareValue = a.revenue - b.revenue;
+            break;
+          case 'lastActivity':
+            compareValue = a.lastActivity.getTime() - b.lastActivity.getTime();
+            break;
+          default:
+            compareValue = b.revenue - a.revenue;
+        }
+        return sortOrder === 'asc' ? compareValue : -compareValue;
+      });
+
+      return sorted;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Calculate paginated results
+  const paginatedSummaries = tenantSummaries ? 
+    tenantSummaries.slice((currentPage - 1) * pageSize, currentPage * pageSize) : [];
+  const totalPages = tenantSummaries ? Math.ceil(tenantSummaries.length / pageSize) : 0;
 
   const statCards = [
     {
@@ -224,33 +285,85 @@ const AdminDashboard = () => {
 
       {/* Tenant Summary Table */}
       <div className="card">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Tenant Overview
           </h2>
+          <select
+            value={pageSize.toString()}
+            onChange={(e) => updateURLParams({ pageSize: e.target.value, page: '1' })}
+            className="input w-auto"
+          >
+            <option value="10">10 per page</option>
+            <option value="25">25 per page</option>
+            <option value="50">50 per page</option>
+            <option value="100">100 per page</option>
+          </select>
         </div>
         
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Tenant
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'name', 
+                    sortOrder: sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Tenant {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Users
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'userCount', 
+                    sortOrder: sortBy === 'userCount' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Users {sortBy === 'userCount' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Patients
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'patientCount', 
+                    sortOrder: sortBy === 'patientCount' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Patients {sortBy === 'patientCount' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Tests
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'testCount', 
+                    sortOrder: sortBy === 'testCount' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Tests {sortBy === 'testCount' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Revenue
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'revenue', 
+                    sortOrder: sortBy === 'revenue' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Revenue {sortBy === 'revenue' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Last Activity
+                <th 
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-700 dark:hover:text-gray-200"
+                  onClick={() => updateURLParams({ 
+                    sortBy: 'lastActivity', 
+                    sortOrder: sortBy === 'lastActivity' && sortOrder === 'asc' ? 'desc' : 'asc',
+                    page: '1'
+                  })}
+                >
+                  Last Activity {sortBy === 'lastActivity' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
@@ -273,8 +386,8 @@ const AdminDashboard = () => {
                     </div>
                   </td>
                 </tr>
-              ) : tenantSummaries && tenantSummaries.length > 0 ? (
-                tenantSummaries.map((tenant) => (
+              ) : paginatedSummaries && paginatedSummaries.length > 0 ? (
+                paginatedSummaries.map((tenant) => (
                   <tr key={tenant.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -333,6 +446,59 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, tenantSummaries?.length || 0)} of {tenantSummaries?.length || 0} tenants
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => updateURLParams({ page: (currentPage - 1).toString() })}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              
+              {[...Array(Math.min(5, totalPages))].map((_, idx) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = idx + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = idx + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + idx;
+                } else {
+                  pageNum = currentPage - 2 + idx;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => updateURLParams({ page: pageNum.toString() })}
+                    className={`px-3 py-1 text-sm rounded-md ${
+                      currentPage === pageNum
+                        ? 'bg-primary-500 text-white'
+                        : 'border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => updateURLParams({ page: (currentPage + 1).toString() })}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

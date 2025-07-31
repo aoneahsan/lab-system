@@ -6,7 +6,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
-import { useNavigate, Routes, Route } from 'react-router-dom';
+import { useNavigate, Routes, Route, useSearchParams } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
 
 interface User {
@@ -35,22 +35,56 @@ const AdminPanel = () => {
   const { currentUser } = useAuthStore();
   const { startImpersonation } = useImpersonationStore();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue'>('dashboard');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
 
+  // Get active tab from URL, default to 'dashboard'
+  const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue';
+  
+  // Get pagination and filter params
+  const page = parseInt(searchParams.get('page') || '1');
+  const search = searchParams.get('search') || '';
+  const status = searchParams.get('status') || 'all';
+  const sortBy = searchParams.get('sortBy') || 'createdAt';
+  const sortOrder = searchParams.get('sortOrder') || 'desc';
+
   // Check if user is super_admin
   const isSuperAdmin = currentUser?.role === 'super_admin';
+
+  // Update URL when changing tabs
+  const setActiveTab = (tab: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    // Reset pagination when changing tabs
+    params.delete('page');
+    params.delete('search');
+    params.delete('status');
+    setSearchParams(params);
+  };
+
+  // Update URL parameters
+  const updateURLParams = (updates: Record<string, string | undefined>) => {
+    const params = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined || value === '') {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+    setSearchParams(params);
+  };
 
   useEffect(() => {
     if (activeTab === 'users') {
       fetchUsers();
-    } else {
+    } else if (activeTab === 'tenants') {
       fetchTenants();
     }
-  }, [activeTab]);
+  }, [activeTab, page, search, status, sortBy, sortOrder]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -263,8 +297,49 @@ const AdminPanel = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
         </div>
       ) : activeTab === 'users' ? (
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="space-y-4">
+          {/* Search and Filter Bar */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search users by name or email..."
+                  value={search}
+                  onChange={(e) => updateURLParams({ search: e.target.value, page: '1' })}
+                  className="input w-full"
+                />
+              </div>
+              <select
+                value={status}
+                onChange={(e) => updateURLParams({ status: e.target.value, page: '1' })}
+                className="input w-full md:w-auto"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  updateURLParams({ sortBy: field, sortOrder: order, page: '1' });
+                }}
+                className="input w-full md:w-auto"
+              >
+                <option value="createdAt-desc">Newest First</option>
+                <option value="createdAt-asc">Oldest First</option>
+                <option value="email-asc">Email A-Z</option>
+                <option value="email-desc">Email Z-A</option>
+                <option value="firstName-asc">Name A-Z</option>
+                <option value="firstName-desc">Name Z-A</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -350,9 +425,51 @@ const AdminPanel = () => {
             </tbody>
           </table>
         </div>
+      </div>
       ) : activeTab === 'tenants' ? (
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="space-y-4">
+          {/* Search and Filter Bar */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search tenants by name or code..."
+                  value={search}
+                  onChange={(e) => updateURLParams({ search: e.target.value, page: '1' })}
+                  className="input w-full"
+                />
+              </div>
+              <select
+                value={status}
+                onChange={(e) => updateURLParams({ status: e.target.value, page: '1' })}
+                className="input w-full md:w-auto"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  updateURLParams({ sortBy: field, sortOrder: order, page: '1' });
+                }}
+                className="input w-full md:w-auto"
+              >
+                <option value="createdAt-desc">Newest First</option>
+                <option value="createdAt-asc">Oldest First</option>
+                <option value="name-asc">Name A-Z</option>
+                <option value="name-desc">Name Z-A</option>
+                <option value="code-asc">Code A-Z</option>
+                <option value="code-desc">Code Z-A</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Tenants Table */}
+          <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -425,6 +542,7 @@ const AdminPanel = () => {
             </tbody>
           </table>
         </div>
+      </div>
       ) : activeTab === 'reports' ? (
         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden rounded-lg p-6">
           <div className="text-center py-12">
