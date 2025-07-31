@@ -17,6 +17,7 @@ const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));
 const PatientDetailPage = lazy(() => import('@/pages/patients/PatientDetailPage'));
+const PatientEditPage = lazy(() => import('@/pages/patients/PatientEditPage'));
 const TestsPage = lazy(() => import('@/pages/tests/TestsPage'));
 const TestDetailPage = lazy(() => import('@/pages/tests/TestDetailPage'));
 const TestPanelsPage = lazy(() => import('@/pages/tests/TestPanelsPage'));
@@ -91,6 +92,7 @@ export const AppRouter = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:patientId" element={<PatientDetailPage />} />
+            <Route path="/patients/:patientId/edit" element={<PatientEditPage />} />
             <Route path="/tests" element={<TestsPage />} />
             <Route path="/tests/panels" element={<TestPanelsPage />} />
             <Route path="/tests/orders" element={<TestOrdersPage />} />
