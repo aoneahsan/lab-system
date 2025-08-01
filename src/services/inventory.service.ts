@@ -32,6 +32,7 @@ import type {
   InventoryAlert,
   InventoryItemFormData,
   StockTransactionFormData,
+  Vendor,
 } from '@/types/inventory.types';
 
 class InventoryService {
@@ -585,19 +586,84 @@ class InventoryServiceWrapper extends InventoryService {
     }
   }
 
-  async getSuppliers() {
-    // This needs to be implemented - return empty for now
-    return [];
+  async getVendors() {
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    if (!tenantId) throw new Error('No tenant selected');
+    
+    const q = query(
+      collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.VENDORS, tenantId)),
+      orderBy('name')
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Vendor[];
   }
 
-  async createSupplier(_data: any) {
-    // This needs to be implemented
-    return '';
+  async createVendor(data: Partial<Vendor>) {
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    const userId = auth.currentUser?.uid;
+    if (!tenantId || !userId) throw new Error('No tenant or user');
+    
+    const vendorData = {
+      ...data,
+      tenantId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      createdBy: userId,
+      updatedBy: userId,
+    };
+    
+    const docRef = await addDoc(
+      collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.VENDORS, tenantId)),
+      vendorData
+    );
+    
+    return docRef.id;
   }
 
-  async updateSupplier(_id: string, _data: any) {
-    // This needs to be implemented
-    return;
+  async updateVendor(id: string, data: Partial<Vendor>) {
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    const userId = auth.currentUser?.uid;
+    if (!tenantId || !userId) throw new Error('No tenant or user');
+    
+    await updateDoc(
+      doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.VENDORS, tenantId), id),
+      {
+        ...data,
+        updatedAt: serverTimestamp(),
+        updatedBy: userId,
+      }
+    );
+  }
+  
+  async deleteVendor(id: string) {
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    if (!tenantId) throw new Error('No tenant selected');
+    
+    // Check if vendor is in use
+    const itemsQuery = query(
+      collection(firestore, getFirestoreCollectionName(COLLECTION_NAMES.INVENTORY_ITEMS, tenantId)),
+      where('preferredVendor.id', '==', id),
+      limit(1)
+    );
+    
+    const itemsSnapshot = await getDocs(itemsQuery);
+    if (!itemsSnapshot.empty) {
+      throw new Error('Cannot delete vendor that is assigned to inventory items');
+    }
+    
+    // Soft delete by marking as inactive
+    await updateDoc(
+      doc(firestore, getFirestoreCollectionName(COLLECTION_NAMES.VENDORS, tenantId), id),
+      {
+        isActive: false,
+        deletedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+    );
   }
 }
 

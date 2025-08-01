@@ -39,6 +39,7 @@ const InvoiceDetailPage = lazy(() => import('@/pages/billing/InvoiceDetailPage')
 const PaymentsPage = lazy(() => import('@/pages/billing/PaymentsPage'));
 const FinancialReportsPage = lazy(() => import('@/pages/billing/FinancialReportsPage'));
 const InventoryPage = lazy(() => import('@/pages/inventory/InventoryDashboard'));
+const VendorsPage = lazy(() => import('@/pages/inventory/VendorsPage'));
 const QualityControlPage = lazy(() => import('@/pages/quality-control/QualityControlPage'));
 const ReportsPage = lazy(() => import('@/pages/reports/ReportDashboard'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
@@ -115,6 +116,7 @@ export const AppRouter = () => {
             <Route path="/billing/claims/:claimId" element={<ClaimDetailPage />} />
             <Route path="/billing/reports" element={<FinancialReportsPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/inventory/vendors" element={<VendorsPage />} />
             <Route path="/quality-control" element={<QualityControlPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />

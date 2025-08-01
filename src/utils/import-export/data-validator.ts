@@ -224,7 +224,7 @@ export class DataValidator {
   
   private static isValidPhone(phone: string): boolean {
     // Basic phone validation - can be customized
-    const phoneRegex = /^[\d\s\-+()\]+$/;
+    const phoneRegex = /^[\d\s\-+()]+$/;
     return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
   }
   

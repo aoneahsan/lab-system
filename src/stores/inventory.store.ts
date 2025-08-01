@@ -39,6 +39,7 @@ interface InventoryStore {
   fetchVendors: () => Promise<void>;
   createVendor: (data: Partial<Vendor>) => Promise<void>;
   updateVendor: (id: string, data: Partial<Vendor>) => Promise<void>;
+  deleteVendor: (id: string) => Promise<void>;
 
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -168,35 +169,44 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
   fetchVendors: async () => {
     set({ loading: true, error: null });
     try {
-      // TODO: Implement vendor service methods
-      // const vendors = await inventoryService.getVendors();
-      set({ vendors: [], loading: false });
+      const vendors = await inventoryService.getVendors();
+      set({ vendors, loading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
-  createVendor: async (_data) => {
+  createVendor: async (data) => {
     set({ loading: true, error: null });
     try {
-      // TODO: Implement vendor service methods
-      // await inventoryService.createVendor(data);
-      // await get().fetchVendors();
+      await inventoryService.createVendor(data);
+      await get().fetchVendors();
       set({ loading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
     }
   },
 
-  updateVendor: async (_id, _data) => {
+  updateVendor: async (id, data) => {
     set({ loading: true, error: null });
     try {
-      // TODO: Implement vendor service methods
-      // await inventoryService.updateVendor(id, data);
-      // await get().fetchVendors();
+      await inventoryService.updateVendor(id, data);
+      await get().fetchVendors();
       set({ loading: false });
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
+    }
+  },
+
+  deleteVendor: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await inventoryService.deleteVendor(id);
+      await get().fetchVendors();
+      set({ loading: false });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'An error occurred', loading: false });
+      throw error;
     }
   },
 
