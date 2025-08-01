@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabFlow EMR Integration</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="popup-header">
+      <img src="icons/icon-32.png" alt="LabFlow" class="logo">
+      <h1>LabFlow Integration</h1>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="status-section">
+      <div class="status-indicator" id="statusIndicator"></div>
+      <span class="status-text" id="statusText">Checking connection...</span>
+    </div>
+
+    <!-- Login Form (shown when not connected) -->
+    <div id="loginSection" class="section" style="display: none;">
+      <h2>Connect to LabFlow</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            placeholder="user@example.com"
+          >
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            placeholder=""""""""""
+          >
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Connect
+        </button>
+      </form>
+    </div>
+
+    <!-- Main Actions (shown when connected) -->
+    <div id="mainSection" class="section" style="display: none;">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">
+          <span id="userInitials"></span>
+        </div>
+        <div class="user-details">
+          <h3 id="userName"></h3>
+          <p id="userRole"></p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="action-btn" id="quickOrderBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11H3m6 0v6m0-6V5a2 2 0 012-2h2a2 2 0 012 2v6m0 0h6m-6 0v6"></path>
+          </svg>
+          <span>Quick Order</span>
+        </button>
+        <button class="action-btn" id="viewResultsBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          <span>View Results</span>
+        </button>
+        <button class="action-btn" id="syncDataBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>Sync Data</span>
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value" id="ordersToday">0</span>
+          <span class="stat-label">Orders Today</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="pendingResults">0</span>
+          <span class="stat-label">Pending Results</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="footer">
+      <button class="link-btn" id="settingsBtn">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        Settings
+      </button>
+      <button class="link-btn" id="logoutBtn" style="display: none;">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Logout
+      </button>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel" style="display: none;">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button class="close-btn" id="closeSettingsBtn">&times;</button>
+      </div>
+      <div class="settings-content">
+        <div class="setting-group">
+          <label>
+            <input type="checkbox" id="autoImport" checked>
+            Auto-import patient data
+          </label>
+        </div>
+        <div class="setting-group">
+          <label>
+            <input type="checkbox" id="notifications" checked>
+            Enable notifications
+          </label>
+        </div>
+        <div class="setting-group">
+          <label for="apiUrl">API Server</label>
+          <select id="apiUrl">
+            <option value="https://api.labflow.com">Production</option>
+            <option value="https://staging-api.labflow.com">Staging</option>
+            <option value="http://localhost:3000/api">Local Development</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label for="hl7Format">HL7 Format</label>
+          <select id="hl7Format">
+            <option value="v2.3">HL7 v2.3</option>
+            <option value="v2.5.1" selected>HL7 v2.5.1</option>
+            <option value="v2.7">HL7 v2.7</option>
+            <option value="fhir">FHIR R4</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

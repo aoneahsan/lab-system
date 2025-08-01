@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Home, Calendar, Package, QrCode, User } from 'lucide-react';
-import HomeScreen from './screens/HomeScreen';
-import ScheduleScreen from './screens/ScheduleScreen';
-import CollectionsScreen from './screens/CollectionsScreen';
-import ScanScreen from './screens/ScanScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import { Home, Calendar, QrCode, Package, User } from 'lucide-react';
+import {
+  HomeScreen,
+  CollectionScreen,
+  ScanScreen,
+  InventoryScreen,
+  ProfileScreen,
+} from './phlebotomist/screens';
 
 interface TabItem {
   id: string;
@@ -14,9 +16,9 @@ interface TabItem {
 
 const tabs: TabItem[] = [
   { id: 'home', label: 'Home', icon: Home },
-  { id: 'schedule', label: 'Schedule', icon: Calendar },
-  { id: 'collections', label: 'Collections', icon: Package },
+  { id: 'collection', label: 'Collection', icon: Calendar },
   { id: 'scan', label: 'Scan', icon: QrCode },
+  { id: 'inventory', label: 'Inventory', icon: Package },
   { id: 'profile', label: 'Profile', icon: User },
 ];
 
@@ -27,12 +29,12 @@ export const PhlebotomistApp: React.FC = () => {
     switch (activeTab) {
       case 'home':
         return <HomeScreen />;
-      case 'schedule':
-        return <ScheduleScreen />;
-      case 'collections':
-        return <CollectionsScreen />;
+      case 'collection':
+        return <CollectionScreen />;
       case 'scan':
         return <ScanScreen />;
+      case 'inventory':
+        return <InventoryScreen />;
       case 'profile':
         return <ProfileScreen />;
       default:
@@ -46,7 +48,10 @@ export const PhlebotomistApp: React.FC = () => {
       <header className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-semibold text-gray-900">LabFlow Phlebotomist</h1>
-          <div className="text-sm text-gray-600">{new Date().toLocaleDateString()}</div>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">Zone: A</span>
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          </div>
         </div>
       </header>
 

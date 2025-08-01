@@ -1,149 +1,106 @@
 import React, { useState } from 'react';
-import {
-  Search,
-  Filter,
-  Plus,
-  FileText,
-  Clock,
-  CheckCircle,
+import { useNavigate } from 'react-router-dom';
+import { 
+  ClipboardList, 
+  Plus, 
+  Clock, 
+  CheckCircle, 
+  XCircle,
   AlertCircle,
   Calendar,
-  User,
   ChevronRight,
-  Send,
-  XCircle,
-  RefreshCw,
+  FileText
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-interface TestOrder {
+interface Order {
   id: string;
-  orderNumber: string;
   patientName: string;
-  patientMRN: string;
+  patientMrn: string;
+  orderDate: string;
   tests: string[];
-  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
-  priority: 'routine' | 'urgent' | 'stat';
-  orderedDate: Date;
-  completedDate?: Date;
-  resultCount?: number;
-  criticalCount?: number;
+  priority: 'stat' | 'urgent' | 'routine';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  provider: string;
+  notes?: string;
 }
 
 export const OrdersScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
 
-  const [orders] = useState<TestOrder[]>([
+  const orders: Order[] = [
     {
-      id: '1',
-      orderNumber: 'ORD-2024-0142',
-      patientName: 'Emma Wilson',
-      patientMRN: 'MRN001234',
-      tests: ['CBC', 'CMP', 'Lipid Panel'],
-      status: 'pending',
+      id: 'ORD001',
+      patientName: 'John Doe',
+      patientMrn: 'MRN123456',
+      orderDate: '2024-10-27T10:00:00',
+      tests: ['CBC', 'Lipid Panel', 'HbA1c'],
       priority: 'stat',
-      orderedDate: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    },
-    {
-      id: '2',
-      orderNumber: 'ORD-2024-0141',
-      patientName: 'James Chen',
-      patientMRN: 'MRN001235',
-      tests: ['HbA1c', 'Glucose', 'Insulin'],
-      status: 'in-progress',
-      priority: 'routine',
-      orderedDate: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    },
-    {
-      id: '3',
-      orderNumber: 'ORD-2024-0140',
-      patientName: 'Sarah Johnson',
-      patientMRN: 'MRN001236',
-      tests: ['TSH', 'Free T4', 'Free T3'],
-      status: 'completed',
-      priority: 'routine',
-      orderedDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      completedDate: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      resultCount: 3,
-      criticalCount: 1,
-    },
-    {
-      id: '4',
-      orderNumber: 'ORD-2024-0139',
-      patientName: 'Michael Brown',
-      patientMRN: 'MRN001237',
-      tests: ['Troponin I', 'BNP', 'D-Dimer'],
       status: 'pending',
-      priority: 'urgent',
-      orderedDate: new Date(Date.now() - 1 * 60 * 60 * 1000),
+      provider: 'Dr. Smith',
+      notes: 'Patient fasting for 12 hours',
     },
-  ]);
+    {
+      id: 'ORD002',
+      patientName: 'Jane Smith',
+      patientMrn: 'MRN123457',
+      orderDate: '2024-10-27T09:30:00',
+      tests: ['TSH', 'Free T4'],
+      priority: 'routine',
+      status: 'in_progress',
+      provider: 'Dr. Smith',
+    },
+    {
+      id: 'ORD003',
+      patientName: 'Bob Johnson',
+      patientMrn: 'MRN123458',
+      orderDate: '2024-10-26T14:00:00',
+      tests: ['Blood Culture x2', 'CBC with Diff'],
+      priority: 'urgent',
+      status: 'completed',
+      provider: 'Dr. Smith',
+    },
+    {
+      id: 'ORD004',
+      patientName: 'Mary Wilson',
+      patientMrn: 'MRN123459',
+      orderDate: '2024-10-26T11:00:00',
+      tests: ['Basic Metabolic Panel', 'Urinalysis'],
+      priority: 'routine',
+      status: 'completed',
+      provider: 'Dr. Smith',
+    },
+  ];
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.patientMRN.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'in-progress':
-        return <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />;
-      case 'cancelled':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const filteredOrders = orders.filter(order => 
+    activeTab === 'active' 
+      ? ['pending', 'in_progress'].includes(order.status)
+      : ['completed', 'cancelled'].includes(order.status)
+  );
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'stat':
-        return 'text-red-600 font-semibold';
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'urgent':
-        return 'text-yellow-600 font-semibold';
+        return 'bg-orange-100 text-orange-700 border-orange-200';
       default:
-        return 'text-gray-600';
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
-  const toggleOrderSelection = (orderId: string) => {
-    setSelectedOrders((prev) =>
-      prev.includes(orderId) ? prev.filter((id) => id !== orderId) : [...prev, orderId]
-    );
-    setShowBulkActions(true);
-  };
-
-  const handleBulkCancel = () => {
-    console.log('Cancelling orders:', selectedOrders);
-    setSelectedOrders([]);
-    setShowBulkActions(false);
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'in_progress':
+        return <Clock className="h-5 w-5 text-yellow-600" />;
+      default:
+        return <AlertCircle className="h-5 w-5 text-gray-400" />;
+    }
   };
 
   return (
@@ -151,202 +108,146 @@ export const OrdersScreen: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold text-gray-900">Test Orders</h1>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Lab Orders</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Manage your patient lab orders
+              </p>
+            </div>
             <button
-              onClick={() => navigate('/clinician/new-order')}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              onClick={() => navigate('/clinician/orders/new')}
+              className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
               <Plus className="h-5 w-5" />
             </button>
           </div>
+        </div>
 
-          {/* Search */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-            {[
-              { id: 'all', label: 'All' },
-              { id: 'pending', label: 'Pending' },
-              { id: 'in-progress', label: 'In Progress' },
-              { id: 'completed', label: 'Completed' },
-            ].map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => setFilterStatus(filter.id)}
-                className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                  filterStatus === filter.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
+        {/* Tabs */}
+        <div className="px-4 pb-3">
+          <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('active')}
+              className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                activeTab === 'active' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Active Orders ({orders.filter(o => ['pending', 'in_progress'].includes(o.status)).length})
+            </button>
+            <button
+              onClick={() => setActiveTab('completed')}
+              className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                activeTab === 'completed' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Completed ({orders.filter(o => ['completed', 'cancelled'].includes(o.status)).length})
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Order List */}
+      {/* Orders List */}
       <div className="p-4 space-y-3">
         {filteredOrders.map((order) => (
-          <div key={order.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div
-              onClick={() => navigate(`/clinician/order/${order.id}`)}
-              className="p-4 cursor-pointer hover:bg-gray-50"
-            >
+          <div
+            key={order.id}
+            className="bg-white rounded-lg shadow-sm overflow-hidden"
+            onClick={() => navigate(`/clinician/order/${order.id}`)}
+          >
+            <div className="p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  {getStatusIcon(order.status)}
-                  <div>
-                    <p className="font-semibold text-gray-900">{order.orderNumber}</p>
-                    <p className="text-sm text-gray-600">
-                      {order.patientName} • {order.patientMRN}
-                    </p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-medium text-gray-900">{order.patientName}</h3>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(order.priority)}`}>
+                      {order.priority.toUpperCase()}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500">{order.patientMrn} • Order #{order.id}</p>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+                    <Calendar className="h-3 w-3" />
+                    <span>{format(new Date(order.orderDate), 'MMM dd, yyyy h:mm a')}</span>
                   </div>
                 </div>
-                <span className={`text-xs uppercase ${getPriorityColor(order.priority)}`}>
-                  {order.priority}
-                </span>
+                {getStatusIcon(order.status)}
               </div>
 
-              <div className="space-y-2">
+              {/* Tests */}
+              <div className="mb-3">
+                <p className="text-sm font-medium text-gray-700 mb-1">Tests Ordered:</p>
                 <div className="flex flex-wrap gap-1">
                   {order.tests.map((test, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
-                    >
+                    <span key={index} className="px-2 py-1 bg-gray-100 text-xs rounded">
                       {test}
                     </span>
                   ))}
                 </div>
+              </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">
-                    <Calendar className="h-4 w-4 inline mr-1" />
-                    {format(order.orderedDate, 'MMM d, h:mm a')}
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status}
-                  </span>
+              {order.notes && (
+                <div className="p-2 bg-yellow-50 rounded-lg flex items-start gap-2">
+                  <FileText className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-yellow-800">{order.notes}</p>
                 </div>
+              )}
 
-                {order.status === 'completed' && order.resultCount && (
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <span className="text-sm text-gray-600">
-                      {order.resultCount} results available
-                    </span>
-                    {order.criticalCount && order.criticalCount > 0 && (
-                      <span className="flex items-center text-red-600 text-sm">
-                        <AlertCircle className="h-4 w-4 mr-1" />
-                        {order.criticalCount} critical
-                      </span>
-                    )}
-                  </div>
-                )}
+              <div className="flex items-center justify-between mt-3">
+                <p className="text-sm text-gray-500">
+                  Ordered by: {order.provider}
+                </p>
+                <ChevronRight className="h-5 w-5 text-gray-400" />
               </div>
             </div>
 
-            {/* Quick Actions */}
-            {order.status === 'pending' && (
-              <div className="px-4 pb-4 flex space-x-2">
+            {activeTab === 'active' && order.status === 'pending' && (
+              <div className="bg-gray-50 px-4 py-3 flex gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/clinician/order/${order.id}/edit`);
+                    // Handle edit order
                   }}
-                  className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
+                  className="flex-1 btn btn-outline btn-sm"
                 >
                   Edit Order
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleOrderSelection(order.id);
+                    // Handle cancel order
                   }}
-                  className="px-3 py-2 bg-red-100 text-red-700 rounded-lg"
+                  className="flex-1 btn btn-outline btn-sm text-red-600 border-red-300 hover:bg-red-50"
                 >
-                  <XCircle className="h-4 w-4" />
+                  Cancel Order
                 </button>
               </div>
             )}
-
-            {order.status === 'completed' && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/clinician/order/${order.id}/results`);
-                }}
-                className="w-full px-4 pb-4"
-              >
-                <div className="w-full py-2 bg-blue-600 text-white rounded-lg text-sm font-medium flex items-center justify-center space-x-2">
-                  <FileText className="h-4 w-4" />
-                  <span>View Results</span>
-                </div>
-              </button>
-            )}
           </div>
         ))}
-
-        {filteredOrders.length === 0 && (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No orders found</p>
-            <p className="text-sm text-gray-400 mt-1">
-              {searchQuery ? 'Try a different search' : 'Create a new order to get started'}
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Bulk Actions */}
-      {showBulkActions && selectedOrders.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 bg-white border-t border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">
-              {selectedOrders.length} order{selectedOrders.length > 1 ? 's' : ''} selected
-            </span>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => {
-                  setSelectedOrders([]);
-                  setShowBulkActions(false);
-                }}
-                className="px-4 py-2 text-gray-600 font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleBulkCancel}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium"
-              >
-                Cancel Orders
-              </button>
-            </div>
-          </div>
+      {filteredOrders.length === 0 && (
+        <div className="p-8 text-center">
+          <ClipboardList className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 font-medium">
+            No {activeTab} orders
+          </p>
+          <p className="text-sm text-gray-400 mt-1">
+            {activeTab === 'active' 
+              ? 'Create a new order to get started'
+              : 'Completed orders will appear here'
+            }
+          </p>
+          {activeTab === 'active' && (
+            <button
+              onClick={() => navigate('/clinician/orders/new')}
+              className="mt-4 btn btn-primary btn-sm"
+            >
+              Create New Order
+            </button>
+          )}
         </div>
       )}
-
-      {/* Floating Action Button */}
-      <button
-        onClick={() => navigate('/clinician/new-order')}
-        className="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 };

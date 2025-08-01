@@ -512,7 +512,8 @@
       "Bash(firebase functions:shell:*)",
       "Bash(kill:*)",
       "Bash(do sed -i '' 's/\\buser\\./currentUser./g' \"$file\")",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:www.nexuspro.pk)"
     ],
     "deny": []
   }

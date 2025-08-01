@@ -1,310 +1,201 @@
-import React, { useState } from 'react';
-import {
-  Calendar,
-  Users,
-  FileText,
-  Activity,
-  TrendingUp,
-  Clock,
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Activity, 
+  Users, 
+  ClipboardList, 
+  TrendingUp, 
   AlertCircle,
-  ChevronRight,
-  Bell,
-  CheckCircle,
-  XCircle,
-  Zap,
+  Clock,
+  CheckCircle
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-
-interface ClinicianStats {
-  activePatients: number;
-  pendingOrders: number;
-  criticalResults: number;
-  todayAppointments: number;
-  avgResponseTime: number;
-  patientSatisfaction: number;
-}
-
-interface CriticalResult {
-  id: string;
-  patientName: string;
-  testName: string;
-  result: string;
-  timeAgo: string;
-  acknowledged: boolean;
-}
-
-interface Appointment {
-  id: string;
-  time: string;
-  patientName: string;
-  type: string;
-  status: 'scheduled' | 'in-progress' | 'completed';
-}
 
 export const HomeScreen: React.FC = () => {
-  const { currentUser } = useAuthStore();
   const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
 
-  const [stats] = useState<ClinicianStats>({
-    activePatients: 142,
-    pendingOrders: 8,
-    criticalResults: 3,
-    todayAppointments: 12,
-    avgResponseTime: 2.5,
-    patientSatisfaction: 94,
-  });
+  const stats = [
+    { label: 'Active Patients', value: '48', icon: Users, color: 'bg-blue-100 text-blue-800' },
+    { label: 'Pending Orders', value: '12', icon: ClipboardList, color: 'bg-yellow-100 text-yellow-800' },
+    { label: 'Critical Results', value: '3', icon: AlertCircle, color: 'bg-red-100 text-red-800' },
+    { label: 'Today\'s Reviews', value: '27', icon: CheckCircle, color: 'bg-green-100 text-green-800' },
+  ];
 
-  const [criticalResults] = useState<CriticalResult[]>([
+  const recentPatients = [
     {
       id: '1',
-      patientName: 'Emma Wilson',
-      testName: 'Troponin I',
-      result: '2.5 ng/mL (H)',
-      timeAgo: '15 min',
-      acknowledged: false,
+      name: 'John Doe',
+      mrn: 'MRN123456',
+      lastTest: 'CBC, Lipid Panel',
+      status: 'critical',
+      time: '10 mins ago',
     },
     {
       id: '2',
-      patientName: 'James Chen',
-      testName: 'Glucose',
-      result: '42 mg/dL (L)',
-      timeAgo: '1 hour',
-      acknowledged: false,
+      name: 'Jane Smith',
+      mrn: 'MRN123457',
+      lastTest: 'HbA1c',
+      status: 'normal',
+      time: '1 hour ago',
     },
     {
       id: '3',
-      patientName: 'Sarah Johnson',
-      testName: 'INR',
-      result: '5.2 (H)',
-      timeAgo: '2 hours',
-      acknowledged: true,
+      name: 'Bob Johnson',
+      mrn: 'MRN123458',
+      lastTest: 'Blood Culture',
+      status: 'pending',
+      time: '2 hours ago',
     },
-  ]);
+  ];
 
-  const [appointments] = useState<Appointment[]>([
+  const criticalAlerts = [
     {
       id: '1',
-      time: '09:00 AM',
-      patientName: 'Michael Brown',
-      type: 'Follow-up',
-      status: 'completed',
+      patient: 'John Doe',
+      test: 'Potassium',
+      value: '6.2 mmol/L',
+      range: '3.5-5.1 mmol/L',
+      severity: 'critical',
     },
     {
       id: '2',
-      time: '10:30 AM',
-      patientName: 'Lisa Davis',
-      type: 'Consultation',
-      status: 'in-progress',
+      patient: 'Mary Wilson',
+      test: 'Glucose',
+      value: '28 mg/dL',
+      range: '70-110 mg/dL',
+      severity: 'critical',
     },
-    {
-      id: '3',
-      time: '11:00 AM',
-      patientName: 'Robert Wilson',
-      type: 'Test Review',
-      status: 'scheduled',
-    },
-  ]);
+  ];
 
-  const handleAcknowledge = (resultId: string) => {
-    console.log('Acknowledging result:', resultId);
-  };
-
-  const getStatusIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'in-progress':
-        return <Clock className="h-4 w-4 text-blue-500" />;
+      case 'critical':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'normal':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
       default:
-        return <Calendar className="h-4 w-4 text-gray-400" />;
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-50">
-      <div className="p-4 space-y-4">
-        {/* Welcome Card */}
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-4 text-white">
-          <h2 className="text-xl font-semibold">
-            Good {format(new Date(), 'a')}, Dr.{' '}
-            {currentUser?.displayName?.split(' ').pop() || 'Smith'}
-          </h2>
-          <p className="text-indigo-100 mt-1">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="bg-white/10 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold">{stats.todayAppointments}</p>
-                  <p className="text-sm text-indigo-100">Appointments</p>
-                </div>
-                <Calendar className="h-8 w-8 text-indigo-200" />
-              </div>
-            </div>
-            <div className="bg-white/10 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold">{stats.criticalResults}</p>
-                  <p className="text-sm text-indigo-100">Critical</p>
-                </div>
-                <AlertCircle className="h-8 w-8 text-indigo-200" />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="flex-1 bg-gray-50">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-6">
+        <h1 className="text-2xl font-bold">
+          Welcome, Dr. {currentUser?.lastName || 'Smith'}
+        </h1>
+        <p className="text-blue-100 mt-1">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
 
-        {/* Critical Results Alert */}
-        {criticalResults.filter((r) => !r.acknowledged).length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-red-600" />
-                <h3 className="font-semibold text-red-900">Critical Results</h3>
-                <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
-                  {criticalResults.filter((r) => !r.acknowledged).length} new
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 gap-3 p-4 -mt-6">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="bg-white rounded-lg shadow-sm p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Icon className="h-5 w-5 text-gray-600" />
+                <span className={`text-xs px-2 py-1 rounded-full ${stat.color}`}>
+                  {stat.label}
                 </span>
               </div>
-              <button
-                onClick={() => navigate('/clinician/critical-results')}
-                className="text-sm text-red-600 font-medium"
-              >
-                View all
-              </button>
+              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Critical Alerts */}
+      {criticalAlerts.length > 0 && (
+        <div className="px-4 pb-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <h3 className="font-medium text-red-900">Critical Results Requiring Review</h3>
             </div>
             <div className="space-y-2">
-              {criticalResults
-                .filter((r) => !r.acknowledged)
-                .slice(0, 2)
-                .map((result) => (
-                  <div key={result.id} className="bg-white rounded p-3 border border-red-100">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{result.patientName}</p>
-                        <p className="text-sm text-gray-600">
-                          {result.testName}:{' '}
-                          <span className="font-semibold text-red-600">{result.result}</span>
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">{result.timeAgo} ago</p>
-                      </div>
-                      <button
-                        onClick={() => handleAcknowledge(result.id)}
-                        className="px-3 py-1 bg-red-600 text-white text-xs rounded-full"
-                      >
-                        Acknowledge
-                      </button>
+              {criticalAlerts.map((alert) => (
+                <div 
+                  key={alert.id}
+                  className="bg-white rounded p-3 border border-red-100"
+                  onClick={() => navigate(`/clinician/patient/${alert.id}/results`)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-gray-900">{alert.patient}</p>
+                      <p className="text-sm text-gray-600">{alert.test}: {alert.value}</p>
+                      <p className="text-xs text-gray-500">Normal: {alert.range}</p>
                     </div>
+                    <span className="text-xs bg-red-600 text-white px-2 py-1 rounded">
+                      Critical
+                    </span>
                   </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Patients</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.activePatients}</p>
-              </div>
-              <Users className="h-8 w-8 text-blue-500" />
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending Orders</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pendingOrders}</p>
-              </div>
-              <FileText className="h-8 w-8 text-yellow-500" />
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Response Time</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.avgResponseTime}h</p>
-              </div>
-              <Clock className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Satisfaction</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.patientSatisfaction}%</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-indigo-500" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
+      )}
 
-        {/* Today's Appointments */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Today's Schedule</h3>
-              <button
-                onClick={() => navigate('/clinician/appointments')}
-                className="text-sm text-indigo-600 font-medium"
-              >
-                View all
-              </button>
-            </div>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {appointments.map((appointment) => (
-              <div
-                key={appointment.id}
-                onClick={() => navigate(`/clinician/appointment/${appointment.id}`)}
-                className="p-4 hover:bg-gray-50 cursor-pointer"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    {getStatusIcon(appointment.status)}
-                    <div>
-                      <p className="font-medium text-gray-900">{appointment.time}</p>
-                      <p className="text-sm text-gray-600">{appointment.patientName}</p>
-                      <p className="text-xs text-gray-500">{appointment.type}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-gray-400" />
+      {/* Recent Patients */}
+      <div className="px-4 pb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Patients</h2>
+          <button 
+            onClick={() => navigate('/clinician/patients')}
+            className="text-sm text-indigo-600 font-medium"
+          >
+            View All
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {recentPatients.map((patient) => (
+            <div
+              key={patient.id}
+              className="bg-white rounded-lg shadow-sm p-4"
+              onClick={() => navigate(`/clinician/patient/${patient.id}`)}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900">{patient.name}</h3>
+                  <p className="text-sm text-gray-500">{patient.mrn}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Last tests: {patient.lastTest}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(patient.status)}`}>
+                    {patient.status}
+                  </span>
+                  <p className="text-xs text-gray-500 mt-1">{patient.time}</p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Quick Actions */}
+      {/* Quick Actions */}
+      <div className="p-4">
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => navigate('/clinician/new-order')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+          <button 
+            onClick={() => navigate('/clinician/orders/new')}
+            className="bg-indigo-600 text-white p-4 rounded-lg font-medium hover:bg-indigo-700"
           >
-            <FileText className="h-8 w-8 text-indigo-600" />
-            <span className="text-sm font-medium text-gray-900">New Order</span>
+            New Lab Order
           </button>
-          <button
-            onClick={() => navigate('/clinician/quick-results')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
+          <button 
+            onClick={() => navigate('/clinician/results')}
+            className="bg-white border border-gray-300 text-gray-700 p-4 rounded-lg font-medium hover:bg-gray-50"
           >
-            <Zap className="h-8 w-8 text-yellow-600" />
-            <span className="text-sm font-medium text-gray-900">Quick Results</span>
-          </button>
-          <button
-            onClick={() => navigate('/clinician/messages')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
-          >
-            <Bell className="h-8 w-8 text-green-600" />
-            <span className="text-sm font-medium text-gray-900">Messages</span>
-          </button>
-          <button
-            onClick={() => navigate('/clinician/analytics')}
-            className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center space-y-2 hover:bg-gray-50"
-          >
-            <Activity className="h-8 w-8 text-purple-600" />
-            <span className="text-sm font-medium text-gray-900">Analytics</span>
+            Review Results
           </button>
         </div>
       </div>
