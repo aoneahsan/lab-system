@@ -10684,6 +10684,11 @@ stop-iteration-iterator@^1.1.0:
     es-errors "^1.3.0"
     internal-slot "^1.1.0"
 
+strata-storage@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/strata-storage/-/strata-storage-1.5.0.tgz#4fe8738d0ec83dd478973f3f94d5ccdb39568f99"
+  integrity sha512-4yUQrW9ok7OP7TJW0kT2P1LX2rcZfbuc9/45u5fVLdrf4vwColoP9F94XhP6AFn27Pc8N4UlKK9SGUBu1syQ3w==
+
 stream-buffers@2.2.x:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/stream-buffers/-/stream-buffers-2.2.0.tgz#91d5f5130d1cef96dcfa7f726945188741d09ee4"
