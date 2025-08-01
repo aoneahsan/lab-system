@@ -1,5 +1,5 @@
 import { api } from './api';
-import { Preferences } from '@capacitor/preferences';
+import { unifiedStorage } from './unified-storage.service';
 
 export interface Notification {
   id: string;
@@ -23,7 +23,7 @@ export interface CriticalValueNotification {
 }
 
 class NotificationService {
-  private readonly STORAGE_KEY = 'labflow_notifications';
+  private readonly STORAGE_KEY = 'notifications';
   private listeners: Array<(notification: Notification) => void> = [];
 
   // Subscribe to notifications
@@ -99,8 +99,7 @@ class NotificationService {
 
   // Store notification locally
   private async storeNotificationLocally(notification: Notification): Promise<void> {
-    const stored = await Preferences.get({ key: this.STORAGE_KEY });
-    const notifications = stored.value ? JSON.parse(stored.value) : [];
+    const notifications = (await unifiedStorage.get<Notification[]>(this.STORAGE_KEY)) || [];
     notifications.unshift(notification);
 
     // Keep only last 100 notifications
@@ -108,16 +107,15 @@ class NotificationService {
       notifications.length = 100;
     }
 
-    await Preferences.set({
-      key: this.STORAGE_KEY,
-      value: JSON.stringify(notifications),
+    await unifiedStorage.set(this.STORAGE_KEY, notifications, {
+      tags: ['notifications'],
+      compression: true
     });
   }
 
   // Get local notifications (for offline access)
   async getLocalNotifications(): Promise<Notification[]> {
-    const stored = await Preferences.get({ key: this.STORAGE_KEY });
-    return stored.value ? JSON.parse(stored.value) : [];
+    return (await unifiedStorage.get<Notification[]>(this.STORAGE_KEY)) || [];
   }
 
   // Request notification permission

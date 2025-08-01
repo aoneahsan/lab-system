@@ -7,7 +7,7 @@ import { Fingerprint, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import type { BiometricAuthPlugin } from 'capacitor-biometric-authentication';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
-import { Preferences } from '@capacitor/preferences';
+import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { App } from '@capacitor/app';
 import { toast } from '@/hooks/useToast';
 
@@ -54,8 +54,8 @@ const MobileLoginPage: React.FC = () => {
 
   const checkSavedCredentials = async () => {
     try {
-      const { value } = await Preferences.get({ key: 'biometric_enabled' });
-      if (value === 'true' && biometricAvailable) {
+      const biometricEnabled = await storageHelpers.getPreference<boolean>(STORAGE_KEYS.BIOMETRIC_ENABLED);
+      if (biometricEnabled && biometricAvailable) {
         handleBiometricLogin();
       }
     } catch (error) {
@@ -74,8 +74,8 @@ const MobileLoginPage: React.FC = () => {
 
       if (verified.success) {
         // Get saved credentials
-        const { value: email } = await Preferences.get({ key: 'user_email' });
-        const { value: token } = await Preferences.get({ key: 'auth_token' });
+        const email = await storageHelpers.getSecure<string>('user_email');
+        const token = await storageHelpers.getSecure<string>('auth_token');
 
         if (email && token) {
           // Restore session
@@ -94,11 +94,11 @@ const MobileLoginPage: React.FC = () => {
       await login({ email: data.email, password: data.password });
 
       // Save credentials for biometric login
-      await Preferences.set({ key: 'user_email', value: data.email });
+      await storageHelpers.setSecure('user_email', data.email);
 
       // Ask to enable biometric
       if (biometricAvailable) {
-        await Preferences.set({ key: 'biometric_enabled', value: 'true' });
+        await storageHelpers.setPreference(STORAGE_KEYS.BIOMETRIC_ENABLED, true);
       }
 
       navigate('/home');

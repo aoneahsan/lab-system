@@ -3,7 +3,7 @@ import { PatientApp } from './PatientApp';
 import { PhlebotomistApp } from './PhlebotomistApp';
 import { LabStaffApp } from './LabStaffApp';
 import { ClinicianApp } from '@/apps/clinician/ClinicianApp';
-import { Preferences } from '@capacitor/preferences';
+import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { useAuthStore } from '@/stores/auth.store';
 
 export const MobileAppSelector: React.FC = () => {
@@ -15,9 +15,9 @@ export const MobileAppSelector: React.FC = () => {
   React.useEffect(() => {
     // Check for app type stored in preferences
     const checkAppType = async () => {
-      const { value } = await Preferences.get({ key: 'appType' });
-      if (value) {
-        setAppType(value as any);
+      const savedAppType = await storageHelpers.getPreference<string>(STORAGE_KEYS.SELECTED_APP);
+      if (savedAppType) {
+        setAppType(savedAppType as any);
       } else {
         // Determine app type based on user role
         if (currentUser) {

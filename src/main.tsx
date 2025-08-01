@@ -2,6 +2,21 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
+import { runStorageMigration } from './utils/storage-migration';
+import { unifiedStorage } from './services/unified-storage.service';
+
+// Initialize unified storage and run migration
+async function initializeApp() {
+  try {
+    // Initialize unified storage
+    await unifiedStorage.initialize();
+    
+    // Run storage migration
+    await runStorageMigration();
+  } catch (error) {
+    console.error('Failed to initialize app:', error);
+  }
+}
 
 // Import debug utilities in development
 if (process.env.NODE_ENV === 'development') {
@@ -9,8 +24,11 @@ if (process.env.NODE_ENV === 'development') {
   import('./utils/test-firebase-permissions');
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+// Initialize app before rendering
+initializeApp().then(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+});

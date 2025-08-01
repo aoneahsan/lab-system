@@ -1,19 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Preferences } from '@capacitor/preferences';
 import { Network } from '@capacitor/network';
-import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
-import { Capacitor } from '@capacitor/core';
-
-let sqlite: typeof CapacitorSQLite;
-let sqliteConnection: SQLiteConnection | null = null;
-let db: SQLiteDBConnection | null = null;
-
-// Initialize SQLite plugin
-if (Capacitor.isNativePlatform()) {
-  sqlite = CapacitorSQLite;
-  sqliteConnection = new SQLiteConnection(sqlite);
-}
+import { unifiedStorage } from '@/services/unified-storage.service';
 
 interface OfflineCollection {
   id: string;
@@ -42,73 +30,25 @@ interface OfflineState {
   lastSyncTime: Date | null;
 
   // Actions
-  addCollection: (collection: Omit<OfflineCollection, 'id' | 'syncStatus'>) => void;
-  updateCollection: (id: string, updates: Partial<OfflineCollection>) => void;
-  removeCollection: (id: string) => void;
+  addCollection: (collection: Omit<OfflineCollection, 'id' | 'syncStatus'>) => Promise<void>;
+  updateCollection: (id: string, updates: Partial<OfflineCollection>) => Promise<void>;
+  removeCollection: (id: string) => Promise<void>;
   setOnlineStatus: (isOnline: boolean) => void;
   syncCollections: () => Promise<void>;
   initializeDatabase: () => Promise<void>;
 }
 
-// SQLite database initialization
-const initializeOfflineDB = async () => {
-  try {
-    // Check if platform supports SQLite
-    if (!Capacitor.isNativePlatform() || !sqlite || !sqliteConnection) {
-      console.warn('SQLite not available on this platform');
-      return;
-    }
+// Helper function to get all collections from storage
+const getStoredCollections = async (): Promise<OfflineCollection[]> => {
+  return (await unifiedStorage.get<OfflineCollection[]>('offline_collections')) || [];
+};
 
-    try {
-      // Check if connection exists
-      const checkConnection = await sqliteConnection.checkConnectionsConsistency();
-      
-      // Create new connection
-      try {
-        db = await sqliteConnection.createConnection(
-          'labflow_offline',
-          false, // encrypted
-          'no-encryption', // mode
-          1, // version
-          false // readonly
-        );
-      } catch (connError) {
-        console.error('Failed to create SQLite connection:', connError);
-        return;
-      }
-    } catch (error) {
-      console.error('Error setting up SQLite connection:', error);
-      return;
-    }
-
-    if (db) {
-      await db.open();
-    }
-
-    // Create tables
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS collections (
-        id TEXT PRIMARY KEY,
-        patient_id TEXT NOT NULL,
-        patient_name TEXT NOT NULL,
-        order_id TEXT NOT NULL,
-        tests TEXT NOT NULL,
-        barcode TEXT NOT NULL,
-        collected_at TEXT NOT NULL,
-        location TEXT NOT NULL,
-        temperature REAL,
-        notes TEXT,
-        photos TEXT,
-        sync_status TEXT DEFAULT 'pending',
-        sync_error TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
-
-    await db.execute(createTableQuery);
-  } catch (error) {
-    console.error('Failed to initialize offline database:', error);
-  }
+// Helper function to save all collections to storage
+const saveCollectionsToStorage = async (collections: OfflineCollection[]): Promise<void> => {
+  await unifiedStorage.set('offline_collections', collections, {
+    tags: ['offline-collections'],
+    compression: true
+  });
 };
 
 export const useOfflineStore = create<OfflineState>()(
@@ -119,23 +59,38 @@ export const useOfflineStore = create<OfflineState>()(
       isOnline: true,
       lastSyncTime: null,
 
-      addCollection: (collection) => {
+      addCollection: async (collection) => {
         const newCollection: OfflineCollection = {
           ...collection,
           id: `col_${Date.now()}`,
           syncStatus: 'pending',
         };
 
+        // Get current collections from storage
+        const collections = await getStoredCollections();
+        collections.push(newCollection);
+        
+        // Save to storage
+        await saveCollectionsToStorage(collections);
+
+        // Update store state
         set((state) => ({
           collections: [...state.collections, newCollection],
           pendingSync: state.pendingSync + 1,
         }));
-
-        // Save to SQLite for persistence
-        saveCollectionToDB(newCollection);
       },
 
-      updateCollection: (id, updates) => {
+      updateCollection: async (id, updates) => {
+        // Get current collections from storage
+        const collections = await getStoredCollections();
+        const updatedCollections = collections.map((col) =>
+          col.id === id ? { ...col, ...updates } : col
+        );
+        
+        // Save to storage
+        await saveCollectionsToStorage(updatedCollections);
+
+        // Update store state
         set((state) => ({
           collections: state.collections.map((col) =>
             col.id === id ? { ...col, ...updates } : col
@@ -143,10 +98,20 @@ export const useOfflineStore = create<OfflineState>()(
         }));
       },
 
-      removeCollection: (id) => {
+      removeCollection: async (id) => {
+        // Get current collections from storage
+        const collections = await getStoredCollections();
+        const filteredCollections = collections.filter((col) => col.id !== id);
+        
+        // Save to storage
+        await saveCollectionsToStorage(filteredCollections);
+
+        // Update store state
         set((state) => ({
           collections: state.collections.filter((col) => col.id !== id),
-          pendingSync: Math.max(0, state.pendingSync - 1),
+          pendingSync: state.collections.filter(
+            (col) => col.id !== id && (col.syncStatus === 'pending' || col.syncStatus === 'failed')
+          ).length,
         }));
       },
 
@@ -167,18 +132,18 @@ export const useOfflineStore = create<OfflineState>()(
         if (pendingCollections.length === 0) return;
 
         // Update status to syncing
-        pendingCollections.forEach((col) => {
-          get().updateCollection(col.id, { syncStatus: 'syncing' });
-        });
+        for (const col of pendingCollections) {
+          await get().updateCollection(col.id, { syncStatus: 'syncing' });
+        }
 
         try {
           // In real app, would make API calls to sync
           await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
 
           // Mark as synced
-          pendingCollections.forEach((col) => {
-            get().updateCollection(col.id, { syncStatus: 'synced' });
-          });
+          for (const col of pendingCollections) {
+            await get().updateCollection(col.id, { syncStatus: 'synced' });
+          }
 
           set({
             pendingSync: 0,
@@ -186,17 +151,31 @@ export const useOfflineStore = create<OfflineState>()(
           });
         } catch (error) {
           // Mark as failed
-          pendingCollections.forEach((col) => {
-            get().updateCollection(col.id, {
+          for (const col of pendingCollections) {
+            await get().updateCollection(col.id, {
               syncStatus: 'failed',
               syncError: error instanceof Error ? error.message : 'Sync failed',
             });
-          });
+          }
         }
       },
 
       initializeDatabase: async () => {
-        await initializeOfflineDB();
+        // Initialize unified storage
+        await unifiedStorage.initialize();
+
+        // Load collections from storage
+        const storedCollections = await getStoredCollections();
+        if (storedCollections.length > 0) {
+          const pendingCount = storedCollections.filter(
+            c => c.syncStatus === 'pending' || c.syncStatus === 'failed'
+          ).length;
+          
+          set({
+            collections: storedCollections,
+            pendingSync: pendingCount
+          });
+        }
 
         // Monitor network status
         const status = await Network.getStatus();
@@ -211,52 +190,23 @@ export const useOfflineStore = create<OfflineState>()(
       name: 'offline-storage',
       storage: {
         getItem: async (name) => {
-          const { value } = await Preferences.get({ key: name });
-          return value ? JSON.parse(value) : null;
+          return await unifiedStorage.get(name);
         },
         setItem: async (name, value) => {
-          await Preferences.set({
-            key: name,
-            value: JSON.stringify(value),
+          await unifiedStorage.set(name, value, {
+            tags: ['offline-store', 'zustand']
           });
         },
         removeItem: async (name) => {
-          await Preferences.remove({ key: name });
+          await unifiedStorage.remove(name);
         },
       },
     }
   )
 );
 
-// Helper function to save collection to SQLite
-const saveCollectionToDB = async (collection: OfflineCollection) => {
-  try {
-    const query = `
-      INSERT INTO collections (
-        id, patient_id, patient_name, order_id, tests, barcode,
-        collected_at, location, temperature, notes, photos, sync_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-    `;
-
-    if (!db) {
-      await initializeOfflineDB();
-    }
-    
-    await db!.run(query, [
-        collection.id,
-        collection.patientId,
-        collection.patientName,
-        collection.orderId,
-        JSON.stringify(collection.tests),
-        collection.barcode,
-        collection.collectedAt.toISOString(),
-        JSON.stringify(collection.location),
-        collection.temperature || null,
-        collection.notes || null,
-        JSON.stringify(collection.photos || []),
-        collection.syncStatus,
-      ]);
-  } catch (error) {
-    console.error('Failed to save collection to database:', error);
-  }
+// Initialize collections from storage on startup
+export const initializeOfflineStore = async () => {
+  const store = useOfflineStore.getState();
+  await store.initializeDatabase();
 };

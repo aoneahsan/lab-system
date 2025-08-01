@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BeakerIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/stores/auth.store';
+import { unifiedStorage, STORAGE_KEYS } from '@/services/unified-storage.service';
 
 const DemoDataLoader: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +26,11 @@ const DemoDataLoader: React.FC = () => {
         `Loaded ${demoData.metadata.counts.patients} patients, ${demoData.metadata.counts.orders} orders, and ${demoData.metadata.counts.results} results`
       );
 
-      // In a real implementation, you would upload this data to Firebase
-      // For now, we'll store it in localStorage for demo purposes
-      localStorage.setItem('labflow_demo_data', JSON.stringify(demoData));
+      // Store demo data using unified storage
+      await unifiedStorage.set(STORAGE_KEYS.DEMO_DATA, demoData, {
+        tags: ['demo-data'],
+        compression: true
+      });
 
       setStatus('Demo data loaded successfully! Refresh the page to see the data.');
     } catch (error) {

@@ -1,5 +1,5 @@
 import { BiometricAuth } from 'capacitor-biometric-authentication';
-import { Preferences } from '@capacitor/preferences';
+import { storageHelpers, STORAGE_KEYS } from './unified-storage.service';
 import type {
   BiometricAuthConfig,
   BiometricEnrollmentStatus,
@@ -8,8 +8,8 @@ import type {
 } from '@/types/biometric.types';
 import { DEFAULT_BIOMETRIC_CONFIG, DEFAULT_BIOMETRIC_PREFERENCES } from '@/types/biometric.types';
 
-const BIOMETRIC_PREFS_KEY = 'labflow_biometric_preferences';
-const LAST_AUTH_KEY = 'labflow_last_biometric_auth';
+const BIOMETRIC_PREFS_KEY = 'biometric_preferences';
+const LAST_AUTH_KEY = 'last_biometric_auth';
 
 class BiometricService {
   private config: BiometricAuthConfig = DEFAULT_BIOMETRIC_CONFIG;
@@ -98,14 +98,12 @@ class BiometricService {
    */
   async getPreferences(): Promise<BiometricPreferences> {
     try {
-      const { value } = await Preferences.get({ key: BIOMETRIC_PREFS_KEY });
-      if (value) {
-        return JSON.parse(value);
-      }
+      const preferences = await storageHelpers.getSecure<BiometricPreferences>(BIOMETRIC_PREFS_KEY);
+      return preferences || DEFAULT_BIOMETRIC_PREFERENCES;
     } catch (error) {
       console.error('Error loading biometric preferences:', error);
+      return DEFAULT_BIOMETRIC_PREFERENCES;
     }
-    return DEFAULT_BIOMETRIC_PREFERENCES;
   }
 
   /**
@@ -113,10 +111,7 @@ class BiometricService {
    */
   async savePreferences(preferences: BiometricPreferences): Promise<void> {
     try {
-      await Preferences.set({
-        key: BIOMETRIC_PREFS_KEY,
-        value: JSON.stringify(preferences),
-      });
+      await storageHelpers.setSecure(BIOMETRIC_PREFS_KEY, preferences);
     } catch (error) {
       console.error('Error saving biometric preferences:', error);
       throw error;
@@ -133,12 +128,10 @@ class BiometricService {
         return false;
       }
 
-      const { value } = await Preferences.get({ key: LAST_AUTH_KEY });
-      if (!value) {
+      const lastAuthTime = await storageHelpers.getSecure<number>(LAST_AUTH_KEY);
+      if (!lastAuthTime) {
         return true;
       }
-
-      const lastAuthTime = parseInt(value, 10);
       const now = Date.now();
       const thresholdMs = prefs.recentAuthThresholdMinutes * 60 * 1000;
 
@@ -154,10 +147,7 @@ class BiometricService {
    */
   private async updateLastAuthTime(): Promise<void> {
     try {
-      await Preferences.set({
-        key: LAST_AUTH_KEY,
-        value: Date.now().toString(),
-      });
+      await storageHelpers.setSecure(LAST_AUTH_KEY, Date.now());
     } catch (error) {
       console.error('Error updating last auth time:', error);
     }
@@ -168,10 +158,7 @@ class BiometricService {
    */
   async clearBiometricData(): Promise<void> {
     try {
-      await Promise.all([
-        Preferences.remove({ key: BIOMETRIC_PREFS_KEY }),
-        Preferences.remove({ key: LAST_AUTH_KEY }),
-      ]);
+      await storageHelpers.clearSecure();
     } catch (error) {
       console.error('Error clearing biometric data:', error);
     }

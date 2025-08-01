@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { unifiedStorage, STORAGE_KEYS } from '@/services/unified-storage.service';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -23,12 +24,29 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'vite-ui-theme',
+  storageKey = STORAGE_KEYS.THEME,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load theme from storage on mount
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await unifiedStorage.get<Theme>(storageKey);
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      } catch (error) {
+        console.error('Failed to load theme:', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    
+    loadTheme();
+  }, [storageKey]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -49,11 +67,22 @@ export function ThemeProvider({
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+    setTheme: async (newTheme: Theme) => {
+      try {
+        await unifiedStorage.set(storageKey, newTheme, {
+          tags: ['ui-preferences']
+        });
+        setTheme(newTheme);
+      } catch (error) {
+        console.error('Failed to save theme:', error);
+      }
     },
   };
+
+  // Don't render until theme is loaded to avoid flash
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>

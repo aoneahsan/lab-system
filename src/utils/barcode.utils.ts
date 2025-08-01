@@ -1,9 +1,9 @@
 /**
  * Barcode and QR code generation utilities for test orders and samples
- * Uses qrcode-studio package for QR code generation
+ * Uses code-craft-studio package for QR code generation
  */
 
-import { QRCodeGenerator } from 'qrcode-studio';
+import { QRCodeGenerator } from 'code-craft-studio';
 
 /**
  * Interface for barcode data structure
