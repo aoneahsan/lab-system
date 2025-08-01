@@ -13,6 +13,8 @@ import {
   QueryConstraint,
   serverTimestamp,
   writeBatch,
+  getCountFromServer,
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase.config';
 import { SHARED_COLLECTIONS } from '@/config/firebase-collections-helper';
@@ -446,27 +448,53 @@ export const testService = {
   async getTestStatistics(tenantId: string): Promise<{
     totalTests: number;
     activeTests: number;
+    todayCount: number;
     testsByCategory: Record<string, number>;
     testsBySpecimenType: Record<string, number>;
   }> {
-    const tests = await this.getTests(tenantId);
+    // Use count queries for better performance
+    const totalCountQuery = query(
+      collection(db, TESTS_COLLECTION),
+      where('tenantId', '==', tenantId)
+    );
+    const activeCountQuery = query(
+      collection(db, TESTS_COLLECTION),
+      where('tenantId', '==', tenantId),
+      where('isActive', '==', true)
+    );
+    
+    // Count today's test orders
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayCountQuery = query(
+      collection(db, TEST_ORDERS_COLLECTION),
+      where('tenantId', '==', tenantId),
+      where('orderedAt', '>=', Timestamp.fromDate(today))
+    );
 
-    const stats = {
-      totalTests: tests.length,
-      activeTests: tests.filter((t) => t.isActive).length,
-      testsByCategory: {} as Record<string, number>,
-      testsBySpecimenType: {} as Record<string, number>,
-    };
+    const [totalSnapshot, activeSnapshot, todaySnapshot] = await Promise.all([
+      getCountFromServer(totalCountQuery),
+      getCountFromServer(activeCountQuery),
+      getCountFromServer(todayCountQuery),
+    ]);
 
-    tests.forEach((test) => {
-      // Count by category
-      stats.testsByCategory[test.category] = (stats.testsByCategory[test.category] || 0) + 1;
-
-      // Count by specimen type
-      stats.testsBySpecimenType[test.specimen.type] =
-        (stats.testsBySpecimenType[test.specimen.type] || 0) + 1;
+    // For category and specimen type counts, fetch a limited sample
+    const sampleTests = await this.getTests(tenantId, { limit: 100 });
+    
+    const testsByCategory: Record<string, number> = {};
+    const testsBySpecimenType: Record<string, number> = {};
+    
+    sampleTests.forEach((test) => {
+      testsByCategory[test.category] = (testsByCategory[test.category] || 0) + 1;
+      testsBySpecimenType[test.specimen.type] = (testsBySpecimenType[test.specimen.type] || 0) + 1;
     });
 
-    return stats;
+    return {
+      totalTests: totalSnapshot.data().count,
+      activeTests: activeSnapshot.data().count,
+      todayCount: todaySnapshot.data().count,
+      testsByCategory,
+      testsBySpecimenType,
+    };
   },
 };

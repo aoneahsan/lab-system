@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { collection, getDocs, updateDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard } from 'lucide-react';
@@ -85,6 +86,7 @@ const AdminPanel = () => {
       fetchTenants();
     }
   }, [activeTab, page, search, status, sortBy, sortOrder]);
+
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -218,7 +220,7 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Admin Panel

@@ -5,32 +5,39 @@ import { useTenant } from '@/hooks/useTenant';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { toast } from '@/stores/toast.store';
 
-const navigation = [
+// Define separate navigation for super admins
+const superAdminNavigation = [
+  { name: 'Admin Panel', href: '/admin', icon: '🛡️' },
+  { name: 'Profile', href: '/profile', icon: '👤' },
+  { name: 'Settings', href: '/settings', icon: '⚙️' },
+];
+
+// Define navigation for regular users
+const regularNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊', roles: 'all' },
   {
     name: 'Patients',
     href: '/patients',
     icon: '👥',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'front_desk', 'clinician'],
+    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'front_desk', 'clinician'],
   },
   {
     name: 'Tests',
     href: '/tests',
     icon: '🧪',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'clinician'],
+    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'clinician'],
   },
   {
     name: 'Samples',
     href: '/samples',
     icon: '🩸',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'phlebotomist'],
+    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'phlebotomist'],
   },
   {
     name: 'Results',
     href: '/results',
     icon: '📋',
     roles: [
-      'super_admin',
       'lab_admin',
       'lab_manager',
       'lab_technician',
@@ -43,37 +50,31 @@ const navigation = [
     name: 'Billing',
     href: '/billing',
     icon: '💳',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'billing_staff'],
+    roles: ['lab_admin', 'lab_manager', 'billing_staff'],
   },
   {
     name: 'Inventory',
     href: '/inventory',
     icon: '📦',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician'],
+    roles: ['lab_admin', 'lab_manager', 'lab_technician'],
   },
   {
     name: 'Quality Control',
     href: '/quality-control',
     icon: '✅',
-    roles: ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'pathologist'],
+    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'pathologist'],
   },
   {
     name: 'Reports',
     href: '/reports',
     icon: '📈',
-    roles: ['super_admin', 'lab_admin', 'lab_manager'],
+    roles: ['lab_admin', 'lab_manager'],
   },
   {
     name: 'Settings',
     href: '/settings',
     icon: '⚙️',
-    roles: ['super_admin', 'lab_admin'],
-  },
-  {
-    name: 'Admin Panel',
-    href: '/admin',
-    icon: '🛡️',
-    roles: ['super_admin'],
+    roles: ['lab_admin'],
   },
 ];
 
@@ -94,13 +95,20 @@ export const DashboardLayout = () => {
   // Use impersonated user's role for navigation if impersonating
   const effectiveUser = isImpersonating && impersonatedUser ? impersonatedUser : currentUser;
 
-  const filteredNavigation = navigation.filter((item) => {
-    // During impersonation, hide admin panel
-    if (isImpersonating && item.href === '/admin') return false;
-    
-    if (item.roles === 'all') return true;
-    return item.roles.includes(effectiveUser?.role || '');
-  });
+  // Use different navigation for super admins when not impersonating
+  const navigation = currentUser?.role === 'super_admin' && !isImpersonating 
+    ? superAdminNavigation 
+    : regularNavigation;
+
+  const filteredNavigation = currentUser?.role === 'super_admin' && !isImpersonating
+    ? navigation // Super admins see all their navigation items
+    : navigation.filter((item) => {
+        if ('roles' in item) {
+          if (item.roles === 'all') return true;
+          return item.roles.includes(effectiveUser?.role || '');
+        }
+        return true;
+      });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -143,8 +151,12 @@ export const DashboardLayout = () => {
           {/* Logo */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h1 className="text-2xl font-bold text-primary-600">LabFlow</h1>
-            {tenant && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{tenant.name}</p>
+            {currentUser?.role === 'super_admin' && !isImpersonating ? (
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">System Administrator</p>
+            ) : (
+              tenant && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{tenant.name}</p>
+              )
             )}
           </div>
 

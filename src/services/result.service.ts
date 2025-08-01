@@ -10,6 +10,8 @@ import {
   Timestamp,
   serverTimestamp,
   getDoc,
+  getCountFromServer,
+  limit,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
@@ -560,21 +562,48 @@ export const resultService = {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const q = query(
+    // Use count queries for better performance
+    const todayQuery = query(
       collection(db, COLLECTIONS.RESULTS),
       where('tenantId', '==', tenantId),
       where('createdAt', '>=', Timestamp.fromDate(today))
     );
+    
+    const pendingQuery = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
+      where('status', '==', 'pending')
+    );
+    
+    const verifiedQuery = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
+      where('status', '==', 'verified')
+    );
+    
+    // For critical results, fetch a limited set
+    const criticalQuery = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
+      where('isCritical', '==', true),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    );
 
-    const snapshot = await getDocs(q);
-    const results = snapshot.docs.map((doc) => doc.data());
+    const [todaySnapshot, pendingSnapshot, verifiedSnapshot, criticalSnapshot] = await Promise.all([
+      getCountFromServer(todayQuery),
+      getCountFromServer(pendingQuery),
+      getCountFromServer(verifiedQuery),
+      getDocs(criticalQuery),
+    ]);
 
     return {
-      total: results.length,
-      pending: results.filter((r) => r.status === 'pending').length,
-      verified: results.filter((r) => r.status === 'verified').length,
-      critical: results.filter((r) => r.isCritical).length,
-      todayCount: results.length,
+      total: todaySnapshot.data().count,
+      pending: pendingSnapshot.data().count,
+      pendingCount: pendingSnapshot.data().count,
+      verified: verifiedSnapshot.data().count,
+      critical: criticalSnapshot.size,
+      todayCount: todaySnapshot.data().count,
     };
   },
 };

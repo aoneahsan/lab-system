@@ -27,7 +27,7 @@ class UnifiedStorageService {
         : ['indexedDB', 'localStorage', 'sessionStorage', 'cache', 'memory'],
       encryption: {
         enabled: true,
-        key: this.generateEncryptionKey()
+        password: this.generateEncryptionKey() // Changed from 'key' to 'password'
       },
       compression: {
         enabled: true,

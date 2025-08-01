@@ -13,6 +13,7 @@ import {
   Timestamp,
   // writeBatch,
   serverTimestamp,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
@@ -330,12 +331,11 @@ export const billingService = {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Get all invoices
-    const invoicesQuery = query(invoicesRef, where('tenantId', '==', tenantId));
-    const invoicesSnapshot = await getDocs(invoicesQuery);
-
-    // Get today's data
+    // Use count queries and limited data for better performance
     const todayTimestamp = Timestamp.fromDate(today);
+    
+    // Count queries
+    const totalInvoicesQuery = query(invoicesRef, where('tenantId', '==', tenantId));
     const todaysInvoicesQuery = query(
       invoicesRef,
       where('tenantId', '==', tenantId),
@@ -346,19 +346,60 @@ export const billingService = {
       where('tenantId', '==', tenantId),
       where('paymentDate', '>=', todayTimestamp)
     );
+    const pendingInvoicesQuery = query(
+      invoicesRef,
+      where('tenantId', '==', tenantId),
+      where('paymentStatus', 'in', ['pending', 'partial'])
+    );
+    const overdueInvoicesQuery = query(
+      invoicesRef,
+      where('tenantId', '==', tenantId),
+      where('paymentStatus', '==', 'overdue')
+    );
 
-    const [todaysInvoicesSnapshot, todaysPaymentsSnapshot] = await Promise.all([
-      getDocs(todaysInvoicesQuery),
-      getDocs(todaysPaymentsQuery),
+    // Get counts and limited data for calculations
+    const [totalCount, todaysInvoicesSnapshot, todaysPaymentsSnapshot, pendingSnapshot, overdueSnapshot] = await Promise.all([
+      getCountFromServer(totalInvoicesQuery),
+      getDocs(query(todaysInvoicesQuery, limit(100))),
+      getDocs(query(todaysPaymentsQuery, limit(100))),
+      getDocs(query(pendingInvoicesQuery, limit(100))),
+      getDocs(query(overdueInvoicesQuery, limit(50))),
     ]);
 
-    // Calculate statistics
+    // Calculate statistics from limited data
     let totalRevenue = 0;
     let pendingPayments = 0;
     let overdueAmount = 0;
     let todaysCharges = 0;
     let todaysPayments = 0;
+    let todayRevenue = 0;
 
+    // Process today's invoices
+    todaysInvoicesSnapshot.docs.forEach((doc) => {
+      const invoice = doc.data() as Invoice;
+      todaysCharges += invoice.totalAmount || 0;
+    });
+
+    // Process today's payments
+    todaysPaymentsSnapshot.docs.forEach((doc) => {
+      const payment = doc.data() as Payment;
+      todaysPayments += payment.amount || 0;
+      todayRevenue += payment.amount || 0;
+    });
+    
+    // Process pending invoices
+    pendingSnapshot.docs.forEach((doc) => {
+      const invoice = doc.data() as Invoice;
+      pendingPayments += invoice.balanceDue || 0;
+    });
+    
+    // Process overdue invoices
+    overdueSnapshot.docs.forEach((doc) => {
+      const invoice = doc.data() as Invoice;
+      overdueAmount += invoice.balanceDue || 0;
+    });
+
+    // Get status counts using individual count queries for accuracy
     const invoicesByStatus: Record<InvoiceStatus, number> = {
       draft: 0,
       sent: 0,
@@ -368,30 +409,6 @@ export const billingService = {
       overdue: 0,
       cancelled: 0,
     };
-
-    invoicesSnapshot.docs.forEach((doc) => {
-      const invoice = doc.data() as Invoice;
-      invoicesByStatus[invoice.status]++;
-      totalRevenue += invoice.totalAmount;
-
-      if (invoice.paymentStatus === 'pending' || invoice.paymentStatus === 'partial') {
-        pendingPayments += invoice.balanceDue;
-      }
-
-      if (invoice.paymentStatus === 'overdue') {
-        overdueAmount += invoice.balanceDue;
-      }
-    });
-
-    todaysInvoicesSnapshot.docs.forEach((doc) => {
-      const invoice = doc.data() as Invoice;
-      todaysCharges += invoice.totalAmount;
-    });
-
-    todaysPaymentsSnapshot.docs.forEach((doc) => {
-      const payment = doc.data() as Payment;
-      todaysPayments += payment.amount;
-    });
 
     // Get claims statistics
     const claimsQuery = query(claimsRef, where('tenantId', '==', tenantId));
@@ -415,12 +432,13 @@ export const billingService = {
     });
 
     return {
-      totalInvoices: invoicesSnapshot.size,
+      totalInvoices: totalCount.data().count,
       totalRevenue,
       pendingPayments,
       overdueAmount,
       todaysCharges,
       todaysPayments,
+      todayRevenue,
       invoicesByStatus,
       paymentsByMethod: {
         cash: 0,

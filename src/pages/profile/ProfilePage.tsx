@@ -6,7 +6,7 @@ import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
 
 const ProfilePage = () => {
-  const { currentUser, updateProfile } = useAuthStore();
+  const { currentUser, updateUserProfile } = useAuthStore();
   const { tenant } = useTenant();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -20,7 +20,8 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      await updateProfile(formData);
+      if (!currentUser?.id) return;
+      await updateUserProfile(currentUser.id, formData);
       toast.success('Profile Updated', 'Your profile has been updated successfully');
       setIsEditing(false);
     } catch (error) {

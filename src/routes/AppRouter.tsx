@@ -128,13 +128,15 @@ export const AppRouter = () => {
           </Route>
         </Route>
 
-        {/* Admin Panel Route */}
+        {/* Admin Panel Route - Now uses DashboardLayout */}
         <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
-          <Route path="/admin/*" element={
-            <AdminRouteGuard>
-              <AdminPanel />
-            </AdminRouteGuard>
-          } />
+          <Route element={<DashboardLayout />}>
+            <Route path="/admin/*" element={
+              <AdminRouteGuard>
+                <AdminPanel />
+              </AdminRouteGuard>
+            } />
+          </Route>
         </Route>
 
         {/* Clinician App Routes */}

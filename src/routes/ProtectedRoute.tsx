@@ -39,8 +39,6 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       '/inventory',
       '/quality-control',
       '/reports',
-      '/settings',
-      '/profile',
       '/onboarding',
       '/clinician',
       '/equipment',
@@ -48,7 +46,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       '/analytics'
     ];
 
-    // Check if current path starts with any end-user route
+    // Profile and Settings pages should be accessible to all users including super admins
     const isEndUserRoute = endUserRoutes.some(route => 
       location.pathname.startsWith(route)
     );
