@@ -13,6 +13,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useOfflinePatients } from '@/hooks/useOfflinePatients';
+import { useAuthStore } from '@/stores/auth.store';
+import { resultService } from '@/services/result.service';
+import { toast } from '@/stores/toast.store';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+import { Share } from '@capacitor/share';
 
 interface TestResult {
   id: string;
@@ -35,6 +41,7 @@ interface TestResult {
 
 export const ResultsScreen: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
   const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -124,14 +131,49 @@ export const ResultsScreen: React.FC = () => {
     }
   };
 
-  const handleDownloadResult = (resultId: string) => {
-    // Implement PDF download
-    console.log('Download result:', resultId);
+  const handleDownloadResult = async (resultId: string) => {
+    try {
+      // Generate PDF URL using the report service
+      const pdfUrl = await resultService.generateResultPDF(currentUser?.tenantId || '', resultId);
+      
+      // For mobile, use Capacitor's Browser plugin to open PDF
+      if (Capacitor.isNativePlatform()) {
+        await Browser.open({ url: pdfUrl });
+      } else {
+        // For web, open in new tab
+        window.open(pdfUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error downloading result:', error);
+      toast.error('Download failed', 'Unable to download the result PDF');
+    }
   };
 
-  const handleShareResult = (resultId: string) => {
-    // Implement share functionality
-    console.log('Share result:', resultId);
+  const handleShareResult = async (resultId: string) => {
+    try {
+      const result = results.find(r => r.id === resultId);
+      if (!result) return;
+      
+      // Generate shareable link or PDF
+      const pdfUrl = await resultService.generateResultPDF(currentUser?.tenantId || '', resultId);
+      
+      if (Capacitor.isNativePlatform()) {
+        // Use native share
+        await Share.share({
+          title: `Lab Result: ${result.testName}`,
+          text: `Here's my lab result for ${result.testName} from ${format(result.resultDate, 'MMM dd, yyyy')}`,
+          url: pdfUrl,
+          dialogTitle: 'Share Result'
+        });
+      } else {
+        // For web, copy link to clipboard
+        await navigator.clipboard.writeText(pdfUrl);
+        toast.success('Link copied', 'Result link copied to clipboard');
+      }
+    } catch (error) {
+      console.error('Error sharing result:', error);
+      toast.error('Share failed', 'Unable to share the result');
+    }
   };
 
   return (
