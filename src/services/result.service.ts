@@ -606,4 +606,21 @@ export const resultService = {
       todayCount: todaySnapshot.data().count,
     };
   },
+
+  // Get patient results
+  async getPatientResults(tenantId: string, patientId: string): Promise<TestResult[]> {
+    const q = query(
+      collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
+      where('patientId', '==', patientId),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }) as TestResult);
+  },
 };

@@ -6,7 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 LabFlow is a comprehensive multi-tenant laboratory management system designed for clinical laboratories. The system includes web application, mobile apps (iOS/Android), and Chrome extension for EMR integration.
 
-## First complete development of whole project, web, mobile and extension and once only everything is working, then only work on testing part, but do make sure that all is working after each module finishes
+## CRITICAL TESTING POLICY - DO NOT WORK ON TESTING AUTOMATICALLY
+
+### ABSOLUTE RULES:
+1. **NEVER** work on testing unless explicitly requested by the user
+2. **NEVER** create test files, test configurations, or testing infrastructure automatically
+3. **NEVER** include testing tasks in development plans or todo lists
+4. **NEVER** suggest or implement testing as part of feature development
+5. **ONLY** work on testing when BOTH conditions are met:
+   - A file named `testing-allowed-for-project.permissions.md` exists in the project
+   - The user explicitly asks for testing (e.g., "create tests for my code")
+6. **ALWAYS** focus exclusively on features, functionality, and core development tasks
+7. **DO NOT** mention testing needs or missing tests when implementing features
+
+## First complete development of whole project, web, mobile and extension. Focus only on features and functionality.
 
 ## Development Commands
 
@@ -25,14 +38,12 @@ yarn build
 # Preview production build
 yarn preview
 
-# Run tests
-yarn test
-yarn test:ui
-yarn test:coverage
-
-# Run E2E tests
-yarn cypress:open
-yarn cypress:run
+# Testing commands - DO NOT USE unless explicitly requested
+# yarn test (ONLY when testing-allowed-for-project.permissions.md exists)
+# yarn test:ui (ONLY when testing-allowed-for-project.permissions.md exists)
+# yarn test:coverage (ONLY when testing-allowed-for-project.permissions.md exists)
+# yarn cypress:open (ONLY when testing-allowed-for-project.permissions.md exists)
+# yarn cypress:run (ONLY when testing-allowed-for-project.permissions.md exists)
 
 # Lint and format
 yarn lint
@@ -88,7 +99,7 @@ yarn deploy
 - **API/Data**: React Query + Axios
 - **Mobile**: Capacitor
 - **Backend**: Firebase (Auth, Firestore, Functions, Storage)
-- **Testing**: Vitest + Cypress
+- **Testing**: Vitest + Cypress (DO NOT IMPLEMENT unless explicitly requested)
 
 ### Custom Packages Priority
 
@@ -120,7 +131,7 @@ Always prefer these custom packages developed by Ahsan:
 3. **State management**: Use Zustand stores in `src/stores/`
 4. **API calls**: Use React Query hooks in `src/hooks/`
 5. **Styling**: Tailwind CSS with custom design system
-6. **Testing**: Write tests for all new features
+6. **Testing**: DO NOT write tests unless explicitly requested
 7. **Offline support**: Implement for all features using local SQL
 8. **Security**: HIPAA compliance required, no sensitive data in logs
 
@@ -158,3 +169,4 @@ Always prefer these custom packages developed by Ahsan:
 - Explored comprehensive multi-tenant laboratory management system requirements
 - Identified key technology stack components for web, mobile, and extension development
 - Began mapping out development guidelines and module implementation strategy
+- DO NOT work on testing until explicitly asked by the user, never add/work on testing of any package or project automatically while planning other things

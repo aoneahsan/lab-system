@@ -232,4 +232,21 @@ export const orderService = {
       dateTo: tomorrow,
     });
   },
+
+  // Get orders by date range
+  async getOrdersByDateRange(tenantId: string, startDate: Date, endDate: Date): Promise<TestOrder[]> {
+    const q = query(
+      collection(db, SHARED_COLLECTIONS.LABFLOW_TEST_ORDERS),
+      where('tenantId', '==', tenantId),
+      where('createdAt', '>=', Timestamp.fromDate(startDate)),
+      where('createdAt', '<=', Timestamp.fromDate(endDate)),
+      orderBy('createdAt', 'desc')
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }) as TestOrder);
+  },
 };

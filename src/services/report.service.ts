@@ -13,8 +13,19 @@ import {
   Timestamp,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '@/config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { getUserById } from '@/services/auth.service';
+import { patientService } from '@/services/patient.service';
+import { sampleService } from '@/services/sample.service';
+import { orderService } from '@/services/order.service';
+import { resultService } from '@/services/result.service';
+import { qcService } from '@/services/qc.service';
+import { inventoryService } from '@/services/inventory.service';
+import { billingService } from '@/services/billing.service';
 import type {
   Report,
   ReportTemplate,
@@ -482,8 +493,9 @@ export const reportService = {
     };
   },
 
-  // Generate report (placeholder - would implement actual report generation logic)
+  // Generate report
   async generateReport(tenantId: string, userId: string, reportId: string): Promise<void> {
+    const startTime = Date.now();
     const report = await this.getReport(tenantId, reportId);
     if (!report) {
       throw new Error('Report not found');
@@ -496,37 +508,268 @@ export const reportService = {
     });
 
     try {
-      // TODO: Implement actual report generation logic based on report config
-      // This would involve:
-      // 1. Fetching data based on dataSource configuration
-      // 2. Applying filters and aggregations
-      // 3. Generating charts if configured
-      // 4. Creating output in requested formats
-      // 5. Saving files to storage
+      // Get template if specified
+      const template = report.templateId 
+        ? await this.getReportTemplate(tenantId, report.templateId)
+        : null;
 
-      // For now, just mark as completed after a delay
-      setTimeout(async () => {
-        await this.updateReport(tenantId, userId, reportId, {
-          status: 'completed',
-          completedAt: serverTimestamp() as Timestamp,
-          output: {
-            data: [],
-            metadata: {
-              generatedAt: serverTimestamp() as Timestamp,
-              generatedBy: userId,
-              duration: 2000,
-              recordCount: 0,
-              parameters: report.parameters || {},
-            },
+      // Fetch data based on template type
+      const reportData = await this.fetchReportData(
+        tenantId, 
+        template?.type || 'custom', 
+        report.parameters
+      );
+
+      // Generate report in requested format
+      const fileUrl = await this.generateReportFile(
+        tenantId,
+        reportId,
+        template,
+        reportData,
+        report.format,
+        userId
+      );
+
+      // Update report with results
+      await this.updateReport(tenantId, userId, reportId, {
+        status: 'completed',
+        completedAt: serverTimestamp() as Timestamp,
+        fileUrl,
+        output: {
+          data: reportData.data || [],
+          metadata: {
+            generatedAt: serverTimestamp() as Timestamp,
+            generatedBy: userId,
+            duration: Date.now() - startTime,
+            recordCount: reportData.recordCount || 0,
+            parameters: report.parameters || {},
           },
-        });
-      }, 2000);
+        },
+      });
     } catch (error) {
       await this.updateReport(tenantId, userId, reportId, {
         status: 'failed',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
+    }
+  },
+
+  // Fetch data based on report type
+  async fetchReportData(
+    tenantId: string, 
+    reportType: string, 
+    parameters: Record<string, any>
+  ): Promise<{ data: any[]; recordCount: number }> {
+    const { startDate, endDate } = parameters;
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
+
+    switch (reportType) {
+      case 'patient_results': {
+        const patientId = parameters.patientId;
+        if (!patientId) throw new Error('Patient ID required for patient results report');
+        
+        const patient = await patientService.getPatient(tenantId, patientId);
+        const results = await resultService.getPatientResults(tenantId, patientId);
+        
+        return {
+          data: results,
+          recordCount: results.length,
+        };
+      }
+
+      case 'daily_summary': {
+        const orders = await orderService.getOrdersByDateRange(tenantId, start, end);
+        const samples = await sampleService.getSamplesByDateRange(tenantId, start, end);
+        
+        return {
+          data: [
+            { 
+              date: start.toISOString(),
+              totalOrders: orders.length,
+              totalSamples: samples.length,
+              completedOrders: orders.filter(o => o.status === 'completed').length,
+              pendingOrders: orders.filter(o => o.status === 'pending').length,
+            }
+          ],
+          recordCount: 1,
+        };
+      }
+
+      case 'quality_control': {
+        const qcRuns = await qcService.getQCRuns(tenantId, {
+          startDate: start,
+          endDate: end,
+        });
+        
+        return {
+          data: qcRuns,
+          recordCount: qcRuns.length,
+        };
+      }
+
+      case 'inventory_status': {
+        const items = await inventoryService.getItems(tenantId);
+        const lowStock = items.filter(item => 
+          item.quantityInStock <= item.reorderLevel
+        );
+        
+        return {
+          data: lowStock,
+          recordCount: lowStock.length,
+        };
+      }
+
+      case 'financial_summary': {
+        const invoices = await billingService.getInvoicesByDateRange(
+          tenantId, 
+          start, 
+          end
+        );
+        
+        const totalRevenue = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
+        const paidAmount = invoices
+          .filter(inv => inv.status === 'paid')
+          .reduce((sum, inv) => sum + inv.totalAmount, 0);
+        
+        return {
+          data: [{
+            period: `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`,
+            totalInvoices: invoices.length,
+            totalRevenue,
+            paidAmount,
+            pendingAmount: totalRevenue - paidAmount,
+            invoices,
+          }],
+          recordCount: invoices.length,
+        };
+      }
+
+      default: {
+        // Custom report - fetch all available data types
+        const [orders, patients, samples] = await Promise.all([
+          orderService.getOrdersByDateRange(tenantId, start, end),
+          patientService.getPatients(tenantId, { limit: 100 }),
+          sampleService.getSamplesByDateRange(tenantId, start, end),
+        ]);
+        
+        return {
+          data: { orders, patients, samples },
+          recordCount: orders.length + patients.length + samples.length,
+        };
+      }
+    }
+  },
+
+  // Generate report file in specified format
+  async generateReportFile(
+    tenantId: string,
+    reportId: string,
+    template: ReportTemplate | null,
+    reportData: { data: any[]; recordCount: number },
+    format: string,
+    userId: string
+  ): Promise<string> {
+    const user = await getUserById(userId);
+    const userName = user ? `${user.firstName} ${user.lastName}` : 'System';
+    
+    switch (format) {
+      case 'pdf': {
+        const pdf = new jsPDF({
+          orientation: template?.layout?.orientation || 'portrait',
+          unit: 'mm',
+          format: template?.layout?.pageSize?.toLowerCase() || 'a4',
+        });
+
+        // Add header
+        pdf.setFontSize(20);
+        pdf.text(template?.name || 'Report', 20, 20);
+        
+        pdf.setFontSize(10);
+        pdf.text(`Generated by: ${userName}`, 20, 30);
+        pdf.text(`Date: ${new Date().toLocaleString()}`, 20, 35);
+        pdf.text(`Records: ${reportData.recordCount}`, 20, 40);
+
+        // Add content based on template sections
+        let yPosition = 50;
+        
+        if (Array.isArray(reportData.data) && reportData.data.length > 0) {
+          // Create table from data
+          const headers = Object.keys(reportData.data[0]);
+          const rows = reportData.data.map(item => 
+            headers.map(header => String(item[header] || ''))
+          );
+
+          autoTable(pdf, {
+            startY: yPosition,
+            head: [headers],
+            body: rows,
+            theme: 'grid',
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [79, 70, 229] },
+          });
+        }
+
+        // Save PDF to blob
+        const pdfBlob = pdf.output('blob');
+        
+        // Upload to Firebase Storage
+        const fileName = `reports/${tenantId}/${reportId}.pdf`;
+        const storageRef = ref(storage, fileName);
+        await uploadBytes(storageRef, pdfBlob);
+        
+        return await getDownloadURL(storageRef);
+      }
+
+      case 'excel':
+      case 'csv': {
+        // Convert data to CSV
+        let csvContent = '';
+        
+        if (Array.isArray(reportData.data) && reportData.data.length > 0) {
+          const headers = Object.keys(reportData.data[0]);
+          csvContent = headers.join(',') + '\n';
+          
+          reportData.data.forEach(row => {
+            const values = headers.map(header => {
+              const value = row[header];
+              // Escape commas and quotes in CSV
+              if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                return `"${value.replace(/"/g, '""')}"`;
+              }
+              return value;
+            });
+            csvContent += values.join(',') + '\n';
+          });
+        }
+
+        // Create blob
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        
+        // Upload to Firebase Storage
+        const fileName = `reports/${tenantId}/${reportId}.csv`;
+        const storageRef = ref(storage, fileName);
+        await uploadBytes(storageRef, blob);
+        
+        return await getDownloadURL(storageRef);
+      }
+
+      case 'json': {
+        // Convert to JSON
+        const jsonContent = JSON.stringify(reportData, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        
+        // Upload to Firebase Storage
+        const fileName = `reports/${tenantId}/${reportId}.json`;
+        const storageRef = ref(storage, fileName);
+        await uploadBytes(storageRef, blob);
+        
+        return await getDownloadURL(storageRef);
+      }
+
+      default:
+        throw new Error(`Unsupported format: ${format}`);
     }
   },
 };

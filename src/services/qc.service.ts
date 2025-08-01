@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { getUserById } from '@/services/auth.service';
 import type {
   QCMaterial,
   QCRun,
@@ -261,6 +262,19 @@ export const qcService = {
     if (filter?.status) {
       q = query(q, where('status', '==', filter.status));
     }
+    
+    // Apply date filtering if provided
+    if (filter?.startDate && filter?.endDate) {
+      q = query(
+        q,
+        where('runDate', '>=', Timestamp.fromDate(filter.startDate)),
+        where('runDate', '<=', Timestamp.fromDate(filter.endDate))
+      );
+    } else if (filter?.startDate) {
+      q = query(q, where('runDate', '>=', Timestamp.fromDate(filter.startDate)));
+    } else if (filter?.endDate) {
+      q = query(q, where('runDate', '<=', Timestamp.fromDate(filter.endDate)));
+    }
 
     q = query(q, orderBy('runDate', 'desc'), limit(100));
 
@@ -348,6 +362,10 @@ export const qcService = {
     // Determine overall run status
     const runStatus = results.some((r) => r.status === 'fail') ? 'rejected' : 'completed';
 
+    // Get user name for operator field
+    const user = await getUserById(userId);
+    const operatorName = user ? `${user.firstName} ${user.lastName}` : userId;
+
     const runData: Omit<QCRun, 'id'> = {
       tenantId,
       runNumber: `QC-${Date.now()}`,
@@ -360,7 +378,7 @@ export const qcService = {
       instrumentId: data.instrumentId,
       temperature: data.temperature,
       humidity: data.humidity,
-      operator: userId, // TODO: Get user name
+      operator: operatorName,
       operatorId: userId,
       results,
       status: runStatus,
@@ -421,20 +439,31 @@ export const qcService = {
     tenantId: string,
     materialId: string,
     testCode: string,
-
-    _startDate?: Date, // TODO: Implement date filtering
-
-    _endDate?: Date // TODO: Implement date filtering
+    startDate?: Date,
+    endDate?: Date
   ): Promise<QCStatistics | null> {
     const statsRef = collection(db, COLLECTIONS.QC_STATISTICS);
-    const q = query(
+    let q = query(
       statsRef,
       where('tenantId', '==', tenantId),
       where('materialId', '==', materialId),
-      where('testCode', '==', testCode),
-      orderBy('calculatedAt', 'desc'),
-      limit(1)
+      where('testCode', '==', testCode)
     );
+
+    // Apply date filtering if provided
+    if (startDate && endDate) {
+      q = query(
+        q,
+        where('periodStart', '>=', Timestamp.fromDate(startDate)),
+        where('periodEnd', '<=', Timestamp.fromDate(endDate))
+      );
+    } else if (startDate) {
+      q = query(q, where('periodStart', '>=', Timestamp.fromDate(startDate)));
+    } else if (endDate) {
+      q = query(q, where('periodEnd', '<=', Timestamp.fromDate(endDate)));
+    }
+
+    q = query(q, orderBy('calculatedAt', 'desc'), limit(1));
 
     const snapshot = await getDocs(q);
     if (snapshot.empty) {

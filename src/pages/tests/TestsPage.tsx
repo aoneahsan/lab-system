@@ -11,6 +11,11 @@ import {
 import TestListTable from '@/components/tests/TestListTable';
 import TestSearchFilters from '@/components/tests/TestSearchFilters';
 import TestForm from '@/components/tests/TestForm';
+import { ImportExportDialog } from '@/components/data-management/ImportExportDialog';
+import { TestCatalogImport } from '@/components/data-management/TestCatalogImport';
+import { TestCatalogExport } from '@/components/data-management/TestCatalogExport';
+import { ExportFormatter } from '@/utils/import-export/export-formatter';
+import { ExcelParser } from '@/utils/import-export/excel-parser';
 import type { TestDefinition, TestDefinitionFormData, TestFilter } from '@/types/test.types';
 
 const TestsPage: React.FC = () => {
@@ -19,6 +24,7 @@ const TestsPage: React.FC = () => {
   const [filters, setFilters] = useState<TestFilter>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTest, setEditingTest] = useState<TestDefinition | null>(null);
+  const [showImportExport, setShowImportExport] = useState(false);
 
   const { data: tests = [], isLoading } = useTests(filters);
   const { data: statistics } = useTestStatistics();
@@ -63,13 +69,16 @@ const TestsPage: React.FC = () => {
   };
 
   const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log('Export tests');
+    setShowImportExport(true);
   };
 
   const handleImport = () => {
-    // TODO: Implement import functionality
-    console.log('Import tests');
+    setShowImportExport(true);
+  };
+
+  const handleDownloadTemplate = () => {
+    const template = ExportFormatter.generateTestImportTemplate();
+    ExcelParser.exportToExcel(template, 'test_catalog_template.xlsx', 'Template');
   };
 
   if (showAddForm || editingTest) {
@@ -234,6 +243,16 @@ const TestsPage: React.FC = () => {
           />
         )}
       </div>
+
+      {/* Import/Export Dialog */}
+      <ImportExportDialog
+        isOpen={showImportExport}
+        onClose={() => setShowImportExport(false)}
+        title="Import/Export Test Catalog"
+        importComponent={<TestCatalogImport />}
+        exportComponent={<TestCatalogExport />}
+        templateDownload={handleDownloadTemplate}
+      />
     </div>
   );
 };

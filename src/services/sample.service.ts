@@ -418,4 +418,21 @@ export const sampleService = {
 
     await batch.commit();
   },
+
+  // Get samples by date range
+  async getSamplesByDateRange(tenantId: string, startDate: Date, endDate: Date): Promise<Sample[]> {
+    const q = query(
+      collection(db, COLLECTIONS.SAMPLES),
+      where('tenantId', '==', tenantId),
+      where('collectionDate', '>=', Timestamp.fromDate(startDate)),
+      where('collectionDate', '<=', Timestamp.fromDate(endDate)),
+      orderBy('collectionDate', 'desc')
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }) as Sample);
+  },
 };

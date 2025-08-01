@@ -29,6 +29,8 @@ export interface GeneralSettings {
   dateFormat: string;
   timeFormat: string;
   currency: string;
+  npiNumber?: string;
+  taxId?: string;
 }
 
 export interface LaboratorySettings {
