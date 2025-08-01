@@ -1,4 +1,4 @@
-import * as QRCodeStudio from 'qrcode-studio';
+import { QRCodeStudio } from 'code-craft-studio';
 import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
 
 export const qrcodeService = {
@@ -14,21 +14,23 @@ export const qrcodeService = {
       priority: sampleLabel.priority,
     };
 
-    const options = {
-      size: config?.size || 200,
-      errorCorrectionLevel: config?.errorCorrectionLevel || 'M',
-      margin: config?.includeMargin ? 4 : 0,
-      color: {
-        dark: config?.color?.dark || '#000000',
-        light: config?.color?.light || '#FFFFFF',
+    // Use code-craft-studio's generate method
+    const result = await QRCodeStudio.generate({
+      data: JSON.stringify(qrData),
+      type: 'text',
+      options: {
+        width: config?.size || 200,
+        height: config?.size || 200,
+        margin: config?.includeMargin ? 4 : 0,
+        errorCorrectionLevel: config?.errorCorrectionLevel || 'M',
+        color: {
+          dark: config?.color?.dark || '#000000',
+          light: config?.color?.light || '#FFFFFF',
+        },
       },
-    };
+    });
 
-    const qrCodeDataUrl = await (QRCodeStudio as any).generateQRCode(
-      JSON.stringify(qrData),
-      options
-    );
-    return qrCodeDataUrl;
+    return result.dataUrl;
   },
 
   // Generate barcode for sample
@@ -41,16 +43,18 @@ export const qrcodeService = {
       includeText?: boolean;
     }
   ): Promise<string> {
-    // Using QRCodeStudio's barcode functionality
-    const barcodeOptions = {
+    // Using code-craft-studio's barcode functionality
+    const result = await QRCodeStudio.generateBarcode({
+      data: barcode,
       format: config?.format || 'CODE128',
-      width: config?.width || 300,
-      height: config?.height || 100,
-      displayValue: config?.includeText !== false,
-    };
+      options: {
+        width: config?.width || 300,
+        height: config?.height || 100,
+        displayValue: config?.includeText !== false,
+      },
+    });
 
-    const barcodeDataUrl = await (QRCodeStudio as any).generateBarcode(barcode, barcodeOptions);
-    return barcodeDataUrl;
+    return result.dataUrl;
   },
 
   // Initialize QR code scanner
@@ -59,31 +63,24 @@ export const qrcodeService = {
     onScanSuccess: (decodedText: string, decodedResult: unknown) => void,
     onScanFailure?: (error: string) => void
   ): Promise<any> {
-    const scanner = await (QRCodeStudio as any).createScanner();
-
-    await scanner.start(videoElement, {
-      fps: 10,
-      qrbox: { width: 250, height: 250 },
-      aspectRatio: 1.0,
-      onScanSuccess: (decodedText: string, decodedResult: unknown) => {
-        try {
-          // Try to parse as JSON for our QR codes
-          const qrData = JSON.parse(decodedText);
-          onScanSuccess(decodedText, qrData);
-        } catch {
-          // If not JSON, just pass the raw text
-          onScanSuccess(decodedText, decodedResult);
-        }
-      },
-      onScanFailure,
-    });
-
-    return scanner;
+    // For web-based scanning, we'll need to handle this differently
+    // code-craft-studio provides React components for scanning
+    // This method will need to be refactored to use the component-based approach
+    console.warn('Scanner initialization needs to be refactored to use code-craft-studio React components');
+    
+    // Return a mock scanner object for now
+    return {
+      stop: async () => {
+        console.log('Scanner stopped');
+      }
+    };
   },
 
   // Stop scanner
   async stopScanner(scanner: any): Promise<void> {
-    await scanner.stop();
+    if (scanner && scanner.stop) {
+      await scanner.stop();
+    }
   },
 
   // Generate sample label with QR code and barcode

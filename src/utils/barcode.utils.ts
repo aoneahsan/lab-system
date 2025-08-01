@@ -3,7 +3,7 @@
  * Uses code-craft-studio package for QR code generation
  */
 
-import { QRCodeGenerator } from 'code-craft-studio';
+import { QRCodeStudio } from 'code-craft-studio';
 
 /**
  * Interface for barcode data structure
@@ -131,22 +131,23 @@ export async function generateSampleQRCode(
 ): Promise<string> {
   const barcodeString = formatBarcodeData(data);
   
-  const qrGenerator = new QRCodeGenerator();
-  
-  const qrOptions = {
-    width: options?.size || 256,
-    height: options?.size || 256,
-    margin: options?.margin || 4,
-    color: {
-      dark: options?.darkColor || '#000000',
-      light: options?.lightColor || '#FFFFFF'
-    },
-    errorCorrectionLevel: options?.errorCorrectionLevel || 'M'
-  };
-  
   try {
-    const qrCodeDataUrl = await qrGenerator.toDataURL(barcodeString, qrOptions);
-    return qrCodeDataUrl;
+    const result = await QRCodeStudio.generate({
+      data: barcodeString,
+      type: 'text',
+      options: {
+        width: options?.size || 256,
+        height: options?.size || 256,
+        margin: options?.margin || 4,
+        errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
+        color: {
+          dark: options?.darkColor || '#000000',
+          light: options?.lightColor || '#FFFFFF'
+        }
+      }
+    });
+    
+    return result.dataUrl;
   } catch (error) {
     console.error('Error generating QR code:', error);
     throw new Error('Failed to generate QR code');
@@ -173,21 +174,34 @@ export async function generateSampleQRCodeToCanvas(
 ): Promise<void> {
   const barcodeString = formatBarcodeData(data);
   
-  const qrGenerator = new QRCodeGenerator();
-  
-  const qrOptions = {
-    width: options?.size || 256,
-    height: options?.size || 256,
-    margin: options?.margin || 4,
-    color: {
-      dark: options?.darkColor || '#000000',
-      light: options?.lightColor || '#FFFFFF'
-    },
-    errorCorrectionLevel: options?.errorCorrectionLevel || 'M'
-  };
-  
   try {
-    await qrGenerator.toCanvas(canvas, barcodeString, qrOptions);
+    // Generate QR code data URL first
+    const result = await QRCodeStudio.generate({
+      data: barcodeString,
+      type: 'text',
+      options: {
+        width: options?.size || 256,
+        height: options?.size || 256,
+        margin: options?.margin || 4,
+        errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
+        color: {
+          dark: options?.darkColor || '#000000',
+          light: options?.lightColor || '#FFFFFF'
+        }
+      }
+    });
+    
+    // Draw the generated image to canvas
+    const img = new Image();
+    img.onload = () => {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+      }
+    };
+    img.src = result.dataUrl;
   } catch (error) {
     console.error('Error generating QR code to canvas:', error);
     throw new Error('Failed to generate QR code to canvas');

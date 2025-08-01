@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, X, AlertCircle } from 'lucide-react';
-import { QRCodeStudio } from 'qrcode-studio';
+import { QRScanner } from 'code-craft-studio';
 
 const ScanScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -9,58 +9,11 @@ const ScanScreen: React.FC = () => {
   const [scanError, setScanError] = useState<string | null>(null);
   const [manualEntry, setManualEntry] = useState('');
 
-  const startScan = async () => {
-    try {
-      setScanError(null);
-      setIsScanning(true);
-
-      // Check permissions
-      const permStatus = await QRCodeStudio.checkPermissions();
-      if (permStatus.camera !== 'granted') {
-        const requestStatus = await QRCodeStudio.requestPermissions();
-        if (requestStatus.camera !== 'granted') {
-          throw new Error('Camera permission denied');
-        }
-      }
-
-      // Add listener for scan results
-      const listener = await QRCodeStudio.addListener('scanResult', (result) => {
-        handleScanResult(result.content);
-        stopScan();
-      });
-
-      // Add error listener
-      const errorListener = await QRCodeStudio.addListener('scanError', (error) => {
-        setScanError(error.message);
-        stopScan();
-      });
-
-      // Start scanning
-      await QRCodeStudio.startScan({
-        showTorchButton: true,
-        showFlipCameraButton: false,
-        camera: 'back'
-      });
-    } catch (error) {
-      setScanError(error instanceof Error ? error.message : 'Failed to start scanner');
-      stopScan();
-    }
-  };
-
-  const stopScan = async () => {
-    try {
-      await QRCodeStudio.stopScan();
-      await QRCodeStudio.removeAllListeners();
-    } catch (error) {
-      console.error('Failed to stop scan:', error);
-    } finally {
-      setIsScanning(false);
-    }
-  };
-
   const handleScanResult = (content: string) => {
     // Parse the barcode content and navigate to appropriate screen
     console.log('Scanned:', content);
+    setScanError(null);
+    setIsScanning(false);
 
     // Example: Navigate to collection detail if it's an order barcode
     if (content.startsWith('ORD-')) {
@@ -70,6 +23,11 @@ const ScanScreen: React.FC = () => {
     } else {
       setScanError('Unknown barcode format');
     }
+  };
+
+  const handleScanError = (error: Error) => {
+    setScanError(error.message || 'Failed to scan barcode');
+    setIsScanning(false);
   };
 
   const handleManualSubmit = (e: React.FormEvent) => {
@@ -98,7 +56,7 @@ const ScanScreen: React.FC = () => {
           <div className="w-full max-w-sm space-y-6">
             {/* Camera Button */}
             <button
-              onClick={startScan}
+              onClick={() => setIsScanning(true)}
               className="w-full bg-blue-500 text-white rounded-lg p-6 flex flex-col items-center space-y-3 hover:bg-blue-600 transition-colors"
             >
               <Camera className="h-12 w-12" />
@@ -145,16 +103,23 @@ const ScanScreen: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center space-y-4">
-            <div className="animate-pulse">
-              <Camera className="h-16 w-16 text-blue-500 mx-auto" />
-            </div>
-            <p className="text-lg font-medium text-gray-900">Scanning...</p>
+          <div className="fixed inset-0 bg-black z-50">
+            <QRScanner
+              onScan={(result) => handleScanResult(result.data)}
+              onError={handleScanError}
+              options={{
+                showTorchButton: true,
+                showFlipCameraButton: true,
+                scanDelay: 500,
+              }}
+              showOverlay={true}
+              className="h-full"
+            />
             <button
-              onClick={stopScan}
-              className="text-sm text-blue-600 hover:text-blue-700"
+              onClick={() => setIsScanning(false)}
+              className="absolute top-4 right-4 bg-white text-gray-900 p-2 rounded-full shadow-lg"
             >
-              Cancel
+              <X className="h-6 w-6" />
             </button>
           </div>
         )}

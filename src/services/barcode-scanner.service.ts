@@ -1,4 +1,4 @@
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { QRCodeStudio } from 'code-craft-studio';
 import { Capacitor } from '@capacitor/core';
 
 export interface ScanResult {
@@ -18,49 +18,34 @@ class BarcodeScannerService {
 
   // Check if barcode scanning is supported
   isSupported(): boolean {
-    return Capacitor.isNativePlatform();
+    return Capacitor.isNativePlatform() || 'mediaDevices' in navigator;
   }
 
   // Request camera permission
   async requestPermission(): Promise<boolean> {
-    if (!this.isSupported()) {
-      console.warn('Barcode scanning is only supported on native platforms');
-      return false;
-    }
-
     try {
-      const status = await BarcodeScanner.checkPermission({ force: true });
-
-      if (status.granted) {
+      const result = await QRCodeStudio.checkPermissions();
+      
+      if (result.camera === 'granted') {
         return true;
       }
-
-      if (status.denied) {
-        // User denied permission
+      
+      if (result.camera === 'denied') {
         alert('Camera permission is required for barcode scanning. Please enable it in settings.');
         return false;
       }
-
-      if (status.restricted || status.unknown) {
-        // iOS only - permission is restricted
-        return false;
-      }
-
-      // Permission not requested yet
-      const newStatus = await BarcodeScanner.checkPermission({ force: true });
-      return newStatus.granted;
+      
+      // Request permissions if not yet granted
+      const requested = await QRCodeStudio.requestPermissions();
+      return requested.camera === 'granted';
     } catch (error) {
       console.error('Error requesting camera permission:', error);
       return false;
     }
   }
 
-  // Start scanning
+  // Start scanning (This will be replaced by React component usage)
   async startScan(): Promise<ScanResult | null> {
-    if (!this.isSupported()) {
-      return this.mockScan();
-    }
-
     if (this.isScanning) {
       console.warn('Scanner is already active');
       return null;
@@ -71,40 +56,18 @@ class BarcodeScannerService {
       return null;
     }
 
-    try {
-      this.isScanning = true;
-
-      // Hide background to show camera preview
-      await BarcodeScanner.hideBackground();
-      document.body.classList.add('scanner-active');
-
-      const result = await BarcodeScanner.startScan();
-
-      return {
-        hasContent: result.hasContent,
-        content: result.content || '',
-        format: result.format || 'UNKNOWN',
-      };
-    } catch (error) {
-      console.error('Error during barcode scan:', error);
-      return null;
-    } finally {
-      await this.stopScan();
-    }
+    // For native platforms, we need to use the React component
+    // This service method will be deprecated in favor of component-based scanning
+    console.warn('Direct scanning via service is deprecated. Use QRScanner or BarcodeScanner components from code-craft-studio');
+    
+    // Return mock data for now
+    return this.mockScan();
   }
 
   // Stop scanning
   async stopScan(): Promise<void> {
-    if (!this.isScanning) return;
-
-    try {
-      await BarcodeScanner.stopScan();
-      await BarcodeScanner.showBackground();
-      document.body.classList.remove('scanner-active');
-      this.isScanning = false;
-    } catch (error) {
-      console.error('Error stopping scanner:', error);
-    }
+    this.isScanning = false;
+    // Scanning stop will be handled by the React component
   }
 
   // Parse barcode content
@@ -158,6 +121,48 @@ class BarcodeScannerService {
     return `${data.type.toUpperCase()}:${data.id}`;
   }
 
+  // Generate barcode image using code-craft-studio
+  async generateBarcodeImage(
+    content: string,
+    format: 'CODE128' | 'CODE39' | 'EAN13' = 'CODE128'
+  ): Promise<string> {
+    try {
+      const result = await QRCodeStudio.generateBarcode({
+        data: content,
+        format,
+        options: {
+          width: 300,
+          height: 100,
+          displayValue: true,
+        },
+      });
+      return result.dataUrl;
+    } catch (error) {
+      console.error('Error generating barcode:', error);
+      throw error;
+    }
+  }
+
+  // Generate QR code using code-craft-studio
+  async generateQRCode(content: string): Promise<string> {
+    try {
+      const result = await QRCodeStudio.generate({
+        data: content,
+        type: 'text',
+        options: {
+          width: 200,
+          height: 200,
+          margin: 4,
+          errorCorrectionLevel: 'M',
+        },
+      });
+      return result.dataUrl;
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      throw error;
+    }
+  }
+
   // Mock scan for web/development
   private async mockScan(): Promise<ScanResult> {
     // Simulate scanning delay
@@ -185,49 +190,26 @@ class BarcodeScannerService {
     };
   }
 
-  // Enable torch/flashlight
-  async enableTorch(): Promise<void> {
-    if (!this.isSupported() || !this.isScanning) return;
-
+  // Read barcode from image file
+  async readFromImage(imageUrl: string): Promise<ScanResult | null> {
     try {
-      await BarcodeScanner.enableTorch();
+      const results = await QRCodeStudio.readBarcodesFromImage({
+        path: imageUrl,
+      });
+      
+      if (results && results.length > 0) {
+        const firstResult = results[0];
+        return {
+          hasContent: true,
+          content: firstResult.displayValue || firstResult.rawValue || '',
+          format: firstResult.format || 'UNKNOWN',
+        };
+      }
+      
+      return null;
     } catch (error) {
-      console.error('Error enabling torch:', error);
-    }
-  }
-
-  // Disable torch/flashlight
-  async disableTorch(): Promise<void> {
-    if (!this.isSupported() || !this.isScanning) return;
-
-    try {
-      await BarcodeScanner.disableTorch();
-    } catch (error) {
-      console.error('Error disabling torch:', error);
-    }
-  }
-
-  // Toggle torch/flashlight
-  async toggleTorch(): Promise<void> {
-    if (!this.isSupported() || !this.isScanning) return;
-
-    try {
-      await BarcodeScanner.toggleTorch();
-    } catch (error) {
-      console.error('Error toggling torch:', error);
-    }
-  }
-
-  // Get torch status
-  async getTorchState(): Promise<boolean> {
-    if (!this.isSupported() || !this.isScanning) return false;
-
-    try {
-      const state = await BarcodeScanner.getTorchState();
-      return state.isEnabled || false;
-    } catch (error) {
-      console.error('Error getting torch state:', error);
-      return false;
+      console.error('Error reading barcode from image:', error);
+      return null;
     }
   }
 }

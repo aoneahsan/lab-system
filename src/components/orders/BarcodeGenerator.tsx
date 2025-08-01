@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Printer, Download } from 'lucide-react';
-import JsBarcode from 'jsbarcode';
+import { QRCodeStudio } from 'code-craft-studio';
 
 interface BarcodeGeneratorProps {
   value: string;
-  format?: string;
+  format?: 'CODE128' | 'CODE39' | 'EAN13' | 'EAN8' | 'UPC';
   width?: number;
   height?: number;
   displayValue?: boolean;
@@ -16,37 +16,51 @@ interface BarcodeGeneratorProps {
 export default function BarcodeGenerator({
   value,
   format = 'CODE128',
-  width = 2,
+  width = 300,
   height = 100,
   displayValue = true,
   text,
   fontSize = 20,
   className = '',
 }: BarcodeGeneratorProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
+  const [barcodeDataUrl, setBarcodeDataUrl] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (svgRef.current && value) {
-      JsBarcode(svgRef.current, value, {
-        format,
-        width,
-        height,
-        displayValue,
-        text: text || value,
-        fontSize,
-        margin: 10,
-        background: '#ffffff',
-        lineColor: '#000000',
-      });
-    }
+    if (!value) return;
+
+    const generateBarcode = async () => {
+      try {
+        setError('');
+        const result = await QRCodeStudio.generateBarcode({
+          data: value,
+          format,
+          options: {
+            width,
+            height,
+            displayValue,
+            text: text || value,
+            fontSize,
+            margin: 10,
+            background: '#ffffff',
+            lineColor: '#000000',
+          },
+        });
+        setBarcodeDataUrl(result.dataUrl);
+      } catch (err) {
+        console.error('Error generating barcode:', err);
+        setError('Failed to generate barcode');
+      }
+    };
+
+    generateBarcode();
   }, [value, format, width, height, displayValue, text, fontSize]);
 
   const handlePrint = () => {
+    if (!barcodeDataUrl) return;
+
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
-
-    const svgContent = svgRef.current?.outerHTML || '';
 
     printWindow.document.write(`
       <html>
@@ -70,7 +84,7 @@ export default function BarcodeGenerator({
           </style>
         </head>
         <body>
-          ${svgContent}
+          <img src="${barcodeDataUrl}" alt="Barcode" />
           <script>
             window.onload = function() {
               window.print();
@@ -87,54 +101,51 @@ export default function BarcodeGenerator({
   };
 
   const handleDownload = () => {
-    if (!canvasRef.current || !svgRef.current) return;
+    if (!barcodeDataUrl) return;
 
-    // Convert SVG to Canvas
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const svgData = new XMLSerializer().serializeToString(svgRef.current);
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const svgUrl = URL.createObjectURL(svgBlob);
-
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-
-      // Download as PNG
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `barcode-${value}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-
-      URL.revokeObjectURL(svgUrl);
-    };
-    img.src = svgUrl;
+    // Download the barcode image
+    const a = document.createElement('a');
+    a.href = barcodeDataUrl;
+    a.download = `barcode-${value}.png`;
+    a.click();
   };
+
+  if (error) {
+    return (
+      <div className={`bg-red-50 p-4 rounded-lg border border-red-200 ${className}`}>
+        <p className="text-red-600 text-sm">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`bg-white p-4 rounded-lg border border-gray-200 ${className}`}>
-      <div className="mb-4">
-        <svg ref={svgRef}></svg>
-        <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+      <div className="mb-4 flex justify-center">
+        {barcodeDataUrl ? (
+          <img src={barcodeDataUrl} alt="Generated Barcode" />
+        ) : (
+          <div className="h-24 flex items-center justify-center text-gray-400">
+            Generating barcode...
+          </div>
+        )}
       </div>
 
       <div className="flex justify-center gap-2">
-        <button onClick={handlePrint} className="btn btn-secondary" title="Print Barcode">
+        <button
+          onClick={handlePrint}
+          className="btn btn-secondary"
+          title="Print Barcode"
+          disabled={!barcodeDataUrl}
+        >
           <Printer className="h-4 w-4" />
           Print
         </button>
-        <button onClick={handleDownload} className="btn btn-secondary" title="Download Barcode">
+        <button
+          onClick={handleDownload}
+          className="btn btn-secondary"
+          title="Download Barcode"
+          disabled={!barcodeDataUrl}
+        >
           <Download className="h-4 w-4" />
           Download
         </button>

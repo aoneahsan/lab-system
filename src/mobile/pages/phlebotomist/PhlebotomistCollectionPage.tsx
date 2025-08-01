@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Thermometer, MapPin, Save, X, CheckCircle, FileText, User } from 'lucide-react';
-import { QRCodeStudio } from 'qrcode-studio';
+import { QRScanner } from 'code-craft-studio';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
@@ -37,52 +37,10 @@ const PhlebotomistCollectionPage: React.FC = () => {
     consent: false,
   });
 
-  const startBarcodeScan = async () => {
-    try {
-      // Check permissions
-      const permStatus = await QRCodeStudio.checkPermissions();
-      if (permStatus.camera !== 'granted') {
-        const requestStatus = await QRCodeStudio.requestPermissions();
-        if (requestStatus.camera !== 'granted') {
-          toast.error('Camera permission denied');
-          return;
-        }
-      }
-
-      setIsScanning(true);
-      document.querySelector('body')?.classList.add('barcode-scanner-active');
-
-      // Add listener for scan results
-      const listener = await QRCodeStudio.addListener('scanResult', (result) => {
-        setCollectionData({ ...collectionData, barcode: result.content });
-        toast.success('Barcode scanned successfully');
-        stopBarcodeScan();
-      });
-
-      // Start scanning
-      await QRCodeStudio.startScan({
-        showTorchButton: true,
-        showFlipCameraButton: false,
-        camera: 'back'
-      });
-    } catch (error) {
-      console.error('Barcode scan failed:', error);
-      toast.error('Failed to scan barcode');
-      setIsScanning(false);
-      document.querySelector('body')?.classList.remove('barcode-scanner-active');
-    }
-  };
-
-  const stopBarcodeScan = async () => {
-    try {
-      await QRCodeStudio.stopScan();
-      await QRCodeStudio.removeAllListeners();
-    } catch (error) {
-      console.error('Failed to stop scan:', error);
-    } finally {
-      setIsScanning(false);
-      document.querySelector('body')?.classList.remove('barcode-scanner-active');
-    }
+  const handleScanResult = (data: string) => {
+    setCollectionData({ ...collectionData, barcode: data });
+    toast.success('Barcode scanned successfully');
+    setIsScanning(false);
   };
 
   const takePhoto = async () => {
@@ -208,7 +166,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
                   placeholder="Scan or enter barcode"
                 />
                 <button
-                  onClick={startBarcodeScan}
+                  onClick={() => setIsScanning(true)}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg"
                 >
                   Scan
@@ -394,16 +352,28 @@ const PhlebotomistCollectionPage: React.FC = () => {
 
       {/* Barcode Scanner Overlay */}
       {isScanning && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="text-white text-center">
-            <p className="mb-4">Position barcode in the frame</p>
-            <button
-              onClick={stopBarcodeScan}
-              className="px-6 py-2 bg-white text-black rounded-lg"
-            >
-              Cancel
-            </button>
-          </div>
+        <div className="fixed inset-0 bg-black z-50">
+          <QRScanner
+            onScan={(result) => handleScanResult(result.data)}
+            onError={(error) => {
+              console.error('Scan error:', error);
+              toast.error('Failed to scan barcode');
+              setIsScanning(false);
+            }}
+            options={{
+              showTorchButton: true,
+              showFlipCameraButton: true,
+              scanDelay: 500,
+            }}
+            showOverlay={true}
+            className="h-full"
+          />
+          <button
+            onClick={() => setIsScanning(false)}
+            className="absolute top-4 right-4 bg-white text-gray-900 p-2 rounded-full shadow-lg"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </div>
       )}
     </div>

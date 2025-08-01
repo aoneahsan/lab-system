@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { X, Printer } from 'lucide-react';
-// import QRCode from 'qrcode';
+import { QRCodeStudio } from 'code-craft-studio';
 import type { Sample } from '@/types/sample.types';
 
 interface BatchBarcodesPrintProps {
@@ -11,19 +11,44 @@ interface BatchBarcodesPrintProps {
 
 const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose, samples }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [qrCodes, setQrCodes] = useState<{ [key: string]: string }>({});
 
-  // const generateQRCode = async (data: string): Promise<string> => {
-  //   try {
-  //     return await QRCode.toDataURL(data, {
-  //       width: 150,
-  //       margin: 1,
-  //       errorCorrectionLevel: 'M',
-  //     });
-  //   } catch (error) {
-  //     console.error('Error generating QR code:', error);
-  //     return '';
-  //   }
-  // };
+  useEffect(() => {
+    if (isOpen && samples.length > 0) {
+      generateAllQRCodes();
+    }
+  }, [isOpen, samples]);
+
+  const generateAllQRCodes = async () => {
+    const codes: { [key: string]: string } = {};
+    
+    for (const sample of samples) {
+      try {
+        const qrData = {
+          sampleId: sample.id,
+          sampleNumber: sample.sampleNumber,
+          barcode: sample.barcode,
+        };
+        
+        const result = await QRCodeStudio.generate({
+          data: JSON.stringify(qrData),
+          type: 'text',
+          options: {
+            width: 150,
+            height: 150,
+            margin: 1,
+            errorCorrectionLevel: 'M',
+          },
+        });
+        
+        codes[sample.id] = result.dataUrl;
+      } catch (error) {
+        console.error(`Error generating QR code for sample ${sample.id}:`, error);
+      }
+    }
+    
+    setQrCodes(codes);
+  };
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -109,17 +134,17 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose
               <div className="print-container grid grid-cols-3 gap-2">
                 {samples.map((sample) => (
                   <div key={sample.id} className="barcode-label border rounded p-3 text-center">
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${JSON.stringify(
-                        {
-                          sampleId: sample.id,
-                          sampleNumber: sample.sampleNumber,
-                          barcode: sample.barcode,
-                        }
-                      )}`}
-                      alt={`Barcode for ${sample.sampleNumber}`}
-                      className="mx-auto mb-2"
-                    />
+                    {qrCodes[sample.id] ? (
+                      <img
+                        src={qrCodes[sample.id]}
+                        alt={`Barcode for ${sample.sampleNumber}`}
+                        className="mx-auto mb-2"
+                      />
+                    ) : (
+                      <div className="h-[150px] w-[150px] mx-auto mb-2 bg-gray-100 flex items-center justify-center text-gray-400">
+                        Generating...
+                      </div>
+                    )}
                     <div className="label-info text-xs">
                       <strong>{sample.sampleNumber}</strong>
                       <br />
