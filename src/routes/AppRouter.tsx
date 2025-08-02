@@ -54,6 +54,7 @@ const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 const AdminPanel = lazy(() => import('@/pages/admin/AdminPanel'));
+const VoiceDictationDemo = lazy(() => import('@/pages/demo/VoiceDictationDemo'));
 
 // Clinician App
 const ClinicianApp = lazy(() =>
@@ -127,6 +128,13 @@ export const AppRouter = () => {
             <Route path="/settings/biometric" element={<BiometricSettingsPage />} />
             <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+
+        {/* Demo Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/demo/voice-dictation" element={<VoiceDictationDemo />} />
           </Route>
         </Route>
 

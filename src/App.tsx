@@ -14,6 +14,8 @@ import { PerformanceProvider } from '@/providers/PerformanceProvider';
 import { performanceMonitor } from '@/utils/performance-monitoring';
 import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics';
 import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
+import { TrackingProvider } from '@/providers/TrackingProvider';
+import { ErrorHandlingProvider } from '@/providers/ErrorHandlingProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,20 +50,22 @@ function App() {
   const RouterComponent = isNativePlatform ? MobileAppSelector : AppRouter;
 
   return (
-    <ErrorBoundary>
+    <ErrorHandlingProvider>
       <QueryClientProvider client={queryClient}>
-        <PerformanceProvider>
-          <BrowserRouter>
-            <InitializeDemoTenant />
-            <RouterComponent />
-            <Toaster />
-            <PerformanceMetrics />
-            <OfflineIndicator />
-          </BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </PerformanceProvider>
+        <TrackingProvider>
+          <PerformanceProvider>
+            <BrowserRouter>
+              <InitializeDemoTenant />
+              <RouterComponent />
+              <Toaster />
+              <PerformanceMetrics />
+              <OfflineIndicator />
+            </BrowserRouter>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </PerformanceProvider>
+        </TrackingProvider>
       </QueryClientProvider>
-    </ErrorBoundary>
+    </ErrorHandlingProvider>
   );
 }
 

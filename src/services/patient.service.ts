@@ -19,6 +19,7 @@ import {
 import { firestore } from '@/config/firebase.config';
 import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
 import { webhookService } from '@/services/webhook.service';
+import { trackingInstance } from '@/providers/TrackingProvider';
 import type {
   Patient,
   CreatePatientData,
@@ -129,7 +130,13 @@ class PatientService {
     data: CreatePatientData,
     createdBy: string
   ): Promise<Patient> {
+    const startTime = Date.now();
     try {
+      // Track patient creation attempt
+      trackingInstance.trackEvent('patient_creation_started', {
+        tenantId,
+        createdBy,
+      });
       const collectionName = this.getCollectionName(tenantId);
       const patientId = this.generatePatientId();
 
@@ -194,8 +201,27 @@ class PatientService {
         // Don't fail the patient creation if webhook fails
       }
 
+      // Track successful patient creation
+      const duration = Date.now() - startTime;
+      trackingInstance.trackEvent('patient_created', {
+        patientId: createdPatient.id,
+        tenantId,
+        createdBy,
+        duration,
+      });
+      trackingInstance.trackMetric('patient_creation_time', duration, 'ms', {
+        tenantId,
+      });
+
       return createdPatient;
     } catch (error) {
+      // Track patient creation failure
+      trackingInstance.trackEvent('patient_creation_failed', {
+        tenantId,
+        createdBy,
+        error: (error as Error).message,
+        duration: Date.now() - startTime,
+      });
       console.error('Error creating patient:', error);
       throw error;
     }
@@ -206,7 +232,14 @@ class PatientService {
     patientId: string,
     data: UpdatePatientData
   ): Promise<Patient> {
+    const startTime = Date.now();
     try {
+      // Track patient update attempt
+      trackingInstance.trackEvent('patient_update_started', {
+        patientId,
+        tenantId,
+        fieldsUpdated: Object.keys(data),
+      });
       const collectionName = this.getCollectionName(tenantId);
       const docRef = doc(firestore, collectionName, patientId);
 
@@ -235,8 +268,27 @@ class PatientService {
         // Don't fail the patient update if webhook fails
       }
 
+      // Track successful patient update
+      const duration = Date.now() - startTime;
+      trackingInstance.trackEvent('patient_updated', {
+        patientId,
+        tenantId,
+        fieldsUpdated: Object.keys(data),
+        duration,
+      });
+      trackingInstance.trackMetric('patient_update_time', duration, 'ms', {
+        tenantId,
+      });
+
       return updatedPatient;
     } catch (error) {
+      // Track patient update failure
+      trackingInstance.trackEvent('patient_update_failed', {
+        patientId,
+        tenantId,
+        error: (error as Error).message,
+        duration: Date.now() - startTime,
+      });
       console.error('Error updating patient:', error);
       throw error;
     }

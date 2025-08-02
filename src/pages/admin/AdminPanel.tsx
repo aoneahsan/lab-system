@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, updateDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard } from 'lucide-react';
+import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity } from 'lucide-react';
+import { MicrophoneIcon } from '@heroicons/react/24/outline';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { useNavigate, Routes, Route, useSearchParams } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
+import { PerformanceDashboard } from '@/components/admin/PerformanceDashboard';
 
 interface User {
   id: string;
@@ -43,7 +45,7 @@ const AdminPanel = () => {
   const [updating, setUpdating] = useState<string | null>(null);
 
   // Get active tab from URL, default to 'dashboard'
-  const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue';
+  const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue' | 'performance';
   
   // Get pagination and filter params
   const page = parseInt(searchParams.get('page') || '1');
@@ -222,12 +224,23 @@ const AdminPanel = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Admin Panel
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage users and tenants across the system
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Admin Panel
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Manage users and tenants across the system
+            </p>
+          </div>
+          <Link
+            to="/demo/voice-dictation"
+            className="btn btn-outline flex items-center gap-2"
+          >
+            <MicrophoneIcon className="h-4 w-4" />
+            Voice Dictation Demo
+          </Link>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -287,6 +300,17 @@ const AdminPanel = () => {
           >
             <CreditCard className="h-5 w-5 inline-block mr-2" />
             Revenue
+          </button>
+          <button
+            onClick={() => setActiveTab('performance')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              activeTab === 'performance'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+          >
+            <Activity className="h-5 w-5 inline-block mr-2" />
+            Performance
           </button>
         </nav>
       </div>
@@ -621,6 +645,8 @@ const AdminPanel = () => {
             </div>
           </div>
         </div>
+      ) : activeTab === 'performance' ? (
+        <PerformanceDashboard />
       ) : null}
     </div>
   );
