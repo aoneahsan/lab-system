@@ -17,6 +17,8 @@ import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 import { TrackingProvider } from '@/providers/TrackingProvider';
 import { ErrorHandlingProvider } from '@/providers/ErrorHandlingProvider';
 import { initializeNotifications } from '@/services/app-notification.service';
+import { firebaseKit } from '@/services/firebase-kit.service';
+import { appUpdateService } from '@/services/app-update.service';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,10 +39,16 @@ function App() {
     // Track app initialization
     performanceMonitor.startTrace('app_initialization');
     
-    // Initialize auth and notifications
+    // Initialize auth, notifications, and platform-specific services
     const initialize = async () => {
       initializeAuth();
       await initializeNotifications();
+      
+      // Initialize Firebase Kit for analytics, crashlytics, performance
+      await firebaseKit.initialize();
+      
+      // Initialize app update service for native platforms
+      await appUpdateService.initialize();
     };
     
     initialize();

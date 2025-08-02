@@ -3,6 +3,7 @@ import { UnifiedTracking } from 'unified-tracking';
 import { useTrackEvent } from 'unified-tracking/react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useLocation } from 'react-router-dom';
+import { firebaseKit } from '@/services/firebase-kit.service';
 
 // Initialize unified tracking on app start
 let initialized = false;
@@ -52,6 +53,9 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
         title: document.title,
         referrer: document.referrer,
       });
+      
+      // Also track in Firebase Analytics
+      await firebaseKit.analytics.setCurrentScreen(document.title, location.pathname);
     };
     
     trackPageView();
@@ -70,6 +74,11 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
           tenantId: currentUser.tenantId,
           department: currentUser.department
         });
+        
+        // Also set user in Firebase Analytics
+        await firebaseKit.analytics.setUserId(currentUser.id);
+        await firebaseKit.analytics.setUserProperty('role', currentUser.role);
+        await firebaseKit.analytics.setUserProperty('tenant_id', currentUser.tenantId);
       }
     };
     

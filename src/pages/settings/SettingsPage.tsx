@@ -70,6 +70,12 @@ const settingCategories: SettingCategory[] = [
     icon: '👥',
     roles: ['admin', 'super_admin'],
   },
+  {
+    title: 'App Updates',
+    description: 'Check for updates, manage app versions, and update settings',
+    link: '/settings/updates',
+    icon: '🔄',
+  },
 ];
 
 const SettingsPage: React.FC = () => {
