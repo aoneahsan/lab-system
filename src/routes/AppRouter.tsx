@@ -59,6 +59,12 @@ const VoiceDictationDemo = lazy(() => import('@/pages/demo/VoiceDictationDemo'))
 const AppointmentsPage = lazy(() => import('@/pages/appointments/AppointmentsPage'));
 const AppointmentDetailPage = lazy(() => import('@/pages/appointments/AppointmentDetailPage'));
 
+// Home Collection Pages
+const HomeCollectionPage = lazy(() => import('@/pages/home-collection/HomeCollectionPage'));
+const HomeCollectionFormPage = lazy(() => import('@/pages/home-collection/HomeCollectionFormPage'));
+const HomeCollectionDetailPage = lazy(() => import('@/pages/home-collection/HomeCollectionDetailPage'));
+const RouteManagementPage = lazy(() => import('@/pages/home-collection/RouteManagementPage'));
+
 // Clinician App
 const ClinicianApp = lazy(() =>
   import('@/apps/clinician/ClinicianApp').then((module) => ({ default: module.ClinicianApp }))
@@ -97,6 +103,10 @@ export const AppRouter = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/appointments/:appointmentId" element={<AppointmentDetailPage />} />
+            <Route path="/home-collection" element={<HomeCollectionPage />} />
+            <Route path="/home-collection/new" element={<HomeCollectionFormPage />} />
+            <Route path="/home-collection/:collectionId" element={<HomeCollectionDetailPage />} />
+            <Route path="/home-collection/routes" element={<RouteManagementPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:patientId" element={<PatientDetailPage />} />
             <Route path="/patients/:patientId/edit" element={<PatientEditPage />} />

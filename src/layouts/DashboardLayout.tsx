@@ -22,6 +22,12 @@ const regularNavigation = [
     roles: ['lab_admin', 'lab_manager', 'front_desk', 'phlebotomist', 'clinician'],
   },
   {
+    name: 'Home Collection',
+    href: '/home-collection',
+    icon: '🏠',
+    roles: ['lab_admin', 'lab_manager', 'phlebotomist', 'front_desk'],
+  },
+  {
     name: 'Patients',
     href: '/patients',
     icon: '👥',
