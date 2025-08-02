@@ -1000,6 +1000,11 @@
   resolved "https://registry.yarnpkg.com/@bugsnag/safe-json-stringify/-/safe-json-stringify-6.0.0.tgz#22abdcd83e008c369902976730c34c150148a758"
   integrity sha512-htzFO1Zc57S8kgdRK9mLcPVTW1BY2ijfH7Dk2CeZmspTWKdKqSo1iwmqrq2WtRjFlo8aRZYgLX0wFrDXF/9DLA==
 
+"@capacitor-community/speech-recognition@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/speech-recognition/-/speech-recognition-7.0.1.tgz#218e1c3bd8f7181312c9ce3af57fcdae7ede8e89"
+  integrity sha512-ykpBZziR575X0eURO5vXaD9gVrXXC/7Ra2qql/2KP6/jxWOqAFuw4eKjSPjwdAgGE6a/Z+v8FJm4SVh57MVwDA==
+
 "@capacitor/android@^7.4.2":
   version "7.4.2"
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-7.4.2.tgz#8fa1b6fbedfbb8506df3444dddaea75cc09ee8a9"
@@ -11277,6 +11282,11 @@ unified-tracking@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/unified-tracking/-/unified-tracking-1.5.0.tgz#3038a1207fd6fafa8d71201a5ea94516d9e15a0f"
   integrity sha512-LrlGdgvXghkXzyZUJGTFnpUmQQBesH4ExCB/kZQNqLWsahfZUdDJ4q1EDlJkVz+rHA3j4bDByh+tRekqpqJmRQ==
+
+unified-tracking@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/unified-tracking/-/unified-tracking-3.0.0.tgz#e151ebdbc3ab21cf73cfcb933397ab35616ff518"
+  integrity sha512-dst/3QKBdCzT69fcgo0j1hOUyD0RCjrbOv5hls8qXpLYS14AWZlaIC2wi9GLbI2gNwVw9tUBAFaR/fQ6LTJCVg==
 
 unique-string@^2.0.0:
   version "2.0.0"
