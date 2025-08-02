@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, FileSpreadsheet, FileText, FileJson, Package } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useInventoryStore } from '@/stores/inventory.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -93,7 +93,7 @@ export const InventoryExport: React.FC = () => {
           CSVParser.exportToCSV(formattedData, filename);
           break;
           
-        case 'json':
+        case 'json': {
           const jsonData = ExportFormatter.formatJSON(formattedData);
           const blob = new Blob([jsonData], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
@@ -105,6 +105,7 @@ export const InventoryExport: React.FC = () => {
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
           break;
+        }
       }
       
       toast.success(`Exported ${filteredItems.length} inventory items successfully`);

@@ -1,85 +1,97 @@
 import React, { useEffect } from 'react';
 import { UnifiedTracking } from 'unified-tracking';
-import { useAuth } from '@/hooks/useAuth';
+import { useTrackEvent } from 'unified-tracking/react';
+import { useAuthStore } from '@/stores/auth.store';
 import { useLocation } from 'react-router-dom';
 
-// Initialize tracking with configuration
-const tracking = new UnifiedTracking({
-  appName: 'LabFlow',
-  appVersion: '1.0.0',
-  environment: import.meta.env.MODE,
-  providers: {
-    firebase: {
-      enabled: true,
-      config: {
-        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-      },
-    },
-    custom: {
-      enabled: true,
-      endpoint: '/api/analytics',
-    },
-  },
-  privacy: {
-    anonymizeIp: true,
-    respectDoNotTrack: true,
-    cookieConsent: true,
-  },
-  performance: {
-    enabled: true,
-    sampleRate: 1.0,
-  },
-});
+// Initialize unified tracking on app start
+let initialized = false;
 
-// Export tracking instance for use in other components
-export const trackingInstance = tracking;
+const initializeTracking = async () => {
+  if (initialized) return;
+  
+  await UnifiedTracking.initialize({
+    analytics: {
+      providers: import.meta.env.VITE_GA_MEASUREMENT_ID ? ['google-analytics'] : [],
+      googleAnalytics: {
+        measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID
+      }
+    },
+    errorTracking: {
+      providers: import.meta.env.VITE_SENTRY_DSN ? ['sentry'] : [],
+      sentry: {
+        dsn: import.meta.env.VITE_SENTRY_DSN,
+        environment: import.meta.env.MODE
+      }
+    }
+  });
+  
+  initialized = true;
+};
 
 interface TrackingProviderProps {
   children: React.ReactNode;
 }
 
 export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
   const location = useLocation();
+
+  // Initialize tracking on mount
+  useEffect(() => {
+    initializeTracking();
+  }, []);
 
   // Track page views
   useEffect(() => {
-    tracking.trackPageView({
-      path: location.pathname,
-      title: document.title,
-      referrer: document.referrer,
-    });
+    const trackPageView = async () => {
+      if (!initialized) await initializeTracking();
+      
+      await UnifiedTracking.track('page_view', {
+        path: location.pathname,
+        title: document.title,
+        referrer: document.referrer,
+      });
+    };
+    
+    trackPageView();
   }, [location]);
 
   // Set user context when authenticated
   useEffect(() => {
-    if (user) {
-      tracking.setUser({
-        id: user.uid,
-        email: user.email || undefined,
-        tenantId: user.tenantId,
-        role: user.role,
-        properties: {
-          department: user.department,
-          tenantName: user.tenantName,
-        },
-      });
-    } else {
-      tracking.clearUser();
-    }
-  }, [user]);
+    const updateUser = async () => {
+      if (!initialized) await initializeTracking();
+      
+      if (currentUser) {
+        await UnifiedTracking.identify(currentUser.id, {
+          email: currentUser.email || undefined,
+          name: currentUser.displayName,
+          role: currentUser.role,
+          tenantId: currentUser.tenantId,
+          department: currentUser.department
+        });
+      }
+    };
+    
+    updateUser();
+  }, [currentUser]);
 
   // Track app lifecycle events
   useEffect(() => {
-    // Track app start
-    tracking.trackEvent('app_started', {
-      timestamp: new Date().toISOString(),
-      platform: 'web',
-    });
+    const trackAppStart = async () => {
+      if (!initialized) await initializeTracking();
+      
+      await UnifiedTracking.track('app_started', {
+        timestamp: new Date().toISOString(),
+        platform: 'web',
+      });
+    };
+    
+    trackAppStart();
 
     // Track app visibility changes
-    const handleVisibilityChange = () => {
-      tracking.trackEvent('app_visibility_changed', {
+    const handleVisibilityChange = async () => {
+      await UnifiedTracking.track('app_visibility_changed', {
         visible: !document.hidden,
         timestamp: new Date().toISOString(),
       });
@@ -88,10 +100,9 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Track app close
-    const handleBeforeUnload = () => {
-      tracking.trackEvent('app_closed', {
+    const handleBeforeUnload = async () => {
+      await UnifiedTracking.track('app_closed', {
         timestamp: new Date().toISOString(),
-        sessionDuration: tracking.getSessionDuration(),
       });
     };
 
@@ -106,33 +117,40 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
   return <>{children}</>;
 };
 
+// Re-export the hook from unified-tracking for convenience
+export { useTrackEvent } from 'unified-tracking/react';
+
 // Custom hooks for tracking
 export const useTracking = () => {
-  const trackEvent = (eventName: string, properties?: Record<string, any>) => {
-    tracking.trackEvent(eventName, properties);
+  const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
+    if (!initialized) await initializeTracking();
+    await UnifiedTracking.track(eventName, properties);
   };
 
-  const trackError = (error: Error, context?: Record<string, any>) => {
-    tracking.trackError(error, context);
+  const trackError = async (error: Error, context?: Record<string, any>) => {
+    if (!initialized) await initializeTracking();
+    await UnifiedTracking.logError(error, context);
   };
 
-  const trackTiming = (category: string, variable: string, value: number, label?: string) => {
-    tracking.trackTiming(category, variable, value, label);
+  const identify = async (userId: string, traits?: Record<string, any>) => {
+    if (!initialized) await initializeTracking();
+    await UnifiedTracking.identify(userId, traits);
   };
 
-  const trackMetric = (name: string, value: number, unit?: string, tags?: Record<string, string>) => {
-    tracking.trackMetric(name, value, unit, tags);
-  };
-
-  const startTransaction = (name: string, operation: string) => {
-    return tracking.startTransaction(name, operation);
+  const setConsent = async (consent: {
+    analytics?: boolean;
+    errorTracking?: boolean;
+    marketing?: boolean;
+    personalization?: boolean;
+  }) => {
+    if (!initialized) await initializeTracking();
+    await UnifiedTracking.setConsent(consent);
   };
 
   return {
     trackEvent,
     trackError,
-    trackTiming,
-    trackMetric,
-    startTransaction,
+    identify,
+    setConsent,
   };
 };

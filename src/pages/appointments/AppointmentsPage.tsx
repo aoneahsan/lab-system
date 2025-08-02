@@ -12,7 +12,7 @@ import { Appointment } from '@/types/appointment.types';
 export const AppointmentsPage: React.FC = () => {
   const navigate = useNavigate();
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState('calendar');
 
   const handleAppointmentClick = (appointment: Appointment) => {

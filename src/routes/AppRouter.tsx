@@ -55,6 +55,8 @@ const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 const AdminPanel = lazy(() => import('@/pages/admin/AdminPanel'));
 const VoiceDictationDemo = lazy(() => import('@/pages/demo/VoiceDictationDemo'));
+const AppointmentsPage = lazy(() => import('@/pages/appointments/AppointmentsPage'));
+const AppointmentDetailPage = lazy(() => import('@/pages/appointments/AppointmentDetailPage'));
 
 // Clinician App
 const ClinicianApp = lazy(() =>
@@ -92,6 +94,8 @@ export const AppRouter = () => {
           
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/appointments" element={<AppointmentsPage />} />
+            <Route path="/appointments/:appointmentId" element={<AppointmentDetailPage />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:patientId" element={<PatientDetailPage />} />
             <Route path="/patients/:patientId/edit" element={<PatientEditPage />} />

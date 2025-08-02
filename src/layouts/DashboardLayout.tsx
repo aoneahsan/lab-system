@@ -16,6 +16,12 @@ const superAdminNavigation = [
 const regularNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊', roles: 'all' },
   {
+    name: 'Appointments',
+    href: '/appointments',
+    icon: '📅',
+    roles: ['lab_admin', 'lab_manager', 'front_desk', 'phlebotomist', 'clinician'],
+  },
+  {
     name: 'Patients',
     href: '/patients',
     icon: '👥',

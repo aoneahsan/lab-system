@@ -1,48 +1,36 @@
 import React, { useCallback, useEffect } from 'react';
-import { ErrorBoundary, UnifiedErrorHandler, ErrorLogger } from 'unified-error-handling';
+import { ErrorBoundary, useErrorHandler as useUnifiedErrorHandler } from 'unified-error-handling/react';
+import { initialize, useAdapter as setAdapter, captureError, captureMessage, setUser, addBreadcrumb } from 'unified-error-handling';
 import { useTracking } from './TrackingProvider';
-import { toast } from 'sonner';
+import { toast } from '@/stores/toast.store';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/auth.store';
 
-// Initialize error handler with configuration
-const errorHandler = new UnifiedErrorHandler({
-  appName: 'LabFlow',
-  environment: import.meta.env.MODE,
-  logging: {
-    console: import.meta.env.DEV,
-    remote: true,
-    endpoint: '/api/errors',
-  },
-  userFeedback: {
-    enabled: true,
-    automatic: false,
-  },
-  recovery: {
-    automatic: true,
-    maxRetries: 3,
-  },
-});
+// Initialize unified error handling
+let initialized = false;
 
-// Initialize error logger
-const errorLogger = new ErrorLogger({
-  handlers: [
-    {
-      type: 'console',
-      enabled: import.meta.env.DEV,
-    },
-    {
-      type: 'remote',
-      enabled: true,
-      endpoint: '/api/logs',
-      batchSize: 10,
-      flushInterval: 5000,
-    },
-  ],
-});
+const initializeErrorHandling = () => {
+  if (initialized) return;
+  
+  initialize({
+    maxBreadcrumbs: 100,
+    enableGlobalHandlers: true,
+    enableConsoleCapture: import.meta.env.DEV
+  });
 
-// Export for use in other components
-export const errorHandlerInstance = errorHandler;
-export const errorLoggerInstance = errorLogger;
+  // Set up adapter based on environment
+  if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
+    setAdapter('sentry', {
+      dsn: import.meta.env.VITE_SENTRY_DSN,
+      environment: import.meta.env.MODE,
+      tracesSampleRate: 0.1
+    });
+  } else {
+    setAdapter('console');
+  }
+  
+  initialized = true;
+};
 
 interface ErrorHandlingProviderProps {
   children: React.ReactNode;
@@ -98,19 +86,42 @@ const ErrorFallback: React.FC<{
 
 export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ children }) => {
   const { trackError } = useTracking();
+  const { currentUser } = useAuthStore();
+
+  // Initialize error handling on mount
+  useEffect(() => {
+    initializeErrorHandling();
+  }, []);
+
+  // Set user context when authenticated
+  useEffect(() => {
+    if (currentUser) {
+      setUser({
+        id: currentUser.id,
+        email: currentUser.email,
+        username: currentUser.displayName || currentUser.email
+      });
+    }
+  }, [currentUser]);
 
   // Global error handler
   const handleError = useCallback(
     (error: Error, errorInfo?: any) => {
-      // Log error
-      errorLogger.error(error, {
-        errorInfo,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        url: window.location.href,
+      // Capture error with unified-error-handling
+      captureError(error, {
+        tags: {
+          component: errorInfo?.componentStack ? 'react-component' : 'global',
+          environment: import.meta.env.MODE
+        },
+        extra: {
+          errorInfo,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+        }
       });
 
-      // Track error
+      // Track error with analytics
       trackError(error, {
         errorInfo,
         component: errorInfo?.componentStack,
@@ -118,7 +129,7 @@ export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ ch
 
       // Show user-friendly error message
       if (!error.message.includes('Network')) {
-        toast.error('An error occurred. Our team has been notified.');
+        toast.error('An error occurred', 'Our team has been notified.');
       }
     },
     [trackError]
@@ -172,21 +183,42 @@ export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ ch
 // Custom hooks for error handling
 export const useErrorHandler = () => {
   const { trackError } = useTracking();
+  const unifiedHandler = useUnifiedErrorHandler();
 
   const logError = useCallback(
     (error: Error, context?: Record<string, any>) => {
-      errorLogger.error(error, context);
+      // Use unified error handler
+      unifiedHandler(error);
+      
+      // Capture with additional context
+      captureError(error, {
+        extra: context
+      });
+      
+      // Track with analytics
       trackError(error, context);
     },
-    [trackError]
+    [trackError, unifiedHandler]
   );
 
   const logWarning = useCallback((message: string, context?: Record<string, any>) => {
-    errorLogger.warn(message, context);
+    captureMessage(message, 'warning');
+    addBreadcrumb({
+      message,
+      category: 'warning',
+      level: 'warning',
+      data: context
+    });
   }, []);
 
   const logInfo = useCallback((message: string, context?: Record<string, any>) => {
-    errorLogger.info(message, context);
+    captureMessage(message, 'info');
+    addBreadcrumb({
+      message,
+      category: 'info',
+      level: 'info',
+      data: context
+    });
   }, []);
 
   const handleAsyncError = useCallback(

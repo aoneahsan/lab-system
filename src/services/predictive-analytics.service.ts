@@ -261,7 +261,7 @@ class PredictiveAnalyticsService {
     const ordersCollection = getTenantSpecificCollectionName('testOrders', tenantId);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    let ordersQuery = query(
+    const ordersQuery = query(
       collection(firestore, ordersCollection),
       where('createdAt', '>=', Timestamp.fromDate(thirtyDaysAgo)),
       orderBy('createdAt', 'desc'),

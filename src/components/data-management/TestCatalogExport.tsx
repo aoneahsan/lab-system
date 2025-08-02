@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, FileSpreadsheet, FileText, FileJson, Filter } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTestStore } from '@/stores/test.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -79,7 +79,7 @@ export const TestCatalogExport: React.FC = () => {
           CSVParser.exportToCSV(formattedData, filename);
           break;
           
-        case 'json':
+        case 'json': {
           const jsonData = ExportFormatter.formatJSON(formattedData);
           const blob = new Blob([jsonData], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
@@ -91,6 +91,7 @@ export const TestCatalogExport: React.FC = () => {
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
           break;
+        }
       }
       
       toast.success(`Exported ${filteredTests.length} tests successfully`);

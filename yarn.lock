@@ -9025,16 +9025,10 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-notification-kit@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/notification-kit/-/notification-kit-1.2.0.tgz#1847e69d6c215aa4fb0bce39d1fb369331a717b1"
-  integrity sha512-ue1Hv/S42y1FXLMfh3HojRXig3JNqMcmTSqDZaFOiqFSM/4p50NrMKq+lYDkSC1LN2PSQArtv2qpSepiKdU05A==
-  dependencies:
-    "@capacitor/local-notifications" "^7.0.1"
-    "@capacitor/preferences" "^7.0.1"
-    "@capacitor/push-notifications" "^7.0.1"
-    firebase "^12.0.0"
-    react-onesignal "^3.2.3"
+notification-kit@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/notification-kit/-/notification-kit-2.0.0.tgz#1edcd1bf84b762f6eeabc3d6e41509125bec9c6d"
+  integrity sha512-tU8Ov7u+SM1bLyvs4rTrjrvKBZXHgBkPC2CuzMoZlNW0nyBcMe3hwBqTA52gz4h1RlrgzQ+fgn/LtCtpQELkPQ==
 
 npm-run-path@^4.0.0:
   version "4.0.1"
@@ -9739,11 +9733,6 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
-
-react-onesignal@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/react-onesignal/-/react-onesignal-3.2.3.tgz#8736c5c642b74a172b38bf41dea97b6f4f9b320a"
-  integrity sha512-5LIbQbybNTQ8ngaMeJEBB1EEzDEYJ8SS10L7hHKNCIIWrTmeKpYFhCgwjwb1QFdZ+eRjil5y+ujJR6syf7SVVw==
 
 "react-redux@8.x.x || 9.x.x":
   version "9.2.0"
@@ -11277,6 +11266,11 @@ unified-error-handling@^1.2.0:
     logrocket-react "^5.0.0"
     raygun4js "^2.28.0"
     rollbar "^2.26.0"
+
+unified-error-handling@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/unified-error-handling/-/unified-error-handling-2.0.0.tgz#3bf48316e83ace3e872119eb2939c60ade8191c5"
+  integrity sha512-OkWWQUr1ulrbwYbNOzxGmfbt+acAfMAEbL4YvWaIiRnkAxhGUwMTUs/JIXIowq9+o7TJKk6YbqdS1IbuuYVotg==
 
 unified-tracking@^1.5.0:
   version "1.5.0"

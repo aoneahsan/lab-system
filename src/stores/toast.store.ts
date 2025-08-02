@@ -1,12 +1,18 @@
-import { create } from 'zustand';
+// Re-export toast from notification-kit integration
+export { toast } from '@/services/app-notification.service';
 
-interface Toast {
+// Keep the Toast type for backward compatibility
+export interface Toast {
   id: string;
   type: 'success' | 'error' | 'warning' | 'info';
   title: string;
   message?: string;
   duration?: number;
 }
+
+// Deprecated: This store is now handled by notification-kit
+// Keeping empty store for backward compatibility if needed
+import { create } from 'zustand';
 
 interface ToastStore {
   toasts: Toast[];
@@ -16,25 +22,6 @@ interface ToastStore {
 
 export const useToastStore = create<ToastStore>((set) => ({
   toasts: [],
-  addToast: (toast) =>
-    set((state) => ({
-      toasts: [...state.toasts, { ...toast, id: Date.now().toString() }],
-    })),
-  removeToast: (id) =>
-    set((state) => ({
-      toasts: state.toasts.filter((toast) => toast.id !== id),
-    })),
+  addToast: () => {},
+  removeToast: () => {},
 }));
-
-export const toast = {
-  success: (title: string, message?: string) =>
-    useToastStore.getState().addToast({ type: 'success', title, message }),
-  error: (title: string, message?: string) =>
-    useToastStore.getState().addToast({ type: 'error', title, message }),
-  warning: (title: string, message?: string) =>
-    useToastStore.getState().addToast({ type: 'warning', title, message }),
-  info: (title: string, message?: string) =>
-    useToastStore.getState().addToast({ type: 'info', title, message }),
-};
-
-export type { Toast };

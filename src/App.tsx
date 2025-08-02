@@ -16,6 +16,7 @@ import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics'
 import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 import { TrackingProvider } from '@/providers/TrackingProvider';
 import { ErrorHandlingProvider } from '@/providers/ErrorHandlingProvider';
+import { initializeNotifications } from '@/services/app-notification.service';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,8 +36,16 @@ function App() {
   useEffect(() => {
     // Track app initialization
     performanceMonitor.startTrace('app_initialization');
-    initializeAuth();
-    // Stop trace after a short delay since initializeAuth is synchronous
+    
+    // Initialize auth and notifications
+    const initialize = async () => {
+      initializeAuth();
+      await initializeNotifications();
+    };
+    
+    initialize();
+    
+    // Stop trace after a short delay
     setTimeout(() => {
       performanceMonitor.stopTrace('app_initialization');
     }, 100);

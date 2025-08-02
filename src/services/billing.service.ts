@@ -424,7 +424,7 @@ export const billingService = {
     ]);
 
     // Calculate statistics from limited data
-    let totalRevenue = 0;
+    const totalRevenue = 0;
     let pendingPayments = 0;
     let overdueAmount = 0;
     let todaysCharges = 0;

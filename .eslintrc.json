@@ -47,6 +47,10 @@
     "*.config.js",
     "*.config.ts",
     "vite.config.*.ts",
-    "cypress.config.ts"
+    "cypress.config.ts",
+    "docs-site/**/*",
+    "capacitor-demo/**/*",
+    "docs-site",
+    "capacitor-demo"
   ]
 }

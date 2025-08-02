@@ -692,7 +692,7 @@ export const reportService = {
         pdf.text(`Records: ${reportData.recordCount}`, 20, 40);
 
         // Add content based on template sections
-        let yPosition = 50;
+        const yPosition = 50;
         
         if (Array.isArray(reportData.data) && reportData.data.length > 0) {
           // Create table from data
