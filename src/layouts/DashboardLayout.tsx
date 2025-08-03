@@ -89,6 +89,12 @@ const regularNavigation = [
     roles: ['patient'],
   },
   {
+    name: 'Workflow',
+    href: '/workflow',
+    icon: '⚡',
+    roles: ['lab_admin', 'lab_manager'],
+  },
+  {
     name: 'Settings',
     href: '/settings',
     icon: '⚙️',

@@ -68,6 +68,9 @@ const RouteManagementPage = lazy(() => import('@/pages/home-collection/RouteMana
 // Customer Portal
 const CustomerPortalPage = lazy(() => import('@/pages/customer-portal/CustomerPortalPage'));
 
+// Workflow Automation
+const WorkflowAutomationPage = lazy(() => import('@/pages/workflow/WorkflowAutomationPage'));
+
 // Clinician App
 const ClinicianApp = lazy(() =>
   import('@/apps/clinician/ClinicianApp').then((module) => ({ default: module.ClinicianApp }))
@@ -148,6 +151,7 @@ export const AppRouter = () => {
             <Route path="/settings/updates" element={<AppUpdateSettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/portal" element={<CustomerPortalPage />} />
+            <Route path="/workflow" element={<WorkflowAutomationPage />} />
           </Route>
         </Route>
 

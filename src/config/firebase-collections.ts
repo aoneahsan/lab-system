@@ -190,3 +190,43 @@ export const STORAGE_PATHS = {
     return getStoragePath('qc/documents');
   },
 };
+
+// Firebase collections constants for services
+export const FIREBASE_COLLECTIONS = {
+  PATIENTS: 'patients',
+  TESTS: 'tests',
+  TEST_ORDERS: 'test_orders',
+  TEST_PANELS: 'test_panels',
+  SAMPLES: 'samples',
+  RESULTS: 'results',
+  INVOICES: 'invoices',
+  INVENTORY_ITEMS: 'inventory_items',
+  STOCK_TRANSACTIONS: 'stock_transactions',
+  PURCHASE_ORDERS: 'purchase_orders',
+  QC_MATERIALS: 'qc_materials',
+  QC_RUNS: 'qc_runs',
+  REPORTS: 'reports',
+  REPORT_TEMPLATES: 'report_templates',
+  EMR_CONNECTIONS: 'emr_connections',
+  WEBHOOKS: 'webhooks',
+  WEBHOOK_LOGS: 'webhook_logs',
+  VALIDATION_RULES: 'validation_rules',
+  INSURANCE_CLAIMS: 'insurance_claims',
+  PAYMENTS: 'payments',
+  HOME_COLLECTIONS: 'home_collections',
+  COLLECTION_ROUTES: 'collection_routes',
+  COLLECTION_KITS: 'collection_kits',
+  PHLEBOTOMIST_LOCATIONS: 'phlebotomist_locations',
+  PORTAL_ACCESS: 'portal_access',
+  SHARED_RESULTS: 'shared_results',
+  PRESCRIPTIONS: 'prescriptions',
+  PORTAL_NOTIFICATIONS: 'portal_notifications',
+  WORKFLOW_RULES: 'workflow_rules',
+  WORKFLOW_EXECUTIONS: 'workflow_executions',
+  TAT_RULES: 'tat_rules',
+  AUTO_VERIFICATION_RULES: 'auto_verification_rules',
+  WORKFLOW_TASKS: 'workflow_tasks',
+  TASK_TEMPLATES: 'task_templates',
+  SAMPLE_ROUTING_RULES: 'sample_routing_rules',
+  WORKFLOW_METRICS: 'workflow_metrics'
+};
