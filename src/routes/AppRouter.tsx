@@ -65,6 +65,9 @@ const HomeCollectionFormPage = lazy(() => import('@/pages/home-collection/HomeCo
 const HomeCollectionDetailPage = lazy(() => import('@/pages/home-collection/HomeCollectionDetailPage'));
 const RouteManagementPage = lazy(() => import('@/pages/home-collection/RouteManagementPage'));
 
+// Customer Portal
+const CustomerPortalPage = lazy(() => import('@/pages/customer-portal/CustomerPortalPage'));
+
 // Clinician App
 const ClinicianApp = lazy(() =>
   import('@/apps/clinician/ClinicianApp').then((module) => ({ default: module.ClinicianApp }))
@@ -144,6 +147,7 @@ export const AppRouter = () => {
             <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
             <Route path="/settings/updates" element={<AppUpdateSettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/portal" element={<CustomerPortalPage />} />
           </Route>
         </Route>
 

@@ -83,6 +83,12 @@ const regularNavigation = [
     roles: ['lab_admin', 'lab_manager'],
   },
   {
+    name: 'Customer Portal',
+    href: '/portal',
+    icon: '🌐',
+    roles: ['patient'],
+  },
+  {
     name: 'Settings',
     href: '/settings',
     icon: '⚙️',
