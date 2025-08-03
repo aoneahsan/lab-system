@@ -228,5 +228,11 @@ export const FIREBASE_COLLECTIONS = {
   WORKFLOW_TASKS: 'workflow_tasks',
   TASK_TEMPLATES: 'task_templates',
   SAMPLE_ROUTING_RULES: 'sample_routing_rules',
-  WORKFLOW_METRICS: 'workflow_metrics'
+  WORKFLOW_METRICS: 'workflow_metrics',
+  COMMUNICATION_CHANNELS: 'communication_channels',
+  MESSAGE_TEMPLATES: 'message_templates',
+  CAMPAIGNS: 'campaigns',
+  MESSAGES: 'messages',
+  COMMUNICATION_PREFERENCES: 'communication_preferences',
+  MESSAGE_LOGS: 'message_logs'
 };
