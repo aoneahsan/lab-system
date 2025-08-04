@@ -74,3 +74,8 @@ export function useResetPassword() {
     },
   });
 }
+
+export function useAuth() {
+  const { currentUser, isAuthenticated, isLoading } = useAuthStore();
+  return { currentUser, isAuthenticated, isLoading };
+}

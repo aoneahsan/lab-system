@@ -37,14 +37,14 @@ export const AppointmentList: React.FC<AppointmentListProps> = ({
 
   const getStatusBadge = (status: Appointment['status']) => {
     const statusConfig = {
-      scheduled: { variant: 'blue' as const, label: 'Scheduled' },
-      confirmed: { variant: 'green' as const, label: 'Confirmed' },
-      'in-progress': { variant: 'yellow' as const, label: 'In Progress' },
-      completed: { variant: 'gray' as const, label: 'Completed' },
-      cancelled: { variant: 'red' as const, label: 'Cancelled' },
-      'no-show': { variant: 'orange' as const, label: 'No Show' },
+      scheduled: { variant: 'info' as const, label: 'Scheduled' },
+      confirmed: { variant: 'success' as const, label: 'Confirmed' },
+      'in-progress': { variant: 'warning' as const, label: 'In Progress' },
+      completed: { variant: 'default' as const, label: 'Completed' },
+      cancelled: { variant: 'danger' as const, label: 'Cancelled' },
+      'no-show': { variant: 'warning' as const, label: 'No Show' },
     };
-    const config = statusConfig[status] || { variant: 'gray' as const, label: status };
+    const config = statusConfig[status] || { variant: 'default' as const, label: status };
     return <Badge variant={config.variant} size="sm">{config.label}</Badge>;
   };
 

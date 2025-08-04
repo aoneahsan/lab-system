@@ -1,4 +1,4 @@
-import { QRCodeStudio } from 'code-craft-studio';
+import { QRCodeStudio } from 'qrcode-studio';
 import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
 
 export const qrcodeService = {
@@ -16,8 +16,7 @@ export const qrcodeService = {
 
     // Use code-craft-studio's generate method
     const result = await QRCodeStudio.generate({
-      data: JSON.stringify(qrData),
-      type: 'text',
+      content: JSON.stringify(qrData),
       options: {
         width: config?.size || 200,
         height: config?.size || 200,
@@ -46,7 +45,7 @@ export const qrcodeService = {
     // Using code-craft-studio's barcode functionality
     const result = await QRCodeStudio.generateBarcode({
       data: barcode,
-      format: config?.format || 'CODE128',
+      type: config?.format || 'CODE128',
       options: {
         width: config?.width || 300,
         height: config?.height || 100,

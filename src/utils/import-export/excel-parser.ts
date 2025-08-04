@@ -12,6 +12,12 @@ export interface ExcelParserOptions {
   maxRows?: number;
 }
 
+export interface ColumnMapping {
+  sourceColumn: string;
+  targetField: string;
+  transform?: (value: any) => any;
+}
+
 export class ExcelParser {
   static async parseFile(file: File, options: ExcelParserOptions = {}): Promise<ParsedData> {
     const { sheet = 0, headerRow = 0, maxRows } = options;

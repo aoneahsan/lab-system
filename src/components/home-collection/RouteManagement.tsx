@@ -6,16 +6,16 @@ import {
   useHomeCollections 
 } from '@/hooks/useHomeCollection';
 import { useUsers } from '@/hooks/useUsers';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/Select';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -60,7 +60,7 @@ export function RouteManagement() {
     const phlebotomist = phlebotomists.find(p => p.id === selectedPhlebotomist);
     
     await createRoute.mutateAsync({
-      routeName: `${phlebotomist?.name} - ${format(selectedDate, 'MMM dd')}`,
+      routeName: `${phlebotomist?.firstName} ${phlebotomist?.lastName} - ${format(selectedDate, 'MMM dd')}`,
       phlebotomistId: selectedPhlebotomist,
       date: format(selectedDate, 'yyyy-MM-dd'),
       collectionIds: selectedCollections,
@@ -123,7 +123,7 @@ export function RouteManagement() {
               <label className="text-sm font-medium">Phlebotomist</label>
               <Select
                 value={selectedPhlebotomist}
-                onValueChange={setSelectedPhlebotomist}
+                onChange={(e) => setSelectedPhlebotomist(e.target.value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select phlebotomist" />
@@ -131,7 +131,7 @@ export function RouteManagement() {
                 <SelectContent>
                   {phlebotomists.map((phlebotomist) => (
                     <SelectItem key={phlebotomist.id} value={phlebotomist.id}>
-                      {phlebotomist.name}
+                      {phlebotomist.firstName} {phlebotomist.lastName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -177,7 +177,7 @@ export function RouteManagement() {
                           {collection.scheduledTimeSlot}
                         </p>
                       </div>
-                      <Badge variant={collection.priority === 'urgent' ? 'destructive' : 'default'}>
+                      <Badge variant={collection.priority === 'urgent' ? 'danger' : 'default'}>
                         {collection.priority}
                       </Badge>
                     </div>
@@ -212,7 +212,7 @@ export function RouteManagement() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <Badge variant={route.status === 'completed' ? 'default' : 'secondary'}>
+                      <Badge variant={route.status === 'completed' ? 'success' : 'default'}>
                         {route.status}
                       </Badge>
                       {route.totalDistance > 0 && (

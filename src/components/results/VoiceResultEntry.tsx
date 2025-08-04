@@ -45,8 +45,11 @@ export const VoiceResultEntry: React.FC<VoiceResultEntryProps> = ({
       testCode: def.code,
       testName: def.name,
       value: '',
-      unit: def.unit,
-      referenceRange: def.referenceRange,
+      unit: def.unit || '',
+      referenceRange: def.referenceRanges?.[0] ? { 
+        min: def.referenceRanges[0].normalMin || 0, 
+        max: def.referenceRanges[0].normalMax || 100 
+      } : { min: 0, max: 100 },
       notes: '',
     }))
   );
@@ -155,13 +158,11 @@ export const VoiceResultEntry: React.FC<VoiceResultEntryProps> = ({
 
     // Convert to TestResult format
     const testResults: Partial<TestResult>[] = results.map(r => ({
-      testCode: r.testCode,
-      value: parseFloat(r.value),
+      testName: r.testName,
+      value: r.value,
       unit: r.unit,
-      flag: r.flag,
-      resultDate: new Date(),
-      notes: r.notes,
-      entryMethod: 'voice',
+      flag: r.flag as TestResult['flag'],
+      comments: r.notes,
     }));
 
     onSubmit(testResults);

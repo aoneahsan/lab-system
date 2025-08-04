@@ -156,25 +156,33 @@ class UnifiedStorageService {
   /**
    * Query storage with MongoDB-like syntax
    */
-  async query<T>(filter: any): Promise<T[]> {
+  async query<T>(filter: any): Promise<Array<{ key: string; value: T }>> {
     await this.initialize();
     return await this.storage.query<T>(filter);
   }
 
   /**
    * Get items by tag
+   * @deprecated This method is not available in the current version of strata
    */
   async getByTag<T>(tag: string): Promise<Array<{ key: string; value: T }>> {
     await this.initialize();
-    return await this.storage.getByTag<T>(tag);
+    // TODO: Implement tag-based retrieval
+    const allItems = await this.storage.query<T>({});
+    return allItems.filter(item => item.key.includes(tag));
   }
 
   /**
    * Remove items by tag
+   * @deprecated This method is not available in the current version of strata
    */
   async removeByTag(tag: string): Promise<void> {
     await this.initialize();
-    await this.storage.removeByTag(tag);
+    // TODO: Implement tag-based removal
+    const items = await this.getByTag(tag);
+    for (const item of items) {
+      await this.storage.remove(item.key);
+    }
   }
 
   /**
@@ -182,7 +190,8 @@ class UnifiedStorageService {
    */
   async export(): Promise<Record<string, any>> {
     await this.initialize();
-    return await this.storage.export();
+    const exportedString = await this.storage.export();
+    return JSON.parse(exportedString);
   }
 
   /**
@@ -190,7 +199,7 @@ class UnifiedStorageService {
    */
   async import(data: Record<string, any>): Promise<void> {
     await this.initialize();
-    await this.storage.import(data);
+    await this.storage.import(JSON.stringify(data));
   }
 
   /**
@@ -202,11 +211,13 @@ class UnifiedStorageService {
     storageType: string;
   }> {
     await this.initialize();
-    const stats = await this.storage.getStats();
+    // TODO: Implement proper stats collection
+    // The getStats method is not available in the current version
+    const allItems = await this.storage.query({});
     return {
-      totalSize: stats.size,
-      itemCount: stats.count,
-      storageType: stats.adapter
+      totalSize: JSON.stringify(allItems).length,
+      itemCount: allItems.length,
+      storageType: 'strata'
     };
   }
 }

@@ -41,12 +41,13 @@ export function AppointmentCommunicationSettings() {
 
   const toggleChannel = (channel: string) => {
     const channels = [...formData.reminderChannels];
-    const index = channels.indexOf(channel);
+    const typedChannel = channel as 'email' | 'sms' | 'whatsapp';
+    const index = channels.indexOf(typedChannel);
     
     if (index > -1) {
       channels.splice(index, 1);
     } else {
-      channels.push(channel);
+      channels.push(typedChannel);
     }
     
     setFormData({ ...formData, reminderChannels: channels });
@@ -99,7 +100,7 @@ export function AppointmentCommunicationSettings() {
                     <label key={channel} className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={formData.reminderChannels.includes(channel)}
+                        checked={formData.reminderChannels.includes(channel as 'email' | 'sms' | 'whatsapp')}
                         onChange={() => toggleChannel(channel)}
                         className="mr-2"
                       />

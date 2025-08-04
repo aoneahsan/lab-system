@@ -380,6 +380,38 @@ class PatientService {
     }
   }
 
+  async getPatients(
+    tenantId: string,
+    options?: { limit?: number }
+  ): Promise<Patient[]> {
+    try {
+      const collectionName = this.getCollectionName(tenantId);
+      const constraints: QueryConstraint[] = [
+        orderBy('createdAt', 'desc')
+      ];
+      
+      if (options?.limit) {
+        constraints.push(limit(options.limit));
+      }
+      
+      const q = query(collection(firestore, collectionName), ...constraints);
+      const snapshot = await getDocs(q);
+      
+      const patients: Patient[] = [];
+      snapshot.docs.forEach((doc) => {
+        patients.push(this.formatPatientData({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      });
+      
+      return patients;
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      throw error;
+    }
+  }
+
   async getPatientStats(tenantId: string): Promise<PatientStats> {
     try {
       const collectionName = this.getCollectionName(tenantId);

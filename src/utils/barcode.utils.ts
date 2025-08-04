@@ -133,8 +133,7 @@ export async function generateSampleQRCode(
   
   try {
     const result = await QRCodeStudio.generate({
-      data: barcodeString,
-      type: 'text',
+      content: barcodeString,
       options: {
         width: options?.size || 256,
         height: options?.size || 256,
@@ -177,8 +176,7 @@ export async function generateSampleQRCodeToCanvas(
   try {
     // Generate QR code data URL first
     const result = await QRCodeStudio.generate({
-      data: barcodeString,
-      type: 'text',
+      content: barcodeString,
       options: {
         width: options?.size || 256,
         height: options?.size || 256,

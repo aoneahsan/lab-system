@@ -3,6 +3,7 @@ import { Download, FileSpreadsheet, FileText, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useInventoryStore } from '@/stores/inventory.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { CSVParser } from '@/utils/import-export/csv-parser';
 import { ExportFormatter } from '@/utils/import-export/export-formatter';
@@ -28,19 +29,21 @@ export const InventoryExport: React.FC = () => {
   const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
   
-  const { currentTenant } = useAuthStore();
-  const { items, fetchItems } = useInventoryStore();
+  const { currentUser } = useAuthStore();
+  const { currentTenant } = useTenantStore();
+  const inventoryStore = useInventoryStore();
+  const items = inventoryStore.items || [];
   
   useEffect(() => {
-    if (currentTenant) {
-      fetchItems(currentTenant.id);
+    if (currentTenant && inventoryStore.fetchInventoryItems) {
+      inventoryStore.fetchInventoryItems();
     }
-  }, [currentTenant, fetchItems]);
+  }, [currentTenant, inventoryStore]);
   
   useEffect(() => {
     // Extract unique categories and locations
     const categories = [...new Set(items.map(i => i.category))].filter(Boolean).sort();
-    const locations = [...new Set(items.map(i => i.location))].filter(Boolean).sort();
+    const locations: string[] = []; // InventoryItem doesn't have location property
     setAvailableCategories(categories);
     setAvailableLocations(locations);
   }, [items]);
@@ -59,7 +62,13 @@ export const InventoryExport: React.FC = () => {
       
       // Filter by stock status
       if (filters.stockStatus !== 'all') {
-        filteredItems = filteredItems.filter(i => i.status === filters.stockStatus);
+        // Map stock status to actual inventory levels
+        filteredItems = filteredItems.filter(i => {
+          if (filters.stockStatus === 'in-stock') return i.currentStock > i.minimumStock;
+          if (filters.stockStatus === 'low-stock') return i.currentStock <= i.minimumStock && i.currentStock > 0;
+          if (filters.stockStatus === 'out-of-stock') return i.currentStock === 0;
+          return true;
+        });
       }
       
       // Filter by categories
@@ -68,11 +77,7 @@ export const InventoryExport: React.FC = () => {
       }
       
       // Filter by locations
-      if (filters.locations.length > 0) {
-        filteredItems = filteredItems.filter(i => 
-          i.location && filters.locations.includes(i.location)
-        );
-      }
+      // Location filtering not applicable - InventoryItem doesn't have location
       
       // Format data
       const formattedData = ExportFormatter.formatInventoryForExport(filteredItems, {
@@ -121,23 +126,26 @@ export const InventoryExport: React.FC = () => {
     let count = items.length;
     
     if (filters.stockStatus !== 'all') {
-      count = items.filter(i => i.status === filters.stockStatus).length;
+      count = items.filter(i => {
+        if (filters.stockStatus === 'in-stock') return i.currentStock > i.minimumStock;
+        if (filters.stockStatus === 'low-stock') return i.currentStock <= i.minimumStock && i.currentStock > 0;
+        if (filters.stockStatus === 'out-of-stock') return i.currentStock === 0;
+        return true;
+      }).length;
     }
     
     if (filters.categories.length > 0) {
-      count = items.filter(i => 
-        filters.categories.includes(i.category) && 
-        (filters.stockStatus === 'all' || i.status === filters.stockStatus)
-      ).length;
+      count = items.filter(i => {
+        if (!filters.categories.includes(i.category)) return false;
+        if (filters.stockStatus === 'all') return true;
+        if (filters.stockStatus === 'in-stock') return i.currentStock > i.minimumStock;
+        if (filters.stockStatus === 'low-stock') return i.currentStock <= i.minimumStock && i.currentStock > 0;
+        if (filters.stockStatus === 'out-of-stock') return i.currentStock === 0;
+        return true;
+      }).length;
     }
     
-    if (filters.locations.length > 0) {
-      count = items.filter(i => 
-        i.location && filters.locations.includes(i.location) &&
-        (filters.categories.length === 0 || filters.categories.includes(i.category)) &&
-        (filters.stockStatus === 'all' || i.status === filters.stockStatus)
-      ).length;
-    }
+    // Location filtering removed as InventoryItem doesn't have location property
     
     return count;
   };

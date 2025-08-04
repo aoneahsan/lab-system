@@ -107,6 +107,16 @@ export interface AppointmentSettings {
     };
   };
   
+  // Legacy properties for backward compatibility
+  enableReminders?: boolean;
+  reminderChannels?: ('sms' | 'email' | 'whatsapp')[];
+  reminderTiming?: number[];
+  reminderTemplates?: {
+    sms?: string;
+    email?: string;
+    whatsapp?: string;
+  };
+  
   // Cancellation policy
   cancellation: {
     allowedHoursBefore: number;

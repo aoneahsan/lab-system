@@ -4,6 +4,7 @@ export interface Tenant {
   code: string;
   description?: string;
   logo?: string;
+  firebasePrefix?: string; // Prefix for Firebase collections/storage
   settings: TenantSettings;
   subscription: TenantSubscription;
   isActive: boolean;

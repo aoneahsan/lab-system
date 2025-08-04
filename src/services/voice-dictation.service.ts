@@ -90,7 +90,8 @@ class VoiceDictationService {
           }
         });
 
-        await SpeechRecognition.addListener('results', (data: any) => {
+        // Final results listener - using partialResults as well since 'results' event doesn't exist
+        await SpeechRecognition.addListener('partialResults', (data: any) => {
           if (onResult && data.matches && data.matches.length > 0) {
             const transcript = data.matches[0];
             onResult(transcript, true);

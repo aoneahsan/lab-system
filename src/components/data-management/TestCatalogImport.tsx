@@ -8,7 +8,8 @@ import { DataValidator } from '@/utils/import-export/data-validator';
 import { LOINCMapper } from '@/utils/import-export/loinc-mapper';
 import { useTestStore } from '@/stores/test.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { Test } from '@/types';
+import { useTenantStore } from '@/stores/tenant.store';
+import { TestDefinition } from '@/types';
 import { toast } from 'sonner';
 
 interface ImportProgress {
@@ -32,7 +33,8 @@ export const TestCatalogImport: React.FC = () => {
     status: 'idle',
   });
   
-  const { currentTenant } = useAuthStore();
+  const { currentUser } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { createTest } = useTestStore();
   
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -112,37 +114,42 @@ export const TestCatalogImport: React.FC = () => {
     
     for (const item of mappingPreview) {
       try {
-        const testData: Partial<Test> = {
+        const testData: Partial<TestDefinition> = {
           code: item.code,
           name: item.name,
           category: item.category,
-          price: item.price,
-          turnaroundTime: item.turnaroundTime,
-          turnaroundUnit: item.turnaroundUnit || 'days',
-          isActive: item.isActive !== false,
-          loincCode: item.loincCode || item.suggestedLOINC?.loincCode,
-          cptCode: item.cptCode,
-          description: item.description,
-          specimenType: item.specimenType,
-          containerType: item.containerType,
-          minimumVolume: item.minimumVolume,
-          volumeUnit: item.volumeUnit,
-          storageTemperature: item.storageTemperature,
+          turnaroundTime: {
+            routine: item.turnaroundTime || 24,
+            stat: item.statTurnaroundTime
+          },
+          loincCode: item.loincCode ? {
+            code: item.loincCode,
+            displayName: item.loincDisplayName || item.name
+          } : undefined,
+          specimen: {
+            type: item.specimenType || 'blood',
+            volume: item.minimumVolume,
+            volumeUnit: item.volumeUnit || 'ml',
+            container: item.containerType,
+            preservative: item.preservative,
+            specialInstructions: item.specialInstructions
+          },
           methodology: item.methodology,
-          units: item.units,
-          referenceRange: item.referenceRange,
-          criticalLow: item.criticalLow,
-          criticalHigh: item.criticalHigh,
-          notes: item.notes,
+          referenceRanges: [],
+          criticalValues: (item.criticalLow || item.criticalHigh) ? {
+            low: item.criticalLow,
+            high: item.criticalHigh
+          } : undefined,
+          isActive: item.isActive !== false
         };
         
         // Enrich with LOINC data if available
         if (testData.loincCode) {
-          const enriched = LOINCMapper.enrichTestWithLOINC(testData, testData.loincCode);
+          const enriched = LOINCMapper.enrichTestWithLOINC(testData, testData.loincCode.code);
           Object.assign(testData, enriched);
         }
         
-        await createTest(currentTenant.id, testData as Test);
+        await createTest(currentTenant.id, testData as TestDefinition);
         
         setProgress(prev => ({
           ...prev,

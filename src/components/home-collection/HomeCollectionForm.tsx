@@ -6,19 +6,19 @@ import { z } from 'zod';
 import { useCreateHomeCollection } from '@/hooks/useHomeCollection';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Textarea } from '@/components/ui/Textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+} from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -75,7 +75,7 @@ export function HomeCollectionForm() {
     setValue,
     watch
   } = useForm<HomeCollectionFormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       priority: 'normal',
       fastingRequired: false,
@@ -84,7 +84,7 @@ export function HomeCollectionForm() {
   });
 
   const selectedPatientId = watch('patientId');
-  const selectedPatient = patients.find(p => p.id === selectedPatientId);
+  const selectedPatient = (patients && 'patients' in patients ? patients.patients : patients)?.find((p: any) => p.id === selectedPatientId);
 
   const onSubmit = async (data: HomeCollectionFormData) => {
     try {
@@ -112,7 +112,7 @@ export function HomeCollectionForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit<HomeCollectionFormData>(onSubmit)} className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Schedule Home Collection</h1>
         <div className="flex gap-2">
@@ -139,13 +139,13 @@ export function HomeCollectionForm() {
               <Label htmlFor="patientId">Patient</Label>
               <Select
                 value={watch('patientId')}
-                onValueChange={(value) => setValue('patientId', value)}
+                onChange={(e) => setValue('patientId', e.target.value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select patient" />
                 </SelectTrigger>
                 <SelectContent>
-                  {patients.map((patient) => (
+                  {((patients && 'patients' in patients ? patients.patients : patients) || []).map((patient: any) => (
                     <SelectItem key={patient.id} value={patient.id}>
                       {patient.firstName} {patient.lastName} - {patient.phone}
                     </SelectItem>
@@ -173,7 +173,7 @@ export function HomeCollectionForm() {
               <Label htmlFor="priority">Priority</Label>
               <Select
                 value={watch('priority')}
-                onValueChange={(value: any) => setValue('priority', value)}
+                onChange={(e) => setValue('priority', e.target.value as any)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -240,7 +240,7 @@ export function HomeCollectionForm() {
               <Label htmlFor="scheduledTimeSlot">Time Slot</Label>
               <Select
                 value={watch('scheduledTimeSlot')}
-                onValueChange={(value) => setValue('scheduledTimeSlot', value)}
+                onChange={(e) => setValue('scheduledTimeSlot', e.target.value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select time slot" />
@@ -373,7 +373,7 @@ export function HomeCollectionForm() {
               <Label htmlFor="paymentMethod">Payment Method</Label>
               <Select
                 value={watch('paymentMethod')}
-                onValueChange={(value: any) => setValue('paymentMethod', value)}
+                onChange={(e) => setValue('paymentMethod', e.target.value as any)}
               >
                 <SelectTrigger>
                   <SelectValue />

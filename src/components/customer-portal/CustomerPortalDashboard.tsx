@@ -1,8 +1,8 @@
 import { useAuthStore } from '@/stores/auth.store';
 import { usePortalDashboard } from '@/hooks/useCustomerPortal';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { 
   FileText, 
   Calendar, 
@@ -37,7 +37,7 @@ export function CustomerPortalDashboard() {
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, {currentUser?.name}</h1>
+          <h1 className="text-3xl font-bold">Welcome back, {currentUser?.firstName}</h1>
           <p className="text-gray-600 mt-1">Here's your health dashboard</p>
         </div>
         <Button onClick={() => navigate('/portal/notifications')}>
@@ -142,7 +142,7 @@ export function CustomerPortalDashboard() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant={result.status === 'completed' ? 'default' : 'secondary'}>
+                      <Badge variant={result.status === 'completed' ? 'success' : 'default'}>
                         {result.status}
                       </Badge>
                       <Download className="h-4 w-4 text-gray-400" />

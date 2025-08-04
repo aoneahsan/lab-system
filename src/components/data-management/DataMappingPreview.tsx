@@ -13,12 +13,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@/components/ui/Select';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
 import {
   AlertCircle,
   CheckCircle,
@@ -95,9 +95,8 @@ export const DataMappingPreview: React.FC<DataMappingPreviewProps> = ({
   // Generate column mappings for parent
   React.useEffect(() => {
     const columnMappings: ColumnMapping[] = targetFields.map(field => ({
-      source: mappings[field.name] || '',
-      target: field.name,
-      required: field.required,
+      sourceColumn: mappings[field.name] || '',
+      targetField: field.name,
     }));
     
     onMappingChange(columnMappings);
@@ -164,7 +163,7 @@ export const DataMappingPreview: React.FC<DataMappingPreviewProps> = ({
               </div>
               <Select
                 value={mappings[field.name] || ''}
-                onValueChange={(value) => handleMappingChange(field.name, value)}
+                onChange={(e) => handleMappingChange(field.name, e.target.value)}
               >
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Select source column" />
@@ -194,17 +193,17 @@ export const DataMappingPreview: React.FC<DataMappingPreviewProps> = ({
       {validationResult && (
         <div className="space-y-2">
           <div className="flex items-center gap-4">
-            <Badge variant={validationResult.isValid ? 'default' : 'destructive'}>
-              {validationResult.summary.validRecords} Valid
+            <Badge variant={validationResult.isValid ? 'success' : 'danger'}>
+              {validationResult.validRows.length} Valid
             </Badge>
-            {validationResult.summary.invalidRecords > 0 && (
-              <Badge variant="destructive">
-                {validationResult.summary.invalidRecords} Invalid
+            {validationResult.invalidRows.length > 0 && (
+              <Badge variant="danger">
+                {validationResult.invalidRows.length} Invalid
               </Badge>
             )}
-            {validationResult.summary.recordsWithWarnings > 0 && (
-              <Badge variant="secondary">
-                {validationResult.summary.recordsWithWarnings} Warnings
+            {validationResult.warnings.length > 0 && (
+              <Badge variant="warning">
+                {validationResult.warnings.length} Warnings
               </Badge>
             )}
           </div>
@@ -263,7 +262,7 @@ export const DataMappingPreview: React.FC<DataMappingPreviewProps> = ({
                   <TableHead className="w-[50px]">
                     <Checkbox
                       checked={selectedRows.size === sampleData.length}
-                      onCheckedChange={toggleAllRows}
+                      onChange={toggleAllRows}
                     />
                   </TableHead>
                   <TableHead className="w-[80px]">Row</TableHead>
@@ -292,7 +291,7 @@ export const DataMappingPreview: React.FC<DataMappingPreviewProps> = ({
                       <TableCell>
                         <Checkbox
                           checked={selectedRows.has(index)}
-                          onCheckedChange={() => toggleRowSelection(index)}
+                          onChange={() => toggleRowSelection(index)}
                         />
                       </TableCell>
                       <TableCell className="font-medium">

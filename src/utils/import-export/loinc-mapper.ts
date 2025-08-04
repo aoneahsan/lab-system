@@ -104,10 +104,10 @@ export class LOINCMapper {
     
     // Try exact code match first
     if (test.loincCode) {
-      const exactMatch = this.loincDatabase.get(test.loincCode);
+      const exactMatch = this.loincDatabase.get(test.loincCode.code);
       if (exactMatch) {
         mappings.push({
-          loincCode: test.loincCode,
+          loincCode: test.loincCode.code,
           testCode: test.code || '',
           testName: test.name || '',
           confidence: 100,
@@ -191,14 +191,17 @@ export class LOINCMapper {
     
     return {
       ...test,
-      loincCode,
+      loincCode: {
+        code: loincCode,
+        displayName: loincData.longCommonName,
+      },
       loincLongName: loincData.longCommonName,
       loincComponent: loincData.component,
       loincProperty: loincData.property,
       loincSystem: loincData.system,
       loincScale: loincData.scaleType,
       loincStatus: loincData.status,
-      units: test.units || loincData.exampleUnits,
+      unit: test.unit || loincData.exampleUnits,
     };
   }
   

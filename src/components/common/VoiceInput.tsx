@@ -123,7 +123,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
           {isSupported && (
             <Button
               type="button"
-              variant={isListening ? 'destructive' : 'outline'}
+              variant={isListening ? 'danger' : 'outline'}
               size="icon"
               onClick={handleToggleListening}
               disabled={disabled}
@@ -160,7 +160,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
               <span className="text-sm text-gray-600">Listening...</span>
             </div>
             {continuous && (
-              <Badge variant="secondary" size="sm">
+              <Badge variant="info" size="sm">
                 Continuous mode
               </Badge>
             )}
@@ -177,12 +177,12 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       {isSupported && !isListening && (
         <div className="flex gap-2 text-xs text-gray-500">
           {autoCorrectMedicalTerms && (
-            <Badge variant="secondary" size="sm">
+            <Badge variant="info" size="sm">
               Medical terms
             </Badge>
           )}
           {parseNumbers && (
-            <Badge variant="secondary" size="sm">
+            <Badge variant="info" size="sm">
               Number parsing
             </Badge>
           )}

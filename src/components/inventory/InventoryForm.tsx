@@ -9,21 +9,23 @@ import type { InventoryItem } from '@/types';
 import { Timestamp } from 'firebase/firestore';
 
 const schema = yup.object({
-  itemCode: yup.string().required('Item code is required'),
   name: yup.string().required('Item name is required'),
+  description: yup.string().optional(),
   category: yup.string().required('Category is required'),
+  manufacturer: yup.string().optional(),
+  catalogNumber: yup.string().optional(),
   unit: yup.string().required('Unit is required'),
-  quantity: yup.number().min(0, 'Quantity must be positive').required('Quantity is required'),
-  reorderLevel: yup.number().min(0, 'Reorder level must be positive').required('Reorder level is required'),
+  currentStock: yup.number().min(0, 'Current stock must be positive').required('Current stock is required'),
+  minimumStock: yup.number().min(0, 'Minimum stock must be positive').required('Minimum stock is required'),
+  reorderPoint: yup.number().min(0, 'Reorder point must be positive').required('Reorder point is required'),
   reorderQuantity: yup.number().min(0, 'Reorder quantity must be positive').required('Reorder quantity is required'),
-  unitCost: yup.number().min(0, 'Unit cost must be positive').required('Unit cost is required'),
-  location: yup.string(),
-  vendorName: yup.string(),
-  vendorItemCode: yup.string(),
-  lotNumber: yup.string(),
-  expiryDate: yup.date().nullable(),
-  storageConditions: yup.string(),
-  notes: yup.string(),
+  unitCost: yup.number().min(0, 'Unit cost must be positive').optional(),
+  vendorName: yup.string().optional(),
+  vendorCatalogNumber: yup.string().optional(),
+  requiresLotTracking: yup.boolean().optional(),
+  requiresExpirationTracking: yup.boolean().optional(),
+  hazardous: yup.boolean().optional(),
+  msdsUrl: yup.string().url('Must be a valid URL').optional(),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -48,38 +50,51 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      itemCode: initialData?.itemCode || '',
       name: initialData?.name || '',
-      category: initialData?.category || 'reagents',
-      unit: initialData?.unit || '',
-      quantity: initialData?.quantity || 0,
-      reorderLevel: initialData?.reorderLevel || 0,
+      description: initialData?.description || '',
+      category: initialData?.category || 'reagent',
+      manufacturer: initialData?.manufacturer || '',
+      catalogNumber: initialData?.catalogNumber || '',
+      unit: initialData?.unit || 'piece',
+      currentStock: initialData?.currentStock || 0,
+      minimumStock: initialData?.minimumStock || 0,
+      reorderPoint: initialData?.reorderPoint || 0,
       reorderQuantity: initialData?.reorderQuantity || 0,
       unitCost: initialData?.unitCost || 0,
-      location: initialData?.location || '',
-      vendorName: initialData?.vendorName || '',
-      vendorItemCode: initialData?.vendorItemCode || '',
-      lotNumber: initialData?.lotNumber || '',
-      expiryDate: initialData?.expiryDate ? initialData.expiryDate.toDate() : null,
-      storageConditions: initialData?.storageConditions || '',
-      notes: initialData?.notes || '',
+      vendorName: initialData?.preferredVendor?.name || '',
+      vendorCatalogNumber: initialData?.preferredVendor?.catalogNumber || '',
+      requiresLotTracking: initialData?.requiresLotTracking || false,
+      requiresExpirationTracking: initialData?.requiresExpirationTracking || false,
+      hazardous: initialData?.hazardous || false,
+      msdsUrl: initialData?.msdsUrl || '',
     },
   });
 
-  const quantity = watch('quantity');
-  const reorderLevel = watch('reorderLevel');
+  const currentStock = watch('currentStock');
+  const minimumStock = watch('minimumStock');
 
   const handleFormSubmit = (data: FormData) => {
-    const status = data.quantity === 0 
-      ? 'out-of-stock' 
-      : data.quantity <= data.reorderLevel 
-        ? 'low-stock' 
-        : 'in-stock';
-
     const itemData: Partial<InventoryItem> = {
-      ...data,
-      status,
-      expiryDate: data.expiryDate ? Timestamp.fromDate(data.expiryDate) : undefined,
+      name: data.name,
+      description: data.description,
+      category: data.category as any,
+      manufacturer: data.manufacturer,
+      catalogNumber: data.catalogNumber,
+      unit: data.unit as any,
+      currentStock: data.currentStock,
+      minimumStock: data.minimumStock,
+      reorderPoint: data.reorderPoint,
+      reorderQuantity: data.reorderQuantity,
+      unitCost: data.unitCost,
+      preferredVendor: data.vendorName ? {
+        id: '',
+        name: data.vendorName,
+        catalogNumber: data.vendorCatalogNumber,
+      } : undefined,
+      requiresLotTracking: data.requiresLotTracking,
+      requiresExpirationTracking: data.requiresExpirationTracking,
+      hazardous: data.hazardous,
+      msdsUrl: data.msdsUrl,
     };
 
     onSubmit(itemData);
@@ -95,7 +110,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Item Code *
+                Item Name *
               </label>
               <input
                 {...register('itemCode')}

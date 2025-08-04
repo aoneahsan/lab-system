@@ -9,7 +9,7 @@ import type { BiometricAuthPlugin } from 'capacitor-biometric-authentication';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { App } from '@capacitor/app';
-import { toast } from '@/hooks/useToast';
+import { toast } from 'sonner';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),

@@ -15,19 +15,20 @@ import { Select } from '@/components/ui/Select';
 const schema = yup.object({
   patientId: yup.string().required('Patient is required'),
   locationId: yup.string().required('Location is required'),
-  appointmentType: yup.string().oneOf(['scheduled', 'home-collection']).required(),
+  appointmentType: yup.string().oneOf(['scheduled', 'home-collection'] as const).required(),
   scheduledDate: yup.string().required('Date is required'),
   scheduledTime: yup.string().required('Time is required'),
-  testIds: yup.array().of(yup.string()).min(1, 'At least one test is required'),
-  specialInstructions: yup.string(),
-  fastingRequired: yup.boolean(),
+  testIds: yup.array().of(yup.string().required()).required().min(1, 'At least one test is required'),
+  specialInstructions: yup.string().optional(),
+  fastingRequired: yup.boolean().required(),
   homeAddress: yup.string().when('appointmentType', {
     is: 'home-collection',
     then: (schema) => schema.required('Address is required for home collection'),
+    otherwise: (schema) => schema.optional(),
   }),
-  homeLandmark: yup.string(),
-  preferredTimeSlot: yup.string(),
-});
+  homeLandmark: yup.string().optional(),
+  preferredTimeSlot: yup.string().optional(),
+}).required();
 
 interface AppointmentBookingFormProps {
   onSuccess?: () => void;
@@ -52,7 +53,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
     setValue,
     formState: { errors },
   } = useForm<AppointmentFormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       patientId: initialPatientId || '',
       appointmentType: 'scheduled',
@@ -69,17 +70,17 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
   const { data: availableSlots } = useAvailableSlots(
     locationId,
     watchedDate ? new Date(watchedDate) : selectedDate,
-    appointmentType as 'scheduled' | 'home-collection'
+    appointmentType === 'scheduled' ? 'regular' : 'home-collection'
   );
 
   const onSubmit = async (data: AppointmentFormData) => {
     try {
-      const patient = patients?.find(p => p.id === data.patientId);
+      const patient = patients?.patients?.find(p => p.id === data.patientId);
       const selectedTests = tests?.filter(t => data.testIds.includes(t.id)) || [];
       
       await createAppointment.mutateAsync({
         patientId: data.patientId,
-        patientName: patient ? `${patient.firstName} ${patient.lastName}` : '',
+        patientName: patient ? patient.fullName : '',
         patientPhone: patient?.phoneNumber || '',
         patientEmail: patient?.email,
         locationId: data.locationId,
@@ -89,7 +90,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
         scheduledTime: data.scheduledTime,
         duration: 30, // Default duration
         testIds: data.testIds,
-        testNames: selectedTests.map(t => t.testName),
+        testNames: selectedTests.map(t => t.name),
         specialInstructions: data.specialInstructions,
         fastingRequired: data.fastingRequired,
         homeCollection: data.appointmentType === 'home-collection' ? {
@@ -120,9 +121,9 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
           disabled={!!initialPatientId}
         >
           <option value="">Select Patient</option>
-          {patients?.map(patient => (
+          {patients?.patients?.map(patient => (
             <option key={patient.id} value={patient.id}>
-              {patient.firstName} {patient.lastName} - {patient.phoneNumber}
+              {patient.fullName} - {patient.phoneNumber}
             </option>
           ))}
         </Select>
@@ -225,7 +226,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
                 {...register('testIds')}
                 className="mr-2"
               />
-              <span className="text-sm">{test.testName} ({test.testCode})</span>
+              <span className="text-sm">{test.name} ({test.code})</span>
             </label>
           ))}
         </div>

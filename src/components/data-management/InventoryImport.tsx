@@ -7,6 +7,7 @@ import { CSVParser } from '@/utils/import-export/csv-parser';
 import { DataValidator } from '@/utils/import-export/data-validator';
 import { useInventoryStore } from '@/stores/inventory.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { InventoryItem } from '@/types';
 import { toast } from 'sonner';
 import { Timestamp } from 'firebase/firestore';
@@ -31,8 +32,9 @@ export const InventoryImport: React.FC = () => {
     status: 'idle',
   });
   
-  const { currentTenant } = useAuthStore();
-  const { createItem } = useInventoryStore();
+  const { currentUser } = useAuthStore();
+  const { currentTenant } = useTenantStore();
+  const inventoryStore = useInventoryStore();
   
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -107,25 +109,30 @@ export const InventoryImport: React.FC = () => {
         }
         
         const inventoryData: Partial<InventoryItem> = {
-          itemCode: item.itemCode,
           name: item.name,
+          description: item.description,
           category: item.category,
+          manufacturer: item.manufacturer,
+          catalogNumber: item.catalogNumber,
           unit: item.unit,
-          quantity: Number(item.quantity) || 0,
-          reorderLevel: Number(item.reorderLevel) || 0,
+          currentStock: Number(item.quantity) || 0,
+          minimumStock: Number(item.reorderLevel) || 0,
+          reorderPoint: Number(item.reorderPoint) || Number(item.reorderLevel) || 0,
           reorderQuantity: Number(item.reorderQuantity) || 0,
           unitCost: Number(item.unitCost) || 0,
-          location: item.location || '',
-          vendorName: item.vendorName || '',
-          vendorItemCode: item.vendorItemCode || '',
-          lotNumber: item.lotNumber || '',
-          expiryDate,
-          storageConditions: item.storageConditions || '',
-          notes: item.notes || '',
-          status: item.quantity > item.reorderLevel ? 'in-stock' : 'low-stock',
+          preferredVendor: item.vendorName ? {
+            id: '',
+            name: item.vendorName,
+            catalogNumber: item.vendorItemCode
+          } : undefined,
+          requiresLotTracking: !!item.lotNumber,
+          requiresExpirationTracking: !!item.expiryDate,
+          isActive: true
         };
         
-        await createItem(currentTenant.id, inventoryData as InventoryItem);
+        if (inventoryStore.createInventoryItem) {
+          await inventoryStore.createInventoryItem(inventoryData as any);
+        }
         
         setProgress(prev => ({
           ...prev,

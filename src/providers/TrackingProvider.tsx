@@ -8,6 +8,9 @@ import { firebaseKit } from '@/services/firebase-kit.service';
 // Initialize unified tracking on app start
 let initialized = false;
 
+// Export tracking instance for direct usage
+export const trackingInstance = UnifiedTracking;
+
 const initializeTracking = async () => {
   if (initialized) return;
   

@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHomeCollections } from '@/hooks/useHomeCollection';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/Select';
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { 
   Calendar,
   Clock,
@@ -112,7 +112,7 @@ export function HomeCollectionList() {
               </div>
             </div>
             
-            <Select onValueChange={handleStatusFilter}>
+            <Select onChange={(e) => handleStatusFilter(e.target.value)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -129,7 +129,7 @@ export function HomeCollectionList() {
               </SelectContent>
             </Select>
 
-            <Select onValueChange={(value) => handleDateFilter(parseInt(value))}>
+            <Select onChange={(e) => handleDateFilter(parseInt(e.target.value))}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Date range" />
               </SelectTrigger>

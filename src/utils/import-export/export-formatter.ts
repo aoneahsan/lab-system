@@ -20,30 +20,28 @@ export class ExportFormatter {
         code: test.code,
         name: test.name,
         category: test.category,
-        price: test.price,
-        turnaroundTime: test.turnaroundTime,
-        turnaroundUnit: test.turnaroundUnit,
-        isActive: test.isActive,
+        price: test.price || 0,
+        turnaroundTime: test.turnaroundTime?.routine || 0,
+        isActive: test.isActive !== false,
       };
       
       if (includeMetadata) {
         Object.assign(baseData, {
           loincCode: test.loincCode || '',
           cptCode: test.cptCode || '',
-          description: test.description || '',
-          specimenType: test.specimenType || '',
-          containerType: test.containerType || '',
-          minimumVolume: test.minimumVolume || '',
-          volumeUnit: test.volumeUnit || '',
-          storageTemperature: test.storageTemperature || '',
+          department: test.department || '',
+          specimenType: test.specimen?.type || '',
+          containerType: test.specimen?.container || '',
+          minimumVolume: test.specimen?.volume || '',
+          volumeUnit: test.specimen?.volumeUnit || '',
           methodology: test.methodology || '',
-          units: test.units || '',
-          referenceRange: test.referenceRange || '',
-          criticalLow: test.criticalLow || '',
-          criticalHigh: test.criticalHigh || '',
+          unit: test.unit || '',
+          referenceRanges: JSON.stringify(test.referenceRanges || []),
+          criticalLow: test.criticalValues?.low || '',
+          criticalHigh: test.criticalValues?.high || '',
           notes: test.notes || '',
-          createdAt: test.createdAt ? format(test.createdAt.toDate(), dateFormat) : '',
-          updatedAt: test.updatedAt ? format(test.updatedAt.toDate(), dateFormat) : '',
+          createdAt: test.createdAt ? format(typeof test.createdAt === 'object' && 'toDate' in test.createdAt ? test.createdAt.toDate() : test.createdAt, dateFormat) : '',
+          updatedAt: test.updatedAt ? format(typeof test.updatedAt === 'object' && 'toDate' in test.updatedAt ? test.updatedAt.toDate() : test.updatedAt, dateFormat) : '',
         });
       }
       
@@ -70,30 +68,26 @@ export class ExportFormatter {
     
     return items.map(item => {
       const baseData: Record<string, any> = {
-        itemCode: item.itemCode,
+        id: item.id,
         name: item.name,
         category: item.category,
         unit: item.unit,
-        quantity: item.quantity,
-        reorderLevel: item.reorderLevel,
+        currentStock: item.currentStock,
+        reorderPoint: item.reorderPoint,
         reorderQuantity: item.reorderQuantity,
-        unitCost: item.unitCost,
-        location: item.location || '',
-        status: item.status,
+        unitCost: item.unitCost || 0,
+        minimumStock: item.minimumStock,
+        maximumStock: item.maximumStock || 0,
       };
       
       if (includeMetadata) {
         Object.assign(baseData, {
           description: item.description || '',
-          vendorId: item.vendorId || '',
-          vendorName: item.vendorName || '',
-          vendorItemCode: item.vendorItemCode || '',
-          lotNumber: item.lotNumber || '',
-          expiryDate: item.expiryDate ? format(item.expiryDate.toDate(), dateFormat) : '',
-          storageConditions: item.storageConditions || '',
-          lastOrderDate: item.lastOrderDate ? format(item.lastOrderDate.toDate(), dateFormat) : '',
-          lastReceivedDate: item.lastReceivedDate ? format(item.lastReceivedDate.toDate(), dateFormat) : '',
-          notes: item.notes || '',
+          manufacturer: item.manufacturer || '',
+          catalogNumber: item.catalogNumber || '',
+          storageCondition: item.storageCondition || '',
+          lastPurchasePrice: item.lastPurchasePrice || 0,
+          isActive: item.isActive !== false,
           createdAt: item.createdAt ? format(item.createdAt.toDate(), dateFormat) : '',
           updatedAt: item.updatedAt ? format(item.updatedAt.toDate(), dateFormat) : '',
         });
@@ -210,10 +204,10 @@ export class ExportFormatter {
   
   static generateFilename(
     prefix: string,
-    format: 'excel' | 'csv' | 'json'
+    fileFormat: 'excel' | 'csv' | 'json'
   ): string {
     const timestamp = format(new Date(), 'yyyyMMdd_HHmmss');
-    const extension = format === 'excel' ? 'xlsx' : format;
+    const extension = fileFormat === 'excel' ? 'xlsx' : fileFormat;
     return `${prefix}_export_${timestamp}.${extension}`;
   }
 }

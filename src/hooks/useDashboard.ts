@@ -35,13 +35,13 @@ export interface DashboardCriticalResult {
 }
 
 export const useDashboardStats = () => {
-  const { tenant } = useTenant();
+  const { currentTenant } = useTenantStore();
   const { data: patientStats } = usePatientStats();
 
   return useQuery({
-    queryKey: ['dashboardStats', tenant?.id],
+    queryKey: ['dashboardStats', currentTenant?.id],
     queryFn: async () => {
-      if (!tenant?.id) throw new Error('No tenant selected');
+      if (!currentTenant?.id) throw new Error('No tenant selected');
 
       const today = new Date();
       const startOfToday = startOfDay(today);
@@ -49,23 +49,23 @@ export const useDashboardStats = () => {
 
       // Get today's tests count
       const testsToday = await testService.getTestOrderCountByDateRange(
-        tenant.id,
+        currentTenant.id,
         startOfToday,
         endOfToday
       );
 
       // Get pending results count
-      const pendingResults = await resultService.getPendingResultsCount(tenant.id);
+      const pendingResults = await resultService.getPendingResultsCount(currentTenant.id);
 
       // Get today's revenue
       const revenueToday = await billingService.getRevenueByDateRange(
-        tenant.id,
+        currentTenant.id,
         startOfToday,
         endOfToday
       );
 
       // Get critical results count
-      const criticalResults = await resultService.getCriticalResultsCount(tenant.id);
+      const criticalResults = await resultService.getCriticalResultsCount(currentTenant.id);
 
       // Get new patients today
       const newPatientsToday = patientStats?.newPatientsThisMonth || 0; // This would need to be refined to get today's count
@@ -81,21 +81,21 @@ export const useDashboardStats = () => {
 
       return stats;
     },
-    enabled: !!tenant?.id,
+    enabled: !!currentTenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   });
 };
 
 export const useDashboardRecentTests = (limit: number = 5) => {
-  const { tenant } = useTenant();
+  const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: ['dashboardRecentTests', tenant?.id, limit],
+    queryKey: ['dashboardRecentTests', currentTenant?.id, limit],
     queryFn: async () => {
-      if (!tenant?.id) throw new Error('No tenant selected');
+      if (!currentTenant?.id) throw new Error('No tenant selected');
 
-      const recentOrders = await testService.getRecentTestOrders(tenant.id, limit);
+      const recentOrders = await testService.getRecentTestOrders(currentTenant.id, limit);
 
       const recentTests: DashboardRecentTest[] = recentOrders.map(order => ({
         id: order.id,
@@ -107,20 +107,20 @@ export const useDashboardRecentTests = (limit: number = 5) => {
 
       return recentTests;
     },
-    enabled: !!tenant?.id,
+    enabled: !!currentTenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
 export const useDashboardCriticalResults = (limit: number = 5) => {
-  const { tenant } = useTenant();
+  const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: ['dashboardCriticalResults', tenant?.id, limit],
+    queryKey: ['dashboardCriticalResults', currentTenant?.id, limit],
     queryFn: async () => {
-      if (!tenant?.id) throw new Error('No tenant selected');
+      if (!currentTenant?.id) throw new Error('No tenant selected');
 
-      const criticalResults = await resultService.getRecentCriticalResults(tenant.id, limit);
+      const criticalResults = await resultService.getRecentCriticalResults(currentTenant.id, limit);
 
       const results: DashboardCriticalResult[] = criticalResults.map(result => ({
         id: result.id,
@@ -134,23 +134,23 @@ export const useDashboardCriticalResults = (limit: number = 5) => {
 
       return results;
     },
-    enabled: !!tenant?.id,
+    enabled: !!currentTenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
 export const useDashboardQuickActions = () => {
-  const { tenant } = useTenant();
+  const { currentTenant } = useTenantStore();
 
   return useQuery({
-    queryKey: ['dashboardQuickActions', tenant?.id],
+    queryKey: ['dashboardQuickActions', currentTenant?.id],
     queryFn: async () => {
-      if (!tenant?.id) throw new Error('No tenant selected');
+      if (!currentTenant?.id) throw new Error('No tenant selected');
 
       // Get counts for quick actions
-      const pendingOrders = await testService.getPendingOrdersCount(tenant.id);
-      const pendingPayments = await billingService.getPendingPaymentsCount(tenant.id);
-      const lowInventory = await inventoryService.getLowStockItemsCount(tenant.id);
+      const pendingOrders = await testService.getPendingOrdersCount(currentTenant.id);
+      const pendingPayments = await billingService.getPendingPaymentsCount(currentTenant.id);
+      const lowInventory = await inventoryService.getLowStockItemsCount(currentTenant.id);
 
       return {
         pendingOrders,
@@ -158,7 +158,7 @@ export const useDashboardQuickActions = () => {
         lowInventory,
       };
     },
-    enabled: !!tenant?.id,
+    enabled: !!currentTenant?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

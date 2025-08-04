@@ -36,7 +36,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
   patient,
   onFollowUpTest,
 }) => {
-  const { user } = useAuth();
+  const { currentUser } = useAuthStore();
   const [showFullInterpretation, setShowFullInterpretation] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'interpretation' | 'trends' | 'recommendations'>('interpretation');
 
@@ -62,10 +62,10 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
       }
       
       const historicalData = patientHistory
-        .filter(r => r.testCode === testDefinition.code)
+        .filter(r => r.testId === testResult.testId)
         .map(r => ({
-          date: r.resultDate.toISOString(),
-          value: r.value,
+          date: (r.enteredAt as any).toDate().toISOString(),
+          value: typeof r.value === 'string' ? parseFloat(r.value) || 0 : r.value,
         }));
 
       return aimlService.analyzeTestTrends(
@@ -81,11 +81,11 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
   const getConfidenceBadgeColor = (confidence: number) => {
     if (confidence >= 0.9) return 'success';
     if (confidence >= 0.7) return 'warning';
-    return 'error';
+    return 'danger';
   };
 
   const getAnomalyBadgeColor = (score: number) => {
-    if (score >= 0.8) return 'error';
+    if (score >= 0.8) return 'danger';
     if (score >= 0.5) return 'warning';
     return 'success';
   };
@@ -106,7 +106,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
 
   if (interpretationError) {
     return (
-      <Alert variant="error" className="mt-4">
+      <Alert variant="danger" className="mt-4">
         <ExclamationTriangleIcon className="h-5 w-5" />
         <p>Failed to generate AI interpretation. Please try again later.</p>
       </Alert>
@@ -193,7 +193,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
 
             {/* Critical Findings */}
             {interpretation.criticalFindings.length > 0 && (
-              <Alert variant="error">
+              <Alert variant="danger">
                 <ExclamationTriangleIcon className="h-5 w-5" />
                 <div>
                   <p className="font-medium mb-1">Critical Findings:</p>
@@ -315,7 +315,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
                         </div>
                         <Badge 
                           variant={
-                            test.priority === 'urgent' ? 'error' : 
+                            test.priority === 'urgent' ? 'danger' : 
                             test.priority === 'routine' ? 'warning' : 
                             'default'
                           }
@@ -344,7 +344,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
         {/* Footer */}
         <div className="pt-4 border-t">
           <p className="text-xs text-gray-500">
-            AI interpretation generated on {interpretation.generatedAt.toLocaleString()} 
+            AI interpretation generated on {new Date().toLocaleString()} 
             {' '}• For clinical decision support only
           </p>
         </div>

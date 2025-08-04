@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Printer, Download } from 'lucide-react';
-import { QRCodeStudio } from 'code-craft-studio';
+import { QRCodeStudio } from 'qrcode-studio';
 
 interface BarcodeGeneratorProps {
   value: string;

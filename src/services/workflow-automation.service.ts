@@ -136,7 +136,13 @@ export const workflowRuleService = {
     execution.completedAt = new Date();
     execution.duration = execution.completedAt.getTime() - execution.startedAt.getTime();
 
-    await updateDoc(executionDoc, execution);
+    await updateDoc(executionDoc, {
+      status: execution.status,
+      completedAt: execution.completedAt,
+      duration: execution.duration,
+      output: execution.output,
+      error: execution.error
+    });
     
     // Update rule execution count
     await updateDoc(doc(db, getCollectionName(FIREBASE_COLLECTIONS.WORKFLOW_RULES), ruleId), {

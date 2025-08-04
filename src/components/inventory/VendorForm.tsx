@@ -7,14 +7,14 @@ import type { Vendor } from '@/types/inventory.types';
 
 const schema = yup.object({
   name: yup.string().required('Vendor name is required'),
-  contactPerson: yup.string(),
-  phone: yup.string(),
-  email: yup.string().email('Invalid email address'),
-  website: yup.string().url('Invalid URL'),
-  address: yup.string(),
-  catalogNumber: yup.string(),
-  leadTimeDays: yup.number().min(0, 'Lead time must be positive'),
-  notes: yup.string(),
+  contactPerson: yup.string().optional(),
+  phone: yup.string().optional(),
+  email: yup.string().email('Invalid email address').optional(),
+  website: yup.string().url('Invalid URL').optional(),
+  address: yup.string().optional(),
+  catalogNumber: yup.string().optional(),
+  leadTimeDays: yup.number().min(0, 'Lead time must be positive').optional(),
+  notes: yup.string().optional(),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -54,7 +54,7 @@ export const VendorForm: React.FC<VendorFormProps> = ({
     const cleanedData: Partial<Vendor> = {};
     Object.entries(data).forEach(([key, value]) => {
       if (value !== '' && value !== undefined && value !== null) {
-        cleanedData[key as keyof Vendor] = value;
+        (cleanedData as any)[key] = value;
       }
     });
     

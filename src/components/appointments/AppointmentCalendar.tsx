@@ -143,7 +143,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                     {format(day, 'd')}
                   </span>
                   {isCurrentMonth && dayAppointments.length > 0 && (
-                    <Badge variant="secondary" size="sm">
+                    <Badge variant="info" size="sm">
                       {dayAppointments.length}
                     </Badge>
                   )}

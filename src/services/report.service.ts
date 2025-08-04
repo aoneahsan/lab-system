@@ -610,8 +610,8 @@ export const reportService = {
       }
 
       case 'inventory_status': {
-        const items = await inventoryService.getItems(tenantId);
-        const lowStock = items.filter(item => 
+        const itemsResponse = await inventoryService.getItems(tenantId);
+        const lowStock = itemsResponse.items.filter(item => 
           item.quantityInStock <= item.reorderLevel
         );
         
@@ -655,7 +655,11 @@ export const reportService = {
         ]);
         
         return {
-          data: { orders, patients, samples },
+          data: {
+            orders: orders,
+            patients: patients,
+            samples: samples
+          },
           recordCount: orders.length + patients.length + samples.length,
         };
       }

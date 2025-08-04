@@ -5,9 +5,9 @@ import {
   useRecordSampleCollection,
   useRecordPayment 
 } from '@/hooks/useHomeCollection';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { 
   MapPin, 
   Phone, 
@@ -224,7 +224,7 @@ export function HomeCollectionDetails() {
                 </Button>
               )}
               <Button 
-                variant="destructive"
+                variant="danger"
                 onClick={() => handleStatusUpdate('cancelled')}
                 disabled={updateStatus.isPending}
               >
