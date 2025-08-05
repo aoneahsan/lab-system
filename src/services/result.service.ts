@@ -210,6 +210,7 @@ export const resultService = {
       enteredBy: userId,
       enteredAt: Timestamp.now(),
       status: 'entered' as ResultStatus,
+      customFields: data.customFields || {},
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };

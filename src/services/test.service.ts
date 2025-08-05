@@ -109,6 +109,7 @@ export const testService = {
     const testData = {
       ...data,
       tenantId,
+      customFields: data.customFields || {},
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       createdBy: userId,
@@ -131,11 +132,18 @@ export const testService = {
     data: Partial<TestDefinitionFormData>
   ): Promise<void> {
     const docRef = doc(db, TESTS_COLLECTION, testId);
-    await updateDoc(docRef, {
+    const updateData: any = {
       ...data,
       updatedAt: serverTimestamp(),
       updatedBy: userId,
-    });
+    };
+    
+    // Preserve customFields if provided
+    if (data.customFields !== undefined) {
+      updateData.customFields = data.customFields;
+    }
+    
+    await updateDoc(docRef, updateData);
   },
 
   async deleteTest(testId: string): Promise<void> {
@@ -402,6 +410,7 @@ export const testService = {
       batch.set(docRef, {
         ...test,
         tenantId,
+        customFields: test.customFields || {},
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         createdBy: userId,

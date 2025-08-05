@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Clock } from 'lucide-react';
 import { useTest, useDeleteTest } from '@/hooks/useTests';
+import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 
 const TestDetailPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -209,6 +210,19 @@ const TestDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">Notes</h2>
               <p className="text-sm text-gray-700 whitespace-pre-wrap">{test.notes}</p>
+            </div>
+          )}
+
+          {/* Custom Fields */}
+          {test.customFields && Object.keys(test.customFields).length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Custom Fields</h2>
+              <CustomFieldsManager
+                module="test"
+                values={test.customFields}
+                readOnly={true}
+                showSections={true}
+              />
             </div>
           )}
         </div>

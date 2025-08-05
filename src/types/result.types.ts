@@ -28,6 +28,7 @@ export interface TestResult {
   rejectedBy?: string;
   rejectedAt?: Timestamp;
   rejectionReason?: string;
+  customFields?: Record<string, any>;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Search } from 'lucide-react';
 import LOINCBrowser from './LOINCBrowser';
+import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { TestDefinitionFormData, LOINCCode } from '@/types/test.types';
 
 interface TestFormProps {
@@ -208,6 +209,15 @@ const TestForm: React.FC<TestFormProps> = ({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Custom Fields */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">Custom Fields</h3>
+          <CustomFieldsManager
+            module="test"
+            errors={errors.customFields as Record<string, string> || {}}
+          />
         </div>
 
         {/* Actions */}

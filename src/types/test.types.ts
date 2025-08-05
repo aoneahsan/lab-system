@@ -60,6 +60,7 @@ export interface TestDefinition {
   price?: number; // Patient price (may differ from cost)
   cptCode?: string;
   notes?: string;
+  customFields?: Record<string, any>;
   createdAt: Date | Timestamp;
   updatedAt: Date | Timestamp;
   createdBy: string;
@@ -236,6 +237,7 @@ export interface TestDefinitionFormData {
   price?: number; // Patient price (may differ from cost)
   cptCode?: string;
   notes?: string;
+  customFields?: Record<string, any>;
 }
 
 export interface TestOrderFormData {
