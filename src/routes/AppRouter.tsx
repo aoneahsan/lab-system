@@ -66,6 +66,10 @@ const HomeCollectionFormPage = lazy(() => import('@/pages/home-collection/HomeCo
 const HomeCollectionDetailPage = lazy(() => import('@/pages/home-collection/HomeCollectionDetailPage'));
 const RouteManagementPage = lazy(() => import('@/pages/home-collection/RouteManagementPage'));
 
+// User Management Pages
+const UsersPage = lazy(() => import('@/pages/users/UsersPage'));
+const UserDetailPage = lazy(() => import('@/pages/users/UserDetailPage'));
+
 // Customer Portal
 const CustomerPortalPage = lazy(() => import('@/pages/customer-portal/CustomerPortalPage'));
 
@@ -144,6 +148,8 @@ export const AppRouter = () => {
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/equipment" element={<EquipmentPage />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/:userId" element={<UserDetailPage />} />
             <Route path="/emr/connections" element={<EMRConnectionsPage />} />
             <Route path="/emr/connections/:connectionId" element={<EMRConnectionDetailPage />} />
             <Route path="/settings" element={<SettingsPage />} />

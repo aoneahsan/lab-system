@@ -11,21 +11,21 @@ interface AnalyticsEvent {
 }
 
 export const useAnalytics = () => {
-  const { trackEvent } = useTracking();
+  const { trackEvent, trackMetric } = useTracking();
   const { currentUser } = useAuth();
 
   // Track user actions
   const trackUserAction = useCallback(
     (action: string, properties?: Record<string, any>) => {
       trackEvent(`user_${action}`, {
-        userId: user?.uid,
-        tenantId: user?.tenantId,
-        role: user?.role,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
+        role: currentUser?.role,
         timestamp: new Date().toISOString(),
         ...properties,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track feature usage
@@ -34,12 +34,12 @@ export const useAnalytics = () => {
       trackEvent('feature_usage', {
         feature,
         action,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
         ...details,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track search queries
@@ -50,11 +50,11 @@ export const useAnalytics = () => {
         query: query.substring(0, 50), // Limit query length for privacy
         resultsCount,
         hasResults: resultsCount > 0,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track form submissions
@@ -64,36 +64,36 @@ export const useAnalytics = () => {
         formName,
         success,
         errorMessage,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track API performance
   const trackApiCall = useCallback(
     (endpoint: string, method: string, duration: number, status: number) => {
-      trackTiming('api', endpoint, duration, method);
+      trackEvent('api', endpoint, duration, method);
       trackMetric('api_response_time', duration, 'ms', {
         endpoint,
         method,
         status: status.toString(),
-        tenantId: user?.tenantId || 'unknown',
+        tenantId: currentUser?.tenantId || 'unknown',
       });
     },
-    [trackTiming, trackMetric, user]
+    [trackEvent, trackMetric, currentUser]
   );
 
   // Track lab-specific metrics
   const trackLabMetrics = useCallback(
     (metricType: string, value: number, details?: Record<string, any>) => {
       trackMetric(`lab_${metricType}`, value, undefined, {
-        tenantId: user?.tenantId || 'unknown',
+        tenantId: currentUser?.tenantId || 'unknown',
         ...details,
       });
     },
-    [trackMetric, user]
+    [trackMetric, currentUser]
   );
 
   // Track test processing
@@ -103,11 +103,11 @@ export const useAnalytics = () => {
         testId,
         action,
         duration,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track report generation
@@ -118,12 +118,12 @@ export const useAnalytics = () => {
         format,
         duration,
         success,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
       });
-      trackTiming('report_generation', reportType, duration, format);
+      trackEvent('report_generation', reportType, duration, format);
     },
-    [trackEvent, trackTiming, user]
+    [trackEvent, currentUser]
   );
 
   // Track QC events
@@ -133,12 +133,12 @@ export const useAnalytics = () => {
         eventType,
         testId,
         passed,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
         ...details,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   // Track inventory events
@@ -148,12 +148,12 @@ export const useAnalytics = () => {
         eventType,
         itemId,
         quantity,
-        userId: user?.uid,
-        tenantId: user?.tenantId,
+        userId: currentUser?.uid,
+        tenantId: currentUser?.tenantId,
         ...details,
       });
     },
-    [trackEvent, user]
+    [trackEvent, currentUser]
   );
 
   return {

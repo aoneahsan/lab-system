@@ -163,7 +163,7 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
         {activeTab === 'custom' && customFields.length > 0 && (
           <CustomFieldsManager
             module="patient"
-            errors={errors.customFields as Record<string, string> || {}}
+            errors={(errors.customFields as any) || {}}
             showSections={false}
           />
         )}

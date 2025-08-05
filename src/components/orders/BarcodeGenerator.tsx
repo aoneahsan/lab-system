@@ -46,8 +46,7 @@ export default function BarcodeGenerator({
           height,
           displayText: displayValue,
           text: text || value,
-          fontSize,
-          margin: 10,
+          margins: 10,
           backgroundColor: '#ffffff',
           foregroundColor: '#000000',
         });

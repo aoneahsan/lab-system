@@ -95,6 +95,12 @@ const regularNavigation = [
     roles: ['lab_admin', 'lab_manager'],
   },
   {
+    name: 'Users',
+    href: '/users',
+    icon: '👥',
+    roles: ['admin', 'lab_admin', 'lab_manager'],
+  },
+  {
     name: 'Settings',
     href: '/settings',
     icon: '⚙️',

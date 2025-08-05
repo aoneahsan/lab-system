@@ -8,30 +8,24 @@ export * from './patient.types';
 // Export everything except ReferenceRange from test.types
 export type {
   TestDefinition,
-  TestCategory,
   TestPanel,
-  TestMethod,
-  TestFrequency,
-  TestDepartment,
-  TestPriority,
-  TestTurnaroundTime,
-  TestPreparation,
-  TestFormData,
-  CustomTestField,
-  QualityControl,
-  QCResult,
-  QCRule
+  TestOrder,
+  OrderedTest,
+  TestResult,
+  ResultAmendment,
+  TestDefinitionFormData,
+  TestOrderFormData,
+  TestFilter,
+  TestOrderFilter,
+  LOINCCode,
+  Test
 } from './test.types';
-export { ReferenceRange as TestReferenceRange } from './test.types';
+export type { ReferenceRange as TestReferenceRange } from './test.types';
 // Export everything from result.types including its ReferenceRange
 export * from './result.types';
 // Specific exports from order to avoid conflicts
 export type { 
-  TestOrder,
-  OrderedTest,
-  TestOrderStatus,
-  TestOrderFormData,
-  TestOrderPriority
+  Specimen
 } from './order';
 
 // Sample types
@@ -46,17 +40,21 @@ export type {
   InvoiceFormData,
   Payment,
   PaymentMethod,
-  InvoiceLineItem,
+  PaymentStatus,
+  InvoiceItem,
   InsuranceClaim,
   ClaimStatus,
-  InsuranceClaimFormData,
+  ClaimFormData,
   PaymentFormData,
-  FinancialReport,
-  FinancialMetrics,
-  RevenueByPeriod,
-  AccountsReceivableAging,
-  PayerAnalysis,
-  CollectionEfficiency
+  InsuranceProvider,
+  InsurancePlan,
+  PatientInsurance,
+  ClaimService,
+  BillingFilter,
+  BillingStatistics,
+  ClaimFilter,
+  ClaimStatistics,
+  InsuranceEligibility
 } from './billing.types';
 export * from './inventory.types';
 export * from './report.types';
@@ -82,5 +80,4 @@ export * from './home-collection.types';
 
 // Re-export commonly used types
 export type { InventoryItem } from './inventory.types';
-export type { Test, TestDefinition } from './test.types';
 export type { User } from './auth.types';

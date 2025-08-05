@@ -407,7 +407,7 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
       {/* Custom Fields */}
       <CustomFieldsManager
         module="patient"
-        errors={errors.customFields as Record<string, string> || {}}
+        errors={(errors.customFields as any) || {}}
       />
 
       <div className="flex justify-end gap-4">

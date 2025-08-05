@@ -216,7 +216,7 @@ const TestForm: React.FC<TestFormProps> = ({
           <h3 className="text-lg font-medium text-gray-900">Custom Fields</h3>
           <CustomFieldsManager
             module="test"
-            errors={errors.customFields as Record<string, string> || {}}
+            errors={(errors.customFields as any) || {}}
           />
         </div>
 

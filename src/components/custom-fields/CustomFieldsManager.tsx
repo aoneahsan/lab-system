@@ -123,8 +123,8 @@ export const CustomFieldsManager = ({
               control={formContext.control}
               render={({ field: formField }) => (
                 <DatePicker
-                  selected={formField.value}
-                  onChange={formField.onChange}
+                  selected={formField.value as Date}
+                  onChange={(date: Date | null) => formField.onChange(date)}
                   dateFormat={field.type === 'datetime' ? 'MM/dd/yyyy h:mm aa' : 'MM/dd/yyyy'}
                   showTimeSelect={field.type === 'datetime'}
                   disabled={readOnly}
@@ -139,7 +139,7 @@ export const CustomFieldsManager = ({
         return (
           <DatePicker
             selected={dateValue}
-            onChange={(date) => handleChange(date)}
+            onChange={(date: Date | null) => handleChange(date)}
             dateFormat={field.type === 'datetime' ? 'MM/dd/yyyy h:mm aa' : 'MM/dd/yyyy'}
             showTimeSelect={field.type === 'datetime'}
             disabled={readOnly}
