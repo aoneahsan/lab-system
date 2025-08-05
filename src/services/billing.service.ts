@@ -495,7 +495,7 @@ export const billingService = {
       overdueAmount,
       todaysCharges,
       todaysPayments,
-      todayRevenue,
+      todaysRevenue: todayRevenue,
       invoicesByStatus,
       paymentsByMethod: await this.calculatePaymentsByMethod(tenantId, today),
       claimsByStatus,
@@ -954,7 +954,7 @@ export const billingService = {
         name: `${patient.firstName} ${patient.lastName}`,
         dateOfBirth: patient.dateOfBirth,
         gender: patient.gender,
-        address: patient.address,
+        address: patient.addresses?.[0] || { line1: '', city: '', state: '', zipCode: '', country: 'US' },
         insuranceId: claim.memberNumber,
         groupNumber: claim.groupNumber,
       } : null,
@@ -987,7 +987,7 @@ export const billingService = {
     message: string;
   }> {
     // Check claim status - in production this would integrate with insurance APIs
-    const claim = await this.getClaim(tenantId, claimId);
+    const claim = await this.getClaim(_tenantId, _claimId);
     if (!claim) {
       throw new Error('Claim not found');
     }
@@ -1008,9 +1008,12 @@ export const billingService = {
       status: claim.status,
       lastChecked: new Date(),
       message: statusMessages[claim.status] || 'Unknown claim status',
-      claimNumber: claim.claimNumber,
-      submittedDate: claim.submittedDate?.toDate(),
-      processedDate: claim.processedDate?.toDate(),
+      // Extended properties for UI display
+      ...{
+        claimNumber: claim.claimNumber,
+        submittedDate: claim.submittedDate?.toDate(),
+        processedDate: claim.processedDate?.toDate(),
+      } as any,
     };
   },
 

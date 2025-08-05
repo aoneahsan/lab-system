@@ -20,7 +20,7 @@ class BiometricService {
   async checkBiometricStatus(): Promise<BiometricEnrollmentStatus> {
     try {
       const result = await BiometricAuth.isAvailable();
-      const isAvailable = result.available || false;
+      const isAvailable = (result as any).available || false;
       const biometryType = (result as any).biometryType || 'unknown';
       const errorMessage = (result as any).error;
 

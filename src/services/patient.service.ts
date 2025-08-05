@@ -103,6 +103,8 @@ class PatientService {
           ...doc,
           uploadedAt: toDate(doc.uploadedAt) || new Date(),
         })) || [],
+      // Preserve custom fields
+      customFields: data.customFields as Record<string, any> || {},
     } as Patient;
   }
 
@@ -171,6 +173,7 @@ class PatientService {
         isVip: false,
         tags: [],
         totalVisits: 0,
+        customFields: data.customFields || {},
         createdAt: serverTimestamp(),
         createdBy,
         updatedAt: serverTimestamp(),

@@ -11,8 +11,8 @@ interface AnalyticsEvent {
 }
 
 export const useAnalytics = () => {
-  const { trackEvent, trackTiming, trackMetric } = useTracking();
-  const { user } = useAuth();
+  const { trackEvent } = useTracking();
+  const { currentUser } = useAuth();
 
   // Track user actions
   const trackUserAction = useCallback(

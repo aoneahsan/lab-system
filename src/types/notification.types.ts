@@ -7,6 +7,7 @@ export type NotificationTemplate =
   | 'test_result_ready'
   | 'appointment_reminder'
   | 'payment_receipt'
+  | 'invoice_sent'
   | 'inventory_alert'
   | 'qc_alert'
   | 'order_status_update'

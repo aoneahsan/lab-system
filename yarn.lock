@@ -10512,10 +10512,10 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-notification-kit@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/notification-kit/-/notification-kit-2.0.1.tgz#90014c6a46dd226beb8a00fc01217414a3675f91"
-  integrity sha512-1ZpBt7Sa0WtUF/do77mrDS+fYUQ/BJsYAT+7F73F8PZ5uPzvs7DFlLjk3dNAmFqjRDtGmHW0x5jDW2kHHLe/Pw==
+notification-kit@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/notification-kit/-/notification-kit-2.0.2.tgz#8fdf0e9d52a7af59278ca30dfd8ef35b25bdd35b"
+  integrity sha512-zI29Txk1cwi1G7zs94p8NX6XY+w9sdEzEjg/c5EozuTG1+L2ZI2UDHuiDP8geX6DN56dR+CEanoiyG0PInDPvg==
 
 npm-run-path@^4.0.0:
   version "4.0.1"

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { X, Printer } from 'lucide-react';
-import { QRCodeStudio } from 'code-craft-studio';
+import { QRCodeStudio, QRType } from 'qrcode-studio';
 import type { Sample } from '@/types/sample.types';
 
 interface BatchBarcodesPrintProps {
@@ -31,14 +31,13 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose
         };
         
         const result = await QRCodeStudio.generate({
-          data: JSON.stringify(qrData),
-          type: 'text',
-          options: {
-            width: 150,
-            height: 150,
-            margin: 1,
-            errorCorrectionLevel: 'M',
-          },
+          type: QRType.TEXT,
+          data: {
+            text: JSON.stringify(qrData)
+          } as any,
+          size: 150,
+          margin: 1,
+          errorCorrectionLevel: 'M' as any,
         });
         
         codes[sample.id] = result.dataUrl;

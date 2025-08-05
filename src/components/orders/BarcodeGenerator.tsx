@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Printer, Download } from 'lucide-react';
-import { QRCodeStudio } from 'qrcode-studio';
+import { QRCodeStudio, BarcodeFormat } from 'qrcode-studio';
 
 interface BarcodeGeneratorProps {
   value: string;
@@ -32,19 +32,24 @@ export default function BarcodeGenerator({
     const generateBarcode = async () => {
       try {
         setError('');
+        const formatMap: Record<string, BarcodeFormat> = {
+          'CODE128': BarcodeFormat.CODE_128,
+          'CODE39': BarcodeFormat.CODE_39,
+          'EAN13': BarcodeFormat.EAN_13,
+          'EAN8': BarcodeFormat.EAN_8,
+          'UPC': BarcodeFormat.UPC_A
+        };
         const result = await QRCodeStudio.generateBarcode({
           data: value,
-          format,
-          options: {
-            width,
-            height,
-            displayValue,
-            text: text || value,
-            fontSize,
-            margin: 10,
-            background: '#ffffff',
-            lineColor: '#000000',
-          },
+          format: formatMap[format] || BarcodeFormat.CODE_128,
+          width,
+          height,
+          displayText: displayValue,
+          text: text || value,
+          fontSize,
+          margin: 10,
+          backgroundColor: '#ffffff',
+          foregroundColor: '#000000',
         });
         setBarcodeDataUrl(result.dataUrl);
       } catch (err) {

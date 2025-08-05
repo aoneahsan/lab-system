@@ -195,12 +195,6 @@ export class LOINCMapper {
         code: loincCode,
         displayName: loincData.longCommonName,
       },
-      loincLongName: loincData.longCommonName,
-      loincComponent: loincData.component,
-      loincProperty: loincData.property,
-      loincSystem: loincData.system,
-      loincScale: loincData.scaleType,
-      loincStatus: loincData.status,
       unit: test.unit || loincData.exampleUnits,
     };
   }

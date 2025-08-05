@@ -75,7 +75,7 @@ const CriticalResultNotification: React.FC<CriticalResultNotificationProps> = ({
       // Send actual notification if email or SMS
       if (data.successful && (data.method === 'email' || data.method === 'sms')) {
         const contact = contactPerson === 'custom' ? customContact : 
-                       data.method === 'email' ? patient.email : patient.phoneNumbers?.[0]?.number;
+                       data.method === 'email' ? patient.email : patient.phoneNumbers?.[0]?.value;
         
         if (contact) {
           await notificationService.sendCriticalResultNotification({
@@ -126,7 +126,7 @@ const CriticalResultNotification: React.FC<CriticalResultNotificationProps> = ({
     if (patient.phoneNumbers?.length > 0) {
       contacts.push({
         type: 'phone',
-        value: patient.phoneNumbers[0].number,
+        value: patient.phoneNumbers[0].value,
         label: patient.phoneNumbers[0].type || 'Primary',
       });
     }

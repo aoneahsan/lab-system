@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import type { Patient, UpdatePatientData } from '@/types/patient.types';
+import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
+import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import { countries } from '@/utils/countries';
 import { relationships } from '@/utils/relationships';
 import { PhoneInput } from '@/components/ui/PhoneInput';
@@ -22,14 +24,10 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
   isSubmitting,
 }) => {
   const [activeTab, setActiveTab] = useState('basic');
+  const { data: customFields = [] } = useCustomFieldsByModule('patient');
+  const validateCustomFields = useValidateCustomFields();
   
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm({
+  const formMethods = useForm({
     defaultValues: {
       firstName: patient.firstName,
       middleName: patient.middleName || '',
@@ -48,8 +46,18 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
       phoneNumbers: patient.phoneNumbers || [],
       addresses: patient.addresses || [],
       emergencyContacts: patient.emergencyContacts || [],
+      customFields: patient.customFields || {},
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+    setError,
+  } = formMethods;
 
   const tabs = [
     { id: 'basic', label: 'Basic Information' },
@@ -58,9 +66,27 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
     { id: 'emergency', label: 'Emergency Contacts' },
     { id: 'medical', label: 'Medical Information' },
     { id: 'additional', label: 'Additional Info' },
+    ...(customFields.length > 0 ? [{ id: 'custom', label: 'Custom Fields' }] : []),
   ];
 
   const onFormSubmit = (data: any) => {
+    // Validate custom fields
+    const { isValid, errors: customErrors } = validateCustomFields(
+      customFields,
+      data.customFields || {}
+    );
+
+    if (!isValid) {
+      Object.entries(customErrors).forEach(([fieldKey, message]) => {
+        setError(`customFields.${fieldKey}` as any, {
+          type: 'manual',
+          message,
+        });
+      });
+      setActiveTab('custom');
+      return;
+    }
+
     onSubmit({
       ...data,
       dateOfBirth: new Date(data.dateOfBirth),
@@ -68,7 +94,8 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="divide-y divide-gray-200 dark:divide-gray-700">
+    <FormProvider {...formMethods}>
+      <form onSubmit={handleSubmit(onFormSubmit)} className="divide-y divide-gray-200 dark:divide-gray-700">
       {/* Tabs */}
       <div className="px-6 py-4">
         <nav className="flex space-x-4 overflow-x-auto" aria-label="Tabs">
@@ -132,6 +159,14 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
         {activeTab === 'additional' && (
           <AdditionalTab register={register} errors={errors} watch={watch} setValue={setValue} />
         )}
+        
+        {activeTab === 'custom' && customFields.length > 0 && (
+          <CustomFieldsManager
+            module="patient"
+            errors={errors.customFields as Record<string, string> || {}}
+            showSections={false}
+          />
+        )}
       </div>
 
       {/* Form Actions */}
@@ -152,7 +187,8 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
-    </form>
+      </form>
+    </FormProvider>
   );
 };
 

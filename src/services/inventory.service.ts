@@ -43,7 +43,10 @@ class InventoryService {
     const itemData = {
       ...data,
       tenantId,
-      currentStock: 0,
+      currentStock: data.currentStock || 0,
+      quantity: data.currentStock || 0, // Set quantity alias
+      reorderLevel: data.reorderLevel || data.reorderPoint, // Set reorderLevel alias
+      status: this.calculateStatus(data.currentStock || 0, data.reorderPoint, data.minimumStock),
       isActive: true,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -57,6 +60,13 @@ class InventoryService {
     );
 
     return docRef.id;
+  }
+
+  private calculateStatus(currentStock: number, reorderPoint: number, minimumStock: number): InventoryItem['status'] {
+    if (currentStock === 0) return 'out_of_stock';
+    if (currentStock <= minimumStock) return 'low_stock';
+    if (currentStock <= reorderPoint) return 'low_stock';
+    return 'in_stock';
   }
 
   /**
@@ -96,9 +106,13 @@ class InventoryService {
       return null;
     }
 
+    const data = docSnap.data();
     return {
       id: docSnap.id,
-      ...docSnap.data(),
+      ...data,
+      quantity: data.currentStock, // Set quantity alias
+      reorderLevel: data.reorderPoint, // Set reorderLevel alias
+      status: data.status || this.calculateStatus(data.currentStock || 0, data.reorderPoint || 0, data.minimumStock || 0),
     } as InventoryItem;
   }
 
@@ -139,10 +153,16 @@ class InventoryService {
     }
 
     const snapshot = await getDocs(q);
-    const items = snapshot.docs.slice(0, pageSize).map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as InventoryItem[];
+    const items = snapshot.docs.slice(0, pageSize).map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        quantity: data.currentStock, // Set quantity alias
+        reorderLevel: data.reorderPoint, // Set reorderLevel alias
+        status: data.status || this.calculateStatus(data.currentStock || 0, data.reorderPoint || 0, data.minimumStock || 0),
+      };
+    }) as InventoryItem[];
 
     return {
       items,
@@ -535,7 +555,7 @@ class InventoryServiceWrapper extends InventoryService {
     return this.createItem(tenantId, data, userId);
   }
 
-  async updateInventoryItem(id: string, data: Partial<InventoryItem>) {
+  async updateInventoryItem(id: string, data: Partial<InventoryItemFormData>) {
     const tenantId = useTenantStore.getState().currentTenant?.id;
     const userId = auth.currentUser?.uid;
     if (!tenantId || !userId) throw new Error('No tenant or user');

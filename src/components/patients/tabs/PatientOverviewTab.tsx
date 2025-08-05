@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { Patient } from '@/types/patient.types';
 
 interface PatientOverviewTabProps {
@@ -209,6 +210,16 @@ export const PatientOverviewTab = ({ patient }: PatientOverviewTabProps) => {
             <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{patient.notes}</p>
           </div>
         </div>
+      )}
+
+      {/* Custom Fields */}
+      {patient.customFields && Object.keys(patient.customFields).length > 0 && (
+        <CustomFieldsManager
+          module="patient"
+          values={patient.customFields}
+          readOnly={true}
+          showSections={true}
+        />
       )}
 
       {/* Record Information */}

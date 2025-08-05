@@ -3,7 +3,7 @@
  * Uses code-craft-studio package for QR code generation
  */
 
-import { QRCodeStudio } from 'code-craft-studio';
+import { QRCodeStudio, QRType } from 'qrcode-studio';
 
 /**
  * Interface for barcode data structure
@@ -133,17 +133,15 @@ export async function generateSampleQRCode(
   
   try {
     const result = await QRCodeStudio.generate({
-      content: barcodeString,
-      options: {
-        width: options?.size || 256,
-        height: options?.size || 256,
-        margin: options?.margin || 4,
-        errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
-        color: {
-          dark: options?.darkColor || '#000000',
-          light: options?.lightColor || '#FFFFFF'
-        }
-      }
+      type: QRType.TEXT,
+      data: {
+        text: barcodeString
+      } as any,
+      size: options?.size || 256,
+      margin: options?.margin || 4,
+      backgroundColor: options?.lightColor || '#FFFFFF',
+      foregroundColor: options?.darkColor || '#000000',
+      errorCorrectionLevel: (options?.errorCorrectionLevel || 'M') as any,
     });
     
     return result.dataUrl;
@@ -176,17 +174,15 @@ export async function generateSampleQRCodeToCanvas(
   try {
     // Generate QR code data URL first
     const result = await QRCodeStudio.generate({
-      content: barcodeString,
-      options: {
-        width: options?.size || 256,
-        height: options?.size || 256,
-        margin: options?.margin || 4,
-        errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
-        color: {
-          dark: options?.darkColor || '#000000',
-          light: options?.lightColor || '#FFFFFF'
-        }
-      }
+      type: QRType.TEXT,
+      data: {
+        text: barcodeString
+      } as any,
+      size: options?.size || 256,
+      margin: options?.margin || 4,
+      backgroundColor: options?.lightColor || '#FFFFFF',
+      foregroundColor: options?.darkColor || '#000000',
+      errorCorrectionLevel: (options?.errorCorrectionLevel || 'M') as any,
     });
     
     // Draw the generated image to canvas

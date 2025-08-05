@@ -24,6 +24,10 @@ export interface TestResult {
   criticalNotified?: boolean;
   criticalNotifiedAt?: Timestamp;
   criticalNotifiedBy?: string;
+  notificationAttempts?: number;
+  rejectedBy?: string;
+  rejectedAt?: Timestamp;
+  rejectionReason?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -50,7 +54,7 @@ export type ResultFlag =
   | 'critical_low'
   | 'critical_high';
 
-export type ResultStatus = 'pending' | 'entered' | 'preliminary' | 'final' | 'verified' | 'amended' | 'cancelled';
+export type ResultStatus = 'pending' | 'entered' | 'preliminary' | 'final' | 'verified' | 'amended' | 'cancelled' | 'in_progress' | 'pending_review' | 'rejected';
 
 export interface ResultValidation {
   id: string;

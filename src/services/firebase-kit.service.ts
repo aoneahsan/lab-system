@@ -2,10 +2,39 @@ import { Capacitor } from '@capacitor/core';
 // TODO: Fix build issue with capacitor-firebase-kit
 // import { FirebaseKit } from 'capacitor-firebase-kit';
 const FirebaseKit = {
-  analytics: { setCollectionEnabled: async () => {}, logEvent: async () => {} },
-  crashlytics: { setCrashlyticsCollectionEnabled: async () => {}, log: async () => {}, recordException: async () => {} },
-  performance: { setPerformanceCollectionEnabled: async () => {}, startTrace: async () => {}, stopTrace: async () => {} },
-  appCheck: { initialize: async () => {} }
+  analytics: { 
+    setCollectionEnabled: async (_params: any) => {}, 
+    logEvent: async (_params: any) => {},
+    setUserId: async (_params: any) => {},
+    setUserProperty: async (_params: any) => {},
+    setCurrentScreen: async (_params: any) => {}
+  },
+  crashlytics: { 
+    setCrashlyticsCollectionEnabled: async (_params: any) => {}, 
+    log: async (_params: any) => {}, 
+    recordException: async (_params: any) => {},
+    setCustomKey: async (_params: any) => {},
+    setUserId: async (_params: any) => {},
+    crash: async () => {}
+  },
+  performance: { 
+    setPerformanceCollectionEnabled: async (_params: any) => {}, 
+    startTrace: async (_params: any) => {}, 
+    stopTrace: async (_params: any) => {},
+    incrementMetric: async (_params: any) => {}
+  },
+  appCheck: { 
+    initialize: async (_params: any) => {} 
+  },
+  remoteConfig: {
+    fetchAndActivate: async () => ({ isFetchedRemote: true }),
+    getString: async (_params: any) => ({ value: '' }),
+    getBoolean: async (_params: any) => ({ value: false }),
+    getNumber: async (_params: any) => ({ value: 0 })
+  },
+  dynamicLinks: {
+    addListener: (_event: string, _callback: any) => ({ remove: () => {} })
+  }
 };
 import { 
   getAuth, 

@@ -5,16 +5,59 @@ export * from './auth.types';
 
 // Core business types
 export * from './patient.types';
-export * from './test.types';
+// Export everything except ReferenceRange from test.types
+export type {
+  TestDefinition,
+  TestCategory,
+  TestPanel,
+  TestMethod,
+  TestFrequency,
+  TestDepartment,
+  TestPriority,
+  TestTurnaroundTime,
+  TestPreparation,
+  TestFormData,
+  CustomTestField,
+  QualityControl,
+  QCResult,
+  QCRule
+} from './test.types';
+export { ReferenceRange as TestReferenceRange } from './test.types';
+// Export everything from result.types including its ReferenceRange
 export * from './result.types';
-export * from './order';
+// Specific exports from order to avoid conflicts
+export type { 
+  TestOrder,
+  OrderedTest,
+  TestOrderStatus,
+  TestOrderFormData,
+  TestOrderPriority
+} from './order';
 
 // Sample types
 export * from './sample.types';
 
 // Operational types
 export * from './appointment.types';
-export * from './billing.types';
+// Specific exports from billing to avoid conflicts with patient types
+export type {
+  Invoice,
+  InvoiceStatus,
+  InvoiceFormData,
+  Payment,
+  PaymentMethod,
+  InvoiceLineItem,
+  InsuranceClaim,
+  ClaimStatus,
+  InsuranceClaimFormData,
+  PaymentFormData,
+  FinancialReport,
+  FinancialMetrics,
+  RevenueByPeriod,
+  AccountsReceivableAging,
+  PayerAnalysis,
+  CollectionEfficiency
+} from './billing.types';
 export * from './inventory.types';
 export * from './report.types';
 

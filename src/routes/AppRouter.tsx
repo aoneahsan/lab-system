@@ -49,6 +49,7 @@ const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const BiometricSettingsPage = lazy(() => import('@/pages/settings/BiometricSettingsPage'));
 const ValidationRulesPage = lazy(() => import('@/pages/settings/ValidationRulesPage'));
+const CustomFieldsPage = lazy(() => import('@/pages/settings/CustomFieldsPage'));
 const ResultValidationRulesPage = lazy(() => import('@/pages/results/ValidationRulesPage'));
 const AppUpdateSettingsPage = lazy(() => import('@/components/settings/AppUpdateSettings').then(module => ({ default: module.AppUpdateSettings })));
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
@@ -148,6 +149,7 @@ export const AppRouter = () => {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/biometric" element={<BiometricSettingsPage />} />
             <Route path="/settings/validation-rules" element={<ValidationRulesPage />} />
+            <Route path="/settings/custom-fields" element={<CustomFieldsPage />} />
             <Route path="/settings/updates" element={<AppUpdateSettingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/portal" element={<CustomerPortalPage />} />

@@ -1,7 +1,9 @@
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCreatePatient } from '@/hooks/usePatients';
+import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
+import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { CreatePatientData } from '@/types/patient.types';
 
 interface PatientRegistrationFormProps {
@@ -11,20 +13,42 @@ interface PatientRegistrationFormProps {
 
 export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistrationFormProps) => {
   const { mutate: createPatient, isPending } = useCreatePatient();
+  const { data: customFields = [] } = useCustomFieldsByModule('patient');
+  const validateCustomFields = useValidateCustomFields();
+
+  const formMethods = useForm<CreatePatientData>({
+    defaultValues: {
+      gender: 'unknown',
+      maritalStatus: 'unknown',
+      customFields: {},
+    },
+  });
 
   const {
     register,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreatePatientData>({
-    defaultValues: {
-      gender: 'unknown',
-      maritalStatus: 'unknown',
-    },
-  });
+    setError,
+  } = formMethods;
 
   const onSubmit = (data: CreatePatientData) => {
+    // Validate custom fields
+    const { isValid, errors: customErrors } = validateCustomFields(
+      customFields,
+      data.customFields || {}
+    );
+
+    if (!isValid) {
+      Object.entries(customErrors).forEach(([fieldKey, message]) => {
+        setError(`customFields.${fieldKey}` as any, {
+          type: 'manual',
+          message,
+        });
+      });
+      return;
+    }
+
     createPatient(data, {
       onSuccess: () => {
         onSuccess?.();
@@ -33,7 +57,8 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <FormProvider {...formMethods}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
           Basic Information
@@ -379,6 +404,12 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         </div>
       </div>
 
+      {/* Custom Fields */}
+      <CustomFieldsManager
+        module="patient"
+        errors={errors.customFields as Record<string, string> || {}}
+      />
+
       <div className="flex justify-end gap-4">
         <button type="button" onClick={onCancel} className="btn btn-secondary" disabled={isPending}>
           Cancel
@@ -387,6 +418,7 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
           {isPending ? 'Creating...' : 'Create Patient'}
         </button>
       </div>
-    </form>
+      </form>
+    </FormProvider>
   );
 };

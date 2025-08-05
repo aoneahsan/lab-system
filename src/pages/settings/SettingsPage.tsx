@@ -43,6 +43,13 @@ const settingCategories: SettingCategory[] = [
     roles: ['admin', 'lab_manager'],
   },
   {
+    title: 'Custom Fields',
+    description: 'Manage custom fields for patients, tests, samples, and other modules',
+    link: '/settings/custom-fields',
+    icon: '📋',
+    roles: ['admin'],
+  },
+  {
     title: 'Validation Rules',
     description: 'Configure result validation rules and quality control checks',
     link: '/settings/validation-rules',

@@ -19,24 +19,28 @@ export const InventoryListTable: React.FC<InventoryListTableProps> = ({
 }) => {
   const getStatusBadge = (status: InventoryItem['status']) => {
     const statusConfig = {
-      'in-stock': {
+      'in_stock': {
         className: 'bg-green-100 text-green-800',
         label: 'In Stock',
       },
-      'low-stock': {
+      'low_stock': {
         className: 'bg-yellow-100 text-yellow-800',
         label: 'Low Stock',
       },
-      'out-of-stock': {
+      'out_of_stock': {
         className: 'bg-red-100 text-red-800',
         label: 'Out of Stock',
       },
+      'expired': {
+        className: 'bg-gray-100 text-gray-800',
+        label: 'Expired',
+      },
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status || 'in_stock'];
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
-        {status === 'low-stock' && <AlertTriangle className="h-3 w-3 mr-1" />}
+        {status === 'low_stock' && <AlertTriangle className="h-3 w-3 mr-1" />}
         {config.label}
       </span>
     );

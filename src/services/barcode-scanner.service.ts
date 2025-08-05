@@ -1,4 +1,4 @@
-import { QRCodeStudio } from 'code-craft-studio';
+import { QRCodeStudio, QRType } from 'qrcode-studio';
 import { Capacitor } from '@capacitor/core';
 
 export interface ScanResult {
@@ -147,14 +147,13 @@ class BarcodeScannerService {
   async generateQRCode(content: string): Promise<string> {
     try {
       const result = await QRCodeStudio.generate({
-        data: content,
-        type: 'text',
-        options: {
-          width: 200,
-          height: 200,
-          margin: 4,
-          errorCorrectionLevel: 'M',
-        },
+        type: QRType.TEXT,
+        data: {
+          text: content
+        } as any,
+        size: 200,
+        margin: 4,
+        errorCorrectionLevel: 'M' as any,
       });
       return result.dataUrl;
     } catch (error) {
@@ -201,7 +200,7 @@ class BarcodeScannerService {
         const firstResult = results[0];
         return {
           hasContent: true,
-          content: firstResult.displayValue || firstResult.rawValue || '',
+          content: (firstResult as any).displayValue || (firstResult as any).rawValue || '',
           format: firstResult.format || 'UNKNOWN',
         };
       }

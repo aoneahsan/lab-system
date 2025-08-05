@@ -7,14 +7,14 @@ import type { Vendor } from '@/types/inventory.types';
 
 const schema = yup.object({
   name: yup.string().required('Vendor name is required'),
-  contactPerson: yup.string().optional(),
-  phone: yup.string().optional(),
-  email: yup.string().email('Invalid email address').optional(),
-  website: yup.string().url('Invalid URL').optional(),
-  address: yup.string().optional(),
-  catalogNumber: yup.string().optional(),
+  contactPerson: yup.string().optional().default(''),
+  phone: yup.string().optional().default(''),
+  email: yup.string().email('Invalid email address').optional().default(''),
+  website: yup.string().url('Invalid URL').optional().default(''),
+  address: yup.string().optional().default(''),
+  catalogNumber: yup.string().optional().default(''),
   leadTimeDays: yup.number().min(0, 'Lead time must be positive').optional(),
-  notes: yup.string().optional(),
+  notes: yup.string().optional().default(''),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -35,7 +35,7 @@ export const VendorForm: React.FC<VendorFormProps> = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       name: initialData?.name || '',
       contactPerson: initialData?.contactPerson || '',

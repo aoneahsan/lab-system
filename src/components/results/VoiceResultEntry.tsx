@@ -198,7 +198,7 @@ export const VoiceResultEntry: React.FC<VoiceResultEntryProps> = ({
         return 'warning';
       case 'critical_high':
       case 'critical_low':
-        return 'error';
+        return 'danger';
       default:
         return 'success';
     }

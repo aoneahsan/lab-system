@@ -73,6 +73,7 @@ export interface Vendor {
 export interface InventoryItem {
   id: string;
   tenantId: string;
+  itemCode: string;
   name: string;
   description?: string;
   category: InventoryCategory;
@@ -80,12 +81,16 @@ export interface InventoryItem {
   catalogNumber?: string;
   unit: UnitOfMeasure;
   storageCondition?: StorageCondition;
+  location?: string;
+  notes?: string;
 
   // Stock levels
   currentStock: number;
+  quantity?: number; // Alias for currentStock for compatibility
   minimumStock: number;
   maximumStock?: number;
   reorderPoint: number;
+  reorderLevel?: number; // Alias for reorderPoint for compatibility
   reorderQuantity: number;
 
   // Cost information
@@ -100,6 +105,7 @@ export interface InventoryItem {
   // Usage tracking
   averageMonthlyUsage?: number;
   lastUsedDate?: Timestamp;
+  expiryDate?: Timestamp;
 
   // Compliance
   requiresLotTracking: boolean;
@@ -108,6 +114,7 @@ export interface InventoryItem {
   msdsUrl?: string;
 
   // Status
+  status?: 'in_stock' | 'low_stock' | 'out_of_stock' | 'expired';
   isActive: boolean;
   discontinuedDate?: Timestamp;
 
@@ -339,24 +346,35 @@ export interface InventoryReport {
  * Form data for creating/updating inventory items
  */
 export interface InventoryItemFormData {
+  itemCode: string;
   name: string;
   description?: string;
   category: InventoryCategory;
   manufacturer?: string;
   catalogNumber?: string;
   unit: UnitOfMeasure;
+  location?: string;
+  notes?: string;
 
   // Stock levels
+  currentStock?: number;
   minimumStock: number;
   maximumStock?: number;
   reorderPoint: number;
+  reorderLevel?: number;
   reorderQuantity: number;
 
   // Storage
   storageCondition?: StorageCondition;
+  lotNumber?: string;
+  expiryDate?: Date;
+  vendorItemCode?: string;
+  storageConditions?: string;
 
   // Cost
   unitCost?: number;
+  vendorPrice?: number;
+  vendorLeadTime?: string;
 
   // Compliance
   requiresLotTracking: boolean;

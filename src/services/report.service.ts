@@ -655,11 +655,11 @@ export const reportService = {
         ]);
         
         return {
-          data: {
-            orders: orders,
-            patients: patients,
-            samples: samples
-          },
+          data: [
+            ...orders.map(o => ({ type: 'order', ...o })),
+            ...patients.map(p => ({ type: 'patient', ...p })),
+            ...samples.map(s => ({ type: 'sample', ...s }))
+          ],
           recordCount: orders.length + patients.length + samples.length,
         };
       }

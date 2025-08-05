@@ -138,6 +138,9 @@ export interface Patient {
   tags?: string[];
   documents?: PatientDocument[];
 
+  // Custom Fields
+  customFields?: Record<string, any>;
+
   // Audit
   createdAt: Date;
   createdBy: string;
@@ -176,6 +179,7 @@ export interface CreatePatientData {
   occupation?: string;
   nationality?: string;
   notes?: string;
+  customFields?: Record<string, any>;
 }
 
 export interface UpdatePatientData

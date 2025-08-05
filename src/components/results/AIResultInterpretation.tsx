@@ -36,7 +36,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
   patient,
   onFollowUpTest,
 }) => {
-  const { currentUser } = useAuthStore();
+  const { currentUser } = useAuth();
   const [showFullInterpretation, setShowFullInterpretation] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'interpretation' | 'trends' | 'recommendations'>('interpretation');
 
@@ -106,7 +106,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
 
   if (interpretationError) {
     return (
-      <Alert variant="danger" className="mt-4">
+      <Alert variant="destructive" className="mt-4">
         <ExclamationTriangleIcon className="h-5 w-5" />
         <p>Failed to generate AI interpretation. Please try again later.</p>
       </Alert>
@@ -193,7 +193,7 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
 
             {/* Critical Findings */}
             {interpretation.criticalFindings.length > 0 && (
-              <Alert variant="danger">
+              <Alert variant="destructive">
                 <ExclamationTriangleIcon className="h-5 w-5" />
                 <div>
                   <p className="font-medium mb-1">Critical Findings:</p>

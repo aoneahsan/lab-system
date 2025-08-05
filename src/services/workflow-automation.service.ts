@@ -140,8 +140,7 @@ export const workflowRuleService = {
       status: execution.status,
       completedAt: execution.completedAt,
       duration: execution.duration,
-      output: execution.output,
-      error: execution.error
+      lastError: execution.lastError
     });
     
     // Update rule execution count

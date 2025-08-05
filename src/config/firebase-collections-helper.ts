@@ -101,6 +101,7 @@ export const COLLECTION_NAMES = {
   RESULT_VALIDATIONS: 'resultValidations',
   TEST_ORDERS: 'test_orders',
   SETTINGS: 'settings',
+  CUSTOM_FIELDS: 'custom_fields',
 } as const;
 
 // Root collections (no tenant prefix)
