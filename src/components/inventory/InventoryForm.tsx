@@ -9,6 +9,7 @@ import type { InventoryItem } from '@/types';
 import { Timestamp } from 'firebase/firestore';
 
 const schema = yup.object({
+  itemCode: yup.string().optional(),
   name: yup.string().required('Item name is required'),
   description: yup.string().optional(),
   category: yup.string().required('Category is required'),
@@ -22,6 +23,8 @@ const schema = yup.object({
   unitCost: yup.number().min(0, 'Unit cost must be positive').optional(),
   vendorName: yup.string().optional(),
   vendorCatalogNumber: yup.string().optional(),
+  location: yup.string().optional(),
+  quantity: yup.number().optional(),
   requiresLotTracking: yup.boolean().optional(),
   requiresExpirationTracking: yup.boolean().optional(),
   hazardous: yup.boolean().optional(),

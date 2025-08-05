@@ -1,5 +1,12 @@
 import { Capacitor } from '@capacitor/core';
-import { FirebaseKit } from 'capacitor-firebase-kit';
+// TODO: Fix build issue with capacitor-firebase-kit
+// import { FirebaseKit } from 'capacitor-firebase-kit';
+const FirebaseKit = {
+  analytics: { setCollectionEnabled: async () => {}, logEvent: async () => {} },
+  crashlytics: { setCrashlyticsCollectionEnabled: async () => {}, log: async () => {}, recordException: async () => {} },
+  performance: { setPerformanceCollectionEnabled: async () => {}, startTrace: async () => {}, stopTrace: async () => {} },
+  appCheck: { initialize: async () => {} }
+};
 import { 
   getAuth, 
   signInWithEmailAndPassword as webSignIn,

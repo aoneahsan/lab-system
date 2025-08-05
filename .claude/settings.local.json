@@ -533,7 +533,10 @@
       "Bash(kill:*)",
       "Bash(do sed -i '' 's/\\buser\\./currentUser./g' \"$file\")",
       "WebFetch(domain:www.npmjs.com)",
-      "WebFetch(domain:www.nexuspro.pk)"
+      "WebFetch(domain:www.nexuspro.pk)",
+      "Bash(vite build:*)",
+      "Bash(xcode-select:*)",
+      "Bash(xcodebuild:*)"
     ],
     "deny": []
   }

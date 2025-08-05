@@ -6,18 +6,22 @@ export * from './auth.types';
 // Core business types
 export * from './patient.types';
 export * from './test.types';
-export * from './sample.types';
 export * from './result.types';
 export * from './order';
+
+// Sample types (avoiding duplicates)
+export type { Sample, ChainOfCustodyEntry } from './sample.types';
+export * from './sample';
 
 // Operational types
 export * from './appointment.types';
 export * from './billing.types';
 export * from './inventory.types';
-export * from './inventory';
-export * from './qc.types';
-export * from './quality-control';
 export * from './report.types';
+
+// Quality Control types (avoiding duplicates)
+export type { QCTest, QCResult, QCRule, QCLevel, QCStatistics, LeveyJenningsData } from './qc.types';
+export * from './quality-control';
 
 // System types
 export * from './tenant.types';
@@ -34,7 +38,6 @@ export * from './workflow-automation.types';
 // Portal types
 export * from './customer-portal.types';
 export * from './home-collection.types';
-export * from './sample';
 
 // Re-export commonly used types
 export type { InventoryItem } from './inventory.types';

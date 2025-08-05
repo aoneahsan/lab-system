@@ -9,24 +9,26 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':capacitor-community-speech-recognition')
     implementation project(':capacitor-community-sqlite')
     implementation project(':capacitor-app')
-    implementation project(':capacitor-barcode-scanner')
+    implementation project(':capacitor-browser')
     implementation project(':capacitor-camera')
     implementation project(':capacitor-device')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-geolocation')
     implementation project(':capacitor-local-notifications')
     implementation project(':capacitor-network')
-    implementation project(':capacitor-preferences')
     implementation project(':capacitor-push-notifications')
+    implementation project(':capacitor-share')
     implementation project(':buildkit-ui')
     implementation project(':capacitor-auth-manager')
     implementation project(':capacitor-biometric-authentication')
     implementation project(':capacitor-firebase-kit')
     implementation project(':capacitor-native-update')
+    implementation project(':code-craft-studio')
     implementation project(':qrcode-studio')
-    implementation project(':unified-error-handling')
+    implementation project(':strata-storage')
     implementation project(':unified-tracking')
 
 }

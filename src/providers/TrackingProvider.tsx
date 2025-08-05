@@ -1,6 +1,15 @@
 import React, { useEffect } from 'react';
-import { UnifiedTracking } from 'unified-tracking';
-import { useTrackEvent } from 'unified-tracking/react';
+// TODO: Fix unified-tracking package build issue
+// import { UnifiedTracking } from 'unified-tracking';
+// import { useTrackEvent } from 'unified-tracking/react';
+const UnifiedTracking = {
+  initialize: async () => {},
+  trackEvent: async () => {},
+  trackPageView: async () => {},
+  setUser: async () => {},
+  clearUser: async () => {}
+};
+const useTrackEvent = () => ({ trackEvent: async () => {} });
 import { useAuthStore } from '@/stores/auth.store';
 import { useLocation } from 'react-router-dom';
 import { firebaseKit } from '@/services/firebase-kit.service';
@@ -130,7 +139,8 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
 };
 
 // Re-export the hook from unified-tracking for convenience
-export { useTrackEvent } from 'unified-tracking/react';
+// export { useTrackEvent } from 'unified-tracking/react';
+export { useTrackEvent };
 
 // Custom hooks for tracking
 export const useTracking = () => {

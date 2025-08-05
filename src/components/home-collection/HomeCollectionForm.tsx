@@ -84,7 +84,7 @@ export function HomeCollectionForm() {
   });
 
   const selectedPatientId = watch('patientId');
-  const selectedPatient = (patients && 'patients' in patients ? patients.patients : patients)?.find((p: any) => p.id === selectedPatientId);
+  const selectedPatient = patients?.patients?.find((p: any) => p.id === selectedPatientId);
 
   const onSubmit = async (data: HomeCollectionFormData) => {
     try {
@@ -112,7 +112,7 @@ export function HomeCollectionForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit<HomeCollectionFormData>(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Schedule Home Collection</h1>
         <div className="flex gap-2">
@@ -145,7 +145,7 @@ export function HomeCollectionForm() {
                   <SelectValue placeholder="Select patient" />
                 </SelectTrigger>
                 <SelectContent>
-                  {((patients && 'patients' in patients ? patients.patients : patients) || []).map((patient: any) => (
+                  {(patients?.patients || []).map((patient: any) => (
                     <SelectItem key={patient.id} value={patient.id}>
                       {patient.firstName} {patient.lastName} - {patient.phone}
                     </SelectItem>

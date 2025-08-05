@@ -9,7 +9,7 @@ import { getRemoteConfig } from 'firebase/remote-config';
 import { getMessaging } from 'firebase/messaging';
 import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,

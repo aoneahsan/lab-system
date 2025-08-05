@@ -6,11 +6,11 @@
 import axios from 'axios';
 import { auth } from '@/config/firebase.config';
 import { trackingInstance } from '@/providers/TrackingProvider';
-import { errorHandlerInstance } from '@/providers/ErrorHandlingProvider';
+import { captureError } from 'unified-error-handling';
 
 // Create axios instance with defaults
 export const api = axios.create({
-  baseURL: process.env.VITE_API_BASE_URL || '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    errorHandlerInstance.handleError(error, { context: 'api_request_interceptor' });
+    captureError(error, { tags: { context: 'api_request_interceptor' } });
     return Promise.reject(error);
   }
 );
@@ -104,11 +104,9 @@ api.interceptors.response.use(
     }
 
     // Log error
-    errorHandlerInstance.handleError(error, {
-      context: 'api_response_interceptor',
-      endpoint,
-      method,
-      status,
+    captureError(error, {
+      tags: { context: 'api_response_interceptor' },
+      extra: { endpoint, method, status }
     });
 
     return Promise.reject(error);

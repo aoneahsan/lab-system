@@ -2,14 +2,17 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
+include ':capacitor-community-speech-recognition'
+project(':capacitor-community-speech-recognition').projectDir = new File('../node_modules/@capacitor-community/speech-recognition/android')
+
 include ':capacitor-community-sqlite'
 project(':capacitor-community-sqlite').projectDir = new File('../node_modules/@capacitor-community/sqlite/android')
 
 include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
 
-include ':capacitor-barcode-scanner'
-project(':capacitor-barcode-scanner').projectDir = new File('../node_modules/@capacitor/barcode-scanner/android')
+include ':capacitor-browser'
+project(':capacitor-browser').projectDir = new File('../node_modules/@capacitor/browser/android')
 
 include ':capacitor-camera'
 project(':capacitor-camera').projectDir = new File('../node_modules/@capacitor/camera/android')
@@ -29,11 +32,11 @@ project(':capacitor-local-notifications').projectDir = new File('../node_modules
 include ':capacitor-network'
 project(':capacitor-network').projectDir = new File('../node_modules/@capacitor/network/android')
 
-include ':capacitor-preferences'
-project(':capacitor-preferences').projectDir = new File('../node_modules/@capacitor/preferences/android')
-
 include ':capacitor-push-notifications'
 project(':capacitor-push-notifications').projectDir = new File('../node_modules/@capacitor/push-notifications/android')
+
+include ':capacitor-share'
+project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
 
 include ':buildkit-ui'
 project(':buildkit-ui').projectDir = new File('../node_modules/buildkit-ui/android')
@@ -50,11 +53,14 @@ project(':capacitor-firebase-kit').projectDir = new File('../node_modules/capaci
 include ':capacitor-native-update'
 project(':capacitor-native-update').projectDir = new File('../node_modules/capacitor-native-update/android')
 
+include ':code-craft-studio'
+project(':code-craft-studio').projectDir = new File('../node_modules/code-craft-studio/android')
+
 include ':qrcode-studio'
 project(':qrcode-studio').projectDir = new File('../node_modules/qrcode-studio/android')
 
-include ':unified-error-handling'
-project(':unified-error-handling').projectDir = new File('../node_modules/unified-error-handling/android')
+include ':strata-storage'
+project(':strata-storage').projectDir = new File('../node_modules/strata-storage/android')
 
 include ':unified-tracking'
 project(':unified-tracking').projectDir = new File('../node_modules/unified-tracking/android')
