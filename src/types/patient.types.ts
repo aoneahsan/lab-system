@@ -187,10 +187,13 @@ export interface PatientListItem {
   id: string;
   patientId: string;
   fullName: string;
+  firstName: string;
+  lastName: string;
   dateOfBirth: Date;
   age: number;
   gender: PatientGender;
   phoneNumber: string;
+  phone: string; // Alias for phoneNumber
   email?: string;
   lastVisitDate?: Date;
   isActive: boolean;

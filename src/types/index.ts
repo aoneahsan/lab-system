@@ -9,9 +9,8 @@ export * from './test.types';
 export * from './result.types';
 export * from './order';
 
-// Sample types (avoiding duplicates)
-export type { Sample, ChainOfCustodyEntry } from './sample.types';
-export * from './sample';
+// Sample types
+export * from './sample.types';
 
 // Operational types
 export * from './appointment.types';
@@ -19,9 +18,8 @@ export * from './billing.types';
 export * from './inventory.types';
 export * from './report.types';
 
-// Quality Control types (avoiding duplicates)
-export type { QCTest, QCResult, QCRule, QCLevel, QCStatistics, LeveyJenningsData } from './qc.types';
-export * from './quality-control';
+// Quality Control types
+export * from './qc.types';
 
 // System types
 export * from './tenant.types';

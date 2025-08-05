@@ -166,12 +166,12 @@ class OfflineDatabaseService {
     await this.initialize();
 
     if (id) {
-      const item = await this.storage.get(`cached_${collection}_${id}`);
+      const item = await this.storage.get<{ id: string; data: any; lastSynced: number }>(`cached_${collection}_${id}`);
       return item ? [{ id: item.id, ...item.data, _lastSynced: item.lastSynced }] : [];
     }
 
     // Get all items for collection
-    const items = await this.storage.query({});
+    const items = await this.storage.query<{ id: string; data: any; lastSynced: number }>({});
     const collectionItems = items
       .filter(item => item.key.startsWith(`cached_${collection}_`))
       .map(item => ({
@@ -186,7 +186,7 @@ class OfflineDatabaseService {
   async getCachedDataByPatient(collection: string, patientId: string): Promise<any[]> {
     await this.initialize();
 
-    const items = await this.storage.query({
+    const items = await this.storage.query<{ id: string; data: any; lastSynced: number }>({
       patientId: patientId
     });
 

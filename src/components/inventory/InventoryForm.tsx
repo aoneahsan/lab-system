@@ -9,26 +9,34 @@ import type { InventoryItem } from '@/types';
 import { Timestamp } from 'firebase/firestore';
 
 const schema = yup.object({
-  itemCode: yup.string().optional(),
+  itemCode: yup.string().required('Item code is required'),
   name: yup.string().required('Item name is required'),
-  description: yup.string().optional(),
+  description: yup.string().required('Description is required'),
   category: yup.string().required('Category is required'),
-  manufacturer: yup.string().optional(),
-  catalogNumber: yup.string().optional(),
+  manufacturer: yup.string().required('Manufacturer is required'),
+  catalogNumber: yup.string().required('Catalog number is required'),
   unit: yup.string().required('Unit is required'),
   currentStock: yup.number().min(0, 'Current stock must be positive').required('Current stock is required'),
   minimumStock: yup.number().min(0, 'Minimum stock must be positive').required('Minimum stock is required'),
   reorderPoint: yup.number().min(0, 'Reorder point must be positive').required('Reorder point is required'),
+  reorderLevel: yup.number().min(0, 'Reorder level must be positive').required('Reorder level is required'),
   reorderQuantity: yup.number().min(0, 'Reorder quantity must be positive').required('Reorder quantity is required'),
-  unitCost: yup.number().min(0, 'Unit cost must be positive').optional(),
-  vendorName: yup.string().optional(),
-  vendorCatalogNumber: yup.string().optional(),
-  location: yup.string().optional(),
+  unitCost: yup.number().min(0, 'Unit cost must be positive').required('Unit cost is required'),
+  vendorName: yup.string().required('Vendor name is required'),
+  vendorCatalogNumber: yup.string().required('Vendor catalog number is required'),
+  vendorItemCode: yup.string().optional(),
+  vendorContactEmail: yup.string().email('Must be a valid email').optional(),
+  vendorLeadTime: yup.string().optional(),
+  location: yup.string().required('Location is required'),
   quantity: yup.number().optional(),
-  requiresLotTracking: yup.boolean().optional(),
-  requiresExpirationTracking: yup.boolean().optional(),
-  hazardous: yup.boolean().optional(),
-  msdsUrl: yup.string().url('Must be a valid URL').optional(),
+  lotNumber: yup.string().optional(),
+  expiryDate: yup.date().optional(),
+  storageConditions: yup.string().optional(),
+  notes: yup.string().optional(),
+  requiresLotTracking: yup.boolean().required('Lot tracking preference is required'),
+  requiresExpirationTracking: yup.boolean().required('Expiration tracking preference is required'),
+  hazardous: yup.boolean().required('Hazardous status is required'),
+  msdsUrl: yup.string().url('Must be a valid URL').required('MSDS URL is required'),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -53,6 +61,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
+      itemCode: initialData?.itemCode || '',
       name: initialData?.name || '',
       description: initialData?.description || '',
       category: initialData?.category || 'reagent',
@@ -62,10 +71,20 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
       currentStock: initialData?.currentStock || 0,
       minimumStock: initialData?.minimumStock || 0,
       reorderPoint: initialData?.reorderPoint || 0,
+      reorderLevel: initialData?.reorderPoint || 0, // Using reorderPoint as default
       reorderQuantity: initialData?.reorderQuantity || 0,
       unitCost: initialData?.unitCost || 0,
       vendorName: initialData?.preferredVendor?.name || '',
       vendorCatalogNumber: initialData?.preferredVendor?.catalogNumber || '',
+      vendorItemCode: '',
+      vendorContactEmail: '',
+      vendorLeadTime: '',
+      location: initialData?.location || '',
+      quantity: initialData?.currentStock || 0,
+      lotNumber: '',
+      expiryDate: undefined,
+      storageConditions: '',
+      notes: initialData?.notes || '',
       requiresLotTracking: initialData?.requiresLotTracking || false,
       requiresExpirationTracking: initialData?.requiresExpirationTracking || false,
       hazardous: initialData?.hazardous || false,
@@ -219,7 +238,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
               {errors.reorderLevel && (
                 <p className="text-red-500 text-xs mt-1">{errors.reorderLevel.message}</p>
               )}
-              {quantity <= reorderLevel && quantity > 0 && (
+              {watch('quantity') && watch('reorderLevel') && watch('quantity') <= watch('reorderLevel') && watch('quantity') > 0 && (
                 <p className="text-yellow-600 text-xs mt-1">
                   Current quantity is at or below reorder level
                 </p>

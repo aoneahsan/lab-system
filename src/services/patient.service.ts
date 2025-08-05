@@ -107,17 +107,20 @@ class PatientService {
   }
 
   private formatPatientListItem(patient: Patient): PatientListItem {
+    const primaryPhone = patient.phoneNumbers.find((p) => p.isPrimary)?.value ||
+      patient.phoneNumbers[0]?.value || '';
+    
     return {
       id: patient.id,
       patientId: patient.patientId,
       fullName: `${patient.firstName} ${patient.middleName || ''} ${patient.lastName}`.trim(),
+      firstName: patient.firstName,
+      lastName: patient.lastName,
       dateOfBirth: patient.dateOfBirth,
       age: this.calculateAge(patient.dateOfBirth),
       gender: patient.gender,
-      phoneNumber:
-        patient.phoneNumbers.find((p) => p.isPrimary)?.value ||
-        patient.phoneNumbers[0]?.value ||
-        '',
+      phoneNumber: primaryPhone,
+      phone: primaryPhone, // Alias for phoneNumber
       email: patient.email,
       lastVisitDate: patient.lastVisitDate,
       isActive: patient.isActive,

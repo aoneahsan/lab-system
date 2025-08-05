@@ -1,4 +1,4 @@
-import { QRCodeStudio } from 'qrcode-studio';
+import { QRCodeStudio, QRType, BarcodeFormat } from 'qrcode-studio';
 import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
 
 export const qrcodeService = {
@@ -16,13 +16,12 @@ export const qrcodeService = {
 
     // Use qrcode-studio's generate method
     const result = await QRCodeStudio.generate({
-      type: 'text' as any,
+      type: QRType.TEXT,
       data: {
         text: JSON.stringify(qrData)
       } as any,
-      width: config?.size || 200,
-      height: config?.size || 200,
-      errorCorrection: (config?.errorCorrectionLevel || 'M') as any
+      size: config?.size || 200,
+      errorCorrectionLevel: (config?.errorCorrectionLevel || 'M') as any
     });
 
     return result.dataUrl;
@@ -39,12 +38,18 @@ export const qrcodeService = {
     }
   ): Promise<string> {
     // Using qrcode-studio's barcode functionality
+    const formatMap = {
+      'CODE128': BarcodeFormat.CODE_128,
+      'CODE39': BarcodeFormat.CODE_39,
+      'EAN13': BarcodeFormat.EAN_13
+    };
+    
     const result = await QRCodeStudio.generateBarcode({
+      format: formatMap[config?.format || 'CODE128'] || BarcodeFormat.CODE_128,
       data: barcode,
-      format: (config?.format || 'CODE128') as any,
       width: config?.width || 300,
       height: config?.height || 100,
-      displayValue: config?.includeText !== false
+      displayText: config?.includeText !== false
     });
 
     return result.dataUrl;

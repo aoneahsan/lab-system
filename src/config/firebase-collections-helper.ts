@@ -62,6 +62,7 @@ export const COLLECTION_NAMES = {
   LOTS: 'lots',
   PURCHASE_ORDERS: 'purchase_orders',
   INVENTORY_ALERTS: 'inventory_alerts',
+  VENDORS: 'vendors',
 
   // Quality Control
   QC_TESTS: 'qc_tests',

@@ -612,7 +612,7 @@ export const reportService = {
       case 'inventory_status': {
         const itemsResponse = await inventoryService.getItems(tenantId);
         const lowStock = itemsResponse.items.filter(item => 
-          item.quantityInStock <= item.reorderLevel
+          item.currentStock <= item.reorderPoint
         );
         
         return {

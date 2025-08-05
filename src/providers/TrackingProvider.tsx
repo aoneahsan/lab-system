@@ -3,16 +3,18 @@ import React, { useEffect } from 'react';
 // import { UnifiedTracking } from 'unified-tracking';
 // import { useTrackEvent } from 'unified-tracking/react';
 const UnifiedTracking = {
-  initialize: async () => {},
-  trackEvent: async () => {},
-  trackPageView: async () => {},
-  setUser: async () => {},
+  initialize: async (config?: any) => {},
+  trackEvent: async (eventName: string, properties?: any) => {},
+  trackPageView: async (pageName?: string, properties?: any) => {},
+  setUser: async (userId: string, traits?: any) => {},
   clearUser: async () => {},
-  trackMetric: async () => {},
-  track: async () => {},
-  identify: async () => {}
+  trackMetric: async (metricName: string, value: number, unit?: string, tags?: any) => {},
+  track: async (eventName: string, properties?: any) => {},
+  identify: async (userId: string, traits?: any) => {},
+  logError: async (error: Error, context?: any) => {},
+  setConsent: async (consent: any) => {}
 };
-const useTrackEvent = () => ({ trackEvent: async () => {} });
+const useTrackEvent = () => ({ trackEvent: async (eventName: string, properties?: any) => {} });
 import { useAuthStore } from '@/stores/auth.store';
 import { useLocation } from 'react-router-dom';
 import { firebaseKit } from '@/services/firebase-kit.service';
