@@ -117,3 +117,6 @@ debug/
 # Lock files (except yarn.lock)
 package-lock.json
 pnpm-lock.yaml
+
+functions/node_modules
+functions/lib
