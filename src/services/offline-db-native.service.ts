@@ -1,107 +1,61 @@
-import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { Strata } from 'strata-storage';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import type { OfflineQueueItem, OfflineMetadata } from './offline-db.service';
 
-// Native implementation using SQLite
+// Native implementation using strata-storage
 export class OfflineDbNativeService {
-  private sqlite: SQLiteConnection;
-  private db: SQLiteDBConnection | null = null;
-  private dbName = 'labflow_offline.db';
+  private storage: Strata;
   private isInitialized = false;
+  private initPromise: Promise<void> | null = null;
 
   constructor() {
-    this.sqlite = new SQLiteConnection(CapacitorSQLite);
+    this.storage = new Strata({
+      defaultStorages: ['sqlite', 'preferences', 'secure-storage', 'filesystem', 'memory'],
+      encryption: {
+        enabled: true,
+        password: 'labflow-offline-encryption-2024'
+      },
+      compression: {
+        enabled: true,
+        threshold: 1024
+      },
+      sync: {
+        enabled: false // Disable sync for offline database
+      }
+    });
   }
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
+    
+    if (!this.initPromise) {
+      this.initPromise = this.performInitialization();
+    }
+    
+    await this.initPromise;
+  }
 
+  private async performInitialization(): Promise<void> {
     try {
-      // Create connection
-      const ret = await this.sqlite.checkConnectionsConsistency();
-      const isConn = (await this.sqlite.isConnection(this.dbName, false)).result;
-
-      if (ret.result && isConn) {
-        this.db = await this.sqlite.retrieveConnection(this.dbName, false);
-      } else {
-        this.db = await this.sqlite.createConnection(this.dbName, false, 'no-encryption', 1, false);
-      }
-
-      await this.db.open();
-      await this.createTables();
+      await this.storage.initialize();
+      await this.setupCollections();
       this.isInitialized = true;
-      console.log('SQLite offline database initialized');
+      console.log('Strata offline database initialized');
     } catch (error) {
-      console.error('Failed to initialize SQLite database:', error);
+      console.error('Failed to initialize Strata database:', error);
       throw error;
     }
   }
 
-  private async createTables(): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
-
-    const tables = [
-      // Offline queue for pending operations
-      `CREATE TABLE IF NOT EXISTS offline_queue (
-        id TEXT PRIMARY KEY,
-        collection TEXT NOT NULL,
-        operation TEXT NOT NULL,
-        data TEXT NOT NULL,
-        timestamp INTEGER NOT NULL,
-        synced INTEGER DEFAULT 0,
-        retry_count INTEGER DEFAULT 0,
-        last_error TEXT
-      )`,
-
-      // Offline metadata
-      `CREATE TABLE IF NOT EXISTS offline_metadata (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      )`,
-
-      // Cached collections
-      `CREATE TABLE IF NOT EXISTS cached_patients (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        data TEXT NOT NULL,
-        last_updated INTEGER NOT NULL
-      )`,
-
-      `CREATE TABLE IF NOT EXISTS cached_orders (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        patient_id TEXT,
-        data TEXT NOT NULL,
-        last_updated INTEGER NOT NULL
-      )`,
-
-      `CREATE TABLE IF NOT EXISTS cached_results (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        order_id TEXT,
-        patient_id TEXT,
-        data TEXT NOT NULL,
-        last_updated INTEGER NOT NULL
-      )`,
-
-      `CREATE TABLE IF NOT EXISTS cached_tests (
-        id TEXT PRIMARY KEY,
-        tenant_id TEXT NOT NULL,
-        data TEXT NOT NULL,
-        last_updated INTEGER NOT NULL
-      )`,
-
-      // Indexes for performance
-      `CREATE INDEX IF NOT EXISTS idx_queue_synced ON offline_queue(synced)`,
-      `CREATE INDEX IF NOT EXISTS idx_patients_tenant ON cached_patients(tenant_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_orders_tenant ON cached_orders(tenant_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_orders_patient ON cached_orders(patient_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_results_order ON cached_results(order_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_results_patient ON cached_results(patient_id)`,
-    ];
-
-    for (const query of tables) {
-      await this.db.execute(query);
+  private async setupCollections(): Promise<void> {
+    // Initialize metadata if not exists
+    const metadata = await this.storage.get<OfflineMetadata>('offline_metadata');
+    if (!metadata) {
+      await this.storage.set('offline_metadata', {
+        lastSyncTime: 0,
+        pendingChanges: 0,
+        collections: {}
+      });
     }
   }
 
@@ -111,97 +65,100 @@ export class OfflineDbNativeService {
     operation: 'create' | 'update' | 'delete',
     data: any
   ): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
     const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const query = `
-      INSERT INTO offline_queue (id, collection, operation, data, timestamp, synced, retry_count)
-      VALUES (?, ?, ?, ?, ?, 0, 0)
-    `;
+    const queueItem: OfflineQueueItem = {
+      id,
+      collection,
+      operation,
+      data,
+      timestamp: Date.now(),
+      synced: false,
+      retryCount: 0
+    };
 
-    await this.db.run(query, [id, collection, operation, JSON.stringify(data), Date.now()]);
+    await this.storage.set(`offline_queue_${id}`, queueItem, {
+      tags: ['offline_queue']
+    });
 
     await this.updatePendingCount();
   }
 
   // Get pending operations
   async getPendingOperations(): Promise<OfflineQueueItem[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const query = `
-      SELECT * FROM offline_queue 
-      WHERE synced = 0 
-      ORDER BY timestamp ASC
-    `;
+    const queueItems = await this.storage.query<OfflineQueueItem>({
+      synced: false
+    });
 
-    const result = await this.db.query(query);
+    // Sort by timestamp
+    const sortedItems = queueItems
+      .map(item => item.value)
+      .sort((a, b) => a.timestamp - b.timestamp);
 
-    return (
-      result.values?.map((row) => ({
-        id: row.id,
-        collection: row.collection,
-        operation: row.operation as 'create' | 'update' | 'delete',
-        data: JSON.parse(row.data),
-        timestamp: row.timestamp,
-        synced: row.synced === 1,
-        retryCount: row.retry_count,
-        lastError: row.last_error,
-      })) || []
-    );
+    return sortedItems;
   }
 
   // Mark operation as synced
   async markAsSynced(id: string): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const query = `UPDATE offline_queue SET synced = 1 WHERE id = ?`;
-    await this.db.run(query, [id]);
+    const item = await this.storage.get<OfflineQueueItem>(`offline_queue_${id}`);
+    if (item) {
+      item.synced = true;
+      await this.storage.set(`offline_queue_${id}`, item, {
+        tags: ['offline_queue']
+      });
+    }
     await this.updatePendingCount();
   }
 
   // Update retry count and error
   async updateRetryInfo(id: string, error: string): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const query = `
-      UPDATE offline_queue 
-      SET retry_count = retry_count + 1, last_error = ? 
-      WHERE id = ?
-    `;
-    await this.db.run(query, [error, id]);
+    const item = await this.storage.get<OfflineQueueItem>(`offline_queue_${id}`);
+    if (item) {
+      item.retryCount = (item.retryCount || 0) + 1;
+      item.lastError = error;
+      await this.storage.set(`offline_queue_${id}`, item, {
+        tags: ['offline_queue']
+      });
+    }
   }
 
   // Cache data locally
   async cacheData(collection: string, tenantId: string, data: any[]): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const tableName = this.getTableName(collection);
-    if (!tableName) return;
+    const collectionKey = this.getCollectionKey(collection);
+    if (!collectionKey) return;
 
     // Clear existing data for tenant
-    await this.db.run(`DELETE FROM ${tableName} WHERE tenant_id = ?`, [tenantId]);
+    const existingItems = await this.storage.query({
+      tenantId: tenantId
+    });
+    
+    for (const item of existingItems) {
+      if (item.key.startsWith(`${collectionKey}_`)) {
+        await this.storage.remove(item.key);
+      }
+    }
 
     // Insert new data
     for (const item of data) {
-      const query = `
-        INSERT INTO ${tableName} (id, tenant_id, data, last_updated)
-        VALUES (?, ?, ?, ?)
-      `;
-
-      let additionalParams = [];
-      if (collection === COLLECTIONS.ORDERS && item.patientId) {
-        additionalParams = [item.patientId];
-      } else if (collection === COLLECTIONS.RESULTS) {
-        additionalParams = [item.orderId || null, item.patientId || null];
-      }
-
-      await this.db.run(query, [
-        item.id,
+      const key = `${collectionKey}_${item.id}`;
+      const cacheItem = {
+        ...item,
         tenantId,
-        JSON.stringify(item),
-        Date.now(),
-        ...additionalParams,
-      ]);
+        lastUpdated: Date.now()
+      };
+
+      await this.storage.set(key, cacheItem, {
+        tags: [collectionKey, `tenant_${tenantId}`]
+      });
     }
 
     await this.updateCollectionMetadata(collection, data.length);
@@ -209,118 +166,109 @@ export class OfflineDbNativeService {
 
   // Get cached data
   async getCachedData(collection: string, tenantId: string, filters?: any): Promise<any[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const tableName = this.getTableName(collection);
-    if (!tableName) return [];
+    const collectionKey = this.getCollectionKey(collection);
+    if (!collectionKey) return [];
 
-    let query = `SELECT data FROM ${tableName} WHERE tenant_id = ?`;
-    const params: any[] = [tenantId];
+    // Build query
+    const query: any = {
+      tenantId: tenantId
+    };
 
     // Add filters
     if (filters) {
       if (filters.patientId) {
-        query += ` AND patient_id = ?`;
-        params.push(filters.patientId);
+        query.patientId = filters.patientId;
       }
       if (filters.orderId) {
-        query += ` AND order_id = ?`;
-        params.push(filters.orderId);
+        query.orderId = filters.orderId;
       }
     }
 
-    query += ` ORDER BY last_updated DESC`;
+    const items = await this.storage.query(query);
+    
+    // Filter by collection and sort by lastUpdated
+    const filteredItems = items
+      .filter(item => item.key.startsWith(`${collectionKey}_`))
+      .map(item => item.value)
+      .sort((a: any, b: any) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
 
-    const result = await this.db.query(query, params);
-
-    return result.values?.map((row) => JSON.parse(row.data)) || [];
+    return filteredItems;
   }
 
   // Get specific cached record
   async getCachedRecord(collection: string, id: string): Promise<any | null> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const tableName = this.getTableName(collection);
-    if (!tableName) return null;
+    const collectionKey = this.getCollectionKey(collection);
+    if (!collectionKey) return null;
 
-    const query = `SELECT data FROM ${tableName} WHERE id = ?`;
-    const result = await this.db.query(query, [id]);
+    const key = `${collectionKey}_${id}`;
+    const item = await this.storage.get(key);
 
-    if (result.values && result.values.length > 0) {
-      return JSON.parse(result.values[0].data);
-    }
-
-    return null;
+    return item || null;
   }
 
   // Update cached record
   async updateCachedRecord(collection: string, id: string, updates: any): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const tableName = this.getTableName(collection);
-    if (!tableName) return;
+    const collectionKey = this.getCollectionKey(collection);
+    if (!collectionKey) return;
 
     // Get existing record
     const existingRecord = await this.getCachedRecord(collection, id);
     if (!existingRecord) return;
 
     // Merge updates
-    const updatedRecord = { ...existingRecord, ...updates };
+    const updatedRecord = { 
+      ...existingRecord, 
+      ...updates,
+      lastUpdated: Date.now()
+    };
 
-    const query = `
-      UPDATE ${tableName} 
-      SET data = ?, last_updated = ? 
-      WHERE id = ?
-    `;
-
-    await this.db.run(query, [JSON.stringify(updatedRecord), Date.now(), id]);
+    const key = `${collectionKey}_${id}`;
+    await this.storage.set(key, updatedRecord, {
+      tags: [collectionKey, `tenant_${updatedRecord.tenantId}`]
+    });
   }
 
   // Get offline metadata
   async getMetadata(): Promise<OfflineMetadata> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const query = `SELECT key, value FROM offline_metadata`;
-    const result = await this.db.query(query);
-
-    const metadata: any = {
+    const metadata = await this.storage.get<OfflineMetadata>('offline_metadata');
+    
+    return metadata || {
       lastSyncTime: 0,
       pendingChanges: 0,
       collections: {},
     };
-
-    result.values?.forEach((row) => {
-      if (row.key === 'metadata') {
-        Object.assign(metadata, JSON.parse(row.value));
-      }
-    });
-
-    return metadata;
   }
 
   // Update metadata
   async updateMetadata(updates: Partial<OfflineMetadata>): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
     const current = await this.getMetadata();
     const updated = { ...current, ...updates };
 
-    const query = `
-      INSERT OR REPLACE INTO offline_metadata (key, value)
-      VALUES ('metadata', ?)
-    `;
-
-    await this.db.run(query, [JSON.stringify(updated)]);
+    await this.storage.set('offline_metadata', updated);
   }
 
   // Update pending count
   private async updatePendingCount(): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const query = `SELECT COUNT(*) as count FROM offline_queue WHERE synced = 0`;
-    const result = await this.db.query(query);
+    const pendingItems = await this.storage.query<OfflineQueueItem>({
+      synced: false
+    });
 
-    const count = result.values?.[0]?.count || 0;
+    const count = pendingItems.filter(item => 
+      item.key.startsWith('offline_queue_')
+    ).length;
+    
     await this.updateMetadata({ pendingChanges: count });
   }
 
@@ -336,8 +284,8 @@ export class OfflineDbNativeService {
     await this.updateMetadata({ collections: metadata.collections });
   }
 
-  // Get table name for collection
-  private getTableName(collection: string): string | null {
+  // Get collection key for storage
+  private getCollectionKey(collection: string): string | null {
     const mapping: Record<string, string> = {
       [COLLECTIONS.PATIENTS]: 'cached_patients',
       [COLLECTIONS.ORDERS]: 'cached_orders',
@@ -350,18 +298,31 @@ export class OfflineDbNativeService {
 
   // Clear all offline data
   async clearOfflineData(): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    await this.initialize();
 
-    const tables = [
-      'offline_queue',
+    // Clear all offline queue items
+    const queueItems = await this.storage.query({});
+    for (const item of queueItems) {
+      if (item.key.startsWith('offline_queue_')) {
+        await this.storage.remove(item.key);
+      }
+    }
+
+    // Clear all cached collections
+    const collectionPrefixes = [
       'cached_patients',
       'cached_orders',
       'cached_results',
       'cached_tests',
     ];
 
-    for (const table of tables) {
-      await this.db.run(`DELETE FROM ${table}`);
+    for (const prefix of collectionPrefixes) {
+      const items = await this.storage.query({});
+      for (const item of items) {
+        if (item.key.startsWith(`${prefix}_`)) {
+          await this.storage.remove(item.key);
+        }
+      }
     }
 
     await this.updateMetadata({
@@ -373,11 +334,8 @@ export class OfflineDbNativeService {
 
   // Close database connection
   async close(): Promise<void> {
-    if (this.db) {
-      await this.db.close();
-      this.db = null;
-      this.isInitialized = false;
-    }
+    // Strata handles connection management automatically
+    this.isInitialized = false;
   }
 
   // Check if offline mode is supported
