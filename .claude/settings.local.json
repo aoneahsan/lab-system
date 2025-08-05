@@ -536,7 +536,12 @@
       "WebFetch(domain:www.nexuspro.pk)",
       "Bash(vite build:*)",
       "Bash(xcode-select:*)",
-      "Bash(xcodebuild:*)"
+      "Bash(xcodebuild:*)",
+      "Bash(firebase functions:config:set:*)",
+      "Bash(firebase functions:list:*)",
+      "Bash(pod deintegrate:*)",
+      "Bash(pod cache clean:*)",
+      "Bash(zip:*)"
     ],
     "deny": []
   }

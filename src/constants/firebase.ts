@@ -46,6 +46,7 @@ export const COLLECTIONS = {
   LOTS: 'lots',
   PURCHASE_ORDERS: 'purchase_orders',
   INVENTORY_ALERTS: 'inventory_alerts',
+  VENDORS: 'vendors',
 
   // Quality control
   QC_RUNS: 'qc_runs',

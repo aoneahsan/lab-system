@@ -64,7 +64,8 @@ export function HomeCollectionForm() {
   const [date, setDate] = useState<Date>();
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   
-  const { data: patients = [] } = usePatients();
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.patients || [];
   const { data: tests = [] } = useTests();
   const createMutation = useCreateHomeCollection();
 
@@ -84,7 +85,7 @@ export function HomeCollectionForm() {
   });
 
   const selectedPatientId = watch('patientId');
-  const selectedPatient = patients?.patients?.find((p: any) => p.id === selectedPatientId);
+  const selectedPatient = patients?.find((p: any) => p.id === selectedPatientId);
 
   const onSubmit = async (data: HomeCollectionFormData) => {
     try {
@@ -145,7 +146,7 @@ export function HomeCollectionForm() {
                   <SelectValue placeholder="Select patient" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(patients?.patients || []).map((patient: any) => (
+                  {patients.map((patient: any) => (
                     <SelectItem key={patient.id} value={patient.id}>
                       {patient.firstName} {patient.lastName} - {patient.phone}
                     </SelectItem>

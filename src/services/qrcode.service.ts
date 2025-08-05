@@ -14,19 +14,15 @@ export const qrcodeService = {
       priority: sampleLabel.priority,
     };
 
-    // Use code-craft-studio's generate method
+    // Use qrcode-studio's generate method
     const result = await QRCodeStudio.generate({
-      content: JSON.stringify(qrData),
-      options: {
-        width: config?.size || 200,
-        height: config?.size || 200,
-        margin: config?.includeMargin ? 4 : 0,
-        errorCorrectionLevel: config?.errorCorrectionLevel || 'M',
-        color: {
-          dark: config?.color?.dark || '#000000',
-          light: config?.color?.light || '#FFFFFF',
-        },
-      },
+      type: 'text' as any,
+      data: {
+        text: JSON.stringify(qrData)
+      } as any,
+      width: config?.size || 200,
+      height: config?.size || 200,
+      errorCorrection: (config?.errorCorrectionLevel || 'M') as any
     });
 
     return result.dataUrl;
@@ -42,15 +38,13 @@ export const qrcodeService = {
       includeText?: boolean;
     }
   ): Promise<string> {
-    // Using code-craft-studio's barcode functionality
+    // Using qrcode-studio's barcode functionality
     const result = await QRCodeStudio.generateBarcode({
       data: barcode,
-      type: config?.format || 'CODE128',
-      options: {
-        width: config?.width || 300,
-        height: config?.height || 100,
-        displayValue: config?.includeText !== false,
-      },
+      format: (config?.format || 'CODE128') as any,
+      width: config?.width || 300,
+      height: config?.height || 100,
+      displayValue: config?.includeText !== false
     });
 
     return result.dataUrl;

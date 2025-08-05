@@ -7,7 +7,10 @@ const UnifiedTracking = {
   trackEvent: async () => {},
   trackPageView: async () => {},
   setUser: async () => {},
-  clearUser: async () => {}
+  clearUser: async () => {},
+  trackMetric: async () => {},
+  track: async () => {},
+  identify: async () => {}
 };
 const useTrackEvent = () => ({ trackEvent: async () => {} });
 import { useAuthStore } from '@/stores/auth.store';
