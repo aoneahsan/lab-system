@@ -479,7 +479,7 @@ export const testService = {
     const todayCountQuery = query(
       collection(db, TEST_ORDERS_COLLECTION),
       where('tenantId', '==', tenantId),
-      where('orderedAt', '>=', Timestamp.fromDate(today))
+      where('orderDate', '>=', Timestamp.fromDate(today))
     );
 
     const [totalSnapshot, activeSnapshot, todaySnapshot] = await Promise.all([
