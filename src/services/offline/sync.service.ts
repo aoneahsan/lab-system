@@ -100,17 +100,20 @@ class SyncService {
       await this.pullLatestData();
 
       // Update sync metadata
-      await offlineDatabase.updateSyncMetadata('all', 'completed');
+      await offlineDatabase.updateSyncMetadata('all', {
+        status: 'completed',
+        timestamp: Date.now()
+      });
 
       console.log('Sync completed successfully');
       toast.success('Data synchronized successfully');
     } catch (error) {
       console.error('Sync error:', error);
-      await offlineDatabase.updateSyncMetadata(
-        'all',
-        'error',
-        error instanceof Error ? error.message : 'Unknown error'
-      );
+      await offlineDatabase.updateSyncMetadata('all', {
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: Date.now()
+      });
       toast.error('Failed to sync data');
     } finally {
       this.syncInProgress = false;
@@ -180,17 +183,23 @@ class SyncService {
             additionalFields.patient_id = data.patientId;
           }
 
-          await offlineDatabase.cacheData(collectionName, doc.id, data, additionalFields);
+          await offlineDatabase.cacheData(collectionName, doc.id, {
+            ...data,
+            ...additionalFields
+          });
         }
 
-        await offlineDatabase.updateSyncMetadata(collectionName, 'completed');
+        await offlineDatabase.updateSyncMetadata(collectionName, {
+          status: 'completed',
+          timestamp: Date.now()
+        });
       } catch (error) {
         console.error(`Error pulling data for ${collectionName}:`, error);
-        await offlineDatabase.updateSyncMetadata(
-          collectionName,
-          'error',
-          error instanceof Error ? error.message : 'Unknown error'
-        );
+        await offlineDatabase.updateSyncMetadata(collectionName, {
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: Date.now()
+        });
       }
     }
   }

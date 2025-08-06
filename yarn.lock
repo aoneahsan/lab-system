@@ -1010,20 +1010,25 @@
   resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-7.4.2.tgz#8fa1b6fbedfbb8506df3444dddaea75cc09ee8a9"
   integrity sha512-FZ7M9NwFkljR7EP5eXiE32mAIfZNcYw2CzRMCG3rQu0u0ZaIoeOeq5/oK4YcDnGpNmu8jpngKJqZ+9OiSQSwDg==
 
-"@capacitor/app@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-7.0.1.tgz#0d0709fb4dde5046c24853f2d6b77a7ea411f748"
-  integrity sha512-ArlVZAAla4MwQoKh26x2AaTDOBh5Vhp1VhMKR3RwqZSsZnazKTFGNrPbr9Ez5r1knnEDfApyjwp1uZnXK1WTYQ==
+"@capacitor/app@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-7.0.2.tgz#63cdcc097b137e8605ffe7b97144f68c014b7db9"
+  integrity sha512-kRWBF6Wc6OQxhL+N6rsegyfJY37Lj9/VJhtrmgmH+y+rdxQLQwUOpMyxXStym7cF+QzGeVpItyVxyUT9fE5ByQ==
 
-"@capacitor/browser@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/browser/-/browser-7.0.1.tgz#efcf3ec0bdc9e580f49db26ae982509b354d478a"
-  integrity sha512-N6KEVLw2enTnourQzYJLvAkSds2Ed21zqsvHnSImrVDenzX8fUj032kMt4EdewmxfxiEwRa911BT1VOPBi0fEA==
+"@capacitor/browser@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/browser/-/browser-7.0.2.tgz#889fa6ab16eeec86f7097b87c92babe15744fcc8"
+  integrity sha512-5kySTunCtH+2sezmTjgDfwvspW7GW/hslQECZeLIRM2qefnxjGTc3fmCTeILYK5EuvcxMs+8sF5BhmzzKqOzuQ==
 
 "@capacitor/camera@^7.0.1":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@capacitor/camera/-/camera-7.0.1.tgz#bcbd1c05cce648fa54b844bf7a6745854cae6ba4"
   integrity sha512-gDUFsYlhMra5VVOa4iJV6+MQRhp3VXpTLQY4JDATj7UvoZ8Hv4DG8qplPL9ufUFNoR3QbDDnf8+gbQOsKdkDjg==
+
+"@capacitor/camera@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/camera/-/camera-7.0.2.tgz#252c7ca951147606fb0dbf30e884001b80ee09b5"
+  integrity sha512-1/UbZZ8MSbRTMMvjQHQFJ0cs2ZNURNoyuUex0rAJwECsyHO0I5SRvu7YoMY5qTcRWScBcqT+3QZcJvETtRg7ug==
 
 "@capacitor/cli@^7.4.2":
   version "7.4.2"
@@ -1055,10 +1060,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@capacitor/device@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/device/-/device-7.0.1.tgz#d7aa792c1025c45855998691b4b4c4f4b3acbceb"
-  integrity sha512-ImjR2LmCEhbckYtOHXTfi5v6B7d4HPX9uKIAQs7wzzmE+yRRXuUTEzARBQ00dZDInAInkbuyQRdjwPTSHZUpnw==
+"@capacitor/device@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/device/-/device-7.0.2.tgz#406bde129d3fcf55f0de0b691509535e2a00e315"
+  integrity sha512-OMGMBjLbh7ApaqW1oOJIV73iyrFK/T5v2MzuQYq3GLT+jnGvCuj/y82Ofq2Fz9/hlJ2fukztPwG1K80jyk0i6w==
 
 "@capacitor/filesystem@^7.0.0", "@capacitor/filesystem@^7.1.4":
   version "7.1.4"
@@ -1079,30 +1084,30 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-7.4.2.tgz#6fd0ae440ee70512b3523b1d6ff6bf5f9f425577"
   integrity sha512-Edd4aZ6IJi4O/7dJIsSIuuo6LXvVVP5V++0Vs1w5bWOGbGhWZXLF0lt0KGFgSUxTuyL6xURGUygkD6dCp35QAQ==
 
-"@capacitor/local-notifications@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/local-notifications/-/local-notifications-7.0.1.tgz#663c0c364518395c995381efebd11f5dcdd1d8da"
-  integrity sha512-GJewoiqiTLXNNRxqeJDi6vxj1Y37jLFI3KSdAM2Omvxew4ewyBSCjwOtXMQaEg+lvzGHtK6FPrSc2v/2EcL0wA==
+"@capacitor/local-notifications@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/local-notifications/-/local-notifications-7.0.2.tgz#6b36c9786571cf7b167040fd2ee27a12636939c6"
+  integrity sha512-U83dKWZjqpD3BBc9nSW24/3rdzpCMgVgcenOmjtc5eee0OSdE3hFAB9RmmRFZbvg0XE3BmrBt595BnzcAEeqaQ==
 
-"@capacitor/network@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/network/-/network-7.0.1.tgz#8241ce6b6b5bbddc3157e218f31dd4ec04f1c4f0"
-  integrity sha512-jKyhTUqegKHjHKkK8e3t0TgwAYpKb3ocYpZkJrB3uXL5figkG06UEhQE4Cp25Dfb4LIjDxTSDLLsDEteKarmyg==
+"@capacitor/network@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/network/-/network-7.0.2.tgz#8dd91aba31ab3243052d8f18fb68227f5c82ff11"
+  integrity sha512-KKkiUvGfMVKIcYaG+KlGAxrQtoRnwJtT+9yhTkCFzZWeYrY91sBZKOVOfnNHO8RiOxqbKn5VSUlyFLQQiyyfyg==
 
 "@capacitor/preferences@^7.0.1":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@capacitor/preferences/-/preferences-7.0.1.tgz#d1791a94fba8018497839fb7bd0bfa8b636dad6d"
   integrity sha512-XF9jOHzvoIBZLwZr/EX6aVaUO1d8Mx7TwBLQS33pYHOliCW5knT5KUkFOXNNYxh9qqODYesee9xuQIKNJpQBag==
 
-"@capacitor/push-notifications@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/push-notifications/-/push-notifications-7.0.1.tgz#faa73aa2d0cc3c937d4331b9f010b123090a1185"
-  integrity sha512-nSHsMSrTHX5pOkX1Khse75/uvSx/JTcXG+9aT6a66CvzalH6MCs0ha8Jv+xu0k9xW8caO+qSUMjfj5Oy82Uxmw==
+"@capacitor/push-notifications@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/push-notifications/-/push-notifications-7.0.2.tgz#755c2eeed58626304ab72d19d08626ace89916d5"
+  integrity sha512-naw1R61V0qlEBa4CsF7+w3ay7V1PdZ4bQ1cJum+lgZB/yz3ASb6fRHm5GPjJFgTR9ET8zN0Q9y7lfgMTBgDOiA==
 
-"@capacitor/share@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/share/-/share-7.0.1.tgz#1d1e6d312504703c1f34fa0de94bed14af4bcbf8"
-  integrity sha512-7GAtWrb2inEWohC8E7mx38qAX6D9yqPDDnUtJaZ8JRpo15jjFRS40Cx388M8h4NlBWjV5NU3qf1sHXnyOBSJ5g==
+"@capacitor/share@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/share/-/share-7.0.2.tgz#74aab38dde1eae6d6889b71f1d09c02fe358da47"
+  integrity sha512-VyNPo/9831xnL17IMDeft5yNdBjoKNb451P95sRcr69hulRDqHc+kndqOVaMXnaA6IyBdWnnFv/n1HUf4cXpGw==
 
 "@capacitor/synapse@^1.0.3":
   version "1.0.4"
@@ -11368,10 +11373,10 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
-recharts@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/recharts/-/recharts-3.1.1.tgz#7fd57c8945ceb172d0b6dd03f335722348088b68"
-  integrity sha512-PVA2gdAiTPaPj+56BV5qVfkuPxhqXBhWKnu7r+7WYsczCWHkSrZcE224GLOAWjUMj+cYTkYfGYV2WC2qdJtvcQ==
+recharts@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/recharts/-/recharts-3.1.2.tgz#44626509c6567ed8208d3347e915397d480bb3d2"
+  integrity sha512-vhNbYwaxNbk/IATK0Ki29k3qvTkGqwvCgyQAQ9MavvvBwjvKnMTswdbklJpcOAoMPN/qxF3Lyqob0zO+ZXkZ4g==
   dependencies:
     "@reduxjs/toolkit" "1.x.x || 2.x.x"
     clsx "^2.1.1"
@@ -12226,10 +12231,10 @@ stop-iteration-iterator@^1.1.0:
     es-errors "^1.3.0"
     internal-slot "^1.1.0"
 
-strata-storage@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/strata-storage/-/strata-storage-2.0.1.tgz#90c1131ec5f9a290e4ae3b810e7b19b137aaa85a"
-  integrity sha512-lxiTgB7gwptkmYXKUWOwYXJkUMIzp1kDM5jcB0rxeHtdYeS233A4pfICBMJMw2xk7K4Vjm1iSnI5psBGTFQ1aA==
+strata-storage@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/strata-storage/-/strata-storage-2.0.3.tgz#0972bef641867e2bb5a6b851015bc2136f9abbc7"
+  integrity sha512-rp1MgEIqFqxep95pA9/uhe68P5ITpVr9QY2rP+mWzH80x38Gs13rxJvZXy/ava1R19pscSJtvEWm2ShODh9cLA==
 
 stream-buffers@2.2.x:
   version "2.2.0"
