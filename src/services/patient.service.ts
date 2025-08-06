@@ -332,7 +332,7 @@ class PatientService {
   }> {
     try {
       const collectionName = this.getCollectionName(tenantId);
-      const constraints: QueryConstraint[] = [];
+      const constraints: QueryConstraint[] = [where('tenantId', '==', tenantId)];
 
       // Apply filters
       if (filters.isActive !== undefined) {
@@ -393,6 +393,7 @@ class PatientService {
     try {
       const collectionName = this.getCollectionName(tenantId);
       const constraints: QueryConstraint[] = [
+        where('tenantId', '==', tenantId),
         orderBy('createdAt', 'desc')
       ];
       
@@ -421,7 +422,8 @@ class PatientService {
   async getPatientStats(tenantId: string): Promise<PatientStats> {
     try {
       const collectionName = this.getCollectionName(tenantId);
-      const snapshot = await getDocs(collection(firestore, collectionName));
+      const q = query(collection(firestore, collectionName), where('tenantId', '==', tenantId));
+      const snapshot = await getDocs(q);
 
       const stats: PatientStats = {
         totalPatients: 0,

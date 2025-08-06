@@ -67,7 +67,7 @@ class AppointmentService {
     } = {}
   ): Promise<Appointment[]> {
     const appointmentsCollection = getTenantSpecificCollectionName('appointments', tenantId);
-    let q = query(collection(firestore, appointmentsCollection));
+    let q = query(collection(firestore, appointmentsCollection), where('tenantId', '==', tenantId));
 
     if (filters.patientId) {
       q = query(q, where('patientId', '==', filters.patientId));
