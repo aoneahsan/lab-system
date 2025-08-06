@@ -73,7 +73,11 @@ export const homeCollectionService = {
   },
 
   async getHomeCollections(filters: HomeCollectionFilters = {}): Promise<HomeCollection[]> {
-    let q = query(collection(db, COLLECTION_NAME));
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+    const tenantId = user.uid; // In production, get from user profile
+
+    let q = query(collection(db, COLLECTION_NAME), where('tenantId', '==', tenantId));
 
     if (filters.status?.length) {
       q = query(q, where('status', 'in', filters.status));
@@ -156,7 +160,11 @@ export const homeCollectionService = {
   },
 
   async getRoutes(phlebotomistId?: string, date?: Date): Promise<CollectionRoute[]> {
-    let q = query(collection(db, ROUTES_COLLECTION));
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+    const tenantId = user.uid; // In production, get from user profile
+
+    let q = query(collection(db, ROUTES_COLLECTION), where('tenantId', '==', tenantId));
 
     if (phlebotomistId) {
       q = query(q, where('phlebotomistId', '==', phlebotomistId));
@@ -185,8 +193,13 @@ export const homeCollectionService = {
 
   // Kit Management
   async getAvailableKits(): Promise<CollectionKit[]> {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+    const tenantId = user.uid; // In production, get from user profile
+
     const q = query(
       collection(db, KITS_COLLECTION),
+      where('tenantId', '==', tenantId),
       where('status', '==', 'available'),
       limit(50)
     );

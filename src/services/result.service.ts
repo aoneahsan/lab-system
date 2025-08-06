@@ -38,7 +38,7 @@ export const resultService = {
     tenantId: string,
     filter?: any
   ): Promise<{ items: TestResult[]; total: number }> {
-    let q = query(collection(db, COLLECTIONS.RESULTS));
+    let q = query(collection(db, COLLECTIONS.RESULTS), where('tenantId', '==', tenantId));
 
     if (filter?.status) {
       q = query(q, where('status', '==', filter.status));
@@ -70,6 +70,7 @@ export const resultService = {
   async getResultsByOrder(tenantId: string, orderId: string): Promise<TestResult[]> {
     const q = query(
       collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
       where('orderId', '==', orderId),
       orderBy('testName')
     );
@@ -88,6 +89,7 @@ export const resultService = {
   async getResultsByPatient(tenantId: string, patientId: string): Promise<TestResult[]> {
     const q = query(
       collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       orderBy('createdAt', 'desc')
     );
@@ -186,7 +188,8 @@ export const resultService = {
   // Get validation rules for a test
   async getValidationRules(tenantId: string, testId: string) {
     const q = query(
-      collection(db, COLLECTIONS.RESULTS),
+      collection(db, COLLECTIONS.RESULT_VALIDATIONS),
+      where('tenantId', '==', tenantId),
       where('testId', '==', testId),
       where('enabled', '==', true)
     );
@@ -321,6 +324,7 @@ export const resultService = {
   async getAmendmentHistory(tenantId: string, resultId: string): Promise<any[]> {
     const q = query(
       collection(db, COLLECTIONS.AUDIT_LOGS),
+      where('tenantId', '==', tenantId),
       where('entityType', '==', 'result'),
       where('entityId', '==', resultId),
       where('action', '==', 'amendment'),
@@ -494,6 +498,7 @@ export const resultService = {
   async getResultGroups(tenantId: string, orderId: string): Promise<any[]> {
     const q = query(
       collection(db, COLLECTIONS.RESULTS),
+      where('tenantId', '==', tenantId),
       where('orderId', '==', orderId),
       orderBy('testName')
     );

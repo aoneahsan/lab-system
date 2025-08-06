@@ -70,7 +70,9 @@ const WESTGARD_RULES: QCRule[] = [
 export const qualityControlService = {
   // QC Tests
   async getQCTests(filters?: any): Promise<QCTest[]> {
-    const constraints = [];
+    const user = await getCurrentUser();
+    const tenantId = user?.tenantId || '';
+    const constraints = [where('tenantId', '==', tenantId)];
 
     if (filters?.status) {
       constraints.push(where('status', '==', filters.status));
@@ -92,9 +94,11 @@ export const qualityControlService = {
 
   async createQCTest(data: Partial<QCTest>): Promise<string> {
     const user = await getCurrentUser();
+    const tenantId = user?.tenantId || '';
     const docRef = await addDoc(collection(db, COLLECTIONS.QC_TESTS), {
       ...data,
       id: generateId(),
+      tenantId,
       status: 'active',
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
@@ -108,6 +112,7 @@ export const qualityControlService = {
     data: Partial<QCResult>
   ): Promise<{ resultId: string; violations: string[] }> {
     const user = await getCurrentUser();
+    const tenantId = user?.tenantId || '';
 
     // Get QC test details
     const qcTest = await this.getQCTest(data.qcTestId!);
@@ -134,6 +139,7 @@ export const qualityControlService = {
     const docRef = await addDoc(collection(db, COLLECTIONS.QC_RESULTS), {
       ...data,
       id: generateId(),
+      tenantId,
       operatorId: user?.uid,
       operatorName: user?.displayName || 'Unknown',
       acceptanceStatus,
@@ -145,10 +151,13 @@ export const qualityControlService = {
   },
 
   async getQCResults(qcTestId: string, levelId?: string, days: number = 30): Promise<QCResult[]> {
+    const user = await getCurrentUser();
+    const tenantId = user?.tenantId || '';
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const constraints = [
+      where('tenantId', '==', tenantId),
       where('qcTestId', '==', qcTestId),
       where('runDate', '>=', Timestamp.fromDate(startDate)),
       orderBy('runDate', 'desc'),
@@ -308,14 +317,20 @@ export const qualityControlService = {
 
   // Helper methods
   async getQCTest(id: string): Promise<QCTest | null> {
+    const user = await getCurrentUser();
+    const tenantId = user?.tenantId || '';
     const docRef = doc(db, COLLECTIONS.QC_TESTS, id);
     const snapshot = await getDoc(docRef);
 
     if (!snapshot.exists()) return null;
+    
+    // Verify tenant access
+    const data = snapshot.data();
+    if (data.tenantId !== tenantId) return null;
 
     return {
       id: snapshot.id,
-      ...snapshot.data(),
+      ...data,
     } as QCTest;
   },
 

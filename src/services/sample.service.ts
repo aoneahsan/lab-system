@@ -45,11 +45,9 @@ const generateBarcode = (sampleNumber: string): string => {
 export const sampleService = {
   // Get samples with filters
   async getSamples(tenantId: string, filter?: SampleFilter): Promise<Sample[]> {
-    let q = query(collection(db, COLLECTIONS.SAMPLES), orderBy('createdAt', 'desc'));
+    const constraints: any[] = [where('tenantId', '==', tenantId)];
 
     if (filter) {
-      const constraints: any[] = [];
-
       if (filter.status) {
         constraints.push(where('status', '==', filter.status));
       }
@@ -68,11 +66,10 @@ export const sampleService = {
       if (filter.collectedBy) {
         constraints.push(where('collectedBy', '==', filter.collectedBy));
       }
-
-      constraints.push(orderBy('createdAt', 'desc'));
-
-      q = query(collection(db, COLLECTIONS.SAMPLES), ...constraints);
     }
+
+    constraints.push(orderBy('createdAt', 'desc'));
+    const q = query(collection(db, COLLECTIONS.SAMPLES), ...constraints);
 
     const snapshot = await getDocs(q);
     return snapshot.docs.map(
@@ -219,22 +216,19 @@ export const sampleService = {
     tenantId: string,
     filter?: { status?: string; phlebotomistId?: string }
   ): Promise<SampleCollection[]> {
-    let q = query(collection(db, COLLECTIONS.SAMPLE_COLLECTIONS), orderBy('scheduledDate', 'desc'));
+    const constraints: any[] = [where('tenantId', '==', tenantId)];
 
     if (filter) {
-      const constraints: any[] = [];
-
       if (filter.status) {
         constraints.push(where('status', '==', filter.status));
       }
       if (filter.phlebotomistId) {
         constraints.push(where('phlebotomistId', '==', filter.phlebotomistId));
       }
-
-      constraints.push(orderBy('scheduledDate', 'desc'));
-
-      q = query(collection(db, COLLECTIONS.SAMPLES), ...constraints);
     }
+
+    constraints.push(orderBy('scheduledDate', 'desc'));
+    const q = query(collection(db, COLLECTIONS.SAMPLE_COLLECTIONS), ...constraints);
 
     const snapshot = await getDocs(q);
     return snapshot.docs.map(

@@ -61,8 +61,10 @@ export const customerPortalService = {
   },
 
   async getPortalAccess(patientId: string): Promise<CustomerPortalAccess | null> {
+    const tenantId = auth.currentUser?.uid || '';
     const q = query(
       collection(db, PORTAL_ACCESS_COLLECTION),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       where('isActive', '==', true),
       limit(1)
@@ -176,8 +178,10 @@ export const customerPortalService = {
   },
 
   async getPrescriptions(patientId: string): Promise<PrescriptionUpload[]> {
+    const tenantId = auth.currentUser?.uid || '';
     const q = query(
       collection(db, PRESCRIPTIONS_COLLECTION),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       orderBy('uploadedAt', 'desc')
     );
@@ -191,8 +195,10 @@ export const customerPortalService = {
 
   // Notifications
   async getNotifications(patientId: string): Promise<PortalNotification[]> {
+    const tenantId = auth.currentUser?.uid || '';
     const q = query(
       collection(db, PORTAL_NOTIFICATIONS_COLLECTION),
+      where('tenantId', '==', tenantId),
       where('recipientId', '==', patientId),
       orderBy('createdAt', 'desc'),
       limit(50)
@@ -214,9 +220,11 @@ export const customerPortalService = {
 
   // Portal Dashboard
   async getPortalDashboard(patientId: string): Promise<PortalDashboardStats> {
+    const tenantId = auth.currentUser?.uid || '';
     // Get results count
     const resultsQuery = query(
       collection(db, `${PROJECT_PREFIX}results`),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId)
     );
     const resultsSnapshot = await getDocs(resultsQuery);
@@ -224,6 +232,7 @@ export const customerPortalService = {
     // Get recent results
     const recentResultsQuery = query(
       collection(db, `${PROJECT_PREFIX}results`),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       orderBy('createdAt', 'desc'),
       limit(5)
@@ -233,6 +242,7 @@ export const customerPortalService = {
     // Get upcoming appointments
     const appointmentsQuery = query(
       collection(db, `${PROJECT_PREFIX}appointments`),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       where('status', 'in', ['requested', 'confirmed']),
       where('appointmentDate', '>=', Timestamp.now()),
@@ -244,6 +254,7 @@ export const customerPortalService = {
     // Get pending invoices
     const invoicesQuery = query(
       collection(db, `${PROJECT_PREFIX}invoices`),
+      where('tenantId', '==', tenantId),
       where('patientId', '==', patientId),
       where('status', 'in', ['sent', 'viewed', 'overdue']),
       orderBy('dueDate', 'asc'),
