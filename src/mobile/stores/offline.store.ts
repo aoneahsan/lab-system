@@ -190,7 +190,8 @@ export const useOfflineStore = create<OfflineState>()(
       name: 'offline-storage',
       storage: {
         getItem: async (name) => {
-          return await unifiedStorage.get(name);
+          const result = await unifiedStorage.get(name);
+          return (result as any)?.state || null;
         },
         setItem: async (name, value) => {
           await unifiedStorage.set(name, value, {

@@ -6,12 +6,12 @@ import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 const db = admin.firestore();
 const storage = admin.storage();
 
-export const generateMonthlyReport = functions.https.onCall(async (data, context) => {
-  if (!context.auth || !['ADMIN', 'LAB_SUPERVISOR'].includes(context.auth.token.role)) {
+export const generateMonthlyReport = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || !['ADMIN', 'LAB_SUPERVISOR'].includes(request.auth.token.role)) {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { tenantId, month, year } = data;
+  const { tenantId, month, year } = request.data;
   const startDate = startOfMonth(new Date(year, month - 1));
   const endDate = endOfMonth(new Date(year, month - 1));
 
@@ -27,7 +27,7 @@ export const generateMonthlyReport = functions.https.onCall(async (data, context
         period: format(startDate, 'MMMM yyyy'),
         ...reportData,
         generatedAt: new Date(),
-        generatedBy: context.auth.uid,
+        generatedBy: request.auth.uid,
       },
     });
 
@@ -55,7 +55,7 @@ export const generateMonthlyReport = functions.https.onCall(async (data, context
       url,
       data: reportData,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: context.auth.uid,
+      createdBy: request.auth.uid,
     });
 
     return { success: true, url };
@@ -65,16 +65,16 @@ export const generateMonthlyReport = functions.https.onCall(async (data, context
   }
 });
 
-export const generatePatientReport = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const generatePatientReport = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { patientId, startDate, endDate } = data;
+  const { patientId, startDate, endDate } = request.data;
 
   try {
     // Verify access
-    if (context.auth.token.role === 'PATIENT' && context.auth.uid !== patientId) {
+    if (request.auth.token.role === 'PATIENT' && request.auth.uid !== patientId) {
       throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
     }
 
@@ -135,12 +135,12 @@ export const generatePatientReport = functions.https.onCall(async (data, context
   }
 });
 
-export const generateQualityControlReport = functions.https.onCall(async (data, context) => {
-  if (!context.auth || !['ADMIN', 'LAB_SUPERVISOR', 'QC_SPECIALIST'].includes(context.auth.token.role)) {
+export const generateQualityControlReport = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || !['ADMIN', 'LAB_SUPERVISOR', 'QC_SPECIALIST'].includes(request.auth.token.role)) {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { tenantId, analyzerId, startDate, endDate } = data;
+  const { tenantId, analyzerId, startDate, endDate } = request.data;
 
   try {
     // Get QC data
@@ -177,7 +177,7 @@ export const generateQualityControlReport = functions.https.onCall(async (data, 
         chartData,
         qcData,
         generatedAt: new Date(),
-        generatedBy: context.auth.uid,
+        generatedBy: request.auth.uid,
       },
     });
 

@@ -11,7 +11,7 @@ interface AnalyticsEvent {
 }
 
 export const useAnalytics = () => {
-  const { trackEvent, trackMetric } = useTracking();
+  const { trackEvent } = useTracking();
   const { currentUser } = useAuth();
 
   // Track user actions
@@ -74,26 +74,27 @@ export const useAnalytics = () => {
   // Track API performance
   const trackApiCall = useCallback(
     (endpoint: string, method: string, duration: number, status: number) => {
-      trackEvent('api', endpoint, duration, method);
-      trackMetric('api_response_time', duration, 'ms', {
+      trackEvent('api_call', {
         endpoint,
         method,
-        status: status.toString(),
+        duration,
+        status,
         tenantId: currentUser?.tenantId || 'unknown',
       });
     },
-    [trackEvent, trackMetric, currentUser]
+    [trackEvent, currentUser]
   );
 
   // Track lab-specific metrics
   const trackLabMetrics = useCallback(
     (metricType: string, value: number, details?: Record<string, any>) => {
-      trackMetric(`lab_${metricType}`, value, undefined, {
+      trackEvent(`lab_metric_${metricType}`, {
+        value,
         tenantId: currentUser?.tenantId || 'unknown',
         ...details,
       });
     },
-    [trackMetric, currentUser]
+    [trackEvent, currentUser]
   );
 
   // Track test processing
@@ -121,7 +122,11 @@ export const useAnalytics = () => {
         userId: currentUser?.uid,
         tenantId: currentUser?.tenantId,
       });
-      trackEvent('report_generation', reportType, duration, format);
+      trackEvent('report_generation_timing', {
+        reportType,
+        format,
+        duration,
+      });
     },
     [trackEvent, currentUser]
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Building2, Phone, Mail, Globe, Edit2, Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { VendorForm } from '@/components/inventory/VendorForm';
 import { Button } from '@/components/ui/Button';
 import type { Vendor } from '@/types/inventory.types';
@@ -12,7 +12,7 @@ const VendorsPage: React.FC = () => {
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { vendors, loading, fetchVendors, createVendor, updateVendor, deleteVendor } = useInventoryStore();
 
   useEffect(() => {

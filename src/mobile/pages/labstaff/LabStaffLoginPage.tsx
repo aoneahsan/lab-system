@@ -39,7 +39,7 @@ const LabStaffLoginPage: React.FC = () => {
   const checkBiometricAvailability = async () => {
     try {
       const result = await BiometricAuth.isAvailable();
-      setBiometricAvailable(result.available);
+      setBiometricAvailable(result || false);
     } catch (error) {
       console.error('Biometric check failed:', error);
     }
@@ -57,10 +57,9 @@ const LabStaffLoginPage: React.FC = () => {
   const handleBiometricLogin = async () => {
     try {
       const verified = await BiometricAuth.authenticate({
-        title: 'Biometric Authentication',
-        subtitle: 'Use your fingerprint or face ID',
-        description: 'Access lab systems securely',
-        fallbackButtonTitle: 'Use Password',
+        reason: 'Access lab systems securely',
+        cancelTitle: 'Use Password',
+        fallbackTitle: 'Use Password',
       });
 
       if (verified.success) {

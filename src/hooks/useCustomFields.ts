@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customFieldService } from '@/services/custom-field.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/stores/toast.store';
 import type {
   CustomFieldDefinition,
   CreateCustomFieldData,
@@ -54,27 +54,19 @@ export const useCustomField = (fieldId: string) => {
 export const useCreateCustomField = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
-  const { toast } = useToast();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: (data: CreateCustomFieldData) =>
-      customFieldService.createCustomField(currentTenant!.id, data, user!.uid),
+      customFieldService.createCustomField(currentTenant!.id, data, currentUser!.uid),
     onSuccess: (field) => {
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.all });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.byModule(field.module) });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.sections(field.module) });
-      toast({
-        title: 'Success',
-        description: 'Custom field created successfully',
-      });
+      toast.success('Success', 'Custom field created successfully');
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to create custom field',
-        variant: 'destructive',
-      });
+      toast.error('Error', error.message || 'Failed to create custom field');
     },
   });
 };
@@ -83,28 +75,20 @@ export const useCreateCustomField = () => {
 export const useUpdateCustomField = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
-  const { toast } = useToast();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({ fieldId, data }: { fieldId: string; data: UpdateCustomFieldData }) =>
-      customFieldService.updateCustomField(currentTenant!.id, fieldId, data, user!.uid),
+      customFieldService.updateCustomField(currentTenant!.id, fieldId, data, currentUser!.uid),
     onSuccess: (field) => {
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.all });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.detail(field.id) });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.byModule(field.module) });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.sections(field.module) });
-      toast({
-        title: 'Success',
-        description: 'Custom field updated successfully',
-      });
+      toast.success('Success', 'Custom field updated successfully');
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to update custom field',
-        variant: 'destructive',
-      });
+      toast.error('Error', error.message || 'Failed to update custom field');
     },
   });
 };
@@ -113,23 +97,15 @@ export const useUpdateCustomField = () => {
 export const useDeleteCustomField = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: (fieldId: string) => customFieldService.deleteCustomField(currentTenant!.id, fieldId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.all });
-      toast({
-        title: 'Success',
-        description: 'Custom field deleted successfully',
-      });
+      toast.success('Success', 'Custom field deleted successfully');
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to delete custom field',
-        variant: 'destructive',
-      });
+      toast.error('Error', error.message || 'Failed to delete custom field');
     },
   });
 };
@@ -138,8 +114,7 @@ export const useDeleteCustomField = () => {
 export const useReorderCustomFields = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { user } = useAuthStore();
-  const { toast } = useToast();
+  const { currentUser } = useAuthStore();
 
   return useMutation({
     mutationFn: ({
@@ -149,21 +124,14 @@ export const useReorderCustomFields = () => {
       module: CustomFieldDefinition['module'];
       fieldOrders: Array<{ fieldId: string; displayOrder: number }>;
     }) =>
-      customFieldService.reorderCustomFields(currentTenant!.id, module, fieldOrders, user!.uid),
+      customFieldService.reorderCustomFields(currentTenant!.id, module, fieldOrders, currentUser!.uid),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.byModule(variables.module) });
       queryClient.invalidateQueries({ queryKey: CUSTOM_FIELD_KEYS.sections(variables.module) });
-      toast({
-        title: 'Success',
-        description: 'Custom fields reordered successfully',
-      });
+      toast.success('Success', 'Custom fields reordered successfully');
     },
     onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to reorder custom fields',
-        variant: 'destructive',
-      });
+      toast.error('Error', error.message || 'Failed to reorder custom fields');
     },
   });
 };

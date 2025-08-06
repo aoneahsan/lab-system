@@ -1,11 +1,11 @@
 import * as functions from 'firebase-functions';
 import { VertexAI } from '@google-cloud/vertexai';
-import { projectId } from '../config';
+import config from '../config';
 
 // Initialize Vertex AI
 const vertexAI = new VertexAI({
-  project: projectId,
-  location: 'us-central1',
+  project: config.vertexai.projectId,
+  location: config.vertexai.location,
 });
 
 const model = vertexAI.getGenerativeModel({
@@ -25,13 +25,13 @@ interface TrendAnalysisData {
   patientInfo?: any;
 }
 
-export const analyzeTestTrends = functions.https.onCall(async (data: TrendAnalysisData, context) => {
+export const analyzeTestTrends = functions.https.onCall(async (request: functions.https.CallableRequest<TrendAnalysisData>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { patientId, testCode, historicalResults, patientInfo } = data;
+  const { patientId, testCode, historicalResults, patientInfo } = request.data;
 
   try {
     // Sort results by date
@@ -172,7 +172,7 @@ function generatePrediction(
   
   // Predict next value using linear regression
   const nextIndex = results.length;
-  let nextValue = trend.slope * nextIndex + trend.intercept;
+  let nextValue = trend.slope * nextIndex + (trend.intercept || 0);
   
   // Apply some constraints to keep prediction reasonable
   const values = results.map(r => r.value);
@@ -232,7 +232,7 @@ Format: ["insight1", "insight2", "insight3"]`;
 
   try {
     const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
     // Extract JSON array from response
     const jsonMatch = response.match(/\[[\s\S]*\]/);

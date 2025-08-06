@@ -263,7 +263,7 @@ const PhlebotomistScanPage: React.FC = () => {
         <div className="fixed inset-0 bg-black z-50">
           <QRScanner
             onScan={(result) => {
-              handleScanResult(result.data);
+              handleScanResult((result as any).text || (result as any).data || '');
               setIsScanning(false);
             }}
             onError={(error) => {

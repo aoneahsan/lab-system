@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from '@/services/appointment.service';
 import { Appointment, AppointmentFormData } from '@/types/appointment.types';
-import { toast } from 'sonner';
+import { toast } from '@/stores/toast.store';
 import { useTenantStore } from '@/stores/tenant.store';
 
 export const useAppointments = (filters?: any) => {
@@ -33,10 +33,10 @@ export const useCreateAppointment = () => {
       appointmentService.createAppointment(currentTenant?.id || '', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', currentTenant?.id] });
-      toast.success('The appointment has been scheduled successfully.');
+      toast.success('Success', 'The appointment has been scheduled successfully.');
     },
     onError: (error) => {
-      toast.error('Failed to create appointment. Please try again.');
+      toast.error('Error', 'Failed to create appointment. Please try again.');
       console.error('Error creating appointment:', error);
     },
   });
@@ -52,10 +52,10 @@ export const useUpdateAppointment = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', currentTenant?.id] });
       queryClient.invalidateQueries({ queryKey: ['appointment', currentTenant?.id, variables.id] });
-      toast.success('The appointment has been updated successfully.');
+      toast.success('Success', 'The appointment has been updated successfully.');
     },
     onError: (error) => {
-      toast.error('Failed to update appointment. Please try again.');
+      toast.error('Error', 'Failed to update appointment. Please try again.');
       console.error('Error updating appointment:', error);
     },
   });
@@ -70,10 +70,10 @@ export const useCancelAppointment = () => {
       appointmentService.cancelAppointment(currentTenant?.id || '', id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', currentTenant?.id] });
-      toast.success('The appointment has been cancelled.');
+      toast.success('Success', 'The appointment has been cancelled.');
     },
     onError: (error) => {
-      toast.error('Failed to cancel appointment. Please try again.');
+      toast.error('Error', 'Failed to cancel appointment. Please try again.');
       console.error('Error cancelling appointment:', error);
     },
   });
@@ -88,10 +88,10 @@ export const useCheckInPatient = () => {
       appointmentService.checkInPatient(currentTenant?.id || '', appointmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', currentTenant?.id] });
-      toast.success('The patient has been checked in successfully.');
+      toast.success('Success', 'The patient has been checked in successfully.');
     },
     onError: (error) => {
-      toast.error('Failed to check in patient. Please try again.');
+      toast.error('Error', 'Failed to check in patient. Please try again.');
       console.error('Error checking in patient:', error);
     },
   });
@@ -106,10 +106,10 @@ export const useCompleteAppointment = () => {
       appointmentService.completeAppointment(currentTenant?.id || '', appointmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', currentTenant?.id] });
-      toast.success('The appointment has been marked as completed.');
+      toast.success('Success', 'The appointment has been marked as completed.');
     },
     onError: (error) => {
-      toast.error('Failed to complete appointment. Please try again.');
+      toast.error('Error', 'Failed to complete appointment. Please try again.');
       console.error('Error completing appointment:', error);
     },
   });

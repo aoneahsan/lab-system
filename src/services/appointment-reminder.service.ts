@@ -35,7 +35,9 @@ export const appointmentReminderService = {
     templateId: string
   ): Promise<void> {
     // Get appointment details
-    const appointment = await appointmentService.getAppointment(appointmentId);
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    if (!tenantId) throw new Error('No tenant ID');
+    const appointment = await appointmentService.getAppointment(tenantId, appointmentId);
     if (!appointment) throw new Error('Appointment not found');
 
     // Prepare template variables
@@ -43,10 +45,10 @@ export const appointmentReminderService = {
       patientName: appointment.patientName,
       appointmentDate: new Date(appointment.scheduledDate).toLocaleDateString(),
       appointmentTime: appointment.scheduledTime,
-      providerName: appointment.providerName,
-      location: appointment.location,
+      providerName: 'Doctor',
+      location: appointment.locationName,
       duration: `${appointment.duration} minutes`,
-      testNames: appointment.tests.map(t => t.name).join(', ')
+      testNames: appointment.testNames.join(', ')
     };
 
     // Send message based on channel
@@ -138,7 +140,9 @@ export const appointmentReminderService = {
     email: boolean;
     whatsapp: boolean;
   }> {
-    const appointment = await appointmentService.getAppointment(appointmentId);
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    if (!tenantId) throw new Error('No tenant ID');
+    const appointment = await appointmentService.getAppointment(tenantId, appointmentId);
     if (!appointment) throw new Error('Appointment not found');
 
     return {
@@ -157,16 +161,21 @@ export const appointmentReminderService = {
     const remindersCollection = collection(db, getCollectionName('appointment_reminders'));
     const reminderDoc = doc(remindersCollection);
     
-    const reminder: AppointmentReminder = {
+    const reminder = {
       id: reminderDoc.id,
       appointmentId,
-      channel,
-      messageId,
-      status: 'pending',
+      type: channel,
       scheduledFor: new Date(),
+      status: 'pending' as const,
       attempts: 0,
-      createdAt: serverTimestamp() as any,
-      updatedAt: serverTimestamp() as any,
+      metadata: {
+        to: '',
+        template: '',
+        variables: {},
+        messageId
+      },
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
       tenantId: useTenantStore.getState().currentTenant?.id || ''
     };
 
@@ -215,7 +224,9 @@ export const appointmentReminderService = {
 
   // Schedule automated reminders for an appointment
   async scheduleAutomatedReminders(appointmentId: string): Promise<void> {
-    const appointment = await appointmentService.getAppointment(appointmentId);
+    const tenantId = useTenantStore.getState().currentTenant?.id;
+    if (!tenantId) throw new Error('No tenant ID');
+    const appointment = await appointmentService.getAppointment(tenantId, appointmentId);
     if (!appointment) throw new Error('Appointment not found');
 
     const preferences = await this.getAppointmentCommPreferences(appointment.patientId);

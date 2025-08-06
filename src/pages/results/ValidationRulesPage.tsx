@@ -46,7 +46,7 @@ const ValidationRulesPage: React.FC = () => {
   };
 
   const handleDeleteRule = (rule: ResultValidationRule) => {
-    if (confirm(`Are you sure you want to delete this ${rule.ruleType} rule for ${rule.testName}?`)) {
+    if (confirm(`Are you sure you want to delete this ${rule.ruleType} rule?`)) {
       deleteRuleMutation.mutate(rule.id);
     }
   };
@@ -162,8 +162,8 @@ const ValidationRulesPage: React.FC = () => {
                   <tr key={rule.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{rule.testName}</div>
-                        <div className="text-sm text-gray-500">{rule.testCode}</div>
+                        <div className="text-sm font-medium text-gray-900">{rule.ruleName}</div>
+                        <div className="text-sm text-gray-500">Test ID: {rule.testId}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -195,7 +195,7 @@ const ValidationRulesPage: React.FC = () => {
                         {rule.ruleType === 'delta' && (
                           <span>
                             Delta: {rule.deltaThreshold}
-                            {rule.deltaType === 'percentage' ? '%' : ''} change
+                            {rule.deltaType === 'percent' ? '%' : ''} change
                           </span>
                         )}
                       </div>

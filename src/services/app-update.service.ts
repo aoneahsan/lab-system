@@ -27,13 +27,13 @@ export const appUpdateService = {
     try {
       // Configure update service
       await CapacitorNativeUpdate.configure({
-        updateUrl: import.meta.env.VITE_UPDATE_SERVER_URL || 'https://api.labflow.app/updates/v1',
-        autoCheck: true,
-        publicKey: import.meta.env.VITE_UPDATE_PUBLIC_KEY || '',
+        // updateUrl: import.meta.env.VITE_UPDATE_SERVER_URL || 'https://api.labflow.app/updates/v1',
+        // autoCheck: true,
+        // publicKey: import.meta.env.VITE_UPDATE_PUBLIC_KEY || '',
         channel: import.meta.env.VITE_UPDATE_CHANNEL || 'production',
         checkInterval: 3600000, // Check every hour
         updateStrategy: 'background', // background, immediate, or manual
-      });
+      } as any);
 
       console.log('📱 Native update service initialized');
       
@@ -52,7 +52,7 @@ export const appUpdateService = {
 
     try {
       // First check for live/OTA updates
-      const liveUpdate = await CapacitorNativeUpdate.checkForUpdate();
+      const liveUpdate = await (CapacitorNativeUpdate as any).check();
       
       if (liveUpdate.available) {
         if (!silent) {
@@ -72,7 +72,7 @@ export const appUpdateService = {
       }
 
       // Then check for native app store updates
-      const nativeUpdate = await CapacitorNativeUpdate.checkAppUpdate();
+      const nativeUpdate = await (CapacitorNativeUpdate as any).checkApp();
       
       if (nativeUpdate.updateAvailable) {
         if (!silent) {
@@ -111,7 +111,7 @@ export const appUpdateService = {
     }
 
     try {
-      await CapacitorNativeUpdate.downloadUpdate({
+      await (CapacitorNativeUpdate as any).download({
         onProgress: (progress) => {
           console.log(`Download progress: ${progress.percent}%`);
           if (onProgress) {
@@ -142,7 +142,7 @@ export const appUpdateService = {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Apply update - this will restart the app
-      await CapacitorNativeUpdate.applyUpdate();
+      await (CapacitorNativeUpdate as any).apply();
     } catch (error) {
       console.error('Failed to apply update:', error);
       toast.error('Update Failed', 'Unable to apply the update. Please restart the app manually.');
@@ -174,7 +174,7 @@ export const appUpdateService = {
     }
 
     try {
-      const versionInfo = await CapacitorNativeUpdate.getCurrentVersion();
+      const versionInfo = await (CapacitorNativeUpdate as any).getVersion();
       return {
         native: versionInfo.versionName,
         build: versionInfo.versionCode,
@@ -197,7 +197,7 @@ export const appUpdateService = {
     }
 
     try {
-      const result = await CapacitorNativeUpdate.isLiveUpdate();
+      const result = await (CapacitorNativeUpdate as any).isLive();
       return result.isLiveUpdate;
     } catch (error) {
       console.error('Failed to check live update status:', error);
@@ -248,7 +248,7 @@ export const appUpdateService = {
 
     try {
       const result = await CapacitorNativeUpdate.requestReview();
-      return result.presented;
+      return (result as any).success || false;
     } catch (error) {
       console.error('Failed to request review:', error);
       return false;
@@ -279,18 +279,7 @@ export const handleUpdateFlow = async (updateInfo: UpdateCheckResult) => {
       // For optional updates, let user choose
       toast.info(
         'Update Available',
-        `Version ${updateInfo.version} is available. Would you like to update now?`,
-        {
-          action: {
-            label: 'Update',
-            onClick: async () => {
-              const downloaded = await appUpdateService.downloadUpdate();
-              if (downloaded) {
-                await appUpdateService.applyUpdate();
-              }
-            }
-          }
-        }
+        `Version ${updateInfo.version} is available. Would you like to update now?`
       );
     }
   }

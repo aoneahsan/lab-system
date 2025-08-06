@@ -135,7 +135,7 @@ export const DashboardLayout = () => {
     : navigation.filter((item) => {
         if ('roles' in item) {
           if (item.roles === 'all') return true;
-          return item.roles.includes(effectiveUser?.role || '');
+          return Array.isArray(item.roles) && item.roles.includes(effectiveUser?.role || '');
         }
         return true;
       });

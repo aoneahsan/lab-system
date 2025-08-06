@@ -229,7 +229,12 @@ export default function InventoryPage() {
                 {editingItem ? 'Edit Item' : 'Add New Item'}
               </h2>
               <InventoryItemForm
-                initialData={editingItem || undefined}
+                initialData={editingItem ? {
+                  ...editingItem,
+                  expiryDate: editingItem.expiryDate instanceof Date 
+                    ? editingItem.expiryDate 
+                    : editingItem.expiryDate?.toDate()
+                } : undefined}
                 onSubmit={editingItem ? handleUpdateItem : handleCreateItem}
                 onCancel={() => {
                   setShowForm(false);

@@ -9,17 +9,17 @@ const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
-  phoneNumber: yup.string().optional(),
+  phoneNumber: yup.string().optional().nullable().default(undefined),
   role: yup.string().oneOf(Object.values(SYSTEM_ROLES) as string[]).required('Role is required'),
   isActive: yup.boolean().required(),
   metadata: yup.object({
-    employeeId: yup.string().optional(),
-    department: yup.string().optional(),
-    designation: yup.string().optional(),
-  }).optional(),
-  preferences: yup.object().optional(),
-  customFields: yup.object().optional(),
-});
+    employeeId: yup.string().optional().nullable().default(undefined),
+    department: yup.string().optional().nullable().default(undefined),
+    designation: yup.string().optional().nullable().default(undefined),
+  }).optional().nullable().default(undefined),
+  preferences: yup.object().optional().nullable().default(undefined),
+  customFields: yup.object().optional().nullable().default(undefined),
+}).required();
 
 interface UserFormProps {
   initialData?: User;
@@ -34,7 +34,7 @@ export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFor
     handleSubmit,
     formState: { errors },
   } = useForm<UserFormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       email: initialData?.email || '',
       firstName: initialData?.firstName || '',

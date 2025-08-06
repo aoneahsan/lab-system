@@ -262,6 +262,7 @@ const ValidationRulesPage: React.FC = () => {
       {/* Validation Rule Modal */}
       {showModal && (
         <ValidationRuleModal
+          isOpen={showModal}
           rule={selectedRule}
           onClose={() => {
             setShowModal(false);

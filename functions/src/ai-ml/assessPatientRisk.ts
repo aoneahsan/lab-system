@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions';
 import { VertexAI } from '@google-cloud/vertexai';
-import { projectId } from '../config';
+import config from '../config';
 
 // Initialize Vertex AI
 const vertexAI = new VertexAI({
-  project: projectId,
+  project: config.vertexai.projectId,
   location: 'us-central1',
 });
 
@@ -25,13 +25,13 @@ interface PatientRiskData {
   medicalHistory?: any[];
 }
 
-export const assessPatientRisk = functions.https.onCall(async (data: PatientRiskData, context) => {
+export const assessPatientRisk = functions.https.onCall(async (request: functions.https.CallableRequest<PatientRiskData>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { patientId, recentResults, patientInfo, medicalHistory } = data;
+  const { patientId, recentResults, patientInfo, medicalHistory } = request.data;
 
   try {
     // Analyze test results for risk factors
@@ -300,7 +300,7 @@ Format: ["measure1", "measure2", "measure3", "measure4", "measure5"]`;
 
   try {
     const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
     const jsonMatch = response.match(/\[[\s\S]*\]/);
     if (jsonMatch) {

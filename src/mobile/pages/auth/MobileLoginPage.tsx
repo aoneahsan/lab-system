@@ -5,7 +5,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Fingerprint, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
-import type { BiometricAuthPlugin } from 'capacitor-biometric-authentication';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { App } from '@capacitor/app';
@@ -46,7 +45,7 @@ const MobileLoginPage: React.FC = () => {
   const checkBiometricAvailability = async () => {
     try {
       const result = await BiometricAuth.isAvailable();
-      setBiometricAvailable(result.available || false);
+      setBiometricAvailable(result || false);
     } catch (error) {
       console.error('Biometric check failed:', error);
     }
@@ -66,10 +65,9 @@ const MobileLoginPage: React.FC = () => {
   const handleBiometricLogin = async () => {
     try {
       const verified = await BiometricAuth.authenticate({
-        title: 'Biometric Authentication',
-        subtitle: 'Use your fingerprint or face ID',
-        description: 'Access your lab results securely',
-        fallbackButtonTitle: 'Use Password',
+        reason: 'Access your lab results securely',
+        cancelTitle: 'Use Password',
+        fallbackTitle: 'Use Password',
       });
 
       if (verified.success) {

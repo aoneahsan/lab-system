@@ -1,15 +1,15 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { format } from 'date-fns';
+import { startOfMonth, endOfMonth } from 'date-fns';
 
 const db = admin.firestore();
 
-export const createInvoice = functions.https.onCall(async (data, context) => {
-  if (!context.auth || !['ADMIN', 'BILLING_STAFF'].includes(context.auth.token.role)) {
+export const createInvoice = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || !['ADMIN', 'BILLING_STAFF'].includes(request.auth.token.role)) {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { patientId, items, insuranceClaimId } = data;
+  const { patientId, items, insuranceClaimId } = request.data;
 
   try {
     // Get patient details
@@ -64,7 +64,7 @@ export const createInvoice = functions.https.onCall(async (data, context) => {
       insuranceClaimId,
       tenantId: patient.tenantId,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: context.auth.uid,
+      createdBy: request.auth.uid,
     });
 
     return { 
@@ -79,12 +79,12 @@ export const createInvoice = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const processPayment = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const processPayment = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { invoiceId, amount, paymentMethod, referenceNumber } = data;
+  const { invoiceId, amount, paymentMethod, referenceNumber } = request.data;
 
   try {
     // Get invoice
@@ -108,7 +108,7 @@ export const processPayment = functions.https.onCall(async (data, context) => {
       referenceNumber,
       status: 'completed',
       processedAt: admin.firestore.FieldValue.serverTimestamp(),
-      processedBy: context.auth.uid,
+      processedBy: request.auth.uid,
       tenantId: invoice.tenantId,
     });
 
@@ -143,12 +143,12 @@ export const processPayment = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const submitInsuranceClaim = functions.https.onCall(async (data, context) => {
-  if (!context.auth || !['ADMIN', 'BILLING_STAFF'].includes(context.auth.token.role)) {
+export const submitInsuranceClaim = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || !['ADMIN', 'BILLING_STAFF'].includes(request.auth.token.role)) {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { patientId, services, diagnosisCodes, authorizationNumber } = data;
+  const { patientId, services, diagnosisCodes, authorizationNumber } = request.data;
 
   try {
     // Get patient and insurance details
@@ -178,7 +178,7 @@ export const submitInsuranceClaim = functions.https.onCall(async (data, context)
       claimAmount,
       status: 'submitted',
       submittedAt: admin.firestore.FieldValue.serverTimestamp(),
-      submittedBy: context.auth.uid,
+      submittedBy: request.auth.uid,
       tenantId: patient.tenantId,
     });
 
@@ -197,10 +197,8 @@ export const submitInsuranceClaim = functions.https.onCall(async (data, context)
   }
 });
 
-export const reconcilePayments = functions.pubsub
-  .schedule('0 2 * * *') // 2:00 AM daily
-  .timeZone('America/Los_Angeles')
-  .onRun(async (context) => {
+// This scheduled function is now exported from index.ts using onSchedule
+export const reconcilePaymentsHandler = async () => {
     console.log('Running payment reconciliation');
 
     try {

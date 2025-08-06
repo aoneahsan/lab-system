@@ -495,7 +495,7 @@ export const billingService = {
       overdueAmount,
       todaysCharges,
       todaysPayments,
-      todaysRevenue: todayRevenue,
+      // todaysRevenue: todayRevenue,
       invoicesByStatus,
       paymentsByMethod: await this.calculatePaymentsByMethod(tenantId, today),
       claimsByStatus,

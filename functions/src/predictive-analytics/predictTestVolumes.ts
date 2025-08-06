@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions';
 import { VertexAI } from '@google-cloud/vertexai';
-import { projectId } from '../config';
+import config from '../config';
 
 // Initialize Vertex AI
 const vertexAI = new VertexAI({
-  project: projectId,
+  project: config.vertexai.projectId,
   location: 'us-central1',
 });
 
@@ -30,13 +30,13 @@ interface ForecastRequest {
   testCodes?: string[];
 }
 
-export const predictTestVolumes = functions.https.onCall(async (data: ForecastRequest, context) => {
+export const predictTestVolumes = functions.https.onCall(async (request: functions.https.CallableRequest<ForecastRequest>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { historicalData, forecastDays, testCodes } = data;
+  const { historicalData, forecastDays, testCodes } = request.data;
 
   try {
     // Group data by test code
@@ -248,9 +248,9 @@ function generateForecast(
 }
 
 function calculateWeeklyAverage(data: Array<{ date: string; count: number }>, dayOfWeek: number) {
-  const dayData = data.filter(d => new Date(d.date).getDay() === dayOfWeek);
+  const dayData = request.data.filter(d => new Date(d.date).getDay() === dayOfWeek);
   if (dayData.length === 0) return 0;
-  return dayData.reduce((sum, d) => sum + d.count, 0) / dayData.length;
+  return dayData.reduce((sum: any, d: any) => sum + d.count, 0) / dayData.length;
 }
 
 async function generateRecommendations(
@@ -279,7 +279,7 @@ Format: ["recommendation1", "recommendation2", "recommendation3"]`;
 
   try {
     const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
     const jsonMatch = response.match(/\[[^\]]*\]/);
     if (jsonMatch) {

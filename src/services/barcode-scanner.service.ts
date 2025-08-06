@@ -127,14 +127,17 @@ class BarcodeScannerService {
     format: 'CODE128' | 'CODE39' | 'EAN13' = 'CODE128'
   ): Promise<string> {
     try {
+      const formatMap = {
+        'CODE128': 'CODE_128' as any,
+        'CODE39': 'CODE_39' as any,
+        'EAN13': 'EAN_13' as any,
+      };
       const result = await QRCodeStudio.generateBarcode({
         data: content,
-        format,
-        options: {
-          width: 300,
-          height: 100,
-          displayValue: true,
-        },
+        format: formatMap[format] || 'CODE_128' as any,
+        width: 300,
+        height: 100,
+        displayText: true,
       });
       return result.dataUrl;
     } catch (error) {

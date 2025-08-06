@@ -3,7 +3,7 @@ import { firebaseConfig } from '@/config/firebase.config';
 
 // Initialize notification kit
 export const initializeNotifications = async () => {
-  await NotificationKit.init({
+  await (NotificationKit as any).init({
     provider: 'firebase',
     config: firebaseConfig,
     inApp: {
@@ -92,11 +92,11 @@ export const localNotifications = {
     every?: 'day' | 'week' | 'month';
     actions?: Array<{ id: string; title: string }>;
   }) => {
-    return await notifications.schedule(options);
+    return await notifications.schedule(options as any);
   },
   
-  cancel: async (id: string) => {
-    await notifications.cancel(id);
+  cancel: async (id: string | number) => {
+    await notifications.cancel(Number(id));
   },
   
   getPending: async () => {

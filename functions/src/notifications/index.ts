@@ -5,12 +5,12 @@ import { sendSMS } from '../services/smsService';
 
 const db = admin.firestore();
 
-export const sendCriticalResultNotification = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const sendCriticalResultNotification = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { resultId, patientId, clinicianId, values } = data;
+  const { resultId, patientId, clinicianId, values } = request.data;
 
   try {
     // Get clinician details
@@ -34,7 +34,7 @@ export const sendCriticalResultNotification = functions.https.onCall(async (data
       priority: 'high',
       status: 'pending',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: context.auth.uid,
+      createdBy: request.auth.uid,
     });
 
     // Send email notification
@@ -74,12 +74,12 @@ export const sendCriticalResultNotification = functions.https.onCall(async (data
   }
 });
 
-export const sendAppointmentReminder = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const sendAppointmentReminder = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { appointmentId, patientId, reminderType } = data;
+  const { appointmentId, patientId, reminderType } = request.data;
 
   try {
     const appointmentDoc = await db.collection('labflow_appointments').doc(appointmentId).get();
@@ -126,7 +126,7 @@ export const sendAppointmentReminder = functions.https.onCall(async (data, conte
       patientId,
       reminderType,
       sentAt: admin.firestore.FieldValue.serverTimestamp(),
-      sentBy: context.auth.uid,
+      sentBy: request.auth.uid,
     });
 
     return { success: true };

@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions';
 import { VertexAI } from '@google-cloud/vertexai';
-import { projectId } from '../config';
+import config from '../config';
 
 // Initialize Vertex AI
 const vertexAI = new VertexAI({
-  project: projectId,
+  project: config.vertexai.projectId,
   location: 'us-central1',
 });
 
@@ -36,13 +36,13 @@ interface QCPredictionData {
   };
 }
 
-export const predictQCResults = functions.https.onCall(async (data: QCPredictionData, context) => {
+export const predictQCResults = functions.https.onCall(async (request: functions.https.CallableRequest<QCPredictionData>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { testCode, historicalQCData, equipmentInfo } = data;
+  const { testCode, historicalQCData, equipmentInfo } = request.data;
 
   try {
     // Sort QC data by date
@@ -290,7 +290,7 @@ Format: ["recommendation1", "recommendation2", "recommendation3"]`;
 
   try {
     const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
     const jsonMatch = response.match(/\[[\s\S]*\]/);
     if (jsonMatch) {

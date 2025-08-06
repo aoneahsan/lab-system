@@ -11,8 +11,9 @@ import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { useNavigate, Routes, Route, useSearchParams } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
 import { PerformanceDashboard } from '@/components/admin/PerformanceDashboard';
+import type { User } from '@/types/auth.types';
 
-interface User {
+interface AdminUser {
   id: string;
   email: string;
   firstName: string;
@@ -20,6 +21,7 @@ interface User {
   role: string;
   tenantId?: string;
   isActive: boolean;
+  phoneNumber?: string;
 }
 
 interface Tenant {
@@ -39,7 +41,7 @@ const AdminPanel = () => {
   const { startImpersonation } = useImpersonationStore();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -180,24 +182,27 @@ const AdminPanel = () => {
     }
   };
 
-  const handleImpersonateUser = (user: User) => {
+  const handleImpersonateUser = (user: AdminUser) => {
     if (!currentUser || user.role === 'super_admin') {
       toast.error('Cannot impersonate', 'You cannot impersonate another super admin');
       return;
     }
 
-    const impersonatedUser = {
+    const impersonatedUser: User = {
       id: user.id,
+      uid: user.id,
       email: user.email,
       displayName: `${user.firstName} ${user.lastName}`,
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.role,
+      role: user.role as any,
       tenantId: user.tenantId || '',
       isActive: user.isActive,
-      settings: {},
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      permissions: [],
+      isEmailVerified: true,
+      phoneNumber: user.phoneNumber
     };
 
     startImpersonation(impersonatedUser, currentUser);

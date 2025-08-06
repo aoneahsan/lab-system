@@ -342,18 +342,22 @@ class AIMLService {
     }
 
     // Check for significant changes from previous results
-    if (testResult.deltaValue && Math.abs(testResult.deltaValue) > 50) {
-      suggestions.push(`Significant change detected (${testResult.deltaValue > 0 ? '+' : ''}${testResult.deltaValue}%)`);
-      suggestions.push('Review patient medication and clinical status');
-    }
+    // TODO: Implement delta change tracking
+    // if (testResult.deltaChange && Math.abs(testResult.deltaChange) > 50) {
+    //   suggestions.push(`Significant change detected (${testResult.deltaChange > 0 ? '+' : ''}${testResult.deltaChange}%)`);
+    //   suggestions.push('Review patient medication and clinical status');
+    // }
 
     // Check for result patterns
-    if (testResult.value && testDefinition.referenceRange) {
-      const { min, max } = testDefinition.referenceRange;
+    if (testResult.value && testDefinition.referenceRanges?.length) {
+      const refRange = testDefinition.referenceRanges[0];
+      const min = refRange.normalMin || 0;
+      const max = refRange.normalMax || 100;
       const midpoint = (min + max) / 2;
       const range = max - min;
       
-      if (Math.abs(testResult.value - midpoint) > range * 0.9) {
+      const numValue = typeof testResult.value === 'string' ? parseFloat(testResult.value) : testResult.value;
+      if (!isNaN(numValue) && Math.abs(numValue - midpoint) > range * 0.9) {
         suggestions.push('Result near extreme of reference range');
       }
     }

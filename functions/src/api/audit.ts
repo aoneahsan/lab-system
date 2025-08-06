@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { db, admin } from '../config/firebase';
+import * as admin from 'firebase-admin';
+const db = admin.firestore();
 
 // Create audit log
 export const createAuditLog = async (req: Request, res: Response) => {
@@ -11,7 +12,7 @@ export const createAuditLog = async (req: Request, res: Response) => {
     };
 
     // Get the tenant ID from the authenticated user
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     const docRef = await db.collection(collectionName).add(auditData);
@@ -43,7 +44,7 @@ export const searchAuditLogs = async (req: Request, res: Response) => {
       limit = 20
     } = req.query;
 
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     let query = db.collection(collectionName).orderBy('timestamp', 'desc');
@@ -105,7 +106,7 @@ export const searchAuditLogs = async (req: Request, res: Response) => {
 export const getAuditLogById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     const doc = await db.collection(collectionName).doc(id).get();
@@ -139,7 +140,7 @@ export const getUserActivity = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { days = 30 } = req.query;
 
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     const startDate = new Date();
@@ -174,7 +175,7 @@ export const getUserActivity = async (req: Request, res: Response) => {
 export const getResourceHistory = async (req: Request, res: Response) => {
   try {
     const { resource, resourceId } = req.params;
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     const snapshot = await db.collection(collectionName)
@@ -208,7 +209,7 @@ export const exportAuditLogs = async (req: Request, res: Response) => {
     const { format = 'csv' } = req.query;
     const filters = req.body;
 
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     let query = db.collection(collectionName).orderBy('timestamp', 'desc');
@@ -267,7 +268,7 @@ export const exportAuditLogs = async (req: Request, res: Response) => {
 export const getAuditStatistics = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
-    const tenantId = req.user?.tenantId || 'default';
+    const tenantId = req.auth?.tenantId || 'default';
     const collectionName = `${tenantId}_audit_logs`;
 
     let query = db.collection(collectionName);

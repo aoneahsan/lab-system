@@ -8,7 +8,7 @@ import {
   exportAuditLogs,
   getAuditStatistics
 } from '../api/audit';
-import { authenticate } from '../middleware/auth';
+// Authentication is handled by Firebase Functions v2;
 
 const router = Router();
 

@@ -89,7 +89,7 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
           name: currentUser.displayName,
           role: currentUser.role,
           tenantId: currentUser.tenantId,
-          department: currentUser.department
+          department: currentUser.metadata?.department
         });
         
         // Also set user in Firebase Analytics

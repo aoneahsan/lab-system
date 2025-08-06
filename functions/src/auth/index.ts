@@ -4,13 +4,13 @@ import { emailService } from '../services/emailService';
 
 const db = admin.firestore();
 
-export const createUserAccount = functions.https.onCall(async (data, context) => {
+export const createUserAccount = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
   // Verify admin role
-  if (!context.auth || context.auth.token.role !== 'ADMIN') {
+  if (!request.auth || request.auth.token.role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { email, password, displayName, role, tenantId } = data;
+  const { email, password, displayName, role, tenantId } = request.data;
 
   try {
     // Create Firebase Auth user
@@ -34,7 +34,7 @@ export const createUserAccount = functions.https.onCall(async (data, context) =>
       tenantId,
       active: true,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: context.auth.uid,
+      createdBy: request.auth.uid,
     });
 
     return { uid: userRecord.uid, email: userRecord.email };
@@ -44,17 +44,17 @@ export const createUserAccount = functions.https.onCall(async (data, context) =>
   }
 });
 
-export const updateUserRole = functions.https.onCall(async (data, context) => {
-  if (!context.auth || context.auth.token.role !== 'ADMIN') {
+export const updateUserRole = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || request.auth.token.role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { userId, newRole } = data;
+  const { userId, newRole } = request.data;
 
   try {
     // Update custom claims
     await admin.auth().setCustomUserClaims(userId, {
-      ...context.auth.token,
+      ...request.auth.token,
       role: newRole,
     });
 
@@ -62,7 +62,7 @@ export const updateUserRole = functions.https.onCall(async (data, context) => {
     await db.collection('labflow_users').doc(userId).update({
       role: newRole,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedBy: context.auth.uid,
+      updatedBy: request.auth.uid,
     });
 
     return { success: true };
@@ -72,12 +72,12 @@ export const updateUserRole = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const deactivateUser = functions.https.onCall(async (data, context) => {
-  if (!context.auth || context.auth.token.role !== 'ADMIN') {
+export const deactivateUser = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || request.auth.token.role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { userId } = data;
+  const { userId } = request.data;
 
   try {
     // Disable user in Firebase Auth
@@ -89,7 +89,7 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
     await db.collection('labflow_users').doc(userId).update({
       active: false,
       deactivatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      deactivatedBy: context.auth.uid,
+      deactivatedBy: request.auth.uid,
     });
 
     return { success: true };
@@ -99,8 +99,8 @@ export const deactivateUser = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const sendSuperAdminCredentials = functions.https.onCall(async (data, context) => {
-  const { email, password, firstName, lastName } = data;
+export const sendSuperAdminCredentials = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  const { email, password, firstName, lastName } = request.data;
 
   try {
     // Email template

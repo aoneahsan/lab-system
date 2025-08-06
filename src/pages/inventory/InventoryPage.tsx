@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Download, Upload, Package, AlertTriangle, TrendingDown, CheckCircle } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { useAuthStore } from '@/stores/auth.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { ImportExportDialog } from '@/components/data-management/ImportExportDialog';
 import { InventoryImport } from '@/components/data-management/InventoryImport';
 import { InventoryExport } from '@/components/data-management/InventoryExport';
@@ -26,7 +26,7 @@ const InventoryPage: React.FC = () => {
     location: '',
   });
 
-  const { currentTenant } = useAuthStore();
+  const { currentTenant } = useTenantStore();
   const { items, loading: isLoading, fetchInventoryItems, createInventoryItem, updateInventoryItem, deleteInventoryItem } = useInventoryStore();
 
   useEffect(() => {
@@ -84,7 +84,14 @@ const InventoryPage: React.FC = () => {
       return false;
     }
     if (filters.category && item.category !== filters.category) return false;
-    if (filters.status !== 'all' && item.status !== filters.status) return false;
+    if (filters.status !== 'all') {
+      const statusMap: Record<string, string> = {
+        'in-stock': 'in_stock',
+        'low-stock': 'low_stock',
+        'out-of-stock': 'out_of_stock'
+      };
+      if (item.status !== statusMap[filters.status]) return false;
+    }
     if (filters.location && item.location !== filters.location) return false;
     return true;
   });
@@ -92,9 +99,9 @@ const InventoryPage: React.FC = () => {
   // Calculate statistics
   const stats = {
     total: items.length,
-    inStock: items.filter(i => i.status === 'in-stock').length,
-    lowStock: items.filter(i => i.status === 'low-stock').length,
-    outOfStock: items.filter(i => i.status === 'out-of-stock').length,
+    inStock: items.filter(i => i.status === 'in_stock').length,
+    lowStock: items.filter(i => i.status === 'low_stock').length,
+    outOfStock: items.filter(i => i.status === 'out_of_stock').length,
     totalValue: items.reduce((sum, i) => sum + (i.quantity * i.unitCost), 0),
   };
 

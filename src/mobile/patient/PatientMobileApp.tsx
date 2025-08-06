@@ -57,7 +57,7 @@ export const PatientMobileApp: React.FC = () => {
       case 'appointments':
         return <AppointmentsScreen />;
       case 'notifications':
-        return <NotificationsScreen onRead={() => setNotificationCount(0)} />;
+        return <NotificationsScreen />;
       case 'profile':
         return <ProfileScreen />;
       default:

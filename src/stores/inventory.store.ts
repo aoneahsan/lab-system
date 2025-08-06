@@ -88,7 +88,13 @@ export const useInventoryStore = create<InventoryStore>((set, get) => ({
   updateInventoryItem: async (id, data) => {
     set({ loading: true, error: null });
     try {
-      await inventoryService.updateInventoryItem(id, data);
+      // Convert InventoryItem to InventoryItemFormData if needed
+      const formData = {
+        ...data,
+        expiryDate: data.expiryDate instanceof Date ? data.expiryDate : 
+                    data.expiryDate ? new Date(data.expiryDate as any) : undefined,
+      };
+      await inventoryService.updateInventoryItem(id, formData);
       await get().fetchInventoryItems();
       set({ loading: false });
     } catch (error) {

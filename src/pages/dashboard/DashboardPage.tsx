@@ -146,7 +146,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <span className={`badge ${
-                    test.status === 'completed' ? 'badge-success' : 
+                    test.status === 'resulted' ? 'badge-success' : 
                     test.status === 'in_progress' ? 'badge-info' : 
                     'badge-warning'
                   }`}>

@@ -19,16 +19,20 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
 }) => {
   const [error, setError] = useState<string>('');
 
-  const handleScanSuccess = (result: { data: string; format?: string }) => {
-    onScan(result.data);
-    toast.success('Barcode Scanned', `Code: ${result.data}`);
-    onClose();
+  const handleScanSuccess = (result: any) => {
+    const data = typeof result === 'string' ? result : result?.data || result?.text;
+    if (data) {
+      onScan(data);
+      toast.success('Barcode Scanned', `Code: ${data}`);
+      onClose();
+    }
   };
 
-  const handleScanError = (error: Error) => {
+  const handleScanError = (error: any) => {
     console.error('Scan error:', error);
-    setError(error.message || 'Failed to scan barcode');
-    toast.error('Scan Failed', error.message || 'Failed to scan barcode');
+    const errorMessage = error?.message || error?.toString() || 'Failed to scan barcode';
+    setError(errorMessage);
+    toast.error('Scan Failed', errorMessage);
   };
 
   // For web platform, show alternative input
@@ -100,11 +104,6 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
             formats={supportedFormats as any}
             onScan={handleScanSuccess}
             onError={handleScanError}
-            options={{
-              showTorchButton: true,
-              showFlipCameraButton: true,
-              scanDelay: 500,
-            }}
             className="w-full h-full"
           />
 

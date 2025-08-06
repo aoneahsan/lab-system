@@ -28,7 +28,7 @@ api.interceptors.request.use(
     }
 
     // Start performance tracking
-    config.metadata = {
+    (config as any).metadata = {
       startTime: Date.now(),
       transactionId: `api_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
@@ -37,7 +37,7 @@ api.interceptors.request.use(
     trackingInstance.trackEvent('api_request', {
       method: config.method,
       url: config.url,
-      transactionId: config.metadata.transactionId,
+      transactionId: (config as any).metadata.transactionId,
     });
 
     return config;
@@ -52,7 +52,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     // Track successful API response
-    const duration = Date.now() - response.config.metadata?.startTime || 0;
+    const duration = Date.now() - (response.config as any).metadata?.startTime || 0;
     const endpoint = response.config.url || 'unknown';
     const method = response.config.method || 'unknown';
 
@@ -61,20 +61,21 @@ api.interceptors.response.use(
       url: endpoint,
       status: response.status,
       duration,
-      transactionId: response.config.metadata?.transactionId,
+      transactionId: (response.config as any).metadata?.transactionId,
     });
 
-    trackingInstance.trackMetric('api_response_time', duration, 'ms', {
+    trackingInstance.trackEvent('api_timing', {
       endpoint,
       method,
       status: response.status.toString(),
+      duration,
     });
 
     return response;
   },
   (error) => {
     // Track failed API response
-    const duration = Date.now() - error.config?.metadata?.startTime || 0;
+    const duration = Date.now() - (error.config as any)?.metadata?.startTime || 0;
     const endpoint = error.config?.url || 'unknown';
     const method = error.config?.method || 'unknown';
     const status = error.response?.status || 0;
@@ -85,13 +86,14 @@ api.interceptors.response.use(
       status,
       duration,
       error: error.message,
-      transactionId: error.config?.metadata?.transactionId,
+      transactionId: (error.config as any)?.metadata?.transactionId,
     });
 
-    trackingInstance.trackMetric('api_error_rate', 1, 'count', {
+    trackingInstance.trackEvent('api_error_metric', {
       endpoint,
       method,
       status: status.toString(),
+      count: 1,
     });
 
     // Handle specific errors

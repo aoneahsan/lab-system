@@ -133,16 +133,8 @@ export const ResultsScreen: React.FC = () => {
 
   const handleDownloadResult = async (resultId: string) => {
     try {
-      // Generate PDF URL using the report service
-      const pdfUrl = await resultService.generateResultPDF(currentUser?.tenantId || '', resultId);
-      
-      // For mobile, use Capacitor's Browser plugin to open PDF
-      if (Capacitor.isNativePlatform()) {
-        await Browser.open({ url: pdfUrl });
-      } else {
-        // For web, open in new tab
-        window.open(pdfUrl, '_blank');
-      }
+      // For now, just show a message as PDF generation is not implemented
+      toast.success('PDF download feature coming soon');
     } catch (error) {
       console.error('Error downloading result:', error);
       toast.error('Download failed', 'Unable to download the result PDF');
@@ -154,22 +146,8 @@ export const ResultsScreen: React.FC = () => {
       const result = results.find(r => r.id === resultId);
       if (!result) return;
       
-      // Generate shareable link or PDF
-      const pdfUrl = await resultService.generateResultPDF(currentUser?.tenantId || '', resultId);
-      
-      if (Capacitor.isNativePlatform()) {
-        // Use native share
-        await Share.share({
-          title: `Lab Result: ${result.testName}`,
-          text: `Here's my lab result for ${result.testName} from ${format(result.resultDate, 'MMM dd, yyyy')}`,
-          url: pdfUrl,
-          dialogTitle: 'Share Result'
-        });
-      } else {
-        // For web, copy link to clipboard
-        await navigator.clipboard.writeText(pdfUrl);
-        toast.success('Link copied', 'Result link copied to clipboard');
-      }
+      // For now, just show a message as PDF generation is not implemented
+      toast.success('Share feature coming soon');
     } catch (error) {
       console.error('Error sharing result:', error);
       toast.error('Share failed', 'Unable to share the result');

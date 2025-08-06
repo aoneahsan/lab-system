@@ -38,7 +38,7 @@ const CriticalResultNotification: React.FC<CriticalResultNotificationProps> = ({
 
   // Load existing notification attempts
   useEffect(() => {
-    if (result.notificationAttempts) {
+    if (result.notificationAttempts && Array.isArray(result.notificationAttempts)) {
       setAttempts(result.notificationAttempts);
     }
   }, [result.notificationAttempts]);

@@ -46,9 +46,8 @@ export default function BarcodeGenerator({
           height,
           displayText: displayValue,
           text: text || value,
-          margins: 10,
-          backgroundColor: '#ffffff',
-          foregroundColor: '#000000',
+          margins: { top: 10, right: 10, bottom: 10, left: 10 },
+          // Remove unsupported properties
         });
         setBarcodeDataUrl(result.dataUrl);
       } catch (err) {

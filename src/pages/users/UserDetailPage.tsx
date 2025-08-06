@@ -1,13 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Mail, Phone, Shield } from 'lucide-react';
-import { useUser } from '@/hooks/useUsers';
+import { useUsers } from '@/hooks/useUsers';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { format } from 'date-fns';
 
 const UserDetailPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { data: user, isLoading } = useUser(userId!);
+  const { data: users, isLoading } = useUsers();
+  const user = users?.find(u => u.id === userId);
 
   if (isLoading) {
     return (
@@ -179,7 +180,7 @@ const UserDetailPage = () => {
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
                   {user.lastLoginAt
-                    ? format(user.lastLoginAt, 'MMM d, yyyy h:mm a')
+                    ? format(user.lastLoginAt instanceof Date ? user.lastLoginAt : (user.lastLoginAt as any).toDate(), 'MMM d, yyyy h:mm a')
                     : 'Never'}
                 </dd>
               </div>
@@ -188,7 +189,7 @@ const UserDetailPage = () => {
                   Created At
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {format(user.createdAt, 'MMM d, yyyy')}
+                  {format(user.createdAt instanceof Date ? user.createdAt : (user.createdAt as any).toDate(), 'MMM d, yyyy')}
                 </dd>
               </div>
               <div>
@@ -196,7 +197,7 @@ const UserDetailPage = () => {
                   Updated At
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {format(user.updatedAt, 'MMM d, yyyy')}
+                  {format(user.updatedAt instanceof Date ? user.updatedAt : (user.updatedAt as any).toDate(), 'MMM d, yyyy')}
                 </dd>
               </div>
             </dl>

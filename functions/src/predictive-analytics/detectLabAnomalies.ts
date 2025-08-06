@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { firestore } from 'firebase-admin';
-import { projectId } from '../config';
+import config from '../config';
 
 interface AnomalyDetectionRequest {
   tenantId: string;
@@ -19,13 +19,13 @@ interface Anomaly {
   description: string;
 }
 
-export const detectLabAnomalies = functions.https.onCall(async (data: AnomalyDetectionRequest, context) => {
+export const detectLabAnomalies = functions.https.onCall(async (request: functions.https.CallableRequest<AnomalyDetectionRequest>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { tenantId, metric, sensitivity, lookbackDays } = data;
+  const { tenantId, metric, sensitivity, lookbackDays } = request.data;
 
   try {
     // Get historical data based on metric type

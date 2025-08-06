@@ -139,8 +139,8 @@ export async function generateSampleQRCode(
       } as any,
       size: options?.size || 256,
       margin: options?.margin || 4,
-      backgroundColor: options?.lightColor || '#FFFFFF',
-      foregroundColor: options?.darkColor || '#000000',
+      // lightColor: options?.lightColor || '#FFFFFF',
+      // darkColor: options?.darkColor || '#000000',
       errorCorrectionLevel: (options?.errorCorrectionLevel || 'M') as any,
     });
     
@@ -180,8 +180,8 @@ export async function generateSampleQRCodeToCanvas(
       } as any,
       size: options?.size || 256,
       margin: options?.margin || 4,
-      backgroundColor: options?.lightColor || '#FFFFFF',
-      foregroundColor: options?.darkColor || '#000000',
+      // lightColor: options?.lightColor || '#FFFFFF',
+      // darkColor: options?.darkColor || '#000000',
       errorCorrectionLevel: (options?.errorCorrectionLevel || 'M') as any,
     });
     

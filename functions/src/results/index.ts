@@ -5,12 +5,12 @@ import { generatePDF } from '../services/pdfGeneratorService';
 const db = admin.firestore();
 const storage = admin.storage();
 
-export const processResult = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const processResult = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { sampleId, testId, values, performedBy } = data;
+  const { sampleId, testId, values, performedBy } = request.data;
 
   try {
     // Get sample details
@@ -58,12 +58,18 @@ export const processResult = functions.https.onCall(async (data, context) => {
 
     // If critical values, trigger notification
     if (criticalValues.length > 0) {
-      await functions.https.onCall('sendCriticalResultNotification')({
+      // Trigger critical result notification
+      // This will be handled by a separate function or scheduled job
+      await db.collection('labflow_notifications').add({
+        type: 'critical_result',
         resultId: resultRef.id,
         patientId: sample.patientId,
         clinicianId: sample.orderingPhysician,
         values: criticalValues,
-      }, context);
+        status: 'pending',
+        tenantId: sample.tenantId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
     }
 
     return { 
@@ -77,12 +83,12 @@ export const processResult = functions.https.onCall(async (data, context) => {
   }
 });
 
-export const verifyResult = functions.https.onCall(async (data, context) => {
-  if (!context.auth || !['LAB_SUPERVISOR', 'PATHOLOGIST', 'ADMIN'].includes(context.auth.token.role)) {
+export const verifyResult = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+  if (!request.auth || !['LAB_SUPERVISOR', 'PATHOLOGIST', 'ADMIN'].includes(request.auth.token.role)) {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized to verify results');
   }
 
-  const { resultId, comments } = data;
+  const { resultId, comments } = request.data;
 
   try {
     const resultDoc = await db.collection('labflow_results').doc(resultId).get();
@@ -95,7 +101,7 @@ export const verifyResult = functions.https.onCall(async (data, context) => {
     // Update result status
     await db.collection('labflow_results').doc(resultId).update({
       status: 'completed',
-      verifiedBy: context.auth.uid,
+      verifiedBy: request.auth.uid,
       verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
       verificationComments: comments,
     });

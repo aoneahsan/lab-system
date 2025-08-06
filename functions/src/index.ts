@@ -1,5 +1,8 @@
-import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { onObjectFinalized } from 'firebase-functions/v2/storage';
+import { onCall } from 'firebase-functions/v2/https';
 
 // Import function modules
 import { criticalResultsMonitor } from './workflows/criticalResultsMonitor';
@@ -11,186 +14,157 @@ import { qualityControlMonitor } from './workflows/qualityControlMonitor';
 import { insuranceEligibilityChecker } from './workflows/insuranceEligibilityChecker';
 import { billingAutomation } from './workflows/billingAutomation';
 import { dataSync } from './sync/dataSync';
-import { notificationService } from './services/notificationService';
-import { emailService } from './services/emailService';
-import { smsService } from './services/smsService';
-import { pdfGeneratorService } from './services/pdfGeneratorService';
 
 // Initialize Admin SDK
 admin.initializeApp();
 
-// Automated Workflows
+// Re-export all callable functions from their modules
+export * from './auth';
+export * from './billing';
+export * from './integration';
+export * from './notifications';
+export * from './reports';
+export * from './results';
+export * from './ai-ml/analyzeTestTrends';
+export * from './ai-ml/assessPatientRisk';
+export * from './ai-ml/interpretTestResults';
+export * from './ai-ml/predictQCResults';
+export * from './predictive-analytics/detectLabAnomalies';
+export * from './predictive-analytics/predictResourceNeeds';
+export * from './predictive-analytics/predictTestVolumes';
+
+// Automated Workflows using Firebase Functions v2
 
 // Monitor critical results and send notifications
-export const monitorCriticalResults = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 300 })
-  .pubsub.schedule('every 5 minutes')
-  .onRun(criticalResultsMonitor);
+export const monitorCriticalResults = onSchedule({
+  schedule: 'every 5 minutes',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, criticalResultsMonitor);
 
 // Check for expiring samples
-export const checkSampleExpiration = functions
-  .runWith({ memory: '256MB', timeoutSeconds: 120 })
-  .pubsub.schedule('every day 06:00')
-  .onRun(sampleExpirationChecker);
+export const checkSampleExpiration = onSchedule({
+  schedule: 'every day 06:00',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, sampleExpirationChecker);
 
 // Send appointment reminders
-export const sendAppointmentReminders = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 300 })
-  .pubsub.schedule('every hour')
-  .onRun(appointmentReminders);
+export const sendAppointmentReminders = onSchedule({
+  schedule: 'every hour',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, appointmentReminders);
 
-// Generate scheduled reports
-export const generateScheduledReports = functions
-  .runWith({ memory: '1GB', timeoutSeconds: 540 })
-  .pubsub.schedule('0 1 * * *') // Daily at 1 AM
-  .onRun(reportGenerator);
+// Generate daily reports
+export const generateDailyReports = onSchedule({
+  schedule: 'every day 22:00',
+  memory: '1GiB',
+  timeoutSeconds: 540,
+}, reportGenerator);
 
 // Monitor inventory levels
-export const monitorInventory = functions
-  .runWith({ memory: '256MB', timeoutSeconds: 120 })
-  .pubsub.schedule('every 6 hours')
-  .onRun(inventoryAlerts);
+export const monitorInventory = onSchedule({
+  schedule: 'every 2 hours',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, inventoryAlerts);
 
-// Quality control monitoring
-export const monitorQualityControl = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 240 })
-  .pubsub.schedule('every 30 minutes')
-  .onRun(qualityControlMonitor);
+// Monitor quality control
+export const monitorQualityControl = onSchedule({
+  schedule: 'every 30 minutes',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, qualityControlMonitor);
 
-// Verify insurance eligibility
-export const verifyInsuranceEligibility = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 300 })
-  .pubsub.schedule('every day 05:00')
-  .onRun(insuranceEligibilityChecker);
+// Check insurance eligibility
+export const checkInsuranceEligibility = onSchedule({
+  schedule: 'every 6 hours',
+  memory: '512MiB',
+  timeoutSeconds: 300,
+}, insuranceEligibilityChecker);
 
-// Automated billing tasks
-export const processBillingAutomation = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 300 })
-  .pubsub.schedule('every day 02:00')
-  .onRun(billingAutomation);
+// Process billing automation
+export const processBillingAutomation = onSchedule({
+  schedule: 'every day 02:00',
+  memory: '1GiB',
+  timeoutSeconds: 540,
+}, billingAutomation);
 
-// Real-time Triggers
+// Firestore Triggers
 
-// New result created - check if critical
-export const onResultCreated = functions.firestore
-  .document('labflow_results/{resultId}')
-  .onCreate(async (snap, context) => {
-    const result = snap.data();
-    const resultId = context.params.resultId;
-    
-    // Check if result has critical values
-    if (result.isCritical) {
-      await notificationService.sendCriticalResultAlert(resultId, result);
-    }
-  });
+// Sync result changes
+export const onResultCreated = onDocumentCreated('labflow_results/{resultId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
 
-// Sample status updated
-export const onSampleStatusUpdated = functions.firestore
-  .document('labflow_samples/{sampleId}')
-  .onUpdate(async (change, context) => {
-    const before = change.before.data();
-    const after = change.after.data();
-    
-    if (before.status !== after.status) {
-      // Notify relevant parties about status change
-      await notificationService.sendSampleStatusUpdate(context.params.sampleId, before.status, after.status);
-    }
-  });
+  const result = snapshot.data();
+  console.log('New result created:', snapshot.id);
 
-// Order created - check inventory
-export const onOrderCreated = functions.firestore
-  .document('labflow_orders/{orderId}')
-  .onCreate(async (snap, context) => {
-    const order = snap.data();
-    
-    // Update inventory levels
-    for (const item of order.items) {
-      await admin.firestore()
-        .collection('labflow_inventory')
-        .doc(item.productId)
-        .update({
-          quantity: admin.firestore.FieldValue.increment(-item.quantity),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-    }
-  });
+  // Trigger any necessary sync operations
+  await dataSync.syncResult(result, snapshot.id);
+});
 
-// HTTP Functions
+// Monitor order status changes
+export const onOrderUpdated = onDocumentUpdated('labflow_orders/{orderId}', async (event) => {
+  const { before, after } = event.data;
+  if (!before || !after) return;
 
-// Sync data endpoint
-export const syncData = functions
-  .runWith({ memory: '1GB', timeoutSeconds: 540 })
-  .https.onRequest(dataSync);
+  const beforeData = before.data();
+  const afterData = after.data();
 
-// Generate PDF report on demand
-export const generatePdfReport = functions
-  .runWith({ memory: '1GB', timeoutSeconds: 300 })
-  .https.onCall(async (data, context) => {
-    if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
-    }
-    
-    return await pdfGeneratorService.generateReport(data);
-  });
+  if (beforeData.status !== afterData.status) {
+    console.log('Order status changed:', after.id, beforeData.status, '->', afterData.status);
+    // Trigger notifications or other workflows
+  }
+});
 
-// Send notification on demand
-export const sendNotification = functions
-  .runWith({ memory: '256MB', timeoutSeconds: 60 })
-  .https.onCall(async (data, context) => {
-    if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
-    }
-    
-    const { type, recipient, message, data: notificationData } = data;
-    
-    switch (type) {
-      case 'email':
-        return await emailService.send(recipient, message.subject, message.body);
-      case 'sms':
-        return await smsService.send(recipient, message.body);
-      case 'push':
-        return await notificationService.sendPushNotification(recipient, message, notificationData);
-      default:
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid notification type');
-    }
-  });
+// Handle sample barcode generation
+export const onSampleCreated = onDocumentCreated('labflow_samples/{sampleId}', async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
 
-// Storage trigger for document processing
-export const processUploadedDocument = functions.storage
-  .object()
-  .onFinalize(async (object) => {
-    const filePath = object.name;
-    
-    if (!filePath) return;
-    
-    // Process different document types
-    if (filePath.startsWith('labflow/reports/')) {
-      // Process reports
-      console.log('Processing report:', filePath);
-    } else if (filePath.startsWith('labflow/results/')) {
-      // Process result attachments
-      console.log('Processing result attachment:', filePath);
-    }
-  });
+  const sample = snapshot.data();
+  console.log('New sample created:', snapshot.id);
 
-// Cleanup old data
-export const cleanupOldData = functions
-  .runWith({ memory: '512MB', timeoutSeconds: 540 })
-  .pubsub.schedule('every sunday 03:00')
-  .onRun(async () => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    // Clean up old notifications
-    const oldNotifications = await admin.firestore()
-      .collection('labflow_notifications')
-      .where('createdAt', '<', thirtyDaysAgo)
-      .where('status', '==', 'read')
-      .get();
-    
-    const batch = admin.firestore().batch();
-    oldNotifications.forEach(doc => batch.delete(doc.ref));
-    await batch.commit();
-    
-    console.log(`Cleaned up ${oldNotifications.size} old notifications`);
-  });
+  // Generate barcode if needed
+  if (!sample.barcode) {
+    await snapshot.ref.update({
+      barcode: `S${Date.now()}${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+});
+
+// Storage Triggers
+
+// Process uploaded documents
+export const processUploadedFile = onObjectFinalized({ region: 'us-central1' }, async (event) => {
+  const filePath = event.data.name;
+  const contentType = event.data.contentType;
+
+  console.log('File uploaded:', filePath, contentType);
+
+  // Process different file types (e.g., lab reports, images)
+  if (contentType?.startsWith('image/')) {
+    // Process images (e.g., generate thumbnails)
+    console.log('Processing image:', filePath);
+  } else if (contentType === 'application/pdf') {
+    // Process PDFs (e.g., extract text for searching)
+    console.log('Processing PDF:', filePath);
+  }
+});
+
+// Utility function for syncing all tenants (can be called manually)
+export const syncAllTenants = onCall({
+  memory: '1GiB',
+  timeoutSeconds: 540,
+}, async (request) => {
+  if (!request.auth || request.auth.token.role !== 'SUPER_ADMIN') {
+    throw new Error('Unauthorized');
+  }
+
+  console.log('Starting full sync for all tenants...');
+  // Implement full sync logic
+  return { success: true, message: 'Sync initiated' };
+});

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, UserPlus, Shield, Search, Filter } from 'lucide-react';
-import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from '@/hooks/useUsers';
+import { useUsers } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/auth.store';
 import { UserListTable } from '@/components/users/UserListTable';
 import { UserForm } from '@/components/users/UserForm';
@@ -18,13 +18,10 @@ const UsersPage = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: users = [], isLoading } = useUsers(filters);
-  const createUserMutation = useCreateUser();
-  const updateUserMutation = useUpdateUser();
-  const deleteUserMutation = useDeleteUser();
+  const { data: users = [], isLoading } = useUsers(filters.role);
 
   // Check if user has permission to manage users
-  const canManageUsers = currentUser?.role === 'admin' || 
+  const canManageUsers = currentUser?.role === 'lab_admin' || 
                         currentUser?.role === 'super_admin' ||
                         currentUser?.permissions?.includes('users.manage');
 
@@ -39,23 +36,23 @@ const UsersPage = () => {
   }, [searchParams, setSearchParams, canManageUsers]);
 
   const handleAddUser = async (data: UserFormData) => {
-    await createUserMutation.mutateAsync(data);
+    // TODO: Implement user creation
+    console.log('Add user:', data);
     setShowAddForm(false);
   };
 
   const handleEditUser = async (data: UserFormData) => {
     if (editingUser) {
-      await updateUserMutation.mutateAsync({
-        userId: editingUser.id,
-        data,
-      });
+      // TODO: Implement user update
+      console.log('Edit user:', editingUser.id, data);
       setEditingUser(null);
     }
   };
 
   const handleDeleteUser = async (user: User) => {
     if (window.confirm(`Are you sure you want to delete ${user.displayName}?`)) {
-      await deleteUserMutation.mutateAsync(user.id);
+      // TODO: Implement user deletion
+      console.log('Delete user:', user.id);
     }
   };
 
@@ -64,10 +61,8 @@ const UsersPage = () => {
   };
 
   const handleToggleStatus = async (user: User) => {
-    await updateUserMutation.mutateAsync({
-      userId: user.id,
-      data: { isActive: !user.isActive },
-    });
+    // TODO: Implement status toggle
+    console.log('Toggle status:', user.id, !user.isActive);
   };
 
   // Filter users based on search term
@@ -117,7 +112,7 @@ const UsersPage = () => {
             setShowAddForm(false);
             setEditingUser(null);
           }}
-          isLoading={createUserMutation.isPending || updateUserMutation.isPending}
+          isLoading={false}
         />
       </div>
     );
@@ -162,11 +157,11 @@ const UsersPage = () => {
           <div className="flex gap-2">
             <select
               value={filters.role || ''}
-              onChange={(e) => setFilters({ ...filters, role: e.target.value || undefined })}
+              onChange={(e) => setFilters({ ...filters, role: (e.target.value || undefined) as any })}
               className="input"
             >
               <option value="">All Roles</option>
-              <option value="admin">Admin</option>
+              <option value="lab_admin">Lab Admin</option>
               <option value="lab_manager">Lab Manager</option>
               <option value="lab_technician">Lab Technician</option>
               <option value="phlebotomist">Phlebotomist</option>

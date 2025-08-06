@@ -105,8 +105,8 @@ const ScanScreen: React.FC = () => {
         ) : (
           <div className="fixed inset-0 bg-black z-50">
             <QRScanner
-              onScan={(result) => handleScanResult(result.data)}
-              onError={handleScanError}
+              onScan={(result) => handleScanResult((result as any).text || (result as any).data || '')}
+              onError={(error: any) => handleScanError(error)}
               options={{
                 showTorchButton: true,
                 showFlipCameraButton: true,

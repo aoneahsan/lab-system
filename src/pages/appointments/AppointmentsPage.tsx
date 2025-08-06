@@ -12,7 +12,7 @@ import { Appointment } from '@/types/appointment.types';
 export const AppointmentsPage: React.FC = () => {
   const navigate = useNavigate();
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState('calendar');
 
   const handleAppointmentClick = (appointment: Appointment) => {
@@ -42,7 +42,7 @@ export const AppointmentsPage: React.FC = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="calendar" className="space-y-4">
         <TabsList>
           <TabsTrigger value="calendar" className="flex items-center gap-2">
             <CalendarIcon className="h-4 w-4" />
@@ -72,13 +72,12 @@ export const AppointmentsPage: React.FC = () => {
 
       {/* Booking Modal */}
       <Modal
-        open={showBookingModal}
+        isOpen={showBookingModal}
         onClose={() => {
           setShowBookingModal(false);
           setSelectedDate(null);
         }}
         title="Book New Appointment"
-        size="lg"
       >
         <AppointmentBookingForm
           onSuccess={handleBookingSuccess}

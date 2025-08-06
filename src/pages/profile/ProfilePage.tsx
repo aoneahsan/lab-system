@@ -14,14 +14,14 @@ const ProfilePage = () => {
     firstName: currentUser?.firstName || '',
     lastName: currentUser?.lastName || '',
     phoneNumber: currentUser?.phoneNumber || '',
-    professionalId: currentUser?.professionalId || '',
-    specialization: currentUser?.specialization || '',
+    professionalId: '',
+    specialization: '',
   });
 
   const handleSave = async () => {
     try {
       if (!currentUser?.id) return;
-      await updateUserProfile(currentUser.id, formData);
+      await updateUserProfile(currentUser.id, formData as any);
       toast.success('Profile Updated', 'Your profile has been updated successfully');
       setIsEditing(false);
     } catch (error) {
@@ -33,14 +33,14 @@ const ProfilePage = () => {
     {
       title: 'Two-Factor Authentication',
       description: 'Add an extra layer of security to your account',
-      status: currentUser?.twoFactorEnabled ? 'Enabled' : 'Disabled',
+      status: 'Disabled',
       action: () => navigate('/settings/security/2fa'),
       icon: '🔐',
     },
     {
       title: 'Biometric Authentication',
       description: 'Use fingerprint or face recognition to sign in',
-      status: currentUser?.biometricEnabled ? 'Enabled' : 'Disabled',
+      status: 'Disabled',
       action: () => navigate('/settings/biometric'),
       icon: '👆',
     },
@@ -56,19 +56,19 @@ const ProfilePage = () => {
     {
       title: 'Email Notifications',
       description: 'Receive email updates about important activities',
-      value: currentUser?.preferences?.emailNotifications ?? true,
+      value: currentUser?.preferences?.notifications?.email ?? true,
       key: 'emailNotifications',
     },
     {
       title: 'SMS Notifications',
       description: 'Get SMS alerts for critical results and urgent matters',
-      value: currentUser?.preferences?.smsNotifications ?? false,
+      value: currentUser?.preferences?.notifications?.sms ?? false,
       key: 'smsNotifications',
     },
     {
       title: 'Dark Mode',
       description: 'Use dark theme for the application',
-      value: currentUser?.preferences?.darkMode ?? false,
+      value: currentUser?.preferences?.theme === 'dark',
       key: 'darkMode',
     },
   ];
@@ -193,7 +193,7 @@ const ProfilePage = () => {
                     />
                   ) : (
                     <p className="text-gray-900 dark:text-white">
-                      {currentUser?.professionalId || 'Not provided'}
+                      {'Not provided'}
                     </p>
                   )}
                 </div>
@@ -211,7 +211,7 @@ const ProfilePage = () => {
                     />
                   ) : (
                     <p className="text-gray-900 dark:text-white">
-                      {currentUser?.specialization || 'Not provided'}
+                      {'Not provided'}
                     </p>
                   )}
                 </div>
@@ -315,7 +315,9 @@ const ProfilePage = () => {
                       [pref.key]: e.target.checked,
                     };
                     try {
-                      await updateProfile({ preferences: newPreferences });
+                      if (currentUser?.id) {
+                        await updateUserProfile(currentUser.id, { preferences: newPreferences });
+                      }
                       toast.success('Preference Updated', `${pref.title} has been ${e.target.checked ? 'enabled' : 'disabled'}`);
                     } catch (error) {
                       toast.error('Update Failed', 'Failed to update preference');

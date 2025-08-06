@@ -18,48 +18,76 @@ import type { TestResult } from '@/types/result.types';
 const sampleTestDefinitions: TestDefinition[] = [
   {
     id: '1',
+    tenantId: 'demo',
     code: 'GLU',
     name: 'Glucose',
     category: 'chemistry',
     unit: 'mg/dL',
-    referenceRange: { min: 70, max: 100 },
-    loinc: '2345-7',
+    specimen: { type: 'blood' },
+    referenceRanges: [{ id: '1', normalMin: 70, normalMax: 100, unit: 'mg/dL' } as any],
+    resultType: 'numeric',
     isActive: true,
-    turnaroundTime: 1,
-  },
+    isOrderable: true,
+    turnaroundTime: { routine: 1 },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'demo',
+    updatedBy: 'demo',
+  } as TestDefinition,
   {
     id: '2',
+    tenantId: 'demo',
     code: 'HGB',
     name: 'Hemoglobin',
     category: 'hematology',
     unit: 'g/dL',
-    referenceRange: { min: 12, max: 16 },
-    loinc: '718-7',
+    specimen: { type: 'blood' },
+    referenceRanges: [{ id: '2', normalMin: 12, normalMax: 16, unit: 'g/dL' } as any],
+    resultType: 'numeric',
     isActive: true,
-    turnaroundTime: 1,
-  },
+    isOrderable: true,
+    turnaroundTime: { routine: 1 },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'demo',
+    updatedBy: 'demo',
+  } as TestDefinition,
   {
     id: '3',
+    tenantId: 'demo',
     code: 'WBC',
     name: 'White Blood Cell Count',
     category: 'hematology',
     unit: 'K/uL',
-    referenceRange: { min: 4.5, max: 11.0 },
-    loinc: '6690-2',
+    specimen: { type: 'blood' },
+    referenceRanges: [{ id: '3', normalMin: 4.5, normalMax: 11.0, unit: 'K/uL' } as any],
+    resultType: 'numeric',
     isActive: true,
-    turnaroundTime: 1,
-  },
+    isOrderable: true,
+    turnaroundTime: { routine: 1 },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'demo',
+    updatedBy: 'demo',
+  } as TestDefinition,
   {
     id: '4',
+    tenantId: 'demo',
     code: 'CREAT',
     name: 'Creatinine',
     category: 'chemistry',
     unit: 'mg/dL',
-    referenceRange: { min: 0.6, max: 1.2 },
-    loinc: '2160-0',
+    specimen: { type: 'blood' },
+    referenceRanges: [{ id: '4', normalMin: 0.6, normalMax: 1.2, unit: 'mg/dL' } as any],
+    resultType: 'numeric',
     isActive: true,
-    turnaroundTime: 1,
-  },
+    isOrderable: true,
+    turnaroundTime: { routine: 1 },
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    createdBy: 'demo',
+    updatedBy: 'demo',
+  } as TestDefinition,
 ];
 
 export const VoiceDictationDemo: React.FC = () => {
@@ -119,7 +147,7 @@ export const VoiceDictationDemo: React.FC = () => {
         </div>
 
         {/* Feature Info */}
-        <Alert variant="info" className="mb-8">
+        <Alert className="mb-8 bg-blue-50 border-blue-200">
           <InformationCircleIcon className="h-5 w-5" />
           <div>
             <p className="font-medium">Voice Dictation Features:</p>
@@ -248,3 +276,5 @@ export const VoiceDictationDemo: React.FC = () => {
     </div>
   );
 };
+
+export default VoiceDictationDemo;

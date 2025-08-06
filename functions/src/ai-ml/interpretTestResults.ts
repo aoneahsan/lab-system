@@ -1,10 +1,10 @@
 import * as functions from 'firebase-functions';
 import { VertexAI } from '@google-cloud/vertexai';
-import { projectId } from '../config';
+import config from '../config';
 
 // Initialize Vertex AI
 const vertexAI = new VertexAI({
-  project: projectId,
+  project: config.vertexai.projectId,
   location: 'us-central1',
 });
 
@@ -26,13 +26,13 @@ interface TestResultData {
   patientInfo?: any;
 }
 
-export const interpretTestResults = functions.https.onCall(async (data: TestResultData, context) => {
+export const interpretTestResults = functions.https.onCall(async (request: functions.https.CallableRequest<TestResultData>) => {
   // Check authentication
-  if (!context.auth) {
+  if (!request.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { testResult, testDefinition, patientHistory, patientInfo } = data;
+  const { testResult, testDefinition, patientHistory, patientInfo } = request.data;
 
   try {
     // Build context for AI analysis

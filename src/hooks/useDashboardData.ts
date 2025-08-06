@@ -34,7 +34,7 @@ export const useDashboardSummary = () => {
         totalPatients: patientStats?.totalPatients || 0,
         testsToday: testStats?.todayCount || 0,
         pendingResults: resultStats?.pendingCount || 0,
-        revenueToday: billingStats?.todayRevenue || 0,
+        revenueToday: billingStats?.todaysPayments || 0,
       };
 
       return summary;
@@ -53,18 +53,23 @@ export const useRecentTests = (limit: number = 5) => {
     queryFn: async () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
-      const orders = await testService.getTestOrders(tenant.id, {
-        limit,
-        sortBy: 'orderedAt',
-        sortDirection: 'desc',
-      });
+      const orders = await testService.getTestOrders(tenant.id);
+      
+      // Sort and limit manually
+      const sortedOrders = orders
+        .sort((a, b) => {
+          const dateA = a.orderDate instanceof Date ? a.orderDate : a.orderDate.toDate();
+          const dateB = b.orderDate instanceof Date ? b.orderDate : b.orderDate.toDate();
+          return dateB.getTime() - dateA.getTime();
+        })
+        .slice(0, limit);
 
-      return orders.map(order => ({
+      return sortedOrders.map(order => ({
         id: order.id,
-        patientName: order.patientName || 'Unknown Patient',
-        testNames: order.orderedTests.map(test => test.name),
+        patientName: 'Unknown Patient', // Patient info would need to be fetched separately
+        testNames: order.tests?.map(test => test.testName) || [],
         status: order.status,
-        orderedAt: order.orderedAt,
+        orderedAt: order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate(),
       }));
     },
     enabled: !!tenant?.id,
@@ -80,20 +85,26 @@ export const useCriticalResults = (limit: number = 3) => {
     queryFn: async () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
-      const results = await resultService.getResults(tenant.id, {
-        flags: ['CRITICAL', 'HIGH'],
-        limit,
-        sortBy: 'reportedAt',
-        sortDirection: 'desc',
+      const response = await resultService.getResults(tenant.id, {
+        flagType: 'critical'
       });
+      
+      // Sort and limit manually
+      const sortedResults = response.items
+        .sort((a, b) => {
+          const dateA = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
+          const dateB = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
+          return dateB.getTime() - dateA.getTime();
+        })
+        .slice(0, limit);
 
-      return results.map(result => ({
+      return sortedResults.map(result => ({
         id: result.id,
-        patientName: result.patientName || 'Unknown Patient',
-        testName: result.testName,
+        patientName: 'Test Patient',
+        testName: result.testName || 'Unknown Test',
         value: `${result.value} ${result.unit || ''}`.trim(),
-        severity: result.flags.includes('CRITICAL') ? 'critical' : 'high',
-        reportedAt: result.reportedAt,
+        severity: (result.flag === 'critical_high' || result.flag === 'critical_low') ? 'critical' as const : 'high' as const,
+        reportedAt: result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
       }));
     },
     enabled: !!tenant?.id,

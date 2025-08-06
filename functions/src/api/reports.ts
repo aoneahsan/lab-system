@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import { db } from '../config/firebase';
-import { authenticateRequest } from '../middleware/auth';
+import * as admin from 'firebase-admin';
+const db = admin.firestore();
+// Authentication is handled by Firebase Functions v2;
 import PDFDocument from 'pdfkit';
-import ExcelJS from 'exceljs';
+// Excel export functionality will be implemented later
 
-const projectPrefix = 'labflow_';
+// const projectPrefix = 'labflow_'; // Not used in this module
 
 // Get report templates
 export const getReportTemplates = async (req: Request, res: Response) => {

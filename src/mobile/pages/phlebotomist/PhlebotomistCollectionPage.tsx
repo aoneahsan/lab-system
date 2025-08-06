@@ -354,7 +354,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
       {isScanning && (
         <div className="fixed inset-0 bg-black z-50">
           <QRScanner
-            onScan={(result) => handleScanResult(result.data)}
+            onScan={(result) => handleScanResult((result as any).text || (result as any).data || '')}
             onError={(error) => {
               console.error('Scan error:', error);
               toast.error('Failed to scan barcode');

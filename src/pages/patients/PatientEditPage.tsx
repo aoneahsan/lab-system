@@ -31,7 +31,7 @@ const PatientEditPage = () => {
     try {
       await updatePatientMutation.mutateAsync({
         patientId,
-        updates: {
+        data: {
           ...data,
           updatedBy: currentUser.email,
           updatedAt: new Date(),
