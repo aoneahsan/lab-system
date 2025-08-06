@@ -41,7 +41,7 @@ export const interpretTestResults = functions.https.onCall(async (request: funct
     // Generate interpretation using Vertex AI
     const result = await model.generateContent(contextPrompt);
     const response = result.response;
-    const interpretation = response.text();
+    const interpretation = response.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate interpretation';
 
     // Parse AI response to extract structured data
     const structuredResult = parseAIResponse(interpretation, testResult, testDefinition);

@@ -541,7 +541,9 @@
       "Bash(firebase functions:list:*)",
       "Bash(pod deintegrate:*)",
       "Bash(pod cache clean:*)",
-      "Bash(zip:*)"
+      "Bash(zip:*)",
+      "Bash(nvm use:*)",
+      "Bash(export:*)"
     ],
     "deny": []
   }

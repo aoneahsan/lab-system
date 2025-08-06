@@ -263,7 +263,7 @@ export const reconcilePaymentsHandler = async () => {
     }
 
     return null;
-  });
+  };
 
 async function generateInvoiceNumber(tenantId: string): Promise<string> {
   // Get tenant's invoice counter

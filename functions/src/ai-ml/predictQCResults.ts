@@ -125,7 +125,7 @@ function analyzeQCHistory(qcData: any[]) {
     const levelViolations: Record<string, number> = {};
     qcData.forEach(d => {
       if (d.violations) {
-        d.violations.forEach(v => {
+        d.violations.forEach((v: string) => {
           if (v.includes(level)) {
             levelViolations[v] = (levelViolations[v] || 0) + 1;
           }
