@@ -72,15 +72,17 @@ export const qualityControlService = {
   async getQCTests(filters?: any): Promise<QCTest[]> {
     const user = await getCurrentUser();
     const tenantId = user?.tenantId || '';
-    const constraints = [where('tenantId', '==', tenantId)];
+    const whereConstraints = [where('tenantId', '==', tenantId)];
 
     if (filters?.status) {
-      constraints.push(where('status', '==', filters.status));
+      whereConstraints.push(where('status', '==', filters.status));
     }
 
-    constraints.push(orderBy('testName'));
-
-    const q = query(collection(db, COLLECTIONS.QC_TESTS), ...constraints);
+    const q = query(
+      collection(db, COLLECTIONS.QC_TESTS), 
+      ...whereConstraints,
+      orderBy('testName')
+    );
 
     const snapshot = await getDocs(q);
     return snapshot.docs.map(

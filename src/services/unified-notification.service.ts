@@ -1,4 +1,4 @@
-import NotificationKit from 'notification-kit';
+import { notifications } from 'notification-kit';
 import { Capacitor } from '@capacitor/core';
 import { auth } from '@/config/firebase';
 import { notificationService } from './notification.service';
@@ -52,12 +52,12 @@ class UnifiedNotificationService {
 
   private setupPushListeners() {
     // Handle push notification received
-    NotificationKit.onPush((notification) => {
+    notifications.onPush((notification) => {
       console.log('Push notification received:', notification);
       
       // Show as in-app notification if app is in foreground
       if (notification.data?.showInApp !== false) {
-        NotificationKit.showInApp({
+        notifications.showInApp({
           title: notification.title || 'New Notification',
           message: notification.body || '',
           type: notification.data?.type || 'info',
@@ -67,7 +67,7 @@ class UnifiedNotificationService {
     });
 
     // Handle push notification opened
-    NotificationKit.onPushOpened((notification) => {
+    notifications.onPushOpened((notification) => {
       console.log('Push notification opened:', notification);
       
       // Handle deep linking based on notification data
@@ -79,13 +79,13 @@ class UnifiedNotificationService {
 
   private setupLocalListeners() {
     // Handle local notification actions
-    NotificationKit.onLocalNotificationAction((notification) => {
-      console.log('Local notification action:', notification);
+    notifications.on('notificationActionPerformed', (event) => {
+      console.log('Notification action performed:', event);
       
-      // Handle specific actions
-      if (notification.actionId === 'view') {
-        if (notification.data?.route) {
-          window.location.href = notification.data.route;
+      // Handle specific actions for local notifications
+      if (event.type === 'local.action' && event.actionId === 'view') {
+        if (event.notification.data?.route) {
+          window.location.href = event.notification.data.route;
         }
       }
     });
@@ -94,11 +94,11 @@ class UnifiedNotificationService {
   // Push Notification Methods
   async requestPushPermission(): Promise<boolean> {
     try {
-      const result = await NotificationKit.requestPermission();
+      const granted = await notifications.requestPermission();
       
-      if (result.receive === 'granted') {
+      if (granted) {
         // Get and store push token
-        this.pushToken = await NotificationKit.getToken();
+        this.pushToken = await notifications.getToken();
         
         // Subscribe to default topics
         await this.subscribeTenantTopics();
@@ -116,7 +116,7 @@ class UnifiedNotificationService {
   async getPushToken(): Promise<string | null> {
     if (!this.pushToken) {
       try {
-        this.pushToken = await NotificationKit.getToken();
+        this.pushToken = await notifications.getToken();
       } catch (error) {
         console.error('Failed to get push token:', error);
       }
@@ -131,17 +131,17 @@ class UnifiedNotificationService {
       // Subscribe to tenant-specific topic
       const tenantId = (this.currentUser as any).tenantId;
       if (tenantId) {
-        await NotificationKit.subscribe(`tenant_${tenantId}`);
+        await notifications.subscribe(`tenant_${tenantId}`);
       }
 
       // Subscribe to user role topics
       const userRole = (this.currentUser as any).role;
       if (userRole) {
-        await NotificationKit.subscribe(`role_${userRole}`);
+        await notifications.subscribe(`role_${userRole}`);
       }
 
       // Subscribe to user-specific topic
-      await NotificationKit.subscribe(`user_${this.currentUser.uid}`);
+      await notifications.subscribe(`user_${this.currentUser.uid}`);
     } catch (error) {
       console.error('Failed to subscribe to topics:', error);
     }
@@ -155,12 +155,15 @@ class UnifiedNotificationService {
     reminderMinutesBefore: number = 60
   ): Promise<number> {
     const reminderTime = new Date(appointmentDate.getTime() - reminderMinutesBefore * 60 * 1000);
+    const id = parseInt(appointmentId.replace(/\D/g, '').slice(-9)); // Generate numeric ID from appointment ID
     
-    const notificationId = await NotificationKit.schedule({
-      id: parseInt(appointmentId.replace(/\D/g, '').slice(-9)), // Generate numeric ID from appointment ID
+    await notifications.schedule({
+      id: id.toString(),
       title: 'Appointment Reminder',
       body: `${patientName}, you have an appointment in ${reminderMinutesBefore} minutes`,
-      at: reminderTime,
+      schedule: {
+        at: reminderTime
+      },
       data: {
         type: 'appointment_reminder',
         appointmentId,
@@ -172,7 +175,7 @@ class UnifiedNotificationService {
       ]
     });
 
-    return notificationId;
+    return id;
   }
 
   async scheduleSampleCollectionReminder(
@@ -180,11 +183,15 @@ class UnifiedNotificationService {
     patientName: string,
     testName: string
   ): Promise<number> {
-    const notificationId = await NotificationKit.schedule({
-      id: parseInt(orderId.replace(/\D/g, '').slice(-9)),
+    const id = parseInt(orderId.replace(/\D/g, '').slice(-9));
+    
+    await notifications.schedule({
+      id: id.toString(),
       title: 'Sample Collection Required',
       body: `${patientName}, please visit the lab for ${testName} sample collection`,
-      in: { hours: 24 }, // Remind after 24 hours
+      schedule: {
+        in: { hours: 24 } // Remind after 24 hours
+      },
       data: {
         type: 'sample_collection',
         orderId,
@@ -192,7 +199,7 @@ class UnifiedNotificationService {
       }
     });
 
-    return notificationId;
+    return id;
   }
 
   async scheduleQCReminder(
@@ -200,11 +207,15 @@ class UnifiedNotificationService {
     testName: string,
     nextRunTime: Date
   ): Promise<number> {
-    const notificationId = await NotificationKit.schedule({
-      id: parseInt(qcTestId.replace(/\D/g, '').slice(-9)),
+    const id = parseInt(qcTestId.replace(/\D/g, '').slice(-9));
+    
+    await notifications.schedule({
+      id: id.toString(),
       title: 'QC Test Due',
       body: `Quality control test for ${testName} is due`,
-      at: nextRunTime,
+      schedule: {
+        at: nextRunTime
+      },
       data: {
         type: 'qc_reminder',
         qcTestId,
@@ -212,52 +223,32 @@ class UnifiedNotificationService {
       }
     });
 
-    return notificationId;
+    return id;
   }
 
   async cancelScheduledNotification(notificationId: number): Promise<void> {
-    await NotificationKit.cancel(notificationId);
+    await notifications.cancel(notificationId);
   }
 
   async getAllScheduledNotifications() {
-    return await NotificationKit.getPending();
+    return await notifications.getPending();
   }
 
   // In-App Notification Methods (Re-export from app-notification.service)
   showSuccess(title: string, message?: string) {
-    NotificationKit.showInApp({
-      title,
-      message: message || '',
-      type: 'success',
-      duration: 4000
-    });
+    return notifications.success(title, message || '');
   }
 
   showError(title: string, message?: string) {
-    NotificationKit.showInApp({
-      title,
-      message: message || '',
-      type: 'error',
-      duration: 6000
-    });
+    return notifications.error(title, message || '');
   }
 
   showWarning(title: string, message?: string) {
-    NotificationKit.showInApp({
-      title,
-      message: message || '',
-      type: 'warning',
-      duration: 5000
-    });
+    return notifications.warning(title, message || '');
   }
 
   showInfo(title: string, message?: string) {
-    NotificationKit.showInApp({
-      title,
-      message: message || '',
-      type: 'info',
-      duration: 4000
-    });
+    return notifications.info(title, message || '');
   }
 
   // Critical Notifications (Combine local + push + backend)
@@ -290,10 +281,12 @@ class UnifiedNotificationService {
 
     // 3. Schedule local notification for mobile platforms
     if (platform !== 'web') {
-      await NotificationKit.schedule({
+      await notifications.schedule({
         title: 'Critical Result Alert',
         body: `${patientName} - ${testName}: ${value} (${flag})`,
-        in: { seconds: 1 }, // Show immediately
+        schedule: {
+          in: { seconds: 1 } // Show immediately
+        },
         data: {
           type: 'critical_result',
           patientId,
@@ -318,7 +311,7 @@ class UnifiedNotificationService {
     );
 
     // Send push notification to inventory managers
-    await NotificationKit.subscribe('inventory_managers');
+    await notifications.subscribe('inventory_managers');
     
     // Backend will handle sending the actual push notification
     await notificationService.sendInventoryAlert(
@@ -345,10 +338,10 @@ class UnifiedNotificationService {
       };
     } else {
       // Mobile platforms
-      const permissions = await NotificationKit.checkPermissions();
+      const permission = await notifications.checkPermission();
       return {
-        push: permissions.receive === 'granted',
-        local: permissions.receive === 'granted' // Same permission for both on mobile
+        push: permission === 'granted',
+        local: permission === 'granted' // Same permission for both on mobile
       };
     }
   }
