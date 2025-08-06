@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, ChevronRight, X, Check } from 'lucide-react';
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { toast } from '@/hooks/useToast';
 
 interface Appointment {
@@ -69,25 +69,28 @@ const MobileAppointmentsPage: React.FC = () => {
 
   const scheduleReminder = async (appointment: Appointment) => {
     try {
-      const permission = await LocalNotifications.requestPermissions();
-
-      if (permission.display === 'granted') {
-        const notificationTime = new Date(appointment.date);
-        notificationTime.setHours(notificationTime.getHours() - 1); // 1 hour before
-
-        await LocalNotifications.schedule({
-          notifications: [
-            {
-              title: 'Appointment Reminder',
-              body: `You have an appointment at ${appointment.time} at ${appointment.location}`,
-              id: parseInt(appointment.id),
-              schedule: { at: notificationTime },
-            },
-          ],
-        });
+      const permissions = await unifiedNotificationService.checkNotificationPermissions();
+      
+      if (!permissions.local) {
+        const granted = await unifiedNotificationService.requestPushPermission();
+        if (!granted) {
+          toast.warning('Notification permission denied');
+          return;
+        }
       }
+
+      // Schedule reminder 1 hour before appointment
+      const notificationId = await unifiedNotificationService.scheduleAppointmentReminder(
+        appointment.id,
+        'Patient', // In real app, would use actual patient name
+        appointment.date,
+        60 // 60 minutes before
+      );
+
+      toast.success('Reminder scheduled');
     } catch (error) {
       console.error('Failed to schedule notification:', error);
+      toast.error('Failed to schedule reminder');
     }
   };
 

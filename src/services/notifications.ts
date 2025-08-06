@@ -1,5 +1,6 @@
 import { api } from './api';
 import { unifiedStorage } from './unified-storage.service';
+import { unifiedNotificationService } from './unified-notification.service';
 
 export interface Notification {
   id: string;
@@ -85,16 +86,16 @@ class NotificationService {
     // Store locally for offline access
     await this.storeNotificationLocally(notification);
 
-    // Show system notification if permission granted
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(notification.title, {
-        body: notification.message,
-        icon: '/icon-192.png',
-        badge: '/icon-72.png',
-        requireInteraction: true,
-        tag: notification.id,
-      });
-    }
+    // Use unified notification service for all notification types
+    await unifiedNotificationService.sendCriticalResultNotification(
+      data.patientId,
+      data.patientName,
+      data.testName,
+      data.value,
+      data.criticalRange,
+      '', // Phone would be fetched from patient record
+      ''  // Email would be fetched from patient record
+    );
   }
 
   // Store notification locally
@@ -120,21 +121,8 @@ class NotificationService {
 
   // Request notification permission
   async requestPermission(): Promise<boolean> {
-    if (!('Notification' in window)) {
-      console.log('This browser does not support notifications');
-      return false;
-    }
-
-    if (Notification.permission === 'granted') {
-      return true;
-    }
-
-    if (Notification.permission !== 'denied') {
-      const permission = await Notification.requestPermission();
-      return permission === 'granted';
-    }
-
-    return false;
+    // Use unified notification service for permission handling
+    return await unifiedNotificationService.requestPushPermission();
   }
 
   // Check if critical value requires notification

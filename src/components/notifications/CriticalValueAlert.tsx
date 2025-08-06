@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { notificationService } from '../../services/notifications';
 import type { CriticalValueNotification } from '../../services/notifications';
+import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface CriticalValueAlertProps {
@@ -24,9 +25,30 @@ const CriticalValueAlert: React.FC<CriticalValueAlertProps> = ({
         notification.patientId, // Would be notificationId in real implementation
         notes
       );
+      
+      // Send critical notification through unified service
+      await unifiedNotificationService.sendCriticalResultNotification(
+        notification.patientId,
+        notification.patientName,
+        notification.testName,
+        notification.value,
+        `Outside range: ${notification.criticalRange}`,
+        '', // Phone would be fetched from patient record in real app
+        ''  // Email would be fetched from patient record in real app
+      );
+      
+      unifiedNotificationService.showSuccess(
+        'Critical value acknowledged',
+        'Provider has been notified'
+      );
+      
       onAcknowledge();
     } catch (error) {
       console.error('Error acknowledging critical value:', error);
+      unifiedNotificationService.showError(
+        'Failed to acknowledge',
+        'Please try again or contact support'
+      );
     } finally {
       setIsAcknowledging(false);
     }

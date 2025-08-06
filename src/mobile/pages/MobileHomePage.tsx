@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePatient } from '@/hooks/usePatients';
-import { PushNotifications } from '@capacitor/push-notifications';
+import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { App } from '@capacitor/app';
 
 const MobileHomePage: React.FC = () => {
@@ -38,22 +38,23 @@ const MobileHomePage: React.FC = () => {
 
   const setupPushNotifications = async () => {
     try {
-      // Request permission
-      const permission = await PushNotifications.requestPermissions();
+      // Initialize unified notification service
+      await unifiedNotificationService.initialize();
+      
+      // Request permission using notification-kit
+      const granted = await unifiedNotificationService.requestPushPermission();
 
-      if (permission.receive === 'granted') {
-        // Register with APNS/FCM
-        await PushNotifications.register();
-
-        // Handle registration
-        PushNotifications.addListener('registration', (token) => {
-          console.log('Push registration success, token: ' + token.value);
-        });
-
-        // Handle incoming notifications
-        PushNotifications.addListener('pushNotificationReceived', (notification) => {
-          setNotifications((prev) => prev + 1);
-        });
+      if (granted) {
+        console.log('Push notifications enabled');
+        
+        // Get push token if needed
+        const token = await unifiedNotificationService.getPushToken();
+        if (token) {
+          console.log('Push registration success, token:', token);
+        }
+        
+        // Notification count will be handled by NotificationCenter component
+        // which subscribes to notification service
       }
     } catch (error) {
       console.error('Push notification setup failed:', error);

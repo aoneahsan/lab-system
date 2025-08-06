@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationService } from '../../services/notifications';
 import type { Notification } from '../../services/notifications';
-import { BellIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { unifiedNotificationService } from '@/services/unified-notification.service';
+import { BellIcon, ExclamationTriangleIcon, CogIcon } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
+import { Capacitor } from '@capacitor/core';
 
 const NotificationCenter: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
   const queryClient = useQueryClient();
+  const platform = Capacitor.getPlatform();
 
   const { data: notifications = [], refetch } = useQuery({
     queryKey: ['notifications'],
@@ -37,11 +41,20 @@ const NotificationCenter: React.FC = () => {
     },
   });
 
-  // Subscribe to new notifications
+  // Subscribe to new notifications and check push permission
   useEffect(() => {
     const unsubscribe = notificationService.subscribe(() => {
       refetch();
     });
+
+    // Check push notification permission status
+    unifiedNotificationService.checkNotificationPermissions().then(permissions => {
+      setPushEnabled(permissions.push);
+    });
+
+    // Initialize notification service
+    unifiedNotificationService.initialize();
+
     return unsubscribe;
   }, [refetch]);
 
@@ -72,6 +85,20 @@ const NotificationCenter: React.FC = () => {
     }
   };
 
+  const handleEnablePushNotifications = async () => {
+    const granted = await unifiedNotificationService.requestPushPermission();
+    if (granted) {
+      setPushEnabled(true);
+      unifiedNotificationService.showSuccess('Push notifications enabled');
+    } else {
+      unifiedNotificationService.showError('Permission denied', 'Please enable notifications in your device settings');
+    }
+  };
+
+  const handleOpenSettings = () => {
+    unifiedNotificationService.openNotificationSettings();
+  };
+
   return (
     <div className="relative">
       <button
@@ -93,15 +120,46 @@ const NotificationCenter: React.FC = () => {
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-                {unreadCount > 0 && (
-                  <button
-                    onClick={() => markAllAsReadMutation.mutate()}
-                    className="text-sm text-blue-600 hover:text-blue-800"
-                  >
-                    Mark all as read
-                  </button>
-                )}
+                <div className="flex items-center space-x-2">
+                  {platform !== 'web' && (
+                    <button
+                      onClick={handleOpenSettings}
+                      className="p-1.5 text-gray-400 hover:text-gray-600"
+                      title="Notification Settings"
+                    >
+                      <CogIcon className="h-4 w-4" />
+                    </button>
+                  )}
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={() => markAllAsReadMutation.mutate()}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
               </div>
+              {!pushEnabled && platform !== 'web' && (
+                <div className="mt-3 p-3 bg-yellow-50 rounded-md">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" />
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <p className="text-sm text-yellow-700">
+                        Enable push notifications to receive alerts
+                      </p>
+                      <button
+                        onClick={handleEnablePushNotifications}
+                        className="mt-2 text-sm font-medium text-yellow-700 hover:text-yellow-600"
+                      >
+                        Enable notifications →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="overflow-y-auto max-h-[500px]">

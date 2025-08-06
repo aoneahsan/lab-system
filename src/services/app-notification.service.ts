@@ -1,9 +1,9 @@
-import { NotificationKit, notifications } from 'notification-kit';
+import NotificationKit from 'notification-kit';
 import { firebaseConfig } from '@/config/firebase.config';
 
-// Initialize notification kit
+// Initialize notification kit with v2.0.3 API
 export const initializeNotifications = async () => {
-  await (NotificationKit as any).init({
+  await NotificationKit.init({
     provider: 'firebase',
     config: firebaseConfig,
     inApp: {
@@ -22,7 +22,7 @@ export const initializeNotifications = async () => {
 // Export convenience methods that match our existing toast API
 export const toast = {
   success: (title: string, message?: string) => {
-    notifications.showInApp({
+    NotificationKit.showInApp({
       title,
       message: message || '',
       type: 'success',
@@ -30,7 +30,7 @@ export const toast = {
     });
   },
   error: (title: string, message?: string) => {
-    notifications.showInApp({
+    NotificationKit.showInApp({
       title,
       message: message || '',
       type: 'error',
@@ -38,7 +38,7 @@ export const toast = {
     });
   },
   warning: (title: string, message?: string) => {
-    notifications.showInApp({
+    NotificationKit.showInApp({
       title,
       message: message || '',
       type: 'warning',
@@ -46,7 +46,7 @@ export const toast = {
     });
   },
   info: (title: string, message?: string) => {
-    notifications.showInApp({
+    NotificationKit.showInApp({
       title,
       message: message || '',
       type: 'info',
@@ -58,27 +58,27 @@ export const toast = {
 // Push notification helpers
 export const pushNotifications = {
   requestPermission: async () => {
-    return await notifications.requestPermission();
+    return await NotificationKit.requestPermission();
   },
   
   getToken: async () => {
-    return await notifications.getToken();
+    return await NotificationKit.getToken();
   },
   
-  onPush: (callback: (notification: any) => void) => {
-    notifications.onPush(callback);
+  onNotificationReceived: (callback: (notification: any) => void) => {
+    NotificationKit.onPush(callback);
   },
   
-  onPushOpened: (callback: (notification: any) => void) => {
-    notifications.onPushOpened(callback);
+  onNotificationOpened: (callback: (notification: any) => void) => {
+    NotificationKit.onPushOpened(callback);
   },
   
-  subscribe: async (topic: string) => {
-    await notifications.subscribe(topic);
+  subscribeTopic: async (topic: string) => {
+    await NotificationKit.subscribe(topic);
   },
   
-  unsubscribe: async (topic: string) => {
-    await notifications.unsubscribe(topic);
+  unsubscribeTopic: async (topic: string) => {
+    await NotificationKit.unsubscribe(topic);
   }
 };
 
@@ -87,22 +87,32 @@ export const localNotifications = {
   schedule: async (options: {
     title: string;
     body: string;
+    id?: number;
     in?: { minutes?: number; hours?: number; days?: number };
     at?: Date;
     every?: 'day' | 'week' | 'month';
     actions?: Array<{ id: string; title: string }>;
+    data?: Record<string, any>;
   }) => {
-    return await notifications.schedule(options as any);
+    return await NotificationKit.schedule(options);
   },
   
-  cancel: async (id: string | number) => {
-    await notifications.cancel(Number(id));
+  cancel: async (id: number) => {
+    await NotificationKit.cancel(id);
+  },
+  
+  cancelAll: async () => {
+    await NotificationKit.cancelAll();
   },
   
   getPending: async () => {
-    return await notifications.getPending();
+    return await NotificationKit.getPending();
+  },
+  
+  onAction: (callback: (notification: any) => void) => {
+    NotificationKit.onLocalNotificationAction(callback);
   }
 };
 
-// Export the notifications object for advanced use
-export { notifications };
+// Export NotificationKit for advanced use
+export { NotificationKit };
