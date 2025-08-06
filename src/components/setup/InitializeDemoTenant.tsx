@@ -10,6 +10,17 @@ const InitializeDemoTenant = () => {
   useEffect(() => {
     const initializeDemoTenant = async () => {
       try {
+        if (!firestore) {
+          console.warn('Firestore not initialized yet');
+          return;
+        }
+        
+        // Check if already initialized in this session
+        const initialized = sessionStorage.getItem('demo-tenant-initialized');
+        if (initialized) {
+          return;
+        }
+        
         // Check if DEMO tenant already exists
         const demoDoc = await getDoc(doc(firestore, 'tenants', 'demo'));
 
@@ -253,11 +264,11 @@ const InitializeDemoTenant = () => {
           }
         }
 
-        // setIsInitialized(true);
+        // Mark as initialized for this session
+        sessionStorage.setItem('demo-tenant-initialized', 'true');
+        console.log('Demo tenant initialization completed');
       } catch (error) {
         console.error('Error initializing DEMO tenant:', error);
-      } finally {
-        // setIsChecking(false);
       }
     };
 

@@ -41,14 +41,19 @@ function App() {
     
     // Initialize auth, notifications, and platform-specific services
     const initialize = async () => {
-      initializeAuth();
-      await initializeNotifications();
-      
-      // Initialize Firebase Kit for analytics, crashlytics, performance
-      await firebaseKit.initialize();
-      
-      // Initialize app update service for native platforms
-      await appUpdateService.initialize();
+      try {
+        initializeAuth();
+        await initializeNotifications();
+        
+        // Initialize Firebase Kit for analytics, crashlytics, performance
+        await firebaseKit.initialize();
+        
+        // Initialize app update service for native platforms
+        await appUpdateService.initialize();
+      } catch (error) {
+        console.error('App initialization error:', error);
+        // Continue app loading even if some services fail
+      }
     };
     
     initialize();
@@ -67,22 +72,24 @@ function App() {
   const RouterComponent = isNativePlatform ? MobileAppSelector : AppRouter;
 
   return (
-    <ErrorHandlingProvider>
+    <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TrackingProvider>
-          <PerformanceProvider>
-            <BrowserRouter>
-              <InitializeDemoTenant />
-              <RouterComponent />
-              <Toaster />
-              <PerformanceMetrics />
-              <OfflineIndicator />
-            </BrowserRouter>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </PerformanceProvider>
-        </TrackingProvider>
+        <BrowserRouter>
+          <ErrorHandlingProvider>
+            <TrackingProvider>
+              <PerformanceProvider>
+                <InitializeDemoTenant />
+                <RouterComponent />
+                <Toaster />
+                <PerformanceMetrics />
+                <OfflineIndicator />
+              </PerformanceProvider>
+            </TrackingProvider>
+          </ErrorHandlingProvider>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-    </ErrorHandlingProvider>
+    </ErrorBoundary>
   );
 }
 
