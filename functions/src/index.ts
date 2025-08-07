@@ -1,11 +1,46 @@
 import * as admin from 'firebase-admin';
 import { onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { onDocumentWritten, onDocumentCreated } from 'firebase-functions/v2/firestore';
 
 // Initialize Firebase Admin
 admin.initializeApp();
 
-// Export minimal working functions
+// Import function modules
+import { criticalResultsMonitor } from './monitors/criticalResultsMonitor';
+import { sampleExpirationMonitor } from './monitors/sampleExpirationMonitor';
+import { qualityControlMonitor } from './monitors/qualityControlMonitor';
+import { resultValidationWorkflow } from './workflows/resultValidationWorkflow';
+import { inventoryAlerts } from './monitors/inventoryAlerts';
+import { appointmentReminders } from './schedulers/appointmentReminders';
+import { checkInsuranceEligibility } from './integrations/insuranceEligibility';
+import { billingAutomation } from './workflows/billingAutomation';
+
+// Export critical results monitoring
+export const monitorCriticalResults = onDocumentWritten('labflow_{tenantId}_results/{resultId}', criticalResultsMonitor);
+
+// Export sample expiration monitoring (runs every 6 hours)
+export const checkSampleExpiration = onSchedule('every 6 hours', sampleExpirationMonitor);
+
+// Export quality control monitoring
+export const monitorQualityControl = onDocumentCreated('labflow_{tenantId}_qc_results/{qcResultId}', qualityControlMonitor);
+
+// Export result validation workflow
+export const validateResults = onDocumentCreated('labflow_{tenantId}_results/{resultId}', resultValidationWorkflow);
+
+// Export inventory monitoring (runs daily at 8 AM)
+export const checkInventoryLevels = onSchedule('0 8 * * *', inventoryAlerts);
+
+// Export appointment reminders (runs daily at 9 AM)
+export const sendAppointmentReminders = onSchedule('0 9 * * *', appointmentReminders);
+
+// Export insurance eligibility checker (callable function)
+export const verifyInsurance = onCall(checkInsuranceEligibility);
+
+// Export billing automation
+export const processBilling = onDocumentWritten('labflow_{tenantId}_results/{resultId}', billingAutomation);
+
+// Keep existing functions for backward compatibility
 export const createOrder = onCall(async (request) => {
   console.log('Creating order');
   return { success: true, orderId: 'test-order' };
