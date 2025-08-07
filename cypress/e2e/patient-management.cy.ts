@@ -1,7 +1,7 @@
 describe('Patient Management', () => {
   beforeEach(() => {
-    cy.interceptAPI();
-    cy.login(Cypress.env('TEST_EMAIL'), Cypress.env('TEST_PASSWORD'));
+    cy.resetDatabase();
+    cy.loginAsLabTech();
     cy.visit('/patients');
   });
 

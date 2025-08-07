@@ -1,0 +1,288 @@
+/* LabFlow EMR Integration Styles */
+
+.labflow-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: none;
+}
+
+.labflow-widget-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+}
+
+.labflow-widget-header img {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.labflow-widget-header span {
+  flex: 1;
+  font-size: 14px;
+}
+
+.labflow-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.labflow-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.labflow-widget-content {
+  padding: 16px;
+}
+
+.labflow-status {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: #9ca3af;
+}
+
+.status-indicator.status-connected {
+  background: #10b981;
+}
+
+.status-indicator.status-disconnected {
+  background: #f59e0b;
+}
+
+.status-indicator.status-error {
+  background: #ef4444;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #374151;
+}
+
+.labflow-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.labflow-btn {
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #374151;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.labflow-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.labflow-btn-primary {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+.labflow-btn-primary:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+}
+
+.labflow-patient-info {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.labflow-patient-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.patient-details {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.patient-details div {
+  margin-bottom: 4px;
+}
+
+.patient-details strong {
+  color: #374151;
+}
+
+/* Dialog Styles */
+.labflow-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.labflow-dialog-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.labflow-dialog-content h3 {
+  margin: 0;
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.labflow-dialog-content iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
+}
+
+/* Floating Action Button */
+.labflow-fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: #4f46e5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  transition: all 0.3s;
+  z-index: 9999;
+}
+
+.labflow-fab:hover {
+  background: #4338ca;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+  transform: translateY(-2px);
+}
+
+.labflow-fab img {
+  width: 32px;
+  height: 32px;
+}
+
+/* Inline Order Button */
+.labflow-inline-order {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 4px 12px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.labflow-inline-order:hover {
+  background: #4338ca;
+}
+
+.labflow-inline-order img {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Toast Notifications */
+.labflow-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10002;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.labflow-toast.success {
+  border-left: 4px solid #10b981;
+}
+
+.labflow-toast.error {
+  border-left: 4px solid #ef4444;
+}
+
+.labflow-toast.info {
+  border-left: 4px solid #3b82f6;
+}

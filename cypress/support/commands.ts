@@ -1,8 +1,12 @@
-/// <reference types="cypress" />
+// ***********************************************************************
+// This file contains custom commands for Cypress.
+// For more comprehensive examples of custom commands:
+// https://on.cypress.io/custom-commands
+// ***********************************************************************
+
 import '@testing-library/cypress/add-commands';
 import 'cypress-real-events/support';
-
-// Custom commands for LabFlow
+import 'cypress-file-upload';
 
 // Authentication commands
 Cypress.Commands.add('login', (email: string, password: string) => {

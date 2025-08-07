@@ -1,138 +1,142 @@
-# LabFlow Chrome Extension
+# LabFlow EMR Integration Chrome Extension
 
-This Chrome extension enables seamless integration between Electronic Medical Record (EMR) systems and LabFlow.
+## Overview
+The LabFlow EMR Integration Chrome Extension seamlessly connects Electronic Medical Record (EMR) systems with LabFlow, enabling healthcare providers to order lab tests and view results directly from their EMR interface.
 
 ## Features
-
-- **Auto-detection** of popular EMR systems (Epic, Cerner, Allscripts, etc.)
+- **Auto-detection** of major EMR systems (Epic, Cerner, Allscripts, etc.)
 - **Patient data extraction** from EMR pages
-- **Lab order extraction** and submission
-- **Real-time connection status** monitoring
-- **Context menu integration** for quick data extraction
-- **Secure API key** configuration
+- **Quick lab ordering** with pre-filled patient information
+- **Real-time results sync** between LabFlow and EMR
+- **Secure authentication** with LabFlow credentials
+- **Offline support** with sync queue
+- **Context menu integration** for quick actions
 
-## Installation
-
-### Development
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable "Developer mode" in the top right
-3. Click "Load unpacked"
-4. Select the `chrome-extension` directory from this project
-
-### Production
-
-The extension will be published to the Chrome Web Store once approved.
-
-## Configuration
-
-1. Click on the LabFlow extension icon in Chrome
-2. Enter your LabFlow API key
-3. Optionally configure the server URL (defaults to `http://localhost:5173`)
-4. Click "Save Configuration"
-5. Test the connection
-
-## Usage
-
-### Automatic Detection
-
-The extension automatically detects when you're on a supported EMR system and adds "Send to LabFlow" buttons to relevant sections.
-
-### Manual Extraction
-
-1. Right-click on any page with patient or order information
-2. Select "Send Patient to LabFlow" or "Send Lab Order to LabFlow"
-3. The extension will attempt to extract and send the data
-
-### Supported EMR Systems
-
-- Epic (MyChart)
-- Cerner (PowerChart)
+## Supported EMR Systems
+- Epic MyChart
+- Cerner PowerChart
 - Allscripts
-- AthenaHealth
+- athenahealth
 - NextGen
 - eClinicalWorks
 - Practice Fusion
-- Generic EMR detection for other systems
 
-## Icon Generation
+## Installation
 
-To generate the required icon sizes from the SVG source:
+### From Source
+1. Clone the repository
+2. Navigate to `chrome-extension` directory
+3. Install dependencies:
+   ```bash
+   cd chrome-extension
+   yarn install
+   ```
+4. Build the extension:
+   ```bash
+   yarn build
+   ```
+5. Open Chrome and navigate to `chrome://extensions/`
+6. Enable "Developer mode"
+7. Click "Load unpacked" and select the `dist` directory
 
-```bash
-# Install dependencies (one time)
-npm install -g sharp-cli
+### From Chrome Web Store
+(Coming soon)
 
-# Generate icons (requires Node.js)
-node generate-icons.js
-```
+## Usage
 
-Or manually create PNG files at these sizes:
-- 16x16 pixels → icon16.png
-- 32x32 pixels → icon32.png
-- 48x48 pixels → icon48.png
-- 128x128 pixels → icon128.png
+### Initial Setup
+1. Click the LabFlow icon in your Chrome toolbar
+2. Click "Login to LabFlow" and authenticate
+3. Grant necessary permissions when prompted
+
+### Ordering Lab Tests
+1. Navigate to a patient record in your EMR
+2. Click the LabFlow widget or use right-click menu
+3. Select "Quick Order" to open the order dialog
+4. Review patient information and select tests
+5. Submit the order to LabFlow
+
+### Viewing Results
+1. Navigate to a patient record
+2. Click "View Results" in the LabFlow widget
+3. Results will be displayed with options to:
+   - View detailed reports
+   - Download PDFs
+   - Push results back to EMR
+
+### Patient Sync
+- Automatic sync when navigating to patient records
+- Manual sync available via "Sync Patient" button
+- Bi-directional data flow between EMR and LabFlow
+
+## Configuration
+
+### EMR Field Mappings
+The extension automatically maps EMR fields to LabFlow fields. Custom mappings can be configured in Settings.
+
+### Permissions
+- `activeTab` - Access current EMR page
+- `storage` - Store authentication and settings
+- `notifications` - Show status updates
+- `contextMenus` - Add right-click options
+
+## Security
+- All data transmitted over HTTPS
+- OAuth 2.0 authentication with LabFlow
+- No patient data stored locally
+- Automatic session timeout
+- HIPAA compliant
 
 ## Development
 
-### File Structure
-
+### Project Structure
 ```
 chrome-extension/
 ├── manifest.json          # Extension configuration
 ├── src/
-│   ├── background.js      # Background service worker
-│   ├── content.js         # Content script for EMR pages
-│   └── injected.js        # (Optional) Page-injected scripts
-├── public/
-│   ├── popup.html         # Extension popup UI
-│   ├── popup.js           # Popup functionality
-│   └── icon*.png          # Extension icons
-└── README.md              # This file
+│   ├── background/       # Service worker
+│   ├── content/          # Content scripts
+│   └── popup/            # Extension popup
+├── icons/                # Extension icons
+├── scripts/              # Build scripts
+└── dist/                 # Built extension
+```
+
+### Building
+```bash
+# Development build with source maps
+yarn dev
+
+# Production build
+NODE_ENV=production yarn build
+
+# Package for distribution
+yarn package
 ```
 
 ### Testing
-
-1. Make changes to the extension files
-2. Go to `chrome://extensions/`
-3. Click the refresh icon on the LabFlow extension card
-4. Test on EMR pages or use test data
-
-### API Endpoints
-
-The extension communicates with these LabFlow API endpoints:
-
-- `POST /api/emr-integration/test` - Test connection
-- `POST /api/emr-integration/patient` - Submit patient data
-- `POST /api/emr-integration/order` - Submit lab order
-
-## Security
-
-- API keys are stored securely in Chrome's local storage
-- All communication uses HTTPS in production
-- No patient data is stored locally
-- Extension only activates on whitelisted EMR domains
+1. Load the extension in Chrome
+2. Navigate to a supported EMR system
+3. Verify the LabFlow widget appears
+4. Test patient data extraction
+5. Test order creation and result viewing
 
 ## Troubleshooting
 
 ### Extension not detecting EMR
+- Verify you're on a supported EMR domain
+- Check console for errors
+- Try refreshing the page
 
-1. Check if the EMR URL is in the supported list
-2. Ensure the extension has permission for the site
-3. Check the console for errors (F12 → Console)
+### Authentication issues
+- Clear extension storage
+- Re-authenticate with LabFlow
+- Check network connectivity
 
-### Connection issues
-
-1. Verify your API key is correct
-2. Check if LabFlow server is running
-3. Ensure no firewall/proxy is blocking requests
-
-### Data extraction issues
-
-1. EMR layouts may have changed
-2. Try manual extraction via right-click menu
-3. Report the issue with EMR system details
+### Data not syncing
+- Verify patient is selected in EMR
+- Check sync queue in extension popup
+- Review console logs for errors
 
 ## Support
-
-For issues or feature requests, please contact the LabFlow support team or create an issue in the project repository.
+For issues or questions, contact support@labflow.com or create an issue in the repository.

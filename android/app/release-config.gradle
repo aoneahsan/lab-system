@@ -1,0 +1,58 @@
+// Release configuration for Android app
+
+android {
+    signingConfigs {
+        release {
+            if (project.hasProperty('LABFLOW_RELEASE_STORE_FILE')) {
+                storeFile file(LABFLOW_RELEASE_STORE_FILE)
+                storePassword LABFLOW_RELEASE_STORE_PASSWORD
+                keyAlias LABFLOW_RELEASE_KEY_ALIAS
+                keyPassword LABFLOW_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+    
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // App Bundle configuration
+            bundle {
+                language {
+                    enableSplit = true
+                }
+                density {
+                    enableSplit = true
+                }
+                abi {
+                    enableSplit = true
+                }
+            }
+        }
+    }
+    
+    // Play Store configuration
+    playConfigs {
+        defaultConfig {
+            enabled = true
+        }
+    }
+}
+
+// Play Publisher configuration
+play {
+    serviceAccountCredentials = file("../play-store-service-account.json")
+    defaultToAppBundles = true
+    track = "internal" // internal, alpha, beta, production
+    releaseStatus = "draft" // draft, completed
+    
+    // Release notes
+    resolutionStrategy = "auto"
+    userFraction = 0.1 // 10% staged rollout
+    
+    // Artifact configuration
+    artifactDir = file("${project.buildDir}/outputs/bundle/release")
+}

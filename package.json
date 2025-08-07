@@ -58,6 +58,8 @@
     "test:prod": "vitest run --coverage",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
+    "test:e2e": "start-server-and-test dev http://localhost:5173 cypress:run",
+    "test:e2e:open": "start-server-and-test dev http://localhost:5173 cypress:open",
     "cap:sync": "cap sync",
     "cap:build:android": "cap build android",
     "cap:build:ios": "cap build ios",
@@ -134,6 +136,8 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.14.5",
+    "@cypress/instrument-cra": "^1.4.0",
     "@cypress/react": "^9.0.1",
     "@cypress/webpack-dev-server": "^4.1.1",
     "@eslint/js": "^10.0.0",
@@ -156,6 +160,7 @@
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "cypress": "^14.5.3",
+    "cypress-file-upload": "^5.0.8",
     "cypress-real-events": "^1.14.0",
     "dotenv": "^17.2.1",
     "eslint": "^9.32.0",
@@ -165,6 +170,7 @@
     "globals": "^16.3.0",
     "jsdom": "^26.1.0",
     "sharp": "^0.34.3",
+    "start-server-and-test": "^2.0.13",
     "tailwindcss": "^4.1.11",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.39.0",

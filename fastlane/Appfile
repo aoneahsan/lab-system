@@ -1,0 +1,19 @@
+# iOS Configuration
+app_identifier("com.labflow.app")
+apple_id(ENV["APPLE_ID"])
+itc_team_id(ENV["ITC_TEAM_ID"])
+team_id(ENV["TEAM_ID"])
+
+# Android Configuration
+for_platform :android do
+  package_name("com.labflow.app")
+end
+
+# Environment-specific configurations
+for_lane :beta do
+  app_identifier("com.labflow.app.beta")
+end
+
+for_lane :release do
+  app_identifier("com.labflow.app")
+end
