@@ -157,8 +157,14 @@ export const useTestOrders = (filter?: TestOrderFilter) => {
 
   return useQuery({
     queryKey: ['testOrders', currentTenant?.id, filter],
-    queryFn: () => testService.getTestOrders(currentTenant!.id, filter),
+    queryFn: async () => {
+      if (!currentTenant?.id) {
+        throw new Error('No tenant selected');
+      }
+      return testService.getTestOrders(currentTenant.id, filter);
+    },
     enabled: !!currentTenant,
+    retry: 1,
   });
 };
 

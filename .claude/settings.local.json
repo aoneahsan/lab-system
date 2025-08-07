@@ -539,11 +539,15 @@
       "Bash(xcodebuild:*)",
       "Bash(firebase functions:config:set:*)",
       "Bash(firebase functions:list:*)",
-      "Bash(pod deintegrate:*)",
+      "Bash(git add:*)",
       "Bash(pod cache clean:*)",
       "Bash(zip:*)",
       "Bash(nvm use:*)",
-      "Bash(export:*)"
+      "Bash(git commit:*)",
+      "Bash(pod deintegrate:*)",
+      "WebFetch(domain:www.zakya.com)",
+      "Bash(export:*)",
+      "WebFetch(domain:labsystem-a1.web.app)"
     ],
     "deny": []
   }

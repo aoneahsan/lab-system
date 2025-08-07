@@ -64,6 +64,7 @@ export interface Sample {
   };
   stabilityHours?: number;
   expirationNotificationSent?: boolean;
+  criticalExpirationNotificationSent?: boolean;
   tenantId: string;
   createdAt: any;
   updatedAt: any;
@@ -87,6 +88,7 @@ export interface QCResult {
   performedAt: any;
   tenantId: string;
   createdAt: any;
+  notificationSent?: boolean;
 }
 
 export interface InventoryItem {

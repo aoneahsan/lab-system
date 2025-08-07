@@ -4,6 +4,7 @@ import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide
 import { useTestOrders, useCreateTestOrder, useUpdateTestOrderStatus } from '@/hooks/useTests';
 import TestOrderForm from '@/components/tests/TestOrderForm';
 import QuickTestOrder from '@/components/tests/QuickTestOrder';
+import { useTenant } from '@/hooks/useTenant';
 import type { TestOrder, TestOrderFormData, TestOrderFilter } from '@/types/test.types';
 
 const TestOrdersPage: React.FC = () => {
@@ -11,8 +12,9 @@ const TestOrdersPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
   const [filter, setFilter] = useState<TestOrderFilter>({});
+  const { tenant } = useTenant();
 
-  const { data: orders = [], isLoading } = useTestOrders(filter);
+  const { data: orders = [], isLoading, error } = useTestOrders(filter);
   const createOrderMutation = useCreateTestOrder();
   const updateStatusMutation = useUpdateTestOrderStatus();
 
@@ -116,6 +118,34 @@ const TestOrdersPage: React.FC = () => {
           onCancel={() => setShowAddForm(false)}
           isLoading={createOrderMutation.isPending}
         />
+      </div>
+    );
+  }
+
+  // Show error state if no tenant
+  if (!tenant) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">No tenant selected. Please select a tenant to view test orders.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">Error loading test orders: {error.message}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

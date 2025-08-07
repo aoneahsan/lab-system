@@ -7,13 +7,13 @@ import { onDocumentWritten, onDocumentCreated } from 'firebase-functions/v2/fire
 admin.initializeApp();
 
 // Import function modules
-import { criticalResultsMonitor } from './monitors/criticalResultsMonitor';
-import { sampleExpirationMonitor } from './monitors/sampleExpirationMonitor';
-import { qualityControlMonitor } from './monitors/qualityControlMonitor';
+import { criticalResultsMonitor } from './workflows/criticalResultsMonitor';
+import { sampleExpirationMonitor } from './workflows/sampleExpirationMonitor';
+import { qualityControlMonitor } from './workflows/qualityControlMonitor';
 import { resultValidationWorkflow } from './workflows/resultValidationWorkflow';
-import { inventoryAlerts } from './monitors/inventoryAlerts';
-import { appointmentReminders } from './schedulers/appointmentReminders';
-import { checkInsuranceEligibility } from './integrations/insuranceEligibility';
+import { inventoryAlerts } from './workflows/inventoryAlerts';
+import { appointmentReminders } from './workflows/appointmentReminders';
+import { checkInsuranceEligibility } from './workflows/insuranceEligibilityChecker';
 import { billingAutomation } from './workflows/billingAutomation';
 
 // Export critical results monitoring

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabFlow Deployment Checker</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .page-check {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        .page-check h3 {
+            margin: 0 0 10px 0;
+            color: #555;
+        }
+        .status {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        .status.pending {
+            background: #2196f3;
+            color: white;
+        }
+        .error-list {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fee;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LabFlow Deployment Checker</h1>
+        <p>This tool checks the deployed LabFlow application for errors on various pages.</p>
+        
+        <button id="startCheck" onclick="startChecking()">Start Checking</button>
+        
+        <div id="results"></div>
+        
+        <div id="summary" class="summary" style="display: none;">
+            <h3>Summary</h3>
+            <p>Total pages checked: <span id="totalPages">0</span></p>
+            <p>Pages with errors: <span id="errorPages">0</span></p>
+            <p>Total console errors: <span id="totalErrors">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const pagesToCheck = [
+            { path: '/dashboard', name: 'Dashboard' },
+            { path: '/tests/orders?action=new', name: 'New Test Order' },
+            { path: '/patients', name: 'Patients List' },
+            { path: '/samples', name: 'Samples' },
+            { path: '/results', name: 'Results' },
+            { path: '/billing', name: 'Billing' },
+            { path: '/inventory', name: 'Inventory' },
+            { path: '/reports', name: 'Reports' }
+        ];
+
+        let totalErrors = 0;
+        let pagesWithErrors = 0;
+
+        async function startChecking() {
+            const button = document.getElementById('startCheck');
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            
+            button.disabled = true;
+            button.textContent = 'Checking...';
+            resultsDiv.innerHTML = '';
+            summaryDiv.style.display = 'none';
+            totalErrors = 0;
+            pagesWithErrors = 0;
+
+            for (const page of pagesToCheck) {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'page-check';
+                pageDiv.innerHTML = `
+                    <h3>${page.name} (${page.path})</h3>
+                    <p><span class="status pending">Checking...</span></p>
+                `;
+                resultsDiv.appendChild(pageDiv);
+
+                try {
+                    const errors = await checkPage(page.path);
+                    
+                    if (errors.length === 0) {
+                        pageDiv.innerHTML = `
+                            <h3>${page.name} (${page.path})</h3>
+                            <p><span class="status success">✓ No errors found</span></p>
+                        `;
+                    } else {
+                        pagesWithErrors++;
+                        totalErrors += errors.length;
+                        pageDiv.innerHTML = `
+                            <h3>${page.name} (${page.path})</h3>
+                            <p><span class="status error">✗ ${errors.length} error(s) found</span></p>
+                            <div class="error-list">
+                                ${errors.map(err => `<div>• ${err}</div>`).join('')}
+                            </div>
+                        `;
+                    }
+                } catch (err) {
+                    pageDiv.innerHTML = `
+                        <h3>${page.name} (${page.path})</h3>
+                        <p><span class="status error">✗ Failed to check page</span></p>
+                        <div class="error-list">
+                            <div>• ${err.message}</div>
+                        </div>
+                    `;
+                }
+
+                // Wait a bit between checks
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Show summary
+            document.getElementById('totalPages').textContent = pagesToCheck.length;
+            document.getElementById('errorPages').textContent = pagesWithErrors;
+            document.getElementById('totalErrors').textContent = totalErrors;
+            summaryDiv.style.display = 'block';
+
+            button.disabled = false;
+            button.textContent = 'Check Again';
+        }
+
+        async function checkPage(path) {
+            const errors = [];
+            
+            // Create an iframe to load the page
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            return new Promise((resolve) => {
+                // Set up console error listener
+                const originalError = iframe.contentWindow.console.error;
+                iframe.contentWindow.console.error = function(...args) {
+                    errors.push(args.join(' '));
+                    if (originalError) originalError.apply(this, args);
+                };
+
+                // Set up error event listener
+                iframe.contentWindow.addEventListener('error', (event) => {
+                    errors.push(`Script error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`);
+                });
+
+                // Load the page
+                iframe.src = `https://labsystem-a1.web.app${path}`;
+
+                // Check after 5 seconds
+                setTimeout(() => {
+                    // Check for "Something went wrong" text
+                    try {
+                        const bodyText = iframe.contentDocument?.body?.innerText || '';
+                        if (bodyText.includes('Something went wrong')) {
+                            errors.push('Page shows "Something went wrong" error');
+                        }
+                    } catch (e) {
+                        // Cross-origin error, ignore
+                    }
+
+                    document.body.removeChild(iframe);
+                    resolve(errors);
+                }, 5000);
+            });
+        }
+    </script>
+</body>
+</html>

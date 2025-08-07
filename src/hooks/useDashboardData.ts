@@ -21,27 +21,39 @@ export const useDashboardSummary = () => {
     queryFn: async () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
-      // Get test statistics
-      const testStats = await testService.getTestStatistics(tenant.id);
-      
-      // Get result statistics
-      const resultStats = await resultService.getResultStatistics(tenant.id);
-      
-      // Get billing statistics
-      const billingStats = await billingService.getBillingStatistics(tenant.id);
+      try {
+        // Get test statistics
+        const testStats = await testService.getTestStatistics(tenant.id);
+        
+        // Get result statistics
+        const resultStats = await resultService.getResultStatistics(tenant.id);
+        
+        // Get billing statistics
+        const billingStats = await billingService.getBillingStatistics(tenant.id);
 
-      const summary: DashboardSummary = {
-        totalPatients: patientStats?.totalPatients || 0,
-        testsToday: testStats?.todayCount || 0,
-        pendingResults: resultStats?.pendingCount || 0,
-        revenueToday: billingStats?.todaysPayments || 0,
-      };
+        const summary: DashboardSummary = {
+          totalPatients: patientStats?.totalPatients || 0,
+          testsToday: testStats?.todayCount || 0,
+          pendingResults: resultStats?.pendingCount || 0,
+          revenueToday: billingStats?.todaysPayments || 0,
+        };
 
-      return summary;
+        return summary;
+      } catch (error) {
+        console.error('Error fetching dashboard summary:', error);
+        // Return default values on error
+        return {
+          totalPatients: patientStats?.totalPatients || 0,
+          testsToday: 0,
+          pendingResults: 0,
+          revenueToday: 0,
+        };
+      }
     },
-    enabled: !!tenant?.id && !!patientStats,
+    enabled: !!tenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    retry: 1,
   });
 };
 
@@ -53,27 +65,33 @@ export const useRecentTests = (limit: number = 5) => {
     queryFn: async () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
-      const orders = await testService.getTestOrders(tenant.id);
-      
-      // Sort and limit manually
-      const sortedOrders = orders
-        .sort((a, b) => {
-          const dateA = a.orderDate instanceof Date ? a.orderDate : a.orderDate.toDate();
-          const dateB = b.orderDate instanceof Date ? b.orderDate : b.orderDate.toDate();
-          return dateB.getTime() - dateA.getTime();
-        })
-        .slice(0, limit);
+      try {
+        const orders = await testService.getTestOrders(tenant.id);
+        
+        // Sort and limit manually
+        const sortedOrders = orders
+          .sort((a, b) => {
+            const dateA = a.orderDate instanceof Date ? a.orderDate : a.orderDate.toDate();
+            const dateB = b.orderDate instanceof Date ? b.orderDate : b.orderDate.toDate();
+            return dateB.getTime() - dateA.getTime();
+          })
+          .slice(0, limit);
 
-      return sortedOrders.map(order => ({
-        id: order.id,
-        patientName: 'Unknown Patient', // Patient info would need to be fetched separately
-        testNames: order.tests?.map(test => test.testName) || [],
-        status: order.status,
-        orderedAt: order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate(),
-      }));
+        return sortedOrders.map(order => ({
+          id: order.id,
+          patientName: 'Unknown Patient', // Patient info would need to be fetched separately
+          testNames: order.tests?.map(test => test.testName) || [],
+          status: order.status,
+          orderedAt: order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate(),
+        }));
+      } catch (error) {
+        console.error('Error fetching recent tests:', error);
+        return [];
+      }
     },
     enabled: !!tenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 1,
   });
 };
 
@@ -85,29 +103,35 @@ export const useCriticalResults = (limit: number = 3) => {
     queryFn: async () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
-      const response = await resultService.getResults(tenant.id, {
-        flagType: 'critical'
-      });
-      
-      // Sort and limit manually
-      const sortedResults = response.items
-        .sort((a, b) => {
-          const dateA = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
-          const dateB = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
-          return dateB.getTime() - dateA.getTime();
-        })
-        .slice(0, limit);
+      try {
+        const response = await resultService.getResults(tenant.id, {
+          flagType: 'critical'
+        });
+        
+        // Sort and limit manually
+        const sortedResults = response.items
+          .sort((a, b) => {
+            const dateA = a.createdAt instanceof Date ? a.createdAt : a.createdAt.toDate();
+            const dateB = b.createdAt instanceof Date ? b.createdAt : b.createdAt.toDate();
+            return dateB.getTime() - dateA.getTime();
+          })
+          .slice(0, limit);
 
-      return sortedResults.map(result => ({
-        id: result.id,
-        patientName: 'Test Patient',
-        testName: result.testName || 'Unknown Test',
-        value: `${result.value} ${result.unit || ''}`.trim(),
-        severity: (result.flag === 'critical_high' || result.flag === 'critical_low') ? 'critical' as const : 'high' as const,
-        reportedAt: result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
-      }));
+        return sortedResults.map(result => ({
+          id: result.id,
+          patientName: 'Test Patient',
+          testName: result.testName || 'Unknown Test',
+          value: `${result.value} ${result.unit || ''}`.trim(),
+          severity: (result.flag === 'critical_high' || result.flag === 'critical_low') ? 'critical' as const : 'high' as const,
+          reportedAt: result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
+        }));
+      } catch (error) {
+        console.error('Error fetching critical results:', error);
+        return [];
+      }
     },
     enabled: !!tenant?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 1,
   });
 };
