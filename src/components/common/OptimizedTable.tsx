@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo, useCallback, useState } from 'react';
 import { VirtualList } from './VirtualList';
 import { debounce } from '@/utils/performance';
 
@@ -54,17 +54,18 @@ export const OptimizedTable = memo(<T extends Record<string, any>>({
   }, [data, sortColumn, sortDirection]);
 
   // Debounced sort handler
-  const handleSort = useCallback(
-    debounce((column: keyof T) => {
+  const handleSort = useCallback((column: keyof T) => {
+    const debouncedSort = debounce(() => {
       if (!onSort) return;
       
       const newDirection = 
         sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
       
       onSort(column, newDirection);
-    }, 300),
-    [onSort, sortColumn, sortDirection]
-  );
+    }, 300);
+    
+    debouncedSort();
+  }, [onSort, sortColumn, sortDirection]);
 
   // Render table header
   const renderHeader = () => (
@@ -165,15 +166,16 @@ export const SearchableTable = memo(<T extends Record<string, any>>({
   searchKeys,
   ...tableProps
 }: OptimizedTableProps<T> & { searchKeys: (keyof T)[] }) => {
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Debounced search
-  const handleSearch = useCallback(
-    debounce((term: string) => {
+  const handleSearch = useCallback((term: string) => {
+    const debouncedSearch = debounce(() => {
       setSearchTerm(term.toLowerCase());
-    }, 300),
-    []
-  );
+    }, 300);
+    
+    debouncedSearch();
+  }, []);
   
   // Filter data based on search
   const filteredData = useMemo(() => {

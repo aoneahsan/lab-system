@@ -28,7 +28,7 @@ Select.displayName = 'Select';
 export const SelectTrigger = React.forwardRef<
   HTMLSelectElement,
   SelectProps & { children?: React.ReactNode }
->(({ children, ...props }, ref) => {
+>(({ _children, ...props }, ref) => {
   return <Select ref={ref} {...props} />;
 });
 

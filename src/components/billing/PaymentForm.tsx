@@ -33,13 +33,14 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         const paymentService = getPaymentService();
         const payment = await paymentService.createPayment(amount, description);
         setClientSecret(payment.metadata?.clientSecret || '');
-      } catch (error) {
+      } catch {
+        // Error handled by calling onError callback
         onError('Failed to initialize payment');
       }
     };
 
     createPaymentIntent();
-  }, [amount, description]);
+  }, [amount, description, onError]);
 
   const onSubmit = async (data: BillingInfo) => {
     if (!stripe || !elements) return;
@@ -59,7 +60,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
       } else {
         onError(result.error || 'Payment failed');
       }
-    } catch (error) {
+    } catch {
+      // Error handled by calling onError callback
       onError('Payment processing failed');
     } finally {
       setProcessing(false);

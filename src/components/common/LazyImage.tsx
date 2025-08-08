@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ImgHTMLAttributes } from 'react';
+import React, { useState, useEffect, useRef, useCallback, ImgHTMLAttributes } from 'react';
 import { createIntersectionObserver } from '@/utils/performance';
 
 interface LazyImageProps extends ImgHTMLAttributes<HTMLImageElement> {
@@ -29,6 +29,26 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const loadImage = useCallback(() => {
+    const img = new Image();
+    
+    img.onload = () => {
+      setImageSrc(src);
+      setIsLoading(false);
+      setHasError(false);
+      onLoad?.();
+    };
+
+    img.onerror = () => {
+      setImageSrc(fallback);
+      setIsLoading(false);
+      setHasError(true);
+      onError?.();
+    };
+
+    img.src = src;
+  }, [src, fallback, onLoad, onError]);
+
   useEffect(() => {
     if (!imageRef.current) return;
 
@@ -57,27 +77,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [src, threshold, rootMargin]);
-
-  const loadImage = () => {
-    const img = new Image();
-    
-    img.onload = () => {
-      setImageSrc(src);
-      setIsLoading(false);
-      setHasError(false);
-      onLoad?.();
-    };
-
-    img.onerror = () => {
-      setImageSrc(fallback);
-      setIsLoading(false);
-      setHasError(true);
-      onError?.();
-    };
-
-    img.src = src;
-  };
+  }, [src, threshold, rootMargin, loadImage]);
 
   // Preload image formats
   const generateSrcSet = () => {
@@ -119,20 +119,4 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       )}
     </div>
   );
-};
-
-// Image preloader utility
-export const preloadImage = (src: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = reject;
-    img.src = src;
-  });
-};
-
-// Batch image preloader
-export const preloadImages = async (urls: string[]): Promise<void[]> => {
-  const promises = urls.map(url => preloadImage(url));
-  return Promise.all(promises);
 };

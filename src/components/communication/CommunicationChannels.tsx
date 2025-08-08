@@ -85,7 +85,7 @@ export function CommunicationChannels() {
                         <label className="block text-sm font-medium mb-1">SMS Provider</label>
                         <select
                           value={channel.configuration.smsProvider || ''}
-                          onChange={(e) => setEditingChannel(type)}
+                          onChange={(_e) => setEditingChannel(type)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                         >
                           <option value="">Select provider</option>
@@ -109,7 +109,7 @@ export function CommunicationChannels() {
                         <input
                           type="text"
                           value={channel.configuration.whatsappBusinessId || ''}
-                          onChange={(e) => setEditingChannel(type)}
+                          onChange={(_e) => setEditingChannel(type)}
                           placeholder="Enter Business ID"
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                         />
@@ -128,7 +128,7 @@ export function CommunicationChannels() {
                         <label className="block text-sm font-medium mb-1">Email Provider</label>
                         <select
                           value={channel.configuration.emailProvider || ''}
-                          onChange={(e) => setEditingChannel(type)}
+                          onChange={(_e) => setEditingChannel(type)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                         >
                           <option value="">Select provider</option>
@@ -142,7 +142,7 @@ export function CommunicationChannels() {
                         <input
                           type="email"
                           value={channel.configuration.emailFromAddress || ''}
-                          onChange={(e) => setEditingChannel(type)}
+                          onChange={(_e) => setEditingChannel(type)}
                           placeholder="noreply@labflow.com"
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                         />
@@ -156,7 +156,7 @@ export function CommunicationChannels() {
                         <label className="block text-sm font-medium mb-1">Push Provider</label>
                         <select
                           value={channel.configuration.pushProvider || ''}
-                          onChange={(e) => setEditingChannel(type)}
+                          onChange={(_e) => setEditingChannel(type)}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
                         >
                           <option value="">Select provider</option>

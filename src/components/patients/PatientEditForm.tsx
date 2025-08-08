@@ -193,7 +193,7 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
 };
 
 // Basic Information Tab
-const BasicInfoTab = ({ register, errors, watch }: any) => (
+const BasicInfoTab = ({ register, errors, _watch }: any) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -304,7 +304,7 @@ const BasicInfoTab = ({ register, errors, watch }: any) => (
 );
 
 // Contact Tab Implementation
-const ContactTab = ({ register, errors, watch, setValue, phoneNumbers }: any) => {
+const ContactTab = ({ _register, _errors, watch, setValue, phoneNumbers }: any) => {
   const handleAddPhone = () => {
     const currentPhones = watch('phoneNumbers') || [];
     setValue('phoneNumbers', [
@@ -450,7 +450,7 @@ const ContactTab = ({ register, errors, watch, setValue, phoneNumbers }: any) =>
   );
 };
 
-const AddressTab = ({ register, errors, watch, setValue, addresses }: any) => {
+const AddressTab = ({ _register, _errors, watch, setValue, addresses }: any) => {
   const handleAddAddress = () => {
     const currentAddresses = watch('addresses') || [];
     setValue('addresses', [
@@ -625,7 +625,7 @@ const AddressTab = ({ register, errors, watch, setValue, addresses }: any) => {
   );
 };
 
-const EmergencyTab = ({ register, errors, watch, setValue, emergencyContacts }: any) => {
+const EmergencyTab = ({ _register, _errors, watch, setValue, emergencyContacts }: any) => {
   const handleAddContact = () => {
     const currentContacts = watch('emergencyContacts') || [];
     setValue('emergencyContacts', [
@@ -761,7 +761,7 @@ const EmergencyTab = ({ register, errors, watch, setValue, emergencyContacts }: 
   );
 };
 
-const MedicalTab = ({ register, errors, watch }: any) => (
+const MedicalTab = ({ register, _errors, _watch }: any) => (
   <div className="space-y-6">
     {/* Allergies */}
     <div>
@@ -872,7 +872,7 @@ const MedicalTab = ({ register, errors, watch }: any) => (
   </div>
 );
 
-const AdditionalTab = ({ register, errors, watch, setValue }: any) => {
+const AdditionalTab = ({ register, _errors, _watch, _setValue }: any) => {
   const nationalities = [
     'American', 'British', 'Canadian', 'Australian', 'Indian', 'Chinese', 'Japanese',
     'German', 'French', 'Italian', 'Spanish', 'Brazilian', 'Mexican', 'Russian',
