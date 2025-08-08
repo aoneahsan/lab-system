@@ -17,7 +17,7 @@
     "test:coverage": "jest --coverage"
   },
   "engines": {
-    "node": "22"
+    "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {
@@ -26,7 +26,6 @@
     "axios": "^1.11.0",
     "csv-parse": "^6.1.0",
     "date-fns": "^4.1.0",
-    "express-buildkit": "^1.1.0",
     "fhir": "^4.12.0",
     "firebase-admin": "^13.4.0",
     "firebase-functions": "^6.4.0",
@@ -35,10 +34,9 @@
     "nodemailer": "^7.0.5",
     "pdfkit": "^0.17.1",
     "qrcode": "^1.5.4",
-    "ts-buildkit": "^1.1.0",
+    "stripe": "^14.25.0",
     "twilio": "^5.8.0",
     "uuid": "^11.1.0",
-    "webauthn-server-buildkit": "^1.6.0",
     "xlsx": "^0.18.5",
     "xlsx-populate": "^1.21.0"
   },
