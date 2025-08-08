@@ -112,7 +112,9 @@ class Logger {
         const { state } = JSON.parse(authState);
         return state?.currentUser?.uid;
       }
-    } catch {}
+    } catch {
+      // Ignore errors when accessing localStorage
+    }
     return undefined;
   }
 

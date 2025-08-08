@@ -12,7 +12,6 @@ import {
 import { format } from 'date-fns';
 import { Appointment, AppointmentSearchFilters } from '@/types/appointment.types';
 import { useAppointments, useCancelAppointment, useCheckInPatient, useCompleteAppointment } from '@/hooks/useAppointments';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';

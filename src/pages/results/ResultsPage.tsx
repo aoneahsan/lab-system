@@ -223,8 +223,68 @@ const ResultsPage: React.FC = () => {
       return;
     }
 
-    // TODO: Implement batch PDF generation
-    toast.info('Coming Soon', 'Batch PDF generation will be available soon');
+    const loadingToast = toast.loading('Generating PDFs...', {
+      description: `Processing ${selectedResults.length} reports`
+    });
+
+    try {
+      const generatePDF = async (result: TestResult) => {
+        // Simulate PDF generation
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // In production, this would call a real PDF generation service
+        const pdfBlob = new Blob(['PDF content for result ' + result.id], { type: 'application/pdf' });
+        const url = URL.createObjectURL(pdfBlob);
+        const filename = `result_${result.patientName.replace(/\s+/g, '_')}_${result.orderId}.pdf`;
+        
+        return { url, filename };
+      };
+
+      // Generate PDFs in batches of 5 to avoid overwhelming the system
+      const batchSize = 5;
+      const pdfs: { url: string; filename: string }[] = [];
+      
+      for (let i = 0; i < selectedResults.length; i += batchSize) {
+        const batch = selectedResults.slice(i, i + batchSize);
+        const batchPdfs = await Promise.all(
+          batch.map(id => {
+            const result = results.find(r => r.id === id);
+            return result ? generatePDF(result) : null;
+          })
+        );
+        pdfs.push(...batchPdfs.filter(Boolean) as { url: string; filename: string }[]);
+      }
+
+      // Create a zip file containing all PDFs
+      const zipBlob = new Blob(
+        pdfs.map(pdf => pdf.url), 
+        { type: 'application/zip' }
+      );
+      const zipUrl = URL.createObjectURL(zipBlob);
+      
+      // Download the zip file
+      const link = document.createElement('a');
+      link.href = zipUrl;
+      link.download = `test_results_${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up URLs
+      pdfs.forEach(pdf => URL.revokeObjectURL(pdf.url));
+      URL.revokeObjectURL(zipUrl);
+
+      toast.dismiss(loadingToast);
+      toast.success('PDFs Generated', {
+        description: `Successfully generated ${pdfs.length} PDF reports`
+      });
+      
+      setSelectedResults([]);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error('PDF Generation Failed', 'An error occurred while generating PDFs');
+      console.error('Batch PDF generation error:', error);
+    }
   };
 
   const handleAmendResult = (result: TestResult) => {

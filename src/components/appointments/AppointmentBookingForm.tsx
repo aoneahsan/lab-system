@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { CalendarIcon, ClockIcon, HomeIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, HomeIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { AppointmentFormData } from '@/types/appointment.types';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
@@ -41,7 +41,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
   onCancel,
   patientId: initialPatientId,
 }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate] = useState(new Date());
   const { data: patients } = usePatients();
   const { data: tests } = useTests();
   const createAppointment = useCreateAppointment();
@@ -50,7 +50,6 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<AppointmentFormData>({
     resolver: yupResolver(schema) as any,

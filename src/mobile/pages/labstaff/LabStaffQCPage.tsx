@@ -326,9 +326,73 @@ const LabStaffQCPage: React.FC = () => {
         )}
 
         {activeTab === 'history' && (
-          <div className="text-center py-8">
-            <Clock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">QC history coming soon</p>
+          <div className="space-y-4">
+            {/* Date filter */}
+            <div className="bg-white rounded-lg shadow-sm p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Filter by date</span>
+                <Calendar className="h-4 w-4 text-gray-400" />
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <button className="px-3 py-2 bg-purple-600 text-white text-sm rounded-lg">Today</button>
+                <button className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg">Yesterday</button>
+                <button className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg">This Week</button>
+                <button className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg">This Month</button>
+              </div>
+            </div>
+
+            {/* History list grouped by date */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Today</h3>
+                <div className="space-y-2">
+                  {todayQC.map((qc) => (
+                    <div key={qc.id} className="bg-white rounded-lg shadow-sm p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{qc.testName} - {qc.level}</p>
+                          <p className="text-xs text-gray-500">{qc.instrumentName}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(qc.status)}
+                          <span className="text-xs text-gray-500">{qc.performedAt.toLocaleTimeString()}</span>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center gap-4 text-xs text-gray-600">
+                        <span>Value: {qc.value}</span>
+                        <span>CV: {qc.cv}%</span>
+                        {qc.rule && <span className="text-yellow-600">Rule: {qc.rule}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Yesterday</h3>
+                <div className="bg-white rounded-lg shadow-sm p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">Hemoglobin - Level 1</p>
+                      <p className="text-xs text-gray-500">Hematology Analyzer H1</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span className="text-xs text-gray-500">09:15 AM</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center gap-4 text-xs text-gray-600">
+                    <span>Value: 12.5</span>
+                    <span>CV: 3.2%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Load more button */}
+            <button className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+              Load More History
+            </button>
           </div>
         )}
       </div>

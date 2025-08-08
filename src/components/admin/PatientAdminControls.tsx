@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Users, Upload, Download, Trash2, Shield, Activity, AlertTriangle } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { toast } from '@/stores/toast.store';
-import type { Patient } from '@/types/patient.types';
 
 export default function PatientAdminControls() {
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
-  const [showMergeDialog, setShowMergeDialog] = useState(false);
-  const [showBulkEditDialog, setShowBulkEditDialog] = useState(false);
+  const [showMergeDialog] = useState(false);
   
   const { data: patients = [] } = usePatients();
 
@@ -48,7 +46,8 @@ export default function PatientAdminControls() {
       toast.error('Select patients', 'Please select at least 2 patients to merge');
       return;
     }
-    setShowMergeDialog(true);
+    // setShowMergeDialog(true);
+    toast.info('Merge feature', 'Patient merge dialog would open here');
   };
 
   return (

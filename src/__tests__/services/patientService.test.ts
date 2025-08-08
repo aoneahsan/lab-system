@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { patientService } from '@/services/patientService';
 import { 
-  collection, 
-  doc, 
   getDoc, 
   getDocs, 
   setDoc, 
@@ -10,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   limit
 } from 'firebase/firestore';
 

@@ -1,9 +1,7 @@
 import { DollarSign, TrendingUp, AlertCircle, Download, CreditCard, FileText } from 'lucide-react';
-import { useBillingStats } from '@/hooks/useBilling';
 import { toast } from '@/stores/toast.store';
 
 export default function BillingAdminControls() {
-  const { data: billingStats } = useBillingStats();
 
   const stats = {
     totalRevenue: '$125,450.00',

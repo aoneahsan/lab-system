@@ -6,6 +6,8 @@ import ReportTemplates from './ReportTemplates';
 import ReportGeneration from './ReportGeneration';
 import ReportFilters from './ReportFilters';
 import ReportPreview from './ReportPreview';
+import ScheduledReports from './ScheduledReports';
+import ReportAnalytics from './ReportAnalytics';
 import type { ReportFormData } from '@/types/report.types';
 
 export default function ReportsDashboard() {
@@ -147,12 +149,7 @@ export default function ReportsDashboard() {
           
           {activeTab === 'templates' && <ReportTemplates />}
           
-          {activeTab === 'scheduled' && (
-            <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Scheduled reports feature coming soon</p>
-            </div>
-          )}
+          {activeTab === 'scheduled' && <ScheduledReports />}
           
           {activeTab === 'history' && (
             <div className="space-y-4">
@@ -198,34 +195,7 @@ export default function ReportsDashboard() {
             </div>
           )}
           
-          {activeTab === 'analytics' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-medium text-gray-900 mb-4">Report Generation Trends</h3>
-                <div className="h-48 flex items-center justify-center text-gray-500">
-                  Chart placeholder - Report generation over time
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-medium text-gray-900 mb-4">Popular Report Types</h3>
-                <div className="h-48 flex items-center justify-center text-gray-500">
-                  Chart placeholder - Report types distribution
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-medium text-gray-900 mb-4">Export Formats</h3>
-                <div className="h-48 flex items-center justify-center text-gray-500">
-                  Chart placeholder - Export format usage
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="font-medium text-gray-900 mb-4">User Activity</h3>
-                <div className="h-48 flex items-center justify-center text-gray-500">
-                  Chart placeholder - Report generation by user
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === 'analytics' && <ReportAnalytics />}
         </div>
       </div>
 

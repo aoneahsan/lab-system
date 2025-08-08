@@ -3,6 +3,7 @@ import { FileText, CheckCircle, Shield, BarChart } from 'lucide-react';
 import ResultEntry from '@/components/results/ResultEntry';
 import ResultReview from '@/components/results/ResultReview';
 import ResultValidationRules from '@/components/results/ResultValidationRules';
+import ResultAnalytics from '@/components/results/ResultAnalytics';
 
 const tabs = [
   { id: 'entry', label: 'Result Entry', icon: FileText },
@@ -69,12 +70,7 @@ export default function ResultDashboard() {
 
           {activeTab === 'validation' && <ResultValidationRules />}
 
-          {activeTab === 'analytics' && (
-            <div className="text-center py-12 text-gray-500">
-              <BarChart className="h-12 w-12 mx-auto mb-4" />
-              <p>Result analytics coming soon</p>
-            </div>
-          )}
+          {activeTab === 'analytics' && <ResultAnalytics />}
         </div>
       </div>
     </div>

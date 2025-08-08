@@ -13,7 +13,7 @@ import {
 
 const InsuranceClaims: React.FC = () => {
   const [selectedClaim, setSelectedClaim] = useState<InsuranceClaim | null>(null);
-  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [showSubmitDialog] = useState(false);
   const [filters, setFilters] = useState({
     status: '',
     provider: '',

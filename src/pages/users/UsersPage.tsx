@@ -6,6 +6,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { UserListTable } from '@/components/users/UserListTable';
 import { UserForm } from '@/components/users/UserForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { userService } from '@/services/users/userService';
+import { toast } from 'sonner';
 import type { User } from '@/types/auth.types';
 import type { UserFormData, UserFilter } from '@/types/user-management.types';
 
@@ -36,23 +38,53 @@ const UsersPage = () => {
   }, [searchParams, setSearchParams, canManageUsers]);
 
   const handleAddUser = async (data: UserFormData) => {
-    // TODO: Implement user creation
-    console.log('Add user:', data);
-    setShowAddForm(false);
+    try {
+      await userService.createUser(data);
+      toast.success('User Created', {
+        description: `${data.displayName} has been added successfully`
+      });
+      setShowAddForm(false);
+      // Refresh the users list
+      window.location.reload();
+    } catch (error: any) {
+      toast.error('Failed to Create User', {
+        description: error.message || 'An error occurred while creating the user'
+      });
+    }
   };
 
   const handleEditUser = async (data: UserFormData) => {
     if (editingUser) {
-      // TODO: Implement user update
-      console.log('Edit user:', editingUser.id, data);
-      setEditingUser(null);
+      try {
+        await userService.updateUser(editingUser.id, data);
+        toast.success('User Updated', {
+          description: `${data.displayName} has been updated successfully`
+        });
+        setEditingUser(null);
+        // Refresh the users list
+        window.location.reload();
+      } catch (error: any) {
+        toast.error('Failed to Update User', {
+          description: error.message || 'An error occurred while updating the user'
+        });
+      }
     }
   };
 
   const handleDeleteUser = async (user: User) => {
     if (window.confirm(`Are you sure you want to delete ${user.displayName}?`)) {
-      // TODO: Implement user deletion
-      console.log('Delete user:', user.id);
+      try {
+        await userService.deleteUser(user.id);
+        toast.success('User Deleted', {
+          description: `${user.displayName} has been removed`
+        });
+        // Refresh the users list
+        window.location.reload();
+      } catch (error: any) {
+        toast.error('Failed to Delete User', {
+          description: error.message || 'An error occurred while deleting the user'
+        });
+      }
     }
   };
 
@@ -61,8 +93,21 @@ const UsersPage = () => {
   };
 
   const handleToggleStatus = async (user: User) => {
-    // TODO: Implement status toggle
-    console.log('Toggle status:', user.id, !user.isActive);
+    try {
+      await userService.toggleUserStatus(user.id, !user.isActive);
+      toast.success(
+        user.isActive ? 'User Deactivated' : 'User Activated',
+        {
+          description: `${user.displayName} has been ${user.isActive ? 'deactivated' : 'activated'}`
+        }
+      );
+      // Refresh the users list
+      window.location.reload();
+    } catch (error: any) {
+      toast.error('Failed to Toggle Status', {
+        description: error.message || 'An error occurred while updating user status'
+      });
+    }
   };
 
   // Filter users based on search term

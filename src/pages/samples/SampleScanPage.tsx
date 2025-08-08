@@ -5,15 +5,19 @@ import { barcodeScannerService } from '@/services/barcode-scanner.service';
 import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';
 import BarcodeScanner from '@/components/samples/BarcodeScanner';
+import { sampleService } from '@/services/sample.service';
+import { useTenantStore } from '@/stores/tenant.store';
 
 const SampleScanPage: React.FC = () => {
   const navigate = useNavigate();
+  const { currentTenant } = useTenantStore();
   const [isScanning, setIsScanning] = useState(false);
   const [isBarcodeScanning, setIsBarcodeScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [scanResult, setScanResult] = useState<{ sampleId?: string; sampleNumber?: string } | null>(
     null
   );
+  const [isSearching, setIsSearching] = useState(false);
   const isNativePlatform = Capacitor.isNativePlatform();
 
   useEffect(() => {
@@ -59,18 +63,39 @@ const SampleScanPage: React.FC = () => {
     }
   };
 
-  const handleBarcodeResult = async (barcode: string) => {
-    setManualInput(barcode);
-    // TODO: Search for sample by barcode
-    toast.info('Searching', `Searching for sample with barcode: ${barcode}`);
-    // For now, just set the manual input field
+  const searchSample = async (barcodeOrNumber: string) => {
+    if (!currentTenant) {
+      toast.error('Error', 'No tenant selected');
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const sample = await sampleService.searchSampleByBarcode(currentTenant.id, barcodeOrNumber);
+      
+      if (sample) {
+        toast.success('Sample Found', `Sample ${sample.sampleNumber} found`);
+        navigate(`/samples/${sample.id}`);
+      } else {
+        toast.error('Not Found', `No sample found with barcode/number: ${barcodeOrNumber}`);
+      }
+    } catch (error) {
+      toast.error('Search Error', 'Failed to search for sample');
+      console.error('Sample search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
-  const handleManualSubmit = (e: React.FormEvent) => {
+  const handleBarcodeResult = async (barcode: string) => {
+    setManualInput(barcode);
+    await searchSample(barcode);
+  };
+
+  const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (manualInput.trim()) {
-      // TODO: Search for sample by barcode/sample number
-      toast.info('Searching', `Searching for sample ${manualInput}...`);
+      await searchSample(manualInput.trim());
     }
   };
 
@@ -162,9 +187,10 @@ const SampleScanPage: React.FC = () => {
             />
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              disabled={isSearching || !manualInput.trim()}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Search
+              {isSearching ? 'Searching...' : 'Search'}
             </button>
           </div>
         </form>

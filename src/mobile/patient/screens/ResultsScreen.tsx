@@ -19,6 +19,7 @@ import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 interface TestResult {
   id: string;
@@ -133,12 +134,47 @@ export const ResultsScreen: React.FC = () => {
 
   const handleDownloadResult = async (resultId: string) => {
     try {
-      // For now, just show a message as PDF generation is not implemented
-      toast.success('PDF download feature coming soon');
+      const result = results.find(r => r.id === resultId);
+      if (!result) return;
+
+      // Generate PDF content
+      const pdfUrl = await resultService.generateResultPDF(resultId);
+      
+      if (Capacitor.isNativePlatform()) {
+        // For mobile platforms, download to device
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const base64 = await blobToBase64(blob);
+        
+        const fileName = `${result.testName.replace(/\s+/g, '_')}_${format(result.resultDate, 'yyyy-MM-dd')}.pdf`;
+        
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: base64,
+          directory: Directory.Documents,
+        });
+        
+        toast.success('PDF downloaded', `Saved to Documents/${fileName}`);
+      } else {
+        // For web, open in new tab
+        window.open(pdfUrl, '_blank');
+      }
     } catch (error) {
       console.error('Error downloading result:', error);
       toast.error('Download failed', 'Unable to download the result PDF');
     }
+  };
+
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        resolve(base64String.split(',')[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
 
   const handleShareResult = async (resultId: string) => {
@@ -146,8 +182,28 @@ export const ResultsScreen: React.FC = () => {
       const result = results.find(r => r.id === resultId);
       if (!result) return;
       
-      // For now, just show a message as PDF generation is not implemented
-      toast.success('Share feature coming soon');
+      // Generate shareable content
+      const resultSummary = `Lab Test Results - ${result.testName}\n` +
+        `Date: ${format(result.resultDate, 'MMM dd, yyyy')}\n` +
+        `Status: ${result.status === 'ready' ? 'Ready' : 'Processing'}\n` +
+        `Doctor: ${result.doctorName}\n` +
+        `Lab: ${result.labLocation}\n\n` +
+        `Results:\n${result.parameters.map(p => 
+          `${p.name}: ${p.value} ${p.unit} (Ref: ${p.referenceRange})${p.flag ? ' ' + p.flag : ''}`
+        ).join('\n')}`;
+      
+      if (Capacitor.isNativePlatform() && Share.canShare()) {
+        // Native share
+        await Share.share({
+          title: `Lab Results - ${result.testName}`,
+          text: resultSummary,
+          dialogTitle: 'Share test results',
+        });
+      } else {
+        // Web fallback - copy to clipboard
+        await navigator.clipboard.writeText(resultSummary);
+        toast.success('Copied to clipboard', 'Results summary copied to clipboard');
+      }
     } catch (error) {
       console.error('Error sharing result:', error);
       toast.error('Share failed', 'Unable to share the result');

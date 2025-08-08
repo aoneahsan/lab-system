@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ChartBarIcon, ClockIcon, ExclamationTriangleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useTracking } from '@/providers/TrackingProvider';
-import { format } from 'date-fns';
 
 interface PerformanceMetric {
   name: string;

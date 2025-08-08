@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { FileText, Play, Settings, TrendingUp } from 'lucide-react';
 import ReportTemplates from '@/components/reports/ReportTemplates';
 import ReportGeneration from '@/components/reports/ReportGeneration';
+import ScheduledReports from '@/components/reports/ScheduledReports';
+import ReportAnalytics from '@/components/reports/ReportAnalytics';
 
 const tabs = [
   { id: 'generate', label: 'Generate Reports', icon: Play },
@@ -48,21 +50,9 @@ export default function ReportDashboard() {
 
           {activeTab === 'templates' && <ReportTemplates />}
 
-          {activeTab === 'scheduled' && (
-            <div className="text-center py-12 text-gray-500">
-              <Settings className="h-12 w-12 mx-auto mb-4" />
-              <p>Scheduled reports coming soon</p>
-              <p className="text-sm mt-2">Set up automatic report generation on a schedule</p>
-            </div>
-          )}
+          {activeTab === 'scheduled' && <ScheduledReports />}
 
-          {activeTab === 'analytics' && (
-            <div className="text-center py-12 text-gray-500">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4" />
-              <p>Report analytics coming soon</p>
-              <p className="text-sm mt-2">Track report usage and performance metrics</p>
-            </div>
-          )}
+          {activeTab === 'analytics' && <ReportAnalytics />}
         </div>
       </div>
     </div>

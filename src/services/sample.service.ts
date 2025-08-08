@@ -95,6 +95,38 @@ export const sampleService = {
     return null;
   },
 
+  // Search sample by barcode or sample number
+  async searchSampleByBarcode(tenantId: string, barcodeOrNumber: string): Promise<Sample | null> {
+    // First try to find by barcode
+    let q = query(
+      collection(db, COLLECTIONS.SAMPLES),
+      where('tenantId', '==', tenantId),
+      where('barcode', '==', barcodeOrNumber)
+    );
+    
+    let snapshot = await getDocs(q);
+    
+    if (snapshot.empty) {
+      // If not found by barcode, try sample number
+      q = query(
+        collection(db, COLLECTIONS.SAMPLES),
+        where('tenantId', '==', tenantId),
+        where('sampleNumber', '==', barcodeOrNumber)
+      );
+      snapshot = await getDocs(q);
+    }
+    
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0];
+      return {
+        id: doc.id,
+        ...doc.data(),
+      } as Sample;
+    }
+    
+    return null;
+  },
+
   // Create sample
   async createSample(tenantId: string, userId: string, data: SampleFormData): Promise<Sample> {
     const sampleNumber = generateSampleNumber();
