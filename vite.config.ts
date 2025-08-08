@@ -5,9 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { compression } from 'vite-plugin-compression2';
 import path from 'path';
+import { securityHeaders, devSecurityHeaders } from './src/middleware/security-headers';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -147,6 +148,8 @@ export default defineConfig({
     hmr: {
       overlay: true,
     },
+    // Apply security headers
+    headers: mode === 'development' ? devSecurityHeaders : securityHeaders,
   },
   test: {
     globals: true,
@@ -164,4 +167,4 @@ export default defineConfig({
       ],
     },
   },
-});
+}));

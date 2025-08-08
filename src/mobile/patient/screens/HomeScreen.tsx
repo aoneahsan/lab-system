@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   FileText,
   Calendar,
@@ -8,16 +8,47 @@ import {
   Activity,
   Bell,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { useOfflinePatients } from '@/hooks/useOfflinePatients';
 import { formatDistanceToNow } from 'date-fns';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const HomeScreen: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
-  const { data: recentResults } = useOfflinePatients({ limit: 3 });
+  const { data: recentResults, refetch } = useOfflinePatients({ limit: 3 });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Medium });
+    }
+    
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['patients'] }),
+        queryClient.invalidateQueries({ queryKey: ['results'] }),
+        queryClient.invalidateQueries({ queryKey: ['appointments'] }),
+      ]);
+      await refetch();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  }, [queryClient, refetch]);
+
+  const handleQuickAction = async (route: string) => {
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+    navigate(route);
+  };
 
   const quickActions = [
     {
@@ -75,7 +106,16 @@ export const HomeScreen: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 bg-gray-50">
+    <div className="flex-1 bg-gray-50 relative">
+      {/* Pull to refresh indicator */}
+      {isRefreshing && (
+        <div className="absolute top-0 left-0 right-0 flex justify-center py-4 z-10">
+          <div className="bg-white rounded-full p-2 shadow-lg">
+            <RefreshCw className="h-5 w-5 text-indigo-600 animate-spin" />
+          </div>
+        </div>
+      )}
+      
       {/* Welcome Section */}
       <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6">
         <h1 className="text-2xl font-bold">
@@ -106,11 +146,21 @@ export const HomeScreen: React.FC = () => {
             {quickActions.map((action) => (
               <button
                 key={action.id}
-                onClick={() => navigate(action.route)}
-                className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center hover:shadow-md transition-shadow"
+                onClick={() => handleQuickAction(action.route)}
+                className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center active:scale-95 transition-all"
               >
-                <div className={`p-3 bg-${action.color}-50 rounded-full mb-2`}>
-                  <action.icon className={`h-6 w-6 text-${action.color}-600`} />
+                <div className={`p-3 rounded-full mb-2 ${
+                  action.color === 'indigo' ? 'bg-indigo-50' :
+                  action.color === 'green' ? 'bg-green-50' :
+                  action.color === 'blue' ? 'bg-blue-50' :
+                  'bg-purple-50'
+                }`}>
+                  <action.icon className={`h-6 w-6 ${
+                    action.color === 'indigo' ? 'text-indigo-600' :
+                    action.color === 'green' ? 'text-green-600' :
+                    action.color === 'blue' ? 'text-blue-600' :
+                    'text-purple-600'
+                  }`} />
                 </div>
                 <span className="text-sm font-medium text-gray-900">{action.label}</span>
               </button>
@@ -135,8 +185,13 @@ export const HomeScreen: React.FC = () => {
               recentResults.map((result: any) => (
                 <div
                   key={result.id}
-                  onClick={() => navigate(`/patient/results/${result.id}`)}
-                  className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between"
+                  onClick={async () => {
+                    if (Capacitor.isNativePlatform()) {
+                      await Haptics.impact({ style: ImpactStyle.Light });
+                    }
+                    navigate(`/patient/results/${result.id}`);
+                  }}
+                  className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between active:bg-gray-50 transition-colors"
                 >
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{result.testName}</p>
@@ -178,8 +233,8 @@ export const HomeScreen: React.FC = () => {
             {features.map((feature) => (
               <button
                 key={feature.id}
-                onClick={() => navigate(feature.route)}
-                className="w-full bg-white p-4 rounded-lg shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
+                onClick={() => handleQuickAction(feature.route)}
+                className="w-full bg-white p-4 rounded-lg shadow-sm flex items-center justify-between active:bg-gray-50 transition-all"
               >
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-gray-50 rounded-lg">
@@ -205,10 +260,18 @@ export const HomeScreen: React.FC = () => {
               <p className="text-sm text-indigo-700 mt-1">
                 Blood Test Collection - Tomorrow at 9:00 AM
               </p>
-              <button className="mt-2 text-sm text-indigo-600 font-medium">View Details →</button>
+              <button 
+                onClick={() => handleQuickAction('/patient/appointments')}
+                className="mt-2 text-sm text-indigo-600 font-medium active:text-indigo-700"
+              >
+                View Details →
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Add some bottom padding for safe area */}
+        <div className="h-8" />
       </div>
     </div>
   );
