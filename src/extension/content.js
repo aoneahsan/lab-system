@@ -390,7 +390,7 @@
 
   function observePageChanges() {
     // Watch for page changes in SPAs
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver((_mutations) => {
       // Check if patient context changed
       const currentUrl = window.location.href;
       if (currentUrl !== lastUrl) {
@@ -410,7 +410,7 @@
     });
   }
 
-  function handleMessage(request, sender, sendResponse) {
+  function handleMessage(request, _sender, _sendResponse) {
     switch (request.action) {
       case 'updateStatus':
         updateConnectionStatus(request.isConnected, request.user);

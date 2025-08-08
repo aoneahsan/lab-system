@@ -3,8 +3,8 @@
 document.addEventListener('DOMContentLoaded', init);
 
 // State
-let isConnected = false;
-let currentUser = null;
+// let isConnected = false; // Commented out - not currently used
+// let currentUser = null; // Commented out - not currently used
 
 // DOM Elements
 const statusIndicator = document.getElementById('statusIndicator');
@@ -57,8 +57,8 @@ async function checkConnection() {
 
 // Update UI based on connection status
 function updateUI(connected, user) {
-  isConnected = connected;
-  currentUser = user;
+  // isConnected = connected; // Commented out - not currently used
+  // currentUser = user; // Commented out - not currently used
   
   if (connected && user) {
     statusIndicator.className = 'status-indicator connected';
@@ -273,7 +273,7 @@ function showMessage(text, type = 'info') {
 }
 
 // Listen for updates from background script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, _sendResponse) => {
   if (request.action === 'updateStatus') {
     updateUI(request.isConnected, request.user);
   }

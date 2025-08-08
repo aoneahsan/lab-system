@@ -2,7 +2,7 @@
 
 // API Configuration
 const LABFLOW_API_URL = 'https://api.labflow.com';
-const LOCAL_API_URL = 'http://localhost:3000/api';
+// const LOCAL_API_URL = 'http://localhost:3000/api'; // Commented out - not currently used
 
 // State management
 let authToken = null;
