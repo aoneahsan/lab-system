@@ -1,0 +1,35 @@
+{
+  "conditions": [],
+  "parameters": {
+    "welcome_message": {
+      "defaultValue": {
+        "value": "Welcome to LabFlow"
+      },
+      "description": "The welcome message displayed to users",
+      "valueType": "STRING"
+    },
+    "maintenance_mode": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "Enable maintenance mode for the app",
+      "valueType": "BOOLEAN"
+    },
+    "feature_flags": {
+      "defaultValue": {
+        "value": "{\"enableAIAnalysis\": true, \"enableVoiceDictation\": true}"
+      },
+      "description": "Feature flags for the application",
+      "valueType": "JSON"
+    }
+  },
+  "version": {
+    "versionNumber": "1",
+    "updateTime": "2024-01-01T00:00:00.000Z",
+    "updateUser": {
+      "email": "system@labflow.com"
+    },
+    "updateOrigin": "CONSOLE",
+    "updateType": "INCREMENTAL_UPDATE"
+  }
+}
