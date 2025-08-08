@@ -43,8 +43,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:prod": "tsc -b && vite build --config vite.config.prod.ts",
-    "build:prod:notsc": "vite build --config vite.config.prod.simple.ts",
+    "build:prod": "./scripts/build-production.sh",
+    "build:mobile": "./scripts/build-mobile.sh",
+    "setup": "./scripts/setup-dev.sh",
+    "deploy": "./scripts/deploy.sh",
+    "deploy:staging": "./scripts/deploy.sh staging",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "preview": "vite preview",
