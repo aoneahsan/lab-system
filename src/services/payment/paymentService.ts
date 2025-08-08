@@ -36,7 +36,7 @@ export class PaymentService {
     const totalAmount = amount + processingFee;
 
     switch (this.provider) {
-      case 'stripe':
+      case 'stripe': {
         const intent = await stripeService.createPaymentIntent(
           totalAmount,
           paymentConfig.currency,
@@ -53,6 +53,7 @@ export class PaymentService {
           metadata,
           createdAt: new Date(),
         };
+      }
       default:
         throw new Error(`Create payment not implemented for: ${this.provider}`);
     }
@@ -66,7 +67,7 @@ export class PaymentService {
   ): Promise<{ success: boolean; payment?: Payment; error?: string }> {
     try {
       switch (this.provider) {
-        case 'stripe':
+        case 'stripe': {
           const stripe = await stripeService.initializeStripe();
           if (!stripe) {
             return { success: false, error: 'Failed to initialize Stripe' };
@@ -96,6 +97,7 @@ export class PaymentService {
             };
           }
           break;
+        }
         default:
           return { success: false, error: `Payment processing not implemented for: ${this.provider}` };
       }
@@ -117,9 +119,10 @@ export class PaymentService {
   ): Promise<{ success: boolean; refund?: any; error?: string }> {
     try {
       switch (this.provider) {
-        case 'stripe':
+        case 'stripe': {
           const refund = await stripeService.processRefund(paymentId, amount, reason);
           return { success: true, refund };
+        }
         default:
           return { success: false, error: `Refund not implemented for: ${this.provider}` };
       }
