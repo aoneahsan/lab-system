@@ -1,16 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, AlertCircle, CheckCircle, Package } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { CSVParser } from '@/utils/import-export/csv-parser';
 import { DataValidator } from '@/utils/import-export/data-validator';
 import { useInventoryStore } from '@/stores/inventory.store';
-import { useAuthStore } from '@/stores/auth.store';
+// TODO: Implement user permission checks
+// import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { InventoryItem } from '@/types';
 import { toast } from 'sonner';
-import { Timestamp } from 'firebase/firestore';
+// TODO: Re-enable when implementing expiry date tracking
+// import { Timestamp } from 'firebase/firestore';
 
 interface ImportProgress {
   total: number;
@@ -21,8 +23,10 @@ interface ImportProgress {
 }
 
 export const InventoryImport: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<Record<string, any>[] | null>(null);
+  // TODO: Implement file preview functionality
+  // const [file, setFile] = useState<File | null>(null);
+  // TODO: Implement data preview before import
+  // const [parsedData, setParsedData] = useState<Record<string, any>[] | null>(null);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [progress, setProgress] = useState<ImportProgress>({
     total: 0,
@@ -32,7 +36,8 @@ export const InventoryImport: React.FC = () => {
     status: 'idle',
   });
   
-  const { currentUser } = useAuthStore();
+  // TODO: Implement user-based permissions for inventory import
+  // const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
   const inventoryStore = useInventoryStore();
   
@@ -40,7 +45,8 @@ export const InventoryImport: React.FC = () => {
     const file = acceptedFiles[0];
     if (!file) return;
     
-    setFile(file);
+    // TODO: Store file for preview
+    // setFile(file);
     setProgress({ ...progress, status: 'validating' });
     
     try {
@@ -56,7 +62,8 @@ export const InventoryImport: React.FC = () => {
         throw new Error('Unsupported file format');
       }
       
-      setParsedData(data);
+      // TODO: Store parsed data for preview
+      // setParsedData(data);
       
       // Validate data
       const validation = DataValidator.validate(data, DataValidator.INVENTORY_RULES);
@@ -100,11 +107,12 @@ export const InventoryImport: React.FC = () => {
     for (const item of validationResult.validRows) {
       try {
         // Parse dates if present
-        let expiryDate: Timestamp | undefined;
+        // TODO: Use expiryDate for inventory items with expiration tracking
+        // let expiryDate: Timestamp | undefined;
         if (item.expiryDate) {
           const date = new Date(item.expiryDate);
           if (!isNaN(date.getTime())) {
-            expiryDate = Timestamp.fromDate(date);
+            // expiryDate = Timestamp.fromDate(date);
           }
         }
         

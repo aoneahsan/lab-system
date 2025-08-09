@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Send } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { doc, updateDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { useAuthStore } from '@/stores/auth.store';

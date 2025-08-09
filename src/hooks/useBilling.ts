@@ -5,13 +5,11 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
 import type {
   Invoice,
-  InsuranceClaim,
   BillingFilter,
   ClaimFilter,
   InvoiceFormData,
   PaymentFormData,
   ClaimFormData,
-  ClaimStatistics,
   EligibilityCheckRequest,
 } from '@/types/billing.types';
 

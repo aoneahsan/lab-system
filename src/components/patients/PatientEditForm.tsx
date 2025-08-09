@@ -3,7 +3,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import type { Patient, UpdatePatientData } from '@/types/patient.types';
 import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
-import { countries } from '@/utils/countries';
+// import { countries } from '@/utils/countries'; // Not used in this component
 import { relationships } from '@/utils/relationships';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { CountrySelect } from '@/components/ui/CountrySelect';

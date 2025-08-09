@@ -5,7 +5,8 @@ import type { PurchaseOrder, Vendor } from '@/types/inventory.types';
 
 export default function PurchaseOrders() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  // TODO: Implement create order modal functionality
+  // const [showCreateOrder, setShowCreateOrder] = useState(false);
   const { purchaseOrders, vendors, fetchPurchaseOrders, fetchVendors } = useInventoryStore();
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export default function PurchaseOrders() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Purchase Orders</h2>
-        <button onClick={() => setShowCreateOrder(true)} className="btn btn-primary">
+        <button onClick={() => {/* TODO: Show create order modal */}} className="btn btn-primary">
           <Plus className="h-4 w-4" />
           Create Order
         </button>

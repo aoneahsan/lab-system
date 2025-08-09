@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, User, AlertCircle, Calendar, ChevronRight } from 'lucide-react';
+import { Search, User, AlertCircle, Calendar, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Patient {

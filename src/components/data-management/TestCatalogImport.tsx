@@ -1,13 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { CSVParser } from '@/utils/import-export/csv-parser';
 import { DataValidator } from '@/utils/import-export/data-validator';
 import { LOINCMapper } from '@/utils/import-export/loinc-mapper';
 import { useTestStore } from '@/stores/test.store';
-import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { TestDefinition } from '@/types';
 import { toast } from 'sonner';
@@ -21,8 +20,9 @@ interface ImportProgress {
 }
 
 export const TestCatalogImport: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<Record<string, any>[] | null>(null);
+  // TODO: Implement file and data preview functionality
+  const [_file, setFile] = useState<File | null>(null);
+  const [_parsedData, setParsedData] = useState<Record<string, any>[] | null>(null);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [mappingPreview, setMappingPreview] = useState<any[]>([]);
   const [progress, setProgress] = useState<ImportProgress>({
@@ -33,7 +33,7 @@ export const TestCatalogImport: React.FC = () => {
     status: 'idle',
   });
   
-  const { currentUser } = useAuthStore();
+  // TODO: Implement user permission checks
   const { currentTenant } = useTenantStore();
   const { createTest } = useTestStore();
   

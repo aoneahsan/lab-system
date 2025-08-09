@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { CalendarIcon, MapPin, Clock, TestTube, CreditCard } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { HomeCollectionFormData } from '@/types/home-collection.types';
@@ -91,7 +91,7 @@ export function HomeCollectionForm() {
     try {
       await createMutation.mutateAsync(data);
       navigate('/home-collection');
-    } catch (error) {
+    } catch (_error) {
       // Error handled by mutation
     }
   };

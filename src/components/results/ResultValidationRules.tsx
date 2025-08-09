@@ -47,8 +47,8 @@ const mockRules: ValidationRule[] = [
 
 export default function ResultValidationRules() {
   const [rules, setRules] = useState<ValidationRule[]>(mockRules);
-  const [showForm, setShowForm] = useState(false);
-  const [editingRule, setEditingRule] = useState<ValidationRule | null>(null);
+  const [_showForm, setShowForm] = useState(false);
+  const [_editingRule, setEditingRule] = useState<ValidationRule | null>(null);
   const [filter, setFilter] = useState<'all' | ValidationRuleType>('all');
 
   const ruleTypeConfig = {

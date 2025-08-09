@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Calendar, Clock, MapPin, User, AlertCircle } from 'lucide-react';
 import { useTestOrders } from '@/hooks/useTests';
@@ -25,7 +25,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
 
   const { data: orders = [] } = useTestOrders({ status: 'pending' });
   const { data: patientsData } = usePatients();
-  const patients = patientsData?.patients || [];
+  const patients = useMemo(() => patientsData?.patients || [], [patientsData?.patients]);
 
   const {
     register,
@@ -70,7 +70,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
         }
       }
     }
-  }, [selectedOrderId, orders, patients, setValue]);
+  }, [selectedOrderId, orders, setValue]);
 
   const getSampleTypeForTest = (testType: string): string => {
     // This would normally come from test definitions

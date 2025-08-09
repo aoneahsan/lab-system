@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMessages } from '@/hooks/useCommunication';
-import { Message } from '@/types/communication.types';
+// import { Message } from '@/types/communication.types'; // Not used in component
 
 export function MessageHistory() {
   const [filters, setFilters] = useState({

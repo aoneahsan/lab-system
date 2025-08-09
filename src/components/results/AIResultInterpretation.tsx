@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -13,10 +13,8 @@ import {
   BeakerIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import { aimlService, ResultInterpretation, TrendAnalysis } from '@/services/ai-ml.service';
+import { aimlService } from '@/services/ai-ml.service';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 import type { TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
 import type { Patient } from '@/types/patient.types';
@@ -36,7 +34,6 @@ export const AIResultInterpretation: React.FC<AIResultInterpretationProps> = ({
   patient,
   onFollowUpTest,
 }) => {
-  const { currentUser } = useAuth();
   const [showFullInterpretation, setShowFullInterpretation] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'interpretation' | 'trends' | 'recommendations'>('interpretation');
 

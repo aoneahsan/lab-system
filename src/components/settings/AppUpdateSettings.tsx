@@ -9,7 +9,7 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { appUpdateService, handleUpdateFlow } from '@/services/app-update.service';
+import { appUpdateService } from '@/services/app-update.service';
 import { Capacitor } from '@capacitor/core';
 import { toast } from '@/stores/toast.store';
 

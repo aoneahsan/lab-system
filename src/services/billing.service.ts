@@ -429,7 +429,7 @@ export const billingService = {
     let overdueAmount = 0;
     let todaysCharges = 0;
     let todaysPayments = 0;
-    let todayRevenue = 0;
+    let _todayRevenue = 0;
 
     // Process today's invoices
     todaysInvoicesSnapshot.docs.forEach((doc) => {
@@ -441,7 +441,7 @@ export const billingService = {
     todaysPaymentsSnapshot.docs.forEach((doc) => {
       const payment = doc.data() as Payment;
       todaysPayments += payment.amount || 0;
-      todayRevenue += payment.amount || 0;
+      _todayRevenue += payment.amount || 0;
     });
     
     // Process pending invoices

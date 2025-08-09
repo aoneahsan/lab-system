@@ -11,10 +11,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
-import { FIREBASE_COLLECTIONS } from '@/config/firebase-collections';
+// import { FIREBASE_COLLECTIONS } from '@/config/firebase-collections';
 import { appointmentService } from './appointment.service';
 import { messageService, templateService } from './communication.service';
-import type { Appointment, AppointmentReminder } from '@/types/appointment.types';
+import type { Appointment } from '@/types/appointment.types';
 import type { MessageTemplate } from '@/types/communication.types';
 
 const getCollectionName = (collectionName: string) => {

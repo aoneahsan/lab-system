@@ -23,12 +23,9 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { 
-  Route, 
   Calendar as CalendarIcon, 
   User,
-  MapPin,
-  Clock,
-  CheckCircle
+  MapPin
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';

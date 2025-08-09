@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useTenant } from '@/hooks/useTenant';
 import { usePatientStats } from '@/hooks/usePatients';
 import { testService } from '@/services/test.service';
 import { resultService } from '@/services/result.service';

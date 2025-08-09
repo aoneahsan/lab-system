@@ -259,7 +259,7 @@ class UnifiedNotificationService {
     value: string,
     flag: string,
     recipientPhone: string,
-    recipientEmail: string
+    _recipientEmail: string
   ) {
     const platform = Capacitor.getPlatform();
     
@@ -302,7 +302,7 @@ class UnifiedNotificationService {
     itemName: string,
     currentStock: number,
     minimumStock: number,
-    managerId: string
+    _managerId: string
   ) {
     // Show in-app notification
     this.showWarning(

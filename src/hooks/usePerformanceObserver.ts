@@ -18,9 +18,10 @@ export function usePerformanceObserver(componentName: string) {
 
     return () => {
       // Track component unmount and lifetime
+      const currentRenderCount = renderCount.current;
       const lifetime = performance.now() - mountTime.current;
       performanceMonitor.recordMetric(`${componentName}_lifetime`, lifetime);
-      performanceMonitor.recordMetric(`${componentName}_renders`, renderCount.current);
+      performanceMonitor.recordMetric(`${componentName}_renders`, currentRenderCount);
     };
   }, [componentName]);
 

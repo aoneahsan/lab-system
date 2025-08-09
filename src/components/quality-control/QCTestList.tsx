@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Plus, Beaker, Calendar, Edit } from 'lucide-react';
+import React from 'react';
+import { Plus, Beaker, Calendar } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 import type { QCTest } from '@/types/quality-control';
 
 export default function QCTestList() {
-  const [showAddTest, setShowAddTest] = useState(false);
+  // TODO: Implement add QC test modal
+  // const [showAddTest, setShowAddTest] = useState(false);
   const { qcTests, loading } = useQualityControlStore();
 
   const getStatusColor = (status: QCTest['status']) => {
@@ -35,7 +36,7 @@ export default function QCTestList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-900">QC Tests</h2>
-        <button onClick={() => setShowAddTest(true)} className="btn btn-primary">
+        <button onClick={() => {/* TODO: Show add test modal */}} className="btn btn-primary">
           <Plus className="h-4 w-4" />
           Add QC Test
         </button>

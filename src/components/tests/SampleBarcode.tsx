@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { QrCode, Download, Printer } from 'lucide-react';
-import { generateSampleQRCode, createSampleBarcodeData, generateBarcodeLabel } from '@/utils/barcode.utils';
+import { generateSampleQRCode, createSampleBarcodeData } from '@/utils/barcode.utils';
 import type { TestOrder } from '@/types/test.types';
 
 interface SampleBarcodeProps {

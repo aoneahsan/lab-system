@@ -10,7 +10,7 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  Filter,
+  
   Search
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -46,7 +46,7 @@ interface Balance {
 const MobilePaymentsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'history'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'completed' | 'pending'>('all');
+  const [selectedsetSelectedFilter] = useState<'all' | 'completed' | 'pending'>('all');
 
   // Mock data
   const [balance] = useState<Balance>({

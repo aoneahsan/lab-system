@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Download, FileSpreadsheet, FileText, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTestStore } from '@/stores/test.store';
-import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { CSVParser } from '@/utils/import-export/csv-parser';
@@ -26,7 +25,8 @@ export const TestCatalogExport: React.FC = () => {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
   
-  const { currentUser } = useAuthStore();
+  // TODO: Implement user permission checks
+  // const { currentUser } = useAuthStore();
   const { currentTenant } = useTenantStore();
   const { tests, fetchTests } = useTestStore();
   

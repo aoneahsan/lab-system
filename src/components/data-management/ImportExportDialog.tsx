@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Upload, Download, FileSpreadsheet, FileText, FileJson } from 'lucide-react';
+import React from 'react';
+import { X, Upload, Download, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tab } from '@headlessui/react';
 

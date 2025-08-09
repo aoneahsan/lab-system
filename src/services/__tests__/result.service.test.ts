@@ -8,14 +8,13 @@ import {
   getDoc, 
   addDoc, 
   updateDoc,
-  query,
   where,
   orderBy,
   serverTimestamp,
   Timestamp,
   getCountFromServer
 } from 'firebase/firestore';
-import type { TestResult, ResultStatus, ResultFlag } from '@/types/result.types';
+import type { TestResult } from '@/types/result.types';
 import type { TestOrder } from '@/types/test.types';
 
 // Mock Firebase modules

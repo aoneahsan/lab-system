@@ -34,9 +34,13 @@ export const CustomFieldDefinitionForm = ({
   const [options, setOptions] = useState<CustomFieldOption[]>(
     initialData?.options || [{ label: '', value: '', isDefault: false }]
   );
-  const [validations, setValidations] = useState<CustomFieldValidation[]>(
+  const [validations] = useState<CustomFieldValidation[]>(
     initialData?.validations || []
   );
+  // TODO: Implement validation management UI
+  // const [validations, setValidations] = useState<CustomFieldValidation[]>(
+  //   initialData?.validations || []
+  // );
 
   const {
     register,

@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getPaymentService } from '@/services/payment/paymentService';
-import { Payment, PaymentMethod } from '@/types/billing';
+import { PaymentMethod } from '@/types/billing';
+// TODO: Use Payment type when implementing payment history
+// import { Payment } from '@/types/billing';
 import { PaymentStatus } from '@/config/payment';
 
 export function usePayment() {

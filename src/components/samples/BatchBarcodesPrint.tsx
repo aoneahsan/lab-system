@@ -17,9 +17,9 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose
     if (isOpen && samples.length > 0) {
       generateAllQRCodes();
     }
-  }, [isOpen, samples]);
+  }, [isOpen, samples, generateAllQRCodes]);
 
-  const generateAllQRCodes = async () => {
+  const generateAllQRCodes = React.useCallback(async () => {
     const codes: { [key: string]: string } = {};
     
     for (const sample of samples) {
@@ -47,7 +47,7 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose
     }
     
     setQrCodes(codes);
-  };
+  }, [samples]);
 
   const handlePrint = () => {
     const printContent = printRef.current;

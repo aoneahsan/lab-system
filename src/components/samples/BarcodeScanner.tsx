@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Camera } from 'lucide-react';
-import { QRScanner, BarcodeScanner as CraftBarcodeScanner } from 'code-craft-studio';
+import { BarcodeScanner as CraftBarcodeScanner } from 'code-craft-studio';
 import { Capacitor } from '@capacitor/core';
 import { toast } from '@/stores/toast.store';
 

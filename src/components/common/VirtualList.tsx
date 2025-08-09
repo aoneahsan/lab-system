@@ -66,17 +66,20 @@ export const VirtualList = memo(<T,>({
     : items.reduce((acc, _, index) => acc + getItemHeight(index), 0);
 
   // Handle scroll with throttling
-  const handleScroll = useCallback(
-    throttle((e: React.UIEvent<HTMLDivElement>) => {
-      const newScrollTop = e.currentTarget.scrollTop;
-      setScrollTop(newScrollTop);
-      setIsScrolling(true);
-      onScroll?.(newScrollTop);
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const newScrollTop = e.currentTarget.scrollTop;
+    setScrollTop(newScrollTop);
+    setIsScrolling(true);
+    onScroll?.(newScrollTop);
 
-      // Reset scrolling state after scroll ends
-      setTimeout(() => setIsScrolling(false), 150);
-    }, 16), // ~60fps
-    [onScroll]
+    // Reset scrolling state after scroll ends
+    setTimeout(() => setIsScrolling(false), 150);
+  }, [onScroll]);
+
+  // Throttle the scroll handler
+  const throttledHandleScroll = useCallback(
+    () => throttle(handleScroll, 16), // ~60fps
+    [handleScroll]
   );
 
   // Render visible items
@@ -131,7 +134,7 @@ export const VirtualList = memo(<T,>({
       ref={scrollElementRef}
       className={`relative overflow-auto ${className}`}
       style={{ height }}
-      onScroll={handleScroll}
+      onScroll={throttledHandleScroll}
     >
       <div
         style={{

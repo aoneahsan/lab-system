@@ -8,7 +8,6 @@ import {
   getDoc, 
   addDoc, 
   updateDoc,
-  query,
   where,
   orderBy,
   serverTimestamp,

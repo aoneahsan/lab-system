@@ -352,7 +352,7 @@ export const resultService = {
       flag?: ResultFlag;
     }>,
     enteredBy: string,
-    enteredByName: string
+    _enteredByName: string
   ): Promise<void> {
     const batch = [];
     const timestamp = Timestamp.now();

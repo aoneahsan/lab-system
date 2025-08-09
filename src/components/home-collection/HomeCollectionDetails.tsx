@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   useHomeCollection, 
-  useUpdateCollectionStatus,
-  useRecordSampleCollection,
-  useRecordPayment 
+  useUpdateCollectionStatus
+  // TODO: Implement sample collection recording
+  // useRecordSampleCollection,
+  // TODO: Implement payment recording  
+  // useRecordPayment 
 } from '@/hooks/useHomeCollection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';

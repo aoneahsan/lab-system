@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import type { InventoryItem } from '@/types';
-import { Timestamp } from 'firebase/firestore';
+// TODO: Use Timestamp for date fields when needed
+// import { Timestamp } from 'firebase/firestore';
 
 const schema = yup.object({
   itemCode: yup.string().required('Item code is required'),
@@ -92,8 +93,8 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     },
   });
 
-  const currentStock = watch('currentStock');
-  const minimumStock = watch('minimumStock');
+  // const currentStock = watch('currentStock');
+  // const minimumStock = watch('minimumStock');
 
   const handleFormSubmit = (data: FormData) => {
     const itemData: Partial<InventoryItem> = {

@@ -24,7 +24,7 @@ export default function ResultReview({ orderId, patientId }: ResultReviewProps) 
     } else if (patientId) {
       fetchResultsByPatient(currentUser.tenantId, patientId);
     }
-  }, [currentUser, orderId, patientId]);
+  }, [currentUser, orderId, patientId, fetchResultsByOrder, fetchResultsByPatient]);
 
   const filteredResults = results.filter((result) => {
     if (filter === 'all') return true;

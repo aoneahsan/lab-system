@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+// Removed unused imports: useState, useEffect
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { offlineDatabase } from '@/services/offline/database.service';
 import { syncService } from '@/services/offline/sync.service';
@@ -20,7 +20,7 @@ export const useOfflineData = <T extends { id: string } = any>({
   enableOffline = true,
 }: UseOfflineDataOptions) => {
   const { isOnline, isOfflineSupported } = useOfflineSupport();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient(); // Not used in this function
 
   // Main query that switches between online and offline
   const query = useQuery({
@@ -96,7 +96,7 @@ export const useOfflineMutation = <TData extends { id: string } = any, TVariable
         return await onlineMutation(variables);
       }
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data, _variables) => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: [collection] });
 

@@ -74,7 +74,7 @@ const mockTemplates: ReportTemplate[] = [
 export default function ReportTemplates() {
   const [templates] = useState<ReportTemplate[]>(mockTemplates);
   const [selectedCategory, setSelectedCategory] = useState<ReportCategory | 'all'>('all');
-  const [showTemplateForm, setShowTemplateForm] = useState(false);
+  const [_showTemplateForm, setShowTemplateForm] = useState(false);
 
   const categoryConfig = {
     patient: { label: 'Patient Reports', color: 'text-blue-600 bg-blue-50' },

@@ -68,7 +68,7 @@ export function useMessaging() {
 }
 
 // Hook for notification preferences
-export function useNotificationPreferences(userId: string) {
+export function useNotificationPreferences(_userId: string) {
   // This would typically fetch from the database
   // For now, returning default preferences
   return {

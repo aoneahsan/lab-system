@@ -6,7 +6,7 @@ import {
   AlertCircle,
   User,
   MapPin,
-  Filter,
+  
   Search,
   ChevronRight,
   MoreVertical,
@@ -38,7 +38,7 @@ interface Collection {
 
 export const CollectionsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState('pending');
+  const [activesetActiveFilter] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);

@@ -273,7 +273,7 @@ export const useCreateWebhookEndpoint = () => {
   const { currentTenant } = useTenantStore();
 
   return useMutation({
-    mutationFn: ({ connectionId, data }: { connectionId: string; data: any }) => {
+    mutationFn: ({ connectionId: _connectionId, data }: { connectionId: string; data: any }) => {
       if (!currentTenant) throw new Error('No tenant selected');
       // Placeholder implementation
       return Promise.resolve({ id: 'webhook-' + Date.now(), ...data });
@@ -293,7 +293,7 @@ export const useCreateWebhookEndpoint = () => {
 
 export const useTestWebhook = () => {
   return useMutation({
-    mutationFn: ({ connectionId, webhookId }: { connectionId: string; webhookId: string }) => {
+    mutationFn: ({ connectionId: _connectionId, webhookId: _webhookId }: { connectionId: string; webhookId: string }) => {
       // Placeholder implementation
       return Promise.resolve({ success: true, message: 'Webhook test successful' });
     },

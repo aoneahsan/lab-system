@@ -26,7 +26,7 @@ export function useStats() {
 
       const today = new Date();
       const startOfToday = startOfDay(today);
-      const endOfToday = endOfDay(today);
+      // const endOfToday = endOfDay(today);
 
       // Get results ready for review
       const resultsRef = collection(db, `${currentTenant.id}_results`);

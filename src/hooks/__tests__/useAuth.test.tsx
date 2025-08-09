@@ -93,7 +93,7 @@ describe('Auth Hooks', () => {
             email: 'test@example.com',
             password: 'wrong-password',
           });
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -155,7 +155,7 @@ describe('Auth Hooks', () => {
             role: 'patient' as const,
             tenantId: 'tenant-1',
           });
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -206,7 +206,7 @@ describe('Auth Hooks', () => {
       await act(async () => {
         try {
           await result.current.mutateAsync();
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -243,7 +243,7 @@ describe('Auth Hooks', () => {
       await act(async () => {
         try {
           await result.current.mutateAsync({ email: 'nonexistent@example.com' });
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });

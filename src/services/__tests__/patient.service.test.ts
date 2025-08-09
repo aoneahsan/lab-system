@@ -59,7 +59,7 @@ vi.mock('@/services/webhook.service', () => ({
 }));
 
 import { patientService } from '../patient.service';
-import { firestore } from '@/config/firebase.config';
+// import { firestore } from '@/config/firebase.config';
 
 // Import all the Firebase functions from the mock
 const {

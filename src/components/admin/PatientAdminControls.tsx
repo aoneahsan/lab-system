@@ -5,7 +5,7 @@ import { toast } from '@/stores/toast.store';
 
 export default function PatientAdminControls() {
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
-  const [showMergeDialog] = useState(false);
+  // const [showMergeDialog, setShowMergeDialog] = useState(false);
   
   const { data: patients = [] } = usePatients();
 

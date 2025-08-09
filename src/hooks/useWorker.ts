@@ -59,7 +59,7 @@ export function useWorker(options: UseWorkerOptions) {
     return () => {
       workerManagerRef.current?.terminateAll();
     };
-  }, [workerUrl, workerName]);
+  }, [workerUrl, workerName, onError, onMessage]);
 
   const postMessage = useCallback((message: any) => {
     if (!workerRef.current) {

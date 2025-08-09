@@ -36,16 +36,17 @@ const FirebaseKit = {
     addListener: (_event: string, _callback: any) => ({ remove: () => {} })
   }
 };
-import { 
-  getAuth, 
-  signInWithEmailAndPassword as webSignIn,
-  createUserWithEmailAndPassword as webCreateUser,
-  signOut as webSignOut,
-  sendPasswordResetEmail as webSendPasswordReset,
-  onAuthStateChanged as webOnAuthStateChanged,
-  User as FirebaseUser
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+// TODO: Implement authentication functions when needed
+// import { 
+//   getAuth, 
+//   signInWithEmailAndPassword as webSignIn,
+//   createUserWithEmailAndPassword as webCreateUser,
+//   signOut as webSignOut,
+//   sendPasswordResetEmail as webSendPasswordReset,
+//   onAuthStateChanged as webOnAuthStateChanged,
+//   User as FirebaseUser
+// } from 'firebase/auth';
+// import { auth } from '@/lib/firebase';
 
 // Initialize Firebase Kit for mobile platforms
 export const initializeFirebaseKit = async () => {

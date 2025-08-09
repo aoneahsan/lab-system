@@ -547,7 +547,11 @@
       "Bash(pod deintegrate:*)",
       "WebFetch(domain:www.zakya.com)",
       "Bash(export:*)",
-      "WebFetch(domain:labsystem-a1.web.app)"
+      "WebFetch(domain:labsystem-a1.web.app)",
+      "Bash(# Get list of files with unused imports warnings\nyarn lint 2>&1 | grep -E \"\"warning.*is defined but never used\"\" | grep -E \"\"import|from\"\" | awk -F'':'' ''{print $1}'' | sort -u | head -20)",
+      "Bash(# Create a script to systematically fix common ESLint warnings\ncat > /tmp/fix-eslint-warnings.sh << ''EOF''\n#!/bin/bash\n\n# Function to fix unused imports in a file\nfix_unused_imports() {\n    local file=$1\n    echo \"\"Fixing unused imports in: $file\"\"\n    \n    # Common unused imports patterns\n    sed -i.bak \\\n        -e \"\"s/import { Timestamp } from ''firebase\\/firestore'';/\\/\\/ TODO: Use Timestamp for date fields when needed\\n\\/\\/ import { Timestamp } from ''firebase\\/firestore'';/g\"\" \\\n        -e \"\"s/^import.*''@\\/stores\\/auth.store'';$/\\/\\/ TODO: Implement user permission checks\\n\\/\\/ &/g\"\" \\\n        \"\"$file\"\"\n}\n\n# Function to comment out unused variables\nfix_unused_vars() {\n    local file=$1\n    echo \"\"Fixing unused variables in: $file\"\"\n    \n    # Common patterns for unused state variables\n    sed -i.bak \\\n        -e \"\"s/const \\[file, setFile\\] = useState/\\/\\/ TODO: Implement file handling\\n  \\/\\/ const [file, setFile] = useState/g\"\" \\\n        -e \"\"s/const \\[parsedData, setParsedData\\] = useState/\\/\\/ TODO: Implement data preview\\n  \\/\\/ const [parsedData, setParsedData] = useState/g\"\" \\\n        \"\"$file\"\"\n}\n\n# Get files with warnings\nFILES=$(yarn lint --format=unix 2>&1 | grep \"\"warning\"\" | awk -F'':'' ''{print $1}'' | sort -u)\n\nfor file in $FILES; do\n    if [[ -f \"\"$file\"\" ]]; then\n        fix_unused_imports \"\"$file\"\"\n        fix_unused_vars \"\"$file\"\" \n    fi\ndone\n\n# Clean up backup files\nfind . -name \"\"*.bak\"\" -delete\n\necho \"\"Completed fixing common ESLint warnings\"\"\nEOF\n\nchmod +x /tmp/fix-eslint-warnings.sh)",
+      "Bash(# Get all unique warning patterns\nyarn lint 2>&1 | grep \"\"warning\"\" | awk -F\"\"''\"\" ''{print $2}'' | sort | uniq -c | sort -nr | head -20)",
+      "Bash(# Get files with Filter import warnings\nyarn lint 2>&1 | grep -E \"\"warning.*''Filter'' is defined but never used\"\" | awk -F'':'' ''{print $1}'' | sort -u)"
     ],
     "deny": []
   }

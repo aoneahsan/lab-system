@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  Filter,
+  
   AlertTriangle,
   Clock,
   CheckCircle,
@@ -29,7 +29,7 @@ interface TestResult {
 const LabStaffResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'pending' | 'critical'>('all');
+  const [selectedsetSelectedFilter] = useState<'all' | 'pending' | 'critical'>('all');
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
 
   // Mock data - in real app would fetch from API

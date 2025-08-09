@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { FileText, Download, Eye, Clock, TrendingUp, Users } from 'lucide-react';
+import { FileText, Download, Clock, TrendingUp, Users } from 'lucide-react';
 import { format, subDays, eachDayOfInterval } from 'date-fns';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];

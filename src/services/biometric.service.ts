@@ -1,5 +1,5 @@
 import { BiometricAuth } from 'capacitor-biometric-authentication';
-import { storageHelpers, STORAGE_KEYS } from './unified-storage.service';
+import { storageHelpers } from './unified-storage.service';
 import type {
   BiometricAuthConfig,
   BiometricEnrollmentStatus,

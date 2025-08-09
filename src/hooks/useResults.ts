@@ -150,7 +150,7 @@ export const useVerifyResult = () => {
   const { currentUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: ({ resultId, comments }: { resultId: string; comments?: string }) => {
+    mutationFn: ({ resultId, comments: _comments }: { resultId: string; comments?: string }) => {
       if (!currentTenant || !currentUser) throw new Error('No tenant or user');
       return resultService.verifyResult(currentTenant.id, currentUser.id, resultId);
     },

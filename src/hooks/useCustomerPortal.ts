@@ -2,10 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerPortalService } from '@/services/customer-portal.service';
 import type {
   CustomerPortalAccess,
-  SharedResult,
-  PrescriptionUpload,
-  PortalNotification,
-  PortalDashboardStats,
   CustomerRegistrationData,
   ShareResultData,
   PrescriptionUploadData

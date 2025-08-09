@@ -2,13 +2,14 @@ import { useCallback } from 'react';
 import { useTracking } from '@/providers/TrackingProvider';
 import { useAuth } from './useAuth';
 
-interface AnalyticsEvent {
-  category: string;
-  action: string;
-  label?: string;
-  value?: number;
-  properties?: Record<string, any>;
-}
+// TODO: Implement analytics event tracking
+// interface AnalyticsEvent {
+//   category: string;
+//   action: string;
+//   label?: string;
+//   value?: number;
+//   properties?: Record<string, any>;
+// }
 
 export const useAnalytics = () => {
   const { trackEvent } = useTracking();

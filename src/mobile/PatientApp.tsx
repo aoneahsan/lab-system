@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Home, FileText, Calendar, User, Bell, ChevronLeft } from 'lucide-react';
-import { useAuthStore } from '@/stores/auth.store';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -30,7 +29,7 @@ const tabs: TabItem[] = [
 export const PatientApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState<string | null>(null);
-  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [unreadNotifications, _setUnreadNotifications] = useState(3);
 
   useEffect(() => {
     // Configure status bar for mobile

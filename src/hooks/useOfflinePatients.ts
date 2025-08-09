@@ -40,7 +40,7 @@ export const useOfflinePatient = (patientId: string) => {
 export const useCreateOfflinePatient = () => {
   const queryClient = useQueryClient();
   const { currentTenant } = useTenantStore();
-  const { queueOperation } = useOffline();
+  // const { queueOperation } = useOffline();
   const tenantId = currentTenant?.id || '';
 
   return useMutation({

@@ -5,7 +5,7 @@ import {
   Download,
   Share2,
   Search,
-  Filter,
+  
   ChevronRight,
   CheckCircle,
   AlertCircle,
@@ -20,9 +20,10 @@ import type { TestResult } from '@/types/result.types';
 
 const MobileTestResultsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
+  // TODO: Implement user authentication
+  // const { currentUser } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statussetStatusFilter] = useState<string>('all');
 
   // In real app, would filter by patient ID
   const { data: results = { items: [], total: 0 }, isLoading } = useResults();

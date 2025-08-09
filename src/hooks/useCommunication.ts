@@ -11,7 +11,6 @@ import type {
   CommunicationChannel,
   MessageTemplate,
   Campaign,
-  Message,
   CommunicationPreferences,
   MessageTemplateFormData,
   CampaignFormData

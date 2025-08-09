@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { VoiceInput } from '@/components/common/VoiceInput';
-import { useVoiceCommands, useVoiceDictation } from '@/hooks/useVoiceDictation';
+import { useVoiceCommands } from '@/hooks/useVoiceDictation';
 import { 
   MicrophoneIcon, 
   CheckIcon, 

@@ -18,7 +18,8 @@ interface TabItem {
 
 export const PatientMobileApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
-  const { currentUser } = useAuthStore();
+  // TODO: Implement user authentication
+  // const { currentUser } = useAuthStore();
   const { isOffline, pendingChanges } = useOffline();
   const [notificationCount, setNotificationCount] = useState(3);
 

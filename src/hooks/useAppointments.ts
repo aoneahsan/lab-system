@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { appointmentService } from '@/services/appointment.service';
-import { Appointment, AppointmentFormData } from '@/types/appointment.types';
+import { Appointment } from '@/types/appointment.types';
 import { toast } from '@/stores/toast.store';
 import { useTenantStore } from '@/stores/tenant.store';
 

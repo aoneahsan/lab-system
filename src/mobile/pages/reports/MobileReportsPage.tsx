@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Download, Eye, Filter, Calendar, Search } from 'lucide-react';
+import { FileText, Download, Eye, Calendar, Search } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Report {
@@ -12,7 +12,7 @@ interface Report {
 }
 
 const MobileReportsPage: React.FC = () => {
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [selectedsetSelectedFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Mock data for reports
