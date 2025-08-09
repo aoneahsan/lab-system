@@ -1,4 +1,4 @@
-import { unifiedStorage, STORAGE_KEYS } from './unified-storage.service';
+import { unifiedStorage } from './unified-storage.service';
 
 export interface OfflineQueueItem {
   id: string;

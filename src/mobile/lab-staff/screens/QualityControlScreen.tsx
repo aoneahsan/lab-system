@@ -3,15 +3,10 @@ import {
   ClipboardCheck,
   AlertCircle,
   CheckCircle,
-  TrendingUp,
-  TrendingDown,
-  Activity,
   Calendar,
-  Filter,
   Plus,
   BarChart3,
   AlertTriangle,
-  ChevronRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +36,7 @@ export const QualityControlScreen: React.FC = () => {
   const navigate = useNavigate();
   const [filterTest, setFilterTest] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [_selectedDate] = useState(new Date());
 
   const [qcResults] = useState<QCResult[]>([
     {

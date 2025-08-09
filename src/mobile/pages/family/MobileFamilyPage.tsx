@@ -17,7 +17,7 @@ interface FamilyMember {
 
 const MobileFamilyPage: React.FC = () => {
   const [showAddMember, setShowAddMember] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
+  const [_selectedMember] = useState<FamilyMember | null>(null);
 
   // Mock data for family members
   const [familyMembers] = useState<FamilyMember[]>([

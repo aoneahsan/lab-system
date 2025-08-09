@@ -21,8 +21,8 @@ interface ImportProgress {
 
 export const TestCatalogImport: React.FC = () => {
   // TODO: Implement file and data preview functionality
-  const [_file, setFile] = useState<File | null>(null);
-  const [_parsedData, setParsedData] = useState<Record<string, any>[] | null>(null);
+  const [, _setFile] = useState<File | null>(null);
+  const [, _setParsedData] = useState<Record<string, any>[] | null>(null);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [mappingPreview, setMappingPreview] = useState<any[]>([]);
   const [progress, setProgress] = useState<ImportProgress>({
@@ -41,7 +41,7 @@ export const TestCatalogImport: React.FC = () => {
     const file = acceptedFiles[0];
     if (!file) return;
     
-    setFile(file);
+    _setFile(file);
     setProgress({ ...progress, status: 'validating' });
     
     try {
@@ -57,7 +57,7 @@ export const TestCatalogImport: React.FC = () => {
         throw new Error('Unsupported file format');
       }
       
-      setParsedData(data);
+      _setParsedData(data);
       
       // Validate data
       const validation = DataValidator.validate(data, DataValidator.TEST_CATALOG_RULES);

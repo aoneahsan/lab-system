@@ -33,10 +33,7 @@ const PhlebotomistLoginPage: React.FC = () => {
   });
 
   useEffect(() => {
-    initializeOfflineSupport();
-  }, []);
-
-  const initializeOfflineSupport = async () => {
+    const initializeOfflineSupport = async () => {
     try {
       // Initialize offline database
       await initializeDatabase();
@@ -50,10 +47,13 @@ const PhlebotomistLoginPage: React.FC = () => {
         setOnlineStatus(status.connected);
         toast.info(status.connected ? 'Back online' : 'Working offline');
       });
-    } catch (error) {
-      console.error('Failed to initialize offline support:', error);
+    } catch (_error) {
+      console.error('Failed to initialize offline support:', _error);
     }
-  };
+    };
+    
+    initializeOfflineSupport();
+  }, [initializeDatabase, setOnlineStatus]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -65,7 +65,7 @@ const PhlebotomistLoginPage: React.FC = () => {
 
       await login({ email: data.email || '', password: data.password || '' });
       navigate('/home');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Invalid email or password');
     }
   };

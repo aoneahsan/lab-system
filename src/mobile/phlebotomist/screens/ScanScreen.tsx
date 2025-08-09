@@ -41,7 +41,7 @@ export const ScanScreen: React.FC = () => {
         setIsScanning(false);
         toast.success('Scan Successful', `${scanMode} information captured`);
       }, 1500);
-    } catch (error) {
+    } catch (_error) {
       setIsScanning(false);
       toast.error('Scan Failed', 'Please try again');
     }

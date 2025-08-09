@@ -9,7 +9,6 @@ import {
   Save,
   ArrowLeft,
   AlertCircle,
-  CheckCircle,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -129,7 +128,7 @@ const LabStaffSamplePage: React.FC = () => {
           `Critical values detected! Immediate notification sent to ${sampleInfo.clinician}`
         );
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to save results');
     } finally {
       setIsSaving(false);

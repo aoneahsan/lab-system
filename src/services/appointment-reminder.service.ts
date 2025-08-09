@@ -206,7 +206,7 @@ export const appointmentReminderService = {
   },
 
   // Get appointment communication preferences
-  async getAppointmentCommPreferences(patientId: string): Promise<{
+  async getAppointmentCommPreferences(_patientId: string): Promise<{
     smsEnabled: boolean;
     emailEnabled: boolean;
     whatsappEnabled: boolean;

@@ -3,18 +3,18 @@ import React, { useEffect } from 'react';
 // import { UnifiedTracking } from 'unified-tracking';
 // import { useTrackEvent } from 'unified-tracking/react';
 const UnifiedTracking = {
-  initialize: async (config?: any) => {},
-  trackEvent: async (eventName: string, properties?: any) => {},
-  trackPageView: async (pageName?: string, properties?: any) => {},
-  setUser: async (userId: string, traits?: any) => {},
+  initialize: async (_config?: any) => {},
+  trackEvent: async (_eventName: string, _properties?: any) => {},
+  trackPageView: async (_pageName?: string, _properties?: any) => {},
+  setUser: async (_userId: string, _traits?: any) => {},
   clearUser: async () => {},
-  trackMetric: async (metricName: string, value: number, unit?: string, tags?: any) => {},
-  track: async (eventName: string, properties?: any) => {},
-  identify: async (userId: string, traits?: any) => {},
-  logError: async (error: Error, context?: any) => {},
-  setConsent: async (consent: any) => {}
+  trackMetric: async (_metricName: string, _value: number, _unit?: string, _tags?: any) => {},
+  track: async (_eventName: string, _properties?: any) => {},
+  identify: async (_userId: string, _traits?: any) => {},
+  logError: async (_error: Error, _context?: any) => {},
+  setConsent: async (_consent: any) => {}
 };
-const useTrackEvent = () => ({ trackEvent: async (eventName: string, properties?: any) => {} });
+const _useTrackEvent = () => ({ trackEvent: async (_eventName: string, _properties?: any) => {} });
 import { useAuthStore } from '@/stores/auth.store';
 import { useLocation } from 'react-router-dom';
 import { firebaseKit } from '@/services/firebase-kit.service';
@@ -22,8 +22,6 @@ import { firebaseKit } from '@/services/firebase-kit.service';
 // Initialize unified tracking on app start
 let initialized = false;
 
-// Export tracking instance for direct usage
-export const trackingInstance = UnifiedTracking;
 
 const initializeTracking = async () => {
   if (initialized) return;
@@ -145,39 +143,4 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
 
 // Re-export the hook from unified-tracking for convenience
 // export { useTrackEvent } from 'unified-tracking/react';
-export { useTrackEvent };
 
-// Custom hooks for tracking
-export const useTracking = () => {
-  const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.track(eventName, properties);
-  };
-
-  const trackError = async (error: Error, context?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.logError(error, context);
-  };
-
-  const identify = async (userId: string, traits?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.identify(userId, traits);
-  };
-
-  const setConsent = async (consent: {
-    analytics?: boolean;
-    errorTracking?: boolean;
-    marketing?: boolean;
-    personalization?: boolean;
-  }) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.setConsent(consent);
-  };
-
-  return {
-    trackEvent,
-    trackError,
-    identify,
-    setConsent,
-  };
-};

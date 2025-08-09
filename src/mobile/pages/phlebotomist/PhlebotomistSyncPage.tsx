@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   RefreshCw,
   Cloud,
   CloudOff,
   CheckCircle,
-  AlertCircle,
   Clock,
   Wifi,
   WifiOff,
   Upload,
-  Download,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -26,7 +23,6 @@ interface SyncStats {
 }
 
 const PhlebotomistSyncPage: React.FC = () => {
-  const navigate = useNavigate();
   const { collections, pendingSync, isOnline, lastSyncTime, syncCollections, removeCollection } =
     useOfflineStore();
 
@@ -42,15 +38,15 @@ const PhlebotomistSyncPage: React.FC = () => {
   };
 
   useEffect(() => {
-    checkNetworkStatus();
-  }, []);
-
-  const checkNetworkStatus = async () => {
+    const checkNetworkStatus = async () => {
     const status = await Network.getStatus();
     if (!status.connected && pendingSync > 0) {
       toast.info('You are offline. Collections will sync when connection is restored.');
     }
-  };
+    };
+    
+    checkNetworkStatus();
+  }, [pendingSync, isOnline]);
 
   const handleSync = async () => {
     if (!isOnline) {
@@ -79,7 +75,7 @@ const PhlebotomistSyncPage: React.FC = () => {
         setSyncProgress(0);
         setIsSyncing(false);
       }, 1000);
-    } catch (error) {
+    } catch (_error) {
       setIsSyncing(false);
       setSyncProgress(0);
       toast.error('Sync failed. Please try again.');

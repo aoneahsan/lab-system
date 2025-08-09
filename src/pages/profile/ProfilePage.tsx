@@ -24,7 +24,7 @@ const ProfilePage = () => {
       await updateUserProfile(currentUser.id, formData as any);
       toast.success('Profile Updated', 'Your profile has been updated successfully');
       setIsEditing(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Update Failed', 'Failed to update profile. Please try again.');
     }
   };
@@ -319,7 +319,7 @@ const ProfilePage = () => {
                         await updateUserProfile(currentUser.id, { preferences: newPreferences });
                       }
                       toast.success('Preference Updated', `${pref.title} has been ${e.target.checked ? 'enabled' : 'disabled'}`);
-                    } catch (error) {
+                    } catch (_error) {
                       toast.error('Update Failed', 'Failed to update preference');
                     }
                   }}

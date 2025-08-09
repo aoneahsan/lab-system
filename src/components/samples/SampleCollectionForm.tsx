@@ -70,7 +70,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
         }
       }
     }
-  }, [selectedOrderId, orders, setValue]);
+  }, [selectedOrderId, orders, setValue, patients]);
 
   const getSampleTypeForTest = (testType: string): string => {
     // This would normally come from test definitions

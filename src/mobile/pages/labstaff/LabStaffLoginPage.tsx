@@ -40,8 +40,8 @@ const LabStaffLoginPage: React.FC = () => {
     try {
       const result = await BiometricAuth.isAvailable();
       setBiometricAvailable(result || false);
-    } catch (error) {
-      console.error('Biometric check failed:', error);
+    } catch (_error) {
+      console.error('Biometric check failed:', _error);
     }
   };
 
@@ -49,7 +49,7 @@ const LabStaffLoginPage: React.FC = () => {
     try {
       await login({ email: data.email, password: data.password });
       navigate('/home');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Invalid email or password');
     }
   };
@@ -72,7 +72,7 @@ const LabStaffLoginPage: React.FC = () => {
           toast.error('Please login with email first to enable biometric login');
         }
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Biometric authentication failed');
     }
   };

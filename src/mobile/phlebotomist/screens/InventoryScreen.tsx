@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, AlertTriangle, TrendingDown, Plus, Minus } from 'lucide-react';
+import { Package, AlertTriangle, Plus, Minus } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 
 interface InventoryItem {

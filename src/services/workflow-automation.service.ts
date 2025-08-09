@@ -9,8 +9,7 @@ import {
   query,
   where,
   orderBy,
-  serverTimestamp,
-  Timestamp
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
@@ -20,7 +19,6 @@ import type {
   WorkflowExecution,
   TATRule,
   AutoVerificationRule,
-  TaskTemplate,
   WorkflowTask,
   SampleRoutingRule,
   WorkflowRuleFormData,

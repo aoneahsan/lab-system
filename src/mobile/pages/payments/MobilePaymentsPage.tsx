@@ -5,7 +5,6 @@ import {
   Receipt, 
   Plus, 
   ChevronRight,
-  Calendar,
   Download,
   CheckCircle,
   AlertCircle,
@@ -46,7 +45,7 @@ interface Balance {
 const MobilePaymentsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'history'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedsetSelectedFilter] = useState<'all' | 'completed' | 'pending'>('all');
+  const [_statusFilter] = useState<'all' | 'completed' | 'pending'>('all');
 
   // Mock data
   const [balance] = useState<Balance>({

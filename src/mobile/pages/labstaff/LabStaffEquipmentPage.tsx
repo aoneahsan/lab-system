@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Cpu,
   AlertTriangle,
-  CheckCircle,
   Activity,
   Wrench,
   Thermometer,
@@ -11,7 +9,6 @@ import {
   Power,
   Wifi,
   WifiOff,
-  Settings,
 } from 'lucide-react';
 import { toast } from '@/hooks/useToast';
 
@@ -40,7 +37,6 @@ interface Alert {
 }
 
 const LabStaffEquipmentPage: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
 
   // Mock data - in real app would fetch from API
@@ -156,11 +152,11 @@ const LabStaffEquipmentPage: React.FC = () => {
     }
   };
 
-  const handleMaintenanceLog = (equipmentId: string) => {
+  const handleMaintenanceLog = (_equipmentId: string) => {
     toast.info('Opening maintenance log...');
   };
 
-  const handleRunDiagnostics = (equipmentId: string) => {
+  const handleRunDiagnostics = (_equipmentId: string) => {
     toast.info('Running diagnostics...');
   };
 

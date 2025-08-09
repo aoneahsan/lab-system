@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Activity,
   Cpu,
   AlertCircle,
-  CheckCircle,
   Clock,
   TrendingUp,
-  Package,
   BarChart,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';

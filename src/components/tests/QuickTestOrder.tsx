@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, X, Zap } from 'lucide-react';
-import { useTests, useTestPanels, useCreateTestOrder } from '@/hooks/useTests';
+import { useTests, useCreateTestOrder } from '@/hooks/useTests';
 import { usePatients } from '@/hooks/usePatients';
 import { toast } from '@/stores/toast.store';
 import type { PatientListItem } from '@/types/patient.types';
@@ -21,7 +21,6 @@ const QuickTestOrder: React.FC<QuickTestOrderProps> = ({ preselectedPatientId, o
   const { data: patientsData } = usePatients();
   const patients = patientsData?.patients || [];
   const { data: tests = [] } = useTests({ isActive: true });
-  const { data: _panels = [] } = useTestPanels();
   const createOrderMutation = useCreateTestOrder();
 
   // Common test groups for quick selection
@@ -85,7 +84,7 @@ const QuickTestOrder: React.FC<QuickTestOrderProps> = ({ preselectedPatientId, o
       setIsOpen(false);
       resetForm();
       onSuccess?.();
-    } catch (_error) {
+    } catch {
       toast.error('Failed to create test order');
     }
   };

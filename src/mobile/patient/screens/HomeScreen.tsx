@@ -24,11 +24,10 @@ export const HomeScreen: React.FC = () => {
   // const { currentUser } = useAuthStore();
   // TODO: Get recent results from offline patients hook
   const recentResults: any[] = [];
-  const refetch = async () => {};
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
 
-  const handleRefresh = useCallback(async () => {
+  const _handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     if (Capacitor.isNativePlatform()) {
       await Haptics.impact({ style: ImpactStyle.Medium });
@@ -40,11 +39,11 @@ export const HomeScreen: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ['results'] }),
         queryClient.invalidateQueries({ queryKey: ['appointments'] }),
       ]);
-      await refetch();
+      // Refetch data here
     } finally {
       setTimeout(() => setIsRefreshing(false), 500);
     }
-  }, [queryClient, refetch]);
+  }, [queryClient]);
 
   const handleQuickAction = async (route: string) => {
     if (Capacitor.isNativePlatform()) {

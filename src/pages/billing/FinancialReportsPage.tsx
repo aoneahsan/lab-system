@@ -8,7 +8,6 @@ import {
   Users,
   CreditCard,
   BarChart3,
-  PieChart,
   Receipt,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

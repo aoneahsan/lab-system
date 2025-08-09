@@ -3,7 +3,7 @@
  * Provides performance monitoring context and utilities
  */
 
-import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useEffect, ReactNode } from 'react';
 import { performanceMonitor } from '@/utils/performance-monitoring';
 
 interface PerformanceContextValue {
@@ -12,6 +12,8 @@ interface PerformanceContextValue {
 }
 
 const PerformanceContext = createContext<PerformanceContextValue | null>(null);
+
+export { PerformanceContext };
 
 export function PerformanceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -47,10 +49,3 @@ export function PerformanceProvider({ children }: { children: ReactNode }) {
   return <PerformanceContext.Provider value={value}>{children}</PerformanceContext.Provider>;
 }
 
-export function usePerformance() {
-  const context = useContext(PerformanceContext);
-  if (!context) {
-    throw new Error('usePerformance must be used within PerformanceProvider');
-  }
-  return context;
-}

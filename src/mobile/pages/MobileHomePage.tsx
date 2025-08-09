@@ -7,22 +7,20 @@ import {
   Bell,
   ChevronRight,
   Activity,
-  Clock,
   AlertCircle,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
-import { usePatient } from '@/hooks/usePatients';
 import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { App } from '@capacitor/app';
 
 const MobileHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
-  const [notifications, setNotifications] = useState(0);
+  const [notifications] = useState(0);
 
   // Mock patient data - in real app, would fetch based on currentUser
-  const patientId = currentUser?.uid || '';
-  const { data: patient } = usePatient(patientId);
+  const _patientId = currentUser?.uid || '';
+  // const { data: _patient } = usePatient(_patientId);
 
   useEffect(() => {
     setupPushNotifications();

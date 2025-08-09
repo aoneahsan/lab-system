@@ -1,6 +1,6 @@
 import type { TestDefinition } from '@/types/test.types';
 type Test = TestDefinition;
-import type { TestResult, ResultValidation } from '@/types/result.types';
+import type { TestResult } from '@/types/result.types';
 
 interface ValidationRule {
   testId: string;

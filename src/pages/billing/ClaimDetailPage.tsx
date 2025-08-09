@@ -3,10 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   FileText,
-  Calendar,
-  DollarSign,
-  User,
-  Building,
   Clock,
   CheckCircle,
   XCircle,
@@ -15,7 +11,6 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useClaim, useSubmitClaim } from '@/hooks/useBilling';
-import { format } from 'date-fns';
 import AppealClaimModal from '@/components/billing/AppealClaimModal';
 
 const ClaimDetailPage: React.FC = () => {

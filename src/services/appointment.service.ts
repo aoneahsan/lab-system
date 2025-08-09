@@ -9,7 +9,6 @@ import {
   where,
   orderBy,
   Timestamp,
-  writeBatch,
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { Appointment, AppointmentSlot, AppointmentSettings } from '@/types/appointment.types';

@@ -8,10 +8,8 @@ import {
   CheckCircle,
   FileText,
   Edit3,
-  Send,
   ChevronRight,
 } from 'lucide-react';
-import { toast } from '@/hooks/useToast';
 
 interface TestResult {
   id: string;
@@ -29,8 +27,8 @@ interface TestResult {
 const LabStaffResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedsetSelectedFilter] = useState<'all' | 'pending' | 'critical'>('all');
-  const [selectedResult, setSelectedResult] = useState<string | null>(null);
+  const [_statusFilter] = useState<'all' | 'pending' | 'critical'>('all');
+  const [_selectedResult] = useState<string | null>(null);
 
   // Mock data - in real app would fetch from API
   const [results] = useState<TestResult[]>([

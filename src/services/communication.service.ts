@@ -10,8 +10,7 @@ import {
   where,
   orderBy,
   serverTimestamp,
-  limit,
-  Timestamp
+  limit
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useTenantStore } from '@/stores/tenant.store';

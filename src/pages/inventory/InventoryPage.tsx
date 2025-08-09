@@ -42,7 +42,7 @@ const InventoryPage: React.FC = () => {
       await createInventoryItem(data as any);
       toast.success('Inventory item added successfully');
       setShowAddForm(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to add inventory item');
     }
   };
@@ -54,7 +54,7 @@ const InventoryPage: React.FC = () => {
       await updateInventoryItem(editingItem.id, data);
       toast.success('Inventory item updated successfully');
       setEditingItem(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update inventory item');
     }
   };
@@ -66,7 +66,7 @@ const InventoryPage: React.FC = () => {
       try {
         await deleteInventoryItem(item.id);
         toast.success('Inventory item deleted successfully');
-      } catch (error) {
+      } catch (_error) {
         toast.error('Failed to delete inventory item');
       }
     }

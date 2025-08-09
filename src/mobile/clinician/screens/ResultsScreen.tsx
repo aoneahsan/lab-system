@@ -3,13 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Activity,
   AlertCircle,
-  CheckCircle,
-  Clock,
   TrendingUp,
   TrendingDown,
-  Filter,
   Search,
-  FileText,
   ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';

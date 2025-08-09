@@ -15,7 +15,7 @@ const tabs = [
 ];
 
 export default function SampleDashboard() {
-  const location = useLocation();
+  const _location = useLocation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('list');
   const [selectedSample, setSelectedSample] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function SampleDashboard() {
     }
   }, [selectedSample, tenantId, fetchSample]);
 
-  const handleSampleSelect = (sampleId: string) => {
+  const _handleSampleSelect = (sampleId: string) => {
     setSelectedSample(sampleId);
   };
 

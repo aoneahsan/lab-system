@@ -8,16 +8,13 @@ import {
   getDoc, 
   addDoc, 
   updateDoc,
-  where,
-  orderBy,
-  serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { settingsService } from '../settings';
 import { notificationService } from '../notification.service';
 import { patientService } from '../patient.service';
-import type { Invoice, Payment, InsuranceClaim, BillingAnalytics } from '@/types/billing.types';
+import type { Invoice, Payment } from '@/types/billing.types';
 
 // Mock Firebase modules
 vi.mock('firebase/firestore');
@@ -312,7 +309,6 @@ describe('BillingService', () => {
         lastName: 'Doe',
         email: 'john@example.com',
       } as any);
-      const mockBlob = new Blob(['pdf content']);
       vi.mocked(uploadBytes).mockResolvedValue({} as any);
       vi.mocked(getDownloadURL).mockResolvedValue('https://storage.url/invoice.pdf');
 

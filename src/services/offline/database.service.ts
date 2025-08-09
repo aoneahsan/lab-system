@@ -4,27 +4,27 @@
 export const offlineDatabase = {
   isAvailable: () => false,
 
-  async getCachedData(collection: string): Promise<any[]> {
+  async getCachedData(_collection: string): Promise<any[]> {
     return [];
   },
 
-  async cacheData(collection: string, id: string, data: any): Promise<void> {
+  async cacheData(_collection: string, _id: string, _data: any): Promise<void> {
     // Mock implementation
   },
 
-  async updateDocument(collection: string, id: string, data: any, metadata?: any): Promise<void> {
+  async updateDocument(_collection: string, _id: string, _data: any, _metadata?: any): Promise<void> {
     // Mock implementation
   },
 
-  async deleteDocument(collection: string, id: string): Promise<void> {
+  async deleteDocument(_collection: string, _id: string): Promise<void> {
     // Mock implementation
   },
 
-  async getDocuments(collection: string): Promise<any[]> {
+  async getDocuments(_collection: string): Promise<any[]> {
     return [];
   },
 
-  async clearCollection(collection: string): Promise<void> {
+  async clearCollection(_collection: string): Promise<void> {
     // Mock implementation
   },
 
@@ -36,11 +36,11 @@ export const offlineDatabase = {
     return [];
   },
 
-  async queueOperation(operation: any): Promise<void> {
+  async queueOperation(_operation: any): Promise<void> {
     // Mock implementation
   },
 
-  async removeQueuedOperation(id: string): Promise<void> {
+  async removeQueuedOperation(_id: string): Promise<void> {
     // Mock implementation
   },
 
@@ -48,11 +48,11 @@ export const offlineDatabase = {
     return [];
   },
 
-  async getLastSyncTime(collection: string): Promise<number | null> {
+  async getLastSyncTime(_collection: string): Promise<number | null> {
     return null;
   },
 
-  async setLastSyncTime(collection: string, timestamp: number): Promise<void> {
+  async setLastSyncTime(_collection: string, _timestamp: number): Promise<void> {
     // Mock implementation
   },
 
@@ -64,19 +64,19 @@ export const offlineDatabase = {
     return [];
   },
 
-  async markSynced(id: string): Promise<void> {
+  async markSynced(_id: string): Promise<void> {
     // Mock implementation
   },
 
-  async markSyncError(id: string, error: any): Promise<void> {
+  async markSyncError(_id: string, _error: any): Promise<void> {
     // Mock implementation
   },
 
-  async updateSyncMetadata(collection: string, metadata: any): Promise<void> {
+  async updateSyncMetadata(_collection: string, _metadata: any): Promise<void> {
     // Mock implementation
   },
 
-  async getSyncMetadata(collection?: string): Promise<any> {
+  async getSyncMetadata(_collection?: string): Promise<any> {
     return {};
   },
 

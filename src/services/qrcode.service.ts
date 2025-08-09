@@ -57,9 +57,9 @@ export const qrcodeService = {
 
   // Initialize QR code scanner
   async initializeScanner(
-    videoElement: HTMLVideoElement,
-    onScanSuccess: (decodedText: string, decodedResult: unknown) => void,
-    onScanFailure?: (error: string) => void
+    _videoElement: HTMLVideoElement,
+    _onScanSuccess: (decodedText: string, decodedResult: unknown) => void,
+    _onScanFailure?: (error: string) => void
   ): Promise<any> {
     // For web-based scanning, we'll need to handle this differently
     // code-craft-studio provides React components for scanning

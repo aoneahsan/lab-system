@@ -4,7 +4,6 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  User,
   MapPin,
   
   Search,
@@ -38,10 +37,10 @@ interface Collection {
 
 export const CollectionsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activesetActiveFilter] = useState('pending');
+  const [_filterStatus] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
+  const [_showFilterOptions] = useState(false);
+  const [_selectedCollection] = useState<string | null>(null);
 
   const [collections] = useState<Collection[]>([
     {

@@ -47,8 +47,8 @@ const mockRules: ValidationRule[] = [
 
 export default function ResultValidationRules() {
   const [rules, setRules] = useState<ValidationRule[]>(mockRules);
-  const [_showForm, setShowForm] = useState(false);
-  const [_editingRule, setEditingRule] = useState<ValidationRule | null>(null);
+  const [_showForm] = useState(false);
+  const [_editingRule] = useState<ValidationRule | null>(null);
   const [filter, setFilter] = useState<'all' | ValidationRuleType>('all');
 
   const ruleTypeConfig = {
@@ -96,7 +96,7 @@ export default function ResultValidationRules() {
                 </option>
               ))}
             </select>
-            <button onClick={() => setShowForm(true)} className="btn btn-primary btn-sm">
+            <button onClick={() => _setShowForm(true)} className="btn btn-primary btn-sm">
               <Plus className="h-4 w-4" />
               Add Rule
             </button>
@@ -163,8 +163,8 @@ export default function ResultValidationRules() {
 
                     <button
                       onClick={() => {
-                        setEditingRule(rule);
-                        setShowForm(true);
+                        _setEditingRule(rule);
+                        _setShowForm(true);
                       }}
                       className="text-gray-600 hover:text-gray-700"
                     >

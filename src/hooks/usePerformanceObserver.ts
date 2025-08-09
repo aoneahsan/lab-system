@@ -13,13 +13,16 @@ export function usePerformanceObserver(componentName: string) {
     // Track component mount
     mountTime.current = performance.now();
     renderCount.current++;
+    
+    // Capture current values for cleanup
+    const currentMountTime = mountTime.current;
+    const currentRenderCount = renderCount.current;
 
     performanceMonitor.trackInteraction('component_mount', { component: componentName });
 
     return () => {
       // Track component unmount and lifetime
-      const currentRenderCount = renderCount.current;
-      const lifetime = performance.now() - mountTime.current;
+      const lifetime = performance.now() - currentMountTime;
       performanceMonitor.recordMetric(`${componentName}_lifetime`, lifetime);
       performanceMonitor.recordMetric(`${componentName}_renders`, currentRenderCount);
     };

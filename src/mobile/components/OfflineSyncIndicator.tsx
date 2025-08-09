@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Cloud, CloudOff, RefreshCw, CheckCircle } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Network } from '@capacitor/network';
@@ -28,21 +28,21 @@ export const OfflineSyncIndicator: React.FC = () => {
         listener.remove();
       };
     }
-  }, [pendingChanges]);
+  }, [pendingChanges, checkPendingChanges, handleSync, checkNetworkStatus]);
 
-  const checkNetworkStatus = async () => {
+  const checkNetworkStatus = useCallback(async () => {
     if (Capacitor.isNativePlatform()) {
       const status = await Network.getStatus();
       setIsOnline(status.connected);
     }
-  };
+  }, []);
 
-  const checkPendingChanges = async () => {
+  const checkPendingChanges = useCallback(async () => {
     const count = await getPendingChangesCount();
     setPendingChanges(count);
-  };
+  }, [getPendingChangesCount]);
 
-  const handleSync = async () => {
+  const handleSync = useCallback(async () => {
     if (!isOnline || isSyncing) return;
 
     setIsSyncing(true);
@@ -58,13 +58,13 @@ export const OfflineSyncIndicator: React.FC = () => {
         setShowSuccess(false);
         setSyncMessage('');
       }, 3000);
-    } catch (error) {
+    } catch {
       setSyncMessage('Sync failed. Will retry...');
       setTimeout(() => setSyncMessage(''), 3000);
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [isOnline, isSyncing, syncOfflineData]);
 
   if (!pendingChanges && isOnline && !showSuccess) {
     return null;

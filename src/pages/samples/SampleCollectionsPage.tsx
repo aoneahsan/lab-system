@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Package, Clock, CheckCircle, Users, FileText, Printer } from 'lucide-react';
+import { Plus, Package, Clock, CheckCircle, Printer } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 import { useCreateSample } from '@/hooks/useSamples';
 import { useTenant } from '@/hooks/useTenant';
@@ -14,7 +14,7 @@ import type { SampleFormData, Sample, CollectionBatch } from '@/types/sample.typ
 
 const SampleCollectionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedBatch, setSelectedBatch] = useState<CollectionBatch | null>(null);
+  const [_selectedBatch] = useState<CollectionBatch | null>(null);
   const [isCreatingBatch, setIsCreatingBatch] = useState(false);
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -81,7 +81,7 @@ const SampleCollectionsPage: React.FC = () => {
         setBatchSamples(createdSamples);
         setShowPrintModal(true);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Batch Creation Failed', 'Failed to create batch');
     } finally {
       setIsCreatingBatch(false);
@@ -109,7 +109,7 @@ const SampleCollectionsPage: React.FC = () => {
       } else {
         toast.error('No Samples', 'No samples found for this batch');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error', 'Failed to fetch batch samples');
     }
   };

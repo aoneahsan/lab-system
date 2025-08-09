@@ -12,7 +12,7 @@ interface UseOfflineDataOptions {
   enableOffline?: boolean;
 }
 
-export const useOfflineData = <T extends { id: string } = any>({
+export const useOfflineData = ({
   collection,
   queryKey,
   onlineQuery,

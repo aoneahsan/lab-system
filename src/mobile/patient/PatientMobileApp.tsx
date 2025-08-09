@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Home, FileText, Calendar, User, Bell } from 'lucide-react';
-import { useAuthStore } from '@/stores/auth.store';
 import { useOffline } from '@/hooks/useOffline';
 import { HomeScreen } from './screens/HomeScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { AppointmentsScreen } from './screens/AppointmentsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
-import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 
 interface TabItem {
   id: string;
@@ -21,7 +19,7 @@ export const PatientMobileApp: React.FC = () => {
   // TODO: Implement user authentication
   // const { currentUser } = useAuthStore();
   const { isOffline, pendingChanges } = useOffline();
-  const [notificationCount, setNotificationCount] = useState(3);
+  const [notificationCount] = useState(3);
 
   const tabs: TabItem[] = [
     { id: 'home', label: 'Home', icon: Home },

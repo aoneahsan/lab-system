@@ -63,9 +63,6 @@ import { patientService } from '../patient.service';
 
 // Import all the Firebase functions from the mock
 const {
-  getFirestore,
-  collection,
-  doc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -75,10 +72,8 @@ const {
   where,
   orderBy,
   limit,
-  startAfter,
-  serverTimestamp,
   Timestamp,
-} = vi.mocked(await import('firebase/firestore'));
+} = vi.mocked(require('firebase/firestore')); // eslint-disable-line @typescript-eslint/no-require-imports
 
 describe('PatientService', () => {
   const tenantId = 'test-tenant';

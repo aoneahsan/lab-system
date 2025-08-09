@@ -104,7 +104,7 @@ describe('usePatients', () => {
   });
 
   it('applies search filter correctly', async () => {
-    const { result } = renderHook(() => usePatients({ search: 'john' }), {
+    renderHook(() => usePatients({ search: 'john' }), {
       wrapper: createWrapper(),
     });
 

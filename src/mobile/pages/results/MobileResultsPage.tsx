@@ -12,7 +12,6 @@ import {
   Clock,
 } from 'lucide-react';
 import { useResults } from '@/hooks/useResults';
-import { useAuthStore } from '@/stores/auth.store';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { toast } from '@/hooks/useToast';
@@ -23,7 +22,7 @@ const MobileTestResultsPage: React.FC = () => {
   // TODO: Implement user authentication
   // const { currentUser } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statussetStatusFilter] = useState<string>('all');
+  const [_statusFilter] = useState<string>('all');
 
   // In real app, would filter by patient ID
   const { data: results = { items: [], total: 0 }, isLoading } = useResults();

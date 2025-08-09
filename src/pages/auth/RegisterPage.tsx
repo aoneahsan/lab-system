@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const RegisterPage = () => {
             message: 'Invalid laboratory code. Please check and try again.',
           });
         }
-      } catch (error) {
+      } catch (_error) {
         setTenantValidation({
           isChecking: false,
           isValid: false,

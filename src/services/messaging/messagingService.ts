@@ -1,4 +1,4 @@
-import { messagingConfig, MessageTemplate, NotificationPreferences } from '@/config/messaging';
+import { messagingConfig, NotificationPreferences } from '@/config/messaging';
 import { smsService } from './smsService';
 import { emailService } from './emailService';
 

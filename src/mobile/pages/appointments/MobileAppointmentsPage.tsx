@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Plus, ChevronRight, X, Check } from 'lucide-react';
+import { Calendar, Clock, MapPin, Plus, ChevronRight, X } from 'lucide-react';
 import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { toast } from '@/hooks/useToast';
 
@@ -80,7 +80,7 @@ const MobileAppointmentsPage: React.FC = () => {
       }
 
       // Schedule reminder 1 hour before appointment
-      const notificationId = await unifiedNotificationService.scheduleAppointmentReminder(
+      await unifiedNotificationService.scheduleAppointmentReminder(
         appointment.id,
         'Patient', // In real app, would use actual patient name
         appointment.date,
@@ -88,8 +88,8 @@ const MobileAppointmentsPage: React.FC = () => {
       );
 
       toast.success('Reminder scheduled');
-    } catch (error) {
-      console.error('Failed to schedule notification:', error);
+    } catch (_error) {
+      console.error('Failed to schedule notification:', _error);
       toast.error('Failed to schedule reminder');
     }
   };
@@ -119,7 +119,7 @@ const MobileAppointmentsPage: React.FC = () => {
       setSelectedDate(null);
       setSelectedTime('');
       setSelectedTests([]);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to book appointment');
     }
   };

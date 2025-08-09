@@ -12,7 +12,7 @@ interface Report {
 }
 
 const MobileReportsPage: React.FC = () => {
-  const [selectedsetSelectedFilter] = useState<string>('all');
+  const [_filterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Mock data for reports

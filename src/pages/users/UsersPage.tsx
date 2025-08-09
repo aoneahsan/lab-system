@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, UserPlus, Shield, Search } from 'lucide-react';
+import { UserPlus, Shield, Search } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/auth.store';
 import { UserListTable } from '@/components/users/UserListTable';

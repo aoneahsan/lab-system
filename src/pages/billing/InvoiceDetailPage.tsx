@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Send, DollarSign, FileText, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Download, Send, DollarSign, AlertCircle } from 'lucide-react';
 import { useInvoice, usePayments, useRecordPayment } from '@/hooks/useBilling';
 import PaymentModal from '@/components/billing/PaymentModal';
 import type { PaymentFormData } from '@/types/billing.types';
@@ -14,7 +14,7 @@ const InvoiceDetailPage: React.FC = () => {
   const { data: payments = [], isLoading: paymentsLoading } = usePayments(invoiceId);
   const recordPaymentMutation = useRecordPayment();
 
-  const handleRecordPayment = async (data: PaymentFormData) => {
+  const _handleRecordPayment = async (data: PaymentFormData) => {
     await recordPaymentMutation.mutateAsync({
       ...data,
       invoiceId: invoiceId!,

@@ -29,7 +29,7 @@ const tabs: TabItem[] = [
 export const PatientApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [previousTab, setPreviousTab] = useState<string | null>(null);
-  const [unreadNotifications, _setUnreadNotifications] = useState(3);
+  const [unreadNotifications] = useState(3);
 
   useEffect(() => {
     // Configure status bar for mobile

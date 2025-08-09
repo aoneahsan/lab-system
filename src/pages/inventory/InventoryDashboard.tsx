@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, TrendingUp, ShoppingCart, Users, AlertTriangle, Activity } from 'lucide-react';
+import { Package, TrendingUp, ShoppingCart, Users, AlertTriangle } from 'lucide-react';
 import InventoryList from '@/components/inventory/InventoryList';
 import StockTracking from '@/components/inventory/StockTracking';
 import PurchaseOrders from '@/components/inventory/PurchaseOrders';

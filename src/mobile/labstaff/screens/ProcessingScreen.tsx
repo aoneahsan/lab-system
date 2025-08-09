@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ClipboardCheck,
   TestTube2,
-  Plus,
-  Minus,
   AlertCircle,
   CheckCircle,
   Camera,
@@ -61,7 +58,7 @@ export const ProcessingScreen: React.FC = () => {
         id: '2',
         name: 'WBC',
         value: '',
-        unit: 'K/¼L',
+        unit: 'K/ï¿½L',
         reference: '4.5-11.0',
         status: 'pending',
       },
@@ -69,7 +66,7 @@ export const ProcessingScreen: React.FC = () => {
         id: '3',
         name: 'Platelets',
         value: '',
-        unit: 'K/¼L',
+        unit: 'K/ï¿½L',
         reference: '150-400',
         status: 'pending',
       },

@@ -2,22 +2,16 @@ import React, { useState } from 'react';
 import {
   TestTube,
   Search,
-  
   Clock,
   AlertCircle,
-  ChevronRight,
   Package,
   QrCode,
   CheckCircle,
   Play,
   Pause,
   RefreshCw,
-  User,
-  Calendar,
   FileText,
-  Beaker,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 interface Sample {
@@ -44,8 +38,8 @@ export const ProcessingScreen: React.FC = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [selectedSample, setSelectedSample] = useState<string | null>(null);
-  const [showScanner, setShowScanner] = useState(false);
+  const [_selectedSample] = useState<string | null>(null);
+  const [, _setShowScanner] = useState(false);
 
   const [samples] = useState<Sample[]>([
     {
@@ -170,7 +164,7 @@ export const ProcessingScreen: React.FC = () => {
 
   const handleScanSample = () => {
     // Implement barcode scanning
-    setShowScanner(true);
+    _setShowScanner(true);
   };
 
   return (

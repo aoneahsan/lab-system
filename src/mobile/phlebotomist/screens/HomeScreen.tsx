@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Package, Users, TrendingUp, Clock } from 'lucide-react';
+import { Calendar, MapPin, Package, Clock } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 
 export const HomeScreen: React.FC = () => {

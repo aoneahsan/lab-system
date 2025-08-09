@@ -1,4 +1,4 @@
-import { insurancePayers, ClaimStatus } from '@/config/payment';
+import { ClaimStatus } from '@/config/payment';
 import { InsuranceClaim, InsuranceVerification } from '@/types/billing';
 
 export class InsuranceService {

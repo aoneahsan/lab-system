@@ -1,12 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Activity, 
   Users, 
   ClipboardList, 
-  TrendingUp, 
   AlertCircle,
-  Clock,
   CheckCircle
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';

@@ -24,7 +24,7 @@ export const ProfileScreen: React.FC = () => {
         'Biometric Updated',
         `Biometric authentication ${!biometricEnabled ? 'enabled' : 'disabled'}`
       );
-    } catch (error) {
+    } catch (_error) {
       toast.error('Error', 'Failed to update biometric settings');
     }
   };

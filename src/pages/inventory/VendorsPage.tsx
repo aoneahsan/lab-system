@@ -28,7 +28,7 @@ const VendorsPage: React.FC = () => {
       await createVendor(data);
       toast.success('Vendor added successfully');
       setShowAddForm(false);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to add vendor');
     }
   };
@@ -40,7 +40,7 @@ const VendorsPage: React.FC = () => {
       await updateVendor(editingVendor.id, data);
       toast.success('Vendor updated successfully');
       setEditingVendor(null);
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to update vendor');
     }
   };
@@ -52,7 +52,7 @@ const VendorsPage: React.FC = () => {
       try {
         await deleteVendor(vendor.id);
         toast.success('Vendor deleted successfully');
-      } catch (error) {
+      } catch (_error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete vendor';
         toast.error(errorMessage);
       }

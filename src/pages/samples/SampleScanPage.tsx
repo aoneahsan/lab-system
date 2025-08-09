@@ -22,16 +22,44 @@ const SampleScanPage: React.FC = () => {
 
   useEffect(() => {
     if (isScanning) {
-      startScanning();
+      const performScan = async () => {
+        try {
+          const result = await barcodeScannerService.startScan();
+          if (result && result.hasContent) {
+            // Handle scan result inline
+            try {
+              const parsed = JSON.parse(result.content);
+              setScanResult(parsed);
+
+              if (parsed.sampleId) {
+                toast.success('Sample Found', `Sample ${parsed.sampleNumber} scanned successfully`);
+                navigate(`/samples/${parsed.sampleId}`);
+              }
+            } catch {
+              toast.error('Invalid QR Code', 'The scanned code is not a valid sample QR code');
+            }
+            setIsScanning(false);
+          }
+
+          if (!result) {
+            toast.error('Scanner Error', 'Failed to start scanner');
+            setIsScanning(false);
+          }
+        } catch {
+          toast.error('Scanner Error', 'Failed to access camera');
+          setIsScanning(false);
+        }
+      };
+      performScan();
     }
     return () => {
       if (isScanning) {
         barcodeScannerService.stopScan();
       }
     };
-  }, [isScanning]);
+  }, [isScanning, navigate]);
 
-  const startScanning = async () => {
+  const _startScanning = async () => {
     try {
       const result = await barcodeScannerService.startScan();
       if (result && result.hasContent) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,7 +7,6 @@ import { Fingerprint, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
-import { App } from '@capacitor/app';
 import { toast } from 'sonner';
 
 const schema = yup.object({
@@ -37,32 +36,33 @@ const MobileLoginPage: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {
-    checkBiometricAvailability();
-    checkSavedCredentials();
-  }, []);
-
   const checkBiometricAvailability = async () => {
     try {
       const result = await BiometricAuth.isAvailable();
       setBiometricAvailable(result || false);
-    } catch (error) {
-      console.error('Biometric check failed:', error);
+    } catch (_error) {
+      console.error('Biometric check failed:', _error);
     }
   };
 
-  const checkSavedCredentials = async () => {
-    try {
-      const biometricEnabled = await storageHelpers.getPreference<boolean>(STORAGE_KEYS.BIOMETRIC_ENABLED);
-      if (biometricEnabled && biometricAvailable) {
-        handleBiometricLogin();
+  useEffect(() => {
+    checkBiometricAvailability();
+    
+    const checkSavedCredentials = async () => {
+      try {
+        const biometricEnabled = await storageHelpers.getPreference<boolean>(STORAGE_KEYS.BIOMETRIC_ENABLED);
+        if (biometricEnabled && biometricAvailable) {
+          handleBiometricLogin();
+        }
+      } catch (_error) {
+        console.error('Failed to check saved credentials:', _error);
       }
-    } catch (error) {
-      console.error('Failed to check saved credentials:', error);
-    }
-  };
+    };
+    
+    checkSavedCredentials();
+  }, [biometricAvailable, handleBiometricLogin]);
 
-  const handleBiometricLogin = async () => {
+  const handleBiometricLogin = useCallback(async () => {
     try {
       const verified = await BiometricAuth.authenticate({
         reason: 'Access your lab results securely',
@@ -81,11 +81,11 @@ const MobileLoginPage: React.FC = () => {
           navigate('/home');
         }
       }
-    } catch (error) {
-      console.error('Biometric authentication failed:', error);
+    } catch (_error) {
+      console.error('Biometric authentication failed:', _error);
       toast.error('Biometric authentication failed');
     }
-  };
+  }, [login, navigate]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -100,7 +100,7 @@ const MobileLoginPage: React.FC = () => {
       }
 
       navigate('/home');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Invalid email or password');
     }
   };

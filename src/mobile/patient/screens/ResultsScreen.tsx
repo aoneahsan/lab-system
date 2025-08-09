@@ -12,12 +12,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { useOfflinePatients } from '@/hooks/useOfflinePatients';
-import { useAuthStore } from '@/stores/auth.store';
+// import { useAuthStore } from '@/stores/auth.store';
 import { resultService } from '@/services/result.service';
 import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';
-import { Browser } from '@capacitor/browser';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
@@ -42,7 +40,7 @@ interface TestResult {
 
 export const ResultsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
+  // const { } = useAuthStore(); // TODO: Add auth store usage
   const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -148,7 +146,7 @@ export const ResultsScreen: React.FC = () => {
         
         const fileName = `${result.testName.replace(/\s+/g, '_')}_${format(result.resultDate, 'yyyy-MM-dd')}.pdf`;
         
-        const savedFile = await Filesystem.writeFile({
+        await Filesystem.writeFile({
           path: fileName,
           data: base64,
           directory: Directory.Documents,

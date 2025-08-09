@@ -114,7 +114,7 @@ const PhlebotomistRoutePage: React.FC = () => {
     }
   };
 
-  const markAsCompleted = (stopId: string) => {
+  const _markAsCompleted = (_stopId: string) => {
     setRouteStops((stops) =>
       stops.map((stop) => (stop.id === stopId ? { ...stop, status: 'completed' } : stop))
     );
@@ -180,7 +180,7 @@ const PhlebotomistRoutePage: React.FC = () => {
 
       {/* Route List */}
       <div className="flex-1 px-6 py-4 space-y-4">
-        {routeStops.map((stop, index) => (
+        {routeStops.map((stop, _index) => (
           <div
             key={stop.id}
             className={`bg-white rounded-lg shadow-sm overflow-hidden ${

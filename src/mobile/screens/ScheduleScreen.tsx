@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, User } from 'lucide-react';
+import { Clock, MapPin, User } from 'lucide-react';
 
 const ScheduleScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);

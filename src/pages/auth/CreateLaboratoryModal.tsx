@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Building2, Loader2 } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
@@ -70,7 +70,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
           message: 'Code is available',
         });
       }
-    } catch (error) {
+    } catch (_error) {
       setCodeValidation({
         isChecking: false,
         isAvailable: false,
@@ -166,7 +166,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
       }
 
       onSuccess(formData.code);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating laboratory:', error);
       toast.error('Creation failed', 'Failed to create laboratory. Please try again.');
     } finally {

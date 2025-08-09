@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, FlashlightOff, Flashlight, RotateCw } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { BarcodeScanner as CapacitorBarcodeScanner } from '@capacitor-community/barcode-scanner';
@@ -21,24 +21,20 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
   const [torchEnabled, setTorchEnabled] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
 
-  useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      startScanning();
-    }
-
-    return () => {
-      if (Capacitor.isNativePlatform()) {
-        CapacitorBarcodeScanner.stopScan();
-      }
-    };
-  }, []);
-
   const checkPermissions = async () => {
     const status = await CapacitorBarcodeScanner.checkPermission({ force: true });
     return status.granted;
   };
 
-  const startScanning = async () => {
+  const handleClose = useCallback(() => {
+    if (Capacitor.isNativePlatform()) {
+      CapacitorBarcodeScanner.stopScan();
+    }
+    document.body.classList.remove('scanner-active');
+    onClose();
+  }, [onClose]);
+
+  const startScanning = useCallback(async () => {
     const hasPermission = await checkPermissions();
     setHasPermission(hasPermission);
 
@@ -57,21 +53,25 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
       onScan(result.content);
       handleClose();
     }
-  };
+  }, [onScan, handleClose]);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      startScanning();
+    }
+
+    return () => {
+      if (Capacitor.isNativePlatform()) {
+        CapacitorBarcodeScanner.stopScan();
+      }
+    };
+  }, [startScanning]);
 
   const toggleTorch = async () => {
     const newState = !torchEnabled;
     setTorchEnabled(newState);
     await CapacitorBarcodeScanner.toggleTorch();
     await Haptics.impact({ style: ImpactStyle.Light });
-  };
-
-  const handleClose = () => {
-    if (Capacitor.isNativePlatform()) {
-      CapacitorBarcodeScanner.stopScan();
-    }
-    document.body.classList.remove('scanner-active');
-    onClose();
   };
 
   // For web fallback

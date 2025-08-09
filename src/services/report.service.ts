@@ -214,11 +214,10 @@ export const reportService = {
     const now = serverTimestamp() as Timestamp;
 
     // Get template if specified
-    let config: Record<string, unknown> = {};
     if (data.templateId) {
       const template = await this.getReportTemplate(tenantId, data.templateId);
       if (template) {
-        config = template.config as unknown as Record<string, unknown>;
+        // const _config = template.config as unknown as Record<string, unknown>;
       }
     }
 
@@ -570,7 +569,7 @@ export const reportService = {
         const patientId = parameters.patientId;
         if (!patientId) throw new Error('Patient ID required for patient results report');
         
-        const patient = await patientService.getPatient(tenantId, patientId);
+        // const patient = await patientService.getPatient(tenantId, patientId);
         const results = await resultService.getPatientResults(tenantId, patientId);
         
         return {

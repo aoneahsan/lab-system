@@ -9,7 +9,6 @@ import {
   CheckCircle,
   ChevronRight,
   Barcode,
-  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 

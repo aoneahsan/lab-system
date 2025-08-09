@@ -8,9 +8,6 @@ import {
   getDoc, 
   addDoc, 
   updateDoc,
-  where,
-  orderBy,
-  serverTimestamp,
   Timestamp,
   getCountFromServer
 } from 'firebase/firestore';

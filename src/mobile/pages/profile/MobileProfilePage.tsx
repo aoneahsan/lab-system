@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   User, 
-  Mail, 
   Phone, 
   Calendar, 
   MapPin, 
@@ -11,7 +10,6 @@ import {
   LogOut,
   ChevronRight,
   Camera,
-  Edit,
   Heart,
   FileText
 } from 'lucide-react';
@@ -203,7 +201,7 @@ const MobileProfilePage: React.FC = () => {
       {/* Menu Items */}
       <div className="flex-1 px-4 py-4">
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {menuItems.map((item, index) => {
+          {menuItems.map((item, _index) => {
             const Icon = item.icon;
             return (
               <button

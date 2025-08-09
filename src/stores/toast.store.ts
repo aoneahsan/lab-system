@@ -20,7 +20,7 @@ interface ToastStore {
   removeToast: (id: string) => void;
 }
 
-export const useToastStore = create<ToastStore>((set) => ({
+export const useToastStore = create<ToastStore>((_set) => ({
   toasts: [],
   addToast: () => {},
   removeToast: () => {},

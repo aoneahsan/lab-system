@@ -74,7 +74,7 @@ const mockTemplates: ReportTemplate[] = [
 export default function ReportTemplates() {
   const [templates] = useState<ReportTemplate[]>(mockTemplates);
   const [selectedCategory, setSelectedCategory] = useState<ReportCategory | 'all'>('all');
-  const [_showTemplateForm, setShowTemplateForm] = useState(false);
+  const [, _setShowTemplateForm] = useState(false);
 
   const categoryConfig = {
     patient: { label: 'Patient Reports', color: 'text-blue-600 bg-blue-50' },
@@ -115,7 +115,7 @@ export default function ReportTemplates() {
                 </option>
               ))}
             </select>
-            <button onClick={() => setShowTemplateForm(true)} className="btn btn-primary btn-sm">
+            <button onClick={() => _setShowTemplateForm(true)} className="btn btn-primary btn-sm">
               <Plus className="h-4 w-4" />
               New Template
             </button>

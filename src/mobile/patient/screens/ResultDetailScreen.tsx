@@ -4,7 +4,7 @@ import { ArrowLeft, Download, Share2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const ResultDetailScreen: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: _id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   // Mock data - replace with actual API call

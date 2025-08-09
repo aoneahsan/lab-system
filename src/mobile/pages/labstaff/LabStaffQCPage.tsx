@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Activity,
-  TrendingUp,
-  TrendingDown,
   AlertCircle,
   CheckCircle,
   XCircle,
@@ -40,7 +37,6 @@ interface QCSchedule {
 }
 
 const LabStaffQCPage: React.FC = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'today' | 'history' | 'schedule'>('today');
 
   // Mock data - in real app would fetch from API
@@ -139,12 +135,12 @@ const LabStaffQCPage: React.FC = () => {
     }
   };
 
-  const handleRunQC = (scheduleId: string) => {
+  const handleRunQC = (_scheduleId: string) => {
     // Navigate to QC entry page
     toast.info('Opening QC entry form...');
   };
 
-  const handleViewChart = (resultId: string) => {
+  const handleViewChart = (_resultId: string) => {
     // Navigate to Levey-Jennings chart
     toast.info('Opening Levey-Jennings chart...');
   };

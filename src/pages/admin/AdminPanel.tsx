@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, updateDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity, Settings, GitBranch } from 'lucide-react';
 import { MicrophoneIcon } from '@heroicons/react/24/outline';
@@ -8,7 +8,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
-import { useNavigate, Routes, Route, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
 import { PerformanceDashboard } from '@/components/admin/PerformanceDashboard';
 import ModuleAdminControls from '@/components/admin/ModuleAdminControls';

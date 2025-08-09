@@ -31,7 +31,7 @@ export const PhlebotomistApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isOnline, setIsOnline] = useState(true);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [activeCollections, setActiveCollections] = useState(3);
+  const [activeCollections] = useState(3);
 
   useEffect(() => {
     // Configure status bar

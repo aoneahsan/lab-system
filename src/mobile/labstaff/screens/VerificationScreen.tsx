@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Barcode,
   CheckCircle,
   AlertCircle,
-  Clock,
   XCircle,
   Eye,
   FileText,
   TrendingUp,
   TrendingDown,
-  Send
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from '@/stores/toast.store';
@@ -40,7 +37,6 @@ interface ResultForVerification {
 }
 
 export const VerificationScreen: React.FC = () => {
-  const navigate = useNavigate();
   const [filterType, setFilterType] = useState<'all' | 'critical' | 'stat'>('all');
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
 
@@ -70,7 +66,7 @@ export const VerificationScreen: React.FC = () => {
         { 
           parameter: 'WBC', 
           value: '15.8', 
-          unit: 'K/¼L', 
+          unit: 'K/ï¿½L', 
           reference: '4.5-11.0', 
           flag: 'H',
           previousValue: '12.1',
@@ -79,7 +75,7 @@ export const VerificationScreen: React.FC = () => {
         { 
           parameter: 'Platelets', 
           value: '450', 
-          unit: 'K/¼L', 
+          unit: 'K/ï¿½L', 
           reference: '150-400', 
           flag: 'H' 
         },
@@ -141,13 +137,13 @@ export const VerificationScreen: React.FC = () => {
     }
   };
 
-  const handleVerify = (resultId: string) => {
+  const handleVerify = (_resultId: string) => {
     // Verification logic here
     toast.success('Result Verified', 'Result has been verified and released');
     setSelectedResult(null);
   };
 
-  const handleReject = (resultId: string) => {
+  const handleReject = (_resultId: string) => {
     // Rejection logic here
     toast.error('Result Rejected', 'Result has been rejected and sent back for review');
     setSelectedResult(null);
@@ -290,7 +286,7 @@ export const VerificationScreen: React.FC = () => {
                       <div key={index} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
                         <span className="text-gray-600">{res.parameter}</span>
                         <span className="text-gray-500">
-                          {res.previousValue} ’ {res.value} {res.unit}
+                          {res.previousValue} ï¿½ {res.value} {res.unit}
                         </span>
                       </div>
                     ))}

@@ -214,7 +214,7 @@ export class PerformanceMonitor {
     if ('performance' in window && 'measure' in window.performance) {
       try {
         performance.measure(name, startMark);
-      } catch (e) {
+      } catch (_e) {
         // Ignore if mark doesn't exist
       }
     }

@@ -23,7 +23,7 @@ interface LabLocation {
 
 const MobileLocationsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState<LabLocation | null>(null);
+  const [_selectedLocation] = useState<LabLocation | null>(null);
 
   // Mock data for lab locations
   const locations: LabLocation[] = [

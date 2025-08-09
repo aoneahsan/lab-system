@@ -1,5 +1,5 @@
 import { loadStripe, Stripe, StripeElements, PaymentIntent } from '@stripe/stripe-js';
-import { paymentConfig, paymentUrls } from '@/config/payment';
+import { paymentConfig } from '@/config/payment';
 import { BillingInfo } from '@/types/billing';
 
 let stripePromise: Promise<Stripe | null>;
@@ -93,7 +93,7 @@ export async function setupACHPayment(
   accountNumber: string,
   routingNumber: string,
   accountHolderName: string,
-  accountHolderType: 'individual' | 'company'
+  _accountHolderType: 'individual' | 'company'
 ): Promise<{ setupIntent?: any; error?: any }> {
   const { error, setupIntent } = await stripe.confirmAcssDebitSetup({
     payment_method: {
@@ -193,11 +193,12 @@ export async function deletePaymentMethod(paymentMethodId: string): Promise<void
 }
 
 // Webhook signature verification
-export function constructWebhookEvent(
+export async function constructWebhookEvent(
   payload: string | Buffer,
   signature: string,
   webhookSecret: string
-): any {
-  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+): Promise<any> {
+  const { default: Stripe } = await import('stripe');
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 }

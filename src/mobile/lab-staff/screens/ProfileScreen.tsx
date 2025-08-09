@@ -3,7 +3,6 @@ import {
   User,
   Award,
   TrendingUp,
-  Clock,
   CheckCircle,
   Settings,
   LogOut,

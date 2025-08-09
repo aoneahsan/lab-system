@@ -429,7 +429,7 @@ export const billingService = {
     let overdueAmount = 0;
     let todaysCharges = 0;
     let todaysPayments = 0;
-    let _todayRevenue = 0;
+    // let _todayRevenue = 0;
 
     // Process today's invoices
     todaysInvoicesSnapshot.docs.forEach((doc) => {
@@ -1354,7 +1354,6 @@ export const billingService = {
       .slice(0, 10);
 
     // Calculate average payment time by correlating with invoices
-    const invoiceIds = [...new Set(payments.map(p => p.invoiceId))];
     let totalPaymentDays = 0;
     let validPaymentCount = 0;
     

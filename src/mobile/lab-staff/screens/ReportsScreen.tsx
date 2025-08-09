@@ -6,9 +6,6 @@ import {
   Activity,
   FileText,
   Download,
-  Calendar,
-  
-  PieChart,
   Users,
   AlertCircle,
   ChevronRight,
@@ -16,7 +13,6 @@ import {
   ArrowDown,
   CheckCircle,
 } from 'lucide-react';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 interface PerformanceMetric {

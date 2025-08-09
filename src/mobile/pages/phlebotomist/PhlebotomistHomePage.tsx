@@ -6,7 +6,6 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Calendar,
   Navigation,
   Battery,
   Wifi,

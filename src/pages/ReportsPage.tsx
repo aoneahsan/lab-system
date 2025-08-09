@@ -7,7 +7,6 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Calendar,
   Filter,
 } from 'lucide-react';
 import { useReports, useCreateReport, useGenerateReport } from '@/hooks/useReports';

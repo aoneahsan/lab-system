@@ -6,7 +6,6 @@ import {
   AlertCircle, 
   CheckCircle, 
   XCircle,
-  QrCode,
   Printer,
   Info
 } from 'lucide-react';
@@ -33,7 +32,7 @@ interface Collection {
 export const CollectionScreen: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
-  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+  const [_selectedCollection] = useState<Collection | null>(null);
 
   const collections: Collection[] = [
     {

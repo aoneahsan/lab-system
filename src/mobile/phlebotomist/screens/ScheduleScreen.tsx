@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import {
   Calendar,
-  Clock,
   MapPin,
-  User,
   AlertCircle,
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   Filter,

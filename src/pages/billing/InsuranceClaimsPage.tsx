@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle, DollarSign } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useClaims, useClaimStatistics } from '@/hooks/useBilling';
 import CreateClaimModal from '@/components/billing/CreateClaimModal';
 import type { ClaimFilter, InsuranceClaim } from '@/types/billing.types';
@@ -9,7 +9,7 @@ const InsuranceClaimsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ClaimFilter>({});
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState<InsuranceClaim | null>(null);
+  const [_selectedClaim] = useState<InsuranceClaim | null>(null);
 
   const { data: claims = [], isLoading } = useClaims(filters);
   const { data: statistics } = useClaimStatistics();

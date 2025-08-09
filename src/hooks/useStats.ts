@@ -3,7 +3,7 @@ import { collection, query, where, getDocs, orderBy, limit } from 'firebase/fire
 import { db } from '@/lib/firebase';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay } from 'date-fns';
 
 interface Stats {
   resultsReady: number;

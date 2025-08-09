@@ -2,13 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   TestTube2, 
-  ClipboardCheck, 
   AlertCircle, 
-  TrendingUp,
   Clock,
-  CheckCircle,
-  Users,
-  Activity
+  CheckCircle
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 

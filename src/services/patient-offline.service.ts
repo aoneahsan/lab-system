@@ -11,7 +11,6 @@ import {
   orderBy,
   limit,
   serverTimestamp,
-  Timestamp,
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
