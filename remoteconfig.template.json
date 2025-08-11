@@ -1,35 +1,30 @@
 {
-  "conditions": [],
   "parameters": {
-    "welcome_message": {
-      "defaultValue": {
-        "value": "Welcome to LabFlow"
-      },
-      "description": "The welcome message displayed to users",
-      "valueType": "STRING"
-    },
     "maintenance_mode": {
       "defaultValue": {
         "value": "false"
       },
-      "description": "Enable maintenance mode for the app",
+      "description": "Enable/disable maintenance mode",
       "valueType": "BOOLEAN"
+    },
+    "minimum_app_version": {
+      "defaultValue": {
+        "value": "1.0.0"
+      },
+      "description": "Minimum required app version",
+      "valueType": "STRING"
     },
     "feature_flags": {
       "defaultValue": {
-        "value": "{\"enableAIAnalysis\": true, \"enableVoiceDictation\": true}"
+        "value": "{\"newBillingModule\":false,\"advancedReporting\":false}"
       },
       "description": "Feature flags for the application",
       "valueType": "JSON"
     }
   },
+  "parameterGroups": {},
+  "conditions": [],
   "version": {
-    "versionNumber": "1",
-    "updateTime": "2024-01-01T00:00:00.000Z",
-    "updateUser": {
-      "email": "system@labflow.com"
-    },
-    "updateOrigin": "CONSOLE",
-    "updateType": "INCREMENTAL_UPDATE"
+    "versionNumber": "1"
   }
 }

@@ -17,16 +17,16 @@ import { checkInsuranceEligibility } from './workflows/insuranceEligibilityCheck
 import { billingAutomation } from './workflows/billingAutomation';
 
 // Export critical results monitoring
-export const monitorCriticalResults = onDocumentWritten('labflow_{tenantId}_results/{resultId}', criticalResultsMonitor);
+export const monitorCriticalResults = onDocumentWritten('labflow_*_results/{resultId}', criticalResultsMonitor);
 
 // Export sample expiration monitoring (runs every 6 hours)
 export const checkSampleExpiration = onSchedule('every 6 hours', sampleExpirationMonitor);
 
 // Export quality control monitoring
-export const monitorQualityControl = onDocumentCreated('labflow_{tenantId}_qc_results/{qcResultId}', qualityControlMonitor);
+export const monitorQualityControl = onDocumentCreated('labflow_*_qc_results/{qcResultId}', qualityControlMonitor);
 
 // Export result validation workflow
-export const validateResults = onDocumentCreated('labflow_{tenantId}_results/{resultId}', resultValidationWorkflow);
+export const validateResults = onDocumentCreated('labflow_*_results/{resultId}', resultValidationWorkflow);
 
 // Export inventory monitoring (runs daily at 8 AM)
 export const checkInventoryLevels = onSchedule('0 8 * * *', inventoryAlerts);
@@ -38,7 +38,7 @@ export const sendAppointmentReminders = onSchedule('0 9 * * *', appointmentRemin
 export const verifyInsurance = onCall(checkInsuranceEligibility);
 
 // Export billing automation
-export const processBilling = onDocumentWritten('labflow_{tenantId}_results/{resultId}', billingAutomation);
+export const processBilling = onDocumentWritten('labflow_*_results/{resultId}', billingAutomation);
 
 // Keep existing functions for backward compatibility
 export const createOrder = onCall(async (request) => {
