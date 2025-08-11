@@ -76,33 +76,38 @@ class PatientService {
       updatedAt: toDate(data.updatedAt) || new Date(),
       lastVisitDate: toDate(data.lastVisitDate),
       // Convert nested dates
-      insurances:
-        (data.insurances as Record<string, unknown>[] | undefined)?.map((ins) => ({
-          ...ins,
-          validFrom: toDate(ins.validFrom) || new Date(),
-          validTo: toDate(ins.validTo),
-        })) || [],
-      allergies:
-        (data.allergies as Record<string, unknown>[] | undefined)?.map((allergy) => ({
-          ...allergy,
-          confirmedDate: toDate(allergy.confirmedDate),
-        })) || [],
-      medications:
-        (data.medications as Record<string, unknown>[] | undefined)?.map((med) => ({
-          ...med,
-          startDate: toDate(med.startDate) || new Date(),
-          endDate: toDate(med.endDate),
-        })) || [],
-      medicalHistory:
-        (data.medicalHistory as Record<string, unknown>[] | undefined)?.map((history) => ({
-          ...history,
-          diagnosedDate: toDate(history.diagnosedDate),
-        })) || [],
-      documents:
-        (data.documents as Record<string, unknown>[] | undefined)?.map((doc) => ({
-          ...doc,
-          uploadedAt: toDate(doc.uploadedAt) || new Date(),
-        })) || [],
+      insurances: Array.isArray(data.insurances)
+        ? (data.insurances as Record<string, unknown>[]).map((ins) => ({
+            ...ins,
+            validFrom: toDate(ins.validFrom) || new Date(),
+            validTo: toDate(ins.validTo),
+          }))
+        : [],
+      allergies: Array.isArray(data.allergies)
+        ? (data.allergies as Record<string, unknown>[]).map((allergy) => ({
+            ...allergy,
+            confirmedDate: toDate(allergy.confirmedDate),
+          }))
+        : [],
+      medications: Array.isArray(data.medications)
+        ? (data.medications as Record<string, unknown>[]).map((med) => ({
+            ...med,
+            startDate: toDate(med.startDate) || new Date(),
+            endDate: toDate(med.endDate),
+          }))
+        : [],
+      medicalHistory: Array.isArray(data.medicalHistory)
+        ? (data.medicalHistory as Record<string, unknown>[]).map((history) => ({
+            ...history,
+            diagnosedDate: toDate(history.diagnosedDate),
+          }))
+        : [],
+      documents: Array.isArray(data.documents)
+        ? (data.documents as Record<string, unknown>[]).map((doc) => ({
+            ...doc,
+            uploadedAt: toDate(doc.uploadedAt) || new Date(),
+          }))
+        : [],
       // Preserve custom fields
       customFields: data.customFields as Record<string, any> || {},
     } as Patient;
