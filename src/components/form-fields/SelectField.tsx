@@ -175,7 +175,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       errorClassName={errorClassName}
       showLabel={showLabel}
     >
-      <style jsx global>{`
+      <style>{`
         :root {
           --select-bg: white;
           --select-border: #d1d5db;

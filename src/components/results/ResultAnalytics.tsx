@@ -8,7 +8,8 @@ const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6'];
 
 export default function ResultAnalytics() {
   const [timeRange, setTimeRange] = useState('month');
-  const { results } = useResults();
+  const { data } = useResults();
+  const results = data?.items || [];
 
   // Calculate analytics data
   const getAnalyticsData = () => {

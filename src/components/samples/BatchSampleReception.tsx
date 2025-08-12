@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { CheckCircle, XCircle, Package, Loader2, Scan } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 // import { Alert, AlertDescription } from '@/components/ui/Alert';
 import {
   Select,

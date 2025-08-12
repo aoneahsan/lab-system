@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { VoiceInput } from '@/components/common/VoiceInput';
 import { VoiceResultEntry } from '@/components/results/VoiceResultEntry';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert } from '@/components/ui/Alert';
 import { 
   MicrophoneIcon, 

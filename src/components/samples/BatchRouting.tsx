@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route, ArrowRight, Building2, Cpu, Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,

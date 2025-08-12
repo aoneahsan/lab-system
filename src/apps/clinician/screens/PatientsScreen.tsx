@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Search, User, Calendar, Phone, ChevronRight, Activity, FileText } from 'lucide-react';

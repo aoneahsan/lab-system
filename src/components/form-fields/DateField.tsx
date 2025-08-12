@@ -57,7 +57,7 @@ export const DateField: React.FC<DateFieldProps> = ({
       <DatePicker
         id={name}
         selected={fieldValue}
-        onChange={(date) => fieldOnChange?.(date)}
+        onChange={(date: any) => fieldOnChange?.(Array.isArray(date) ? date[0] : date)}
         dateFormat={showTimeSelect ? `${dateFormat} ${timeFormat}` : dateFormat}
         minDate={minDate}
         maxDate={maxDate}
@@ -95,7 +95,7 @@ export const DateField: React.FC<DateFieldProps> = ({
       errorClassName={errorClassName}
       showLabel={showLabel}
     >
-      <style jsx global>{`
+      <style>{`
         .date-picker-popper {
           z-index: 9999 !important;
         }
@@ -237,7 +237,6 @@ export const TimeField: React.FC<DateFieldProps> = (props) => {
       {...props}
       label={props.label || 'Time'}
       showTimeSelect={true}
-      showTimeSelectOnly={true as any}
       dateFormat="HH:mm"
       timeFormat="HH:mm"
       timeIntervals={props.timeIntervals || 15}

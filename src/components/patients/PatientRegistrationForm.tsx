@@ -123,7 +123,7 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
             label="Gender"
             name="gender"
             value={watch('gender')}
-            onChange={(value) => setValue('gender', value || '')}
+            onChange={(value) => setValue('gender', value as any || '')}
             options={[
               { value: 'male', label: 'Male' },
               { value: 'female', label: 'Female' },
@@ -139,7 +139,7 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
             label="Blood Group"
             name="bloodGroup"
             value={watch('bloodGroup')}
-            onChange={(value) => setValue('bloodGroup', value || '')}
+            onChange={(value) => setValue('bloodGroup', value as any || '')}
             options={[
               { value: 'A+', label: 'A+' },
               { value: 'A-', label: 'A-' },
@@ -161,7 +161,7 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
             label="Marital Status"
             name="maritalStatus"
             value={watch('maritalStatus')}
-            onChange={(value) => setValue('maritalStatus', value || '')}
+            onChange={(value) => setValue('maritalStatus', value as any || '')}
             options={[
               { value: 'single', label: 'Single' },
               { value: 'married', label: 'Married' },

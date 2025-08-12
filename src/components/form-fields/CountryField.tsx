@@ -43,7 +43,7 @@ export const CountryField: React.FC<CountryFieldProps> = ({
       errorClassName={errorClassName}
       showLabel={showLabel}
     >
-      <style jsx global>{`
+      <style>{`
         .rcsc-country-dropdown,
         .rcsc-state-dropdown,
         .rcsc-city-dropdown {

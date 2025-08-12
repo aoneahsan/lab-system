@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Fingerprint, FaceIcon, LockIcon } from 'lucide-react';
+import { Fingerprint, UserCheck, LockIcon } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { useAuthStore } from '@/stores/auth.store';
@@ -71,7 +71,7 @@ export const BiometricLock: React.FC<BiometricLockProps> = ({
     }
   };
 
-  const BiometricIcon = biometricType === 'face' ? FaceIcon : Fingerprint;
+  const BiometricIcon = biometricType === 'face' ? UserCheck : Fingerprint;
 
   return (
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">

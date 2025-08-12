@@ -6,7 +6,7 @@ import {
   useHomeCollections 
 } from '@/hooks/useHomeCollection';
 import { useUsers } from '@/hooks/useUsers';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import {
@@ -25,7 +25,9 @@ import {
 import { 
   Calendar as CalendarIcon, 
   User,
-  MapPin
+  MapPin,
+  Route,
+  Clock
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';

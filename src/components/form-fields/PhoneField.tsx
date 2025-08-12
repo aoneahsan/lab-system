@@ -76,7 +76,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
       showLabel={showLabel}
     >
       <div className="phone-input-wrapper relative">
-        <style jsx global>{`
+        <style>{`
           .phone-input-wrapper .PhoneInput {
             position: relative;
           }
@@ -160,7 +160,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          defaultCountry={defaultCountry}
+          defaultCountry={defaultCountry as any}
           international={international}
           withCountryCallingCode={withCountryCallingCode}
           countrySelectProps={countrySelectProps}

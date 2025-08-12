@@ -82,9 +82,9 @@ export class UserService {
       const uid = userCredential.user.uid;
 
       // Update display name
-      if (data.displayName) {
+      if ((data as any).displayName) {
         await updateProfile(userCredential.user, {
-          displayName: data.displayName
+          displayName: (data as any).displayName
         });
       }
 
@@ -92,7 +92,7 @@ export class UserService {
       const userData: Partial<User> = {
         uid,
         email: data.email,
-        displayName: data.displayName,
+        displayName: (data as any).displayName,
         role: data.role,
         permissions: data.permissions || [],
         isActive: true,
@@ -100,7 +100,7 @@ export class UserService {
           ...data.metadata,
           employeeId: data.metadata?.employeeId,
           department: data.metadata?.department,
-          phoneNumber: data.metadata?.phoneNumber
+          phoneNumber: (data.metadata as any)?.phoneNumber
         },
         createdAt: new Date(),
         updatedAt: new Date()
@@ -113,7 +113,7 @@ export class UserService {
       });
 
       // Send password reset email if requested
-      if (data.sendPasswordReset) {
+      if ((data as any).sendPasswordReset) {
         await sendPasswordResetEmail(auth, data.email);
       }
 

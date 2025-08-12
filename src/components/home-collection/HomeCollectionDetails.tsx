@@ -7,7 +7,7 @@ import {
   // TODO: Implement payment recording  
   // useRecordPayment 
 } from '@/hooks/useHomeCollection';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { 

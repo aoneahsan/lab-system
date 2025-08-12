@@ -30,6 +30,17 @@ export {
   CreditCardField,
 } from './SpecializedFields';
 
+// Re-import for field groups
+import { TextField } from './TextField';
+import { EmailField } from './EmailField';
+import { PhoneField } from './PhoneField';
+import { DateField } from './DateField';
+import { SelectField } from './SelectField';
+import { RelationshipField } from './RelationshipField';
+import { AgeField, NumberField, CurrencyField } from './NumberField';
+import { CountryField, StateField, CityField } from './CountryField';
+import { ZipCodeField, UrlField, CreditCardField } from './SpecializedFields';
+
 // Commonly used field groups
 export const AddressFields = {
   TextField,

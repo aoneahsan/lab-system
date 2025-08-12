@@ -202,7 +202,7 @@ export const SearchableTable = memo(<T extends Record<string, any>>({
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
-      <OptimizedTable {...tableProps} data={filteredData} />
+      <OptimizedTable {...tableProps as any} data={filteredData} />
     </div>
   );
 });

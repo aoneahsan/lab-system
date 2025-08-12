@@ -8,7 +8,7 @@ export default function InventoryAdminControls() {
 
   const stats = {
     totalItems: inventory.length,
-    lowStock: inventory.filter(i => i.quantity <= i.minQuantity).length,
+    lowStock: inventory.filter(i => (i.quantity || i.currentStock || 0) <= i.minimumStock).length,
     expiringSoon: 8, // Mock data
     totalValue: '$45,250.00', // Mock data
   };

@@ -295,13 +295,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 control={control}
                 name="expiryDate"
                 render={({ field }) => (
-                  <DatePicker
-                    selected={field.value}
+                  <DateField
+                    label=""
+                    name="expiryDate"
+                    value={field.value}
                     onChange={field.onChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    dateFormat="MM/dd/yyyy"
-                    placeholderText="Select expiry date"
+                    placeholder="Select expiry date"
                     minDate={new Date()}
+                    showLabel={false}
                   />
                 )}
               />

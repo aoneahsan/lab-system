@@ -193,7 +193,7 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
 };
 
 // Basic Information Tab
-const BasicInfoTab = ({ register, errors, _watch }: any) => (
+const BasicInfoTab = ({ register: _register, errors: _errors, _watch }: any) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -342,7 +342,7 @@ const ContactTab = ({ _register, _errors, watch, setValue, phoneNumbers }: any) 
         </label>
         <input
           type="email"
-          {...register('email', { 
+          {..._register('email', { 
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
               message: 'Invalid email address'
@@ -350,8 +350,8 @@ const ContactTab = ({ _register, _errors, watch, setValue, phoneNumbers }: any) 
           })}
           className="input"
         />
-        {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+        {_errors.email && (
+          <p className="mt-1 text-sm text-red-600">{_errors.email.message}</p>
         )}
       </div>
 
@@ -430,7 +430,7 @@ const ContactTab = ({ _register, _errors, watch, setValue, phoneNumbers }: any) 
         </label>
         <input
           type="text"
-          {...register('occupation')}
+          {..._register('occupation')}
           className="input"
         />
       </div>
@@ -442,7 +442,7 @@ const ContactTab = ({ _register, _errors, watch, setValue, phoneNumbers }: any) 
         </label>
         <input
           type="text"
-          {...register('employer')}
+          {..._register('employer')}
           className="input"
         />
       </div>

@@ -5,7 +5,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
-declare const self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
 // Precache all static assets
 precacheAndRoute(self.__WB_MANIFEST);
@@ -127,7 +127,7 @@ async function syncResults() {
 }
 
 // Handle push notifications
-self.addEventListener('push', (event) => {
+self.addEventListener('push', (event: any) => {
   if (!event.data) return;
   
   const data = event.data.json();
@@ -153,23 +153,23 @@ self.addEventListener('push', (event) => {
   };
   
   event.waitUntil(
-    self.registration.showNotification(data.title || 'LabFlow Notification', options)
+    (self as any).registration.showNotification(data.title || 'LabFlow Notification', options)
   );
 });
 
 // Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', (event: any) => {
   event.notification.close();
   
   if (event.action === 'view') {
     event.waitUntil(
-      self.clients.openWindow('/notifications')
+      (self as any).clients.openWindow('/notifications')
     );
   }
 });
 
 // Periodic background sync for critical updates
-self.addEventListener('periodicsync', (event) => {
+self.addEventListener('periodicsync', (event: any) => {
   if (event.tag === 'check-critical-results') {
     event.waitUntil(checkCriticalResults());
   }
@@ -182,7 +182,7 @@ async function checkCriticalResults() {
       const results = await response.json();
       if (results.length > 0) {
         // Show notification for critical results
-        await self.registration.showNotification('Critical Results', {
+        await (self as any).registration.showNotification('Critical Results', {
           body: `${results.length} critical results require immediate attention`,
           icon: '/labflow-icon-192.png',
           badge: '/labflow-badge-72.png',

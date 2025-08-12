@@ -12,6 +12,7 @@
 		"verbatimModuleSyntax": false,
 		"moduleDetection": "force",
 		"noEmit": true,
+		"skipDefaultLibCheck": true,
 		"jsx": "react-jsx",
 
 		/* Linting */

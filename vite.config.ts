@@ -36,6 +36,8 @@ export default defineConfig(({ mode }) => ({
       manifest: false, // We already have a manifest.json
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        globIgnores: ['**/stats.html'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/functions/],
         runtimeCaching: [

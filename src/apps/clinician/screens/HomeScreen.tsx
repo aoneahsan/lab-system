@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { AlertCircle, ClipboardList, FileText, Users, Activity, Clock } from 'lucide-react';
 import { useCriticalResults } from '@/hooks/useCriticalResults';

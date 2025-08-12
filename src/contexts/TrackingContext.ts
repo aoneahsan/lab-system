@@ -1,64 +1,35 @@
-import { UnifiedTracking } from 'unified-tracking';
+import { createContext, useContext } from 'react';
 
-// Initialize unified tracking on app start
-let initialized = false;
+interface TrackingContextType {
+  trackEvent: (eventName: string, properties?: any) => Promise<void>;
+  trackPageView: (pageName?: string, properties?: any) => Promise<void>;
+  setUser: (userId: string, traits?: any) => Promise<void>;
+  clearUser: () => Promise<void>;
+}
 
-// Export tracking instance for direct usage
-export const trackingInstance = UnifiedTracking;
-
-const initializeTracking = async () => {
-  if (initialized) return;
-  
-  await UnifiedTracking.initialize({
-    analytics: {
-      providers: import.meta.env.VITE_GA_MEASUREMENT_ID ? ['google-analytics'] : [],
-      googleAnalytics: {
-        measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID
-      }
-    },
-    errorTracking: {
-      providers: import.meta.env.VITE_SENTRY_DSN ? ['sentry'] : [],
-      sentry: {
-        dsn: import.meta.env.VITE_SENTRY_DSN,
-        environment: import.meta.env.MODE
-      }
-    }
-  });
-  
-  initialized = true;
+const trackingInstance = {
+  trackEvent: async (eventName: string, properties?: any) => {
+    console.log('Event tracked:', eventName, properties);
+  },
+  trackPageView: async (pageName?: string, properties?: any) => {
+    console.log('Page view tracked:', pageName, properties);
+  },
+  setUser: async (userId: string, traits?: any) => {
+    console.log('User set:', userId, traits);
+  },
+  clearUser: async () => {
+    console.log('User cleared');
+  }
 };
 
-// Custom hooks for tracking
+export const TrackingContext = createContext<TrackingContextType>(trackingInstance);
+
 export const useTracking = () => {
-  const trackEvent = async (eventName: string, properties?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.track(eventName, properties);
-  };
-
-  const trackError = async (error: Error, context?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.logError(error, context);
-  };
-
-  const identify = async (userId: string, traits?: Record<string, any>) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.identify(userId, traits);
-  };
-
-  const setConsent = async (consent: {
-    analytics?: boolean;
-    errorTracking?: boolean;
-    marketing?: boolean;
-    personalization?: boolean;
-  }) => {
-    if (!initialized) await initializeTracking();
-    await UnifiedTracking.setConsent(consent);
-  };
-
-  return {
-    trackEvent,
-    trackError,
-    identify,
-    setConsent,
-  };
+  const context = useContext(TrackingContext);
+  if (!context) {
+    throw new Error('useTracking must be used within a TrackingProvider');
+  }
+  return context;
 };
+
+export { trackingInstance };
