@@ -1,9 +1,10 @@
 import { Package, AlertTriangle, TrendingDown, ShoppingCart, Download, BarChart3 } from 'lucide-react';
-import { useInventory } from '@/hooks/useInventory';
+import { useInventoryItems } from '@/hooks/useInventory';
 import { toast } from '@/stores/toast.store';
 
 export default function InventoryAdminControls() {
-  const { data: inventory = [] } = useInventory();
+  const { data } = useInventoryItems();
+  const inventory = Array.isArray(data) ? data : (data?.items || []);
 
   const stats = {
     totalItems: inventory.length,

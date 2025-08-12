@@ -3,11 +3,12 @@ import { useResults } from '@/hooks/useResults';
 import { toast } from '@/stores/toast.store';
 
 export default function ResultAdminControls() {
-  const { data: results = [] } = useResults();
+  const { data } = useResults();
+  const results = data?.items || [];
 
   const stats = {
     totalResults: results.length,
-    validated: results.filter(r => r.status === 'validated').length,
+    validated: results.filter(r => r.status === 'verified').length,
     pendingReview: results.filter(r => r.status === 'pending_review').length,
     criticalResults: 7, // Mock data
   };

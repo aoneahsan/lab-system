@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Vial, Upload, Download, BarChart3, AlertTriangle, Activity } from 'lucide-react';
+import { TestTube, Upload, Download, BarChart3, AlertTriangle, Activity } from 'lucide-react';
 import { useSamples } from '@/hooks/useSamples';
 import { toast } from '@/stores/toast.store';
 
@@ -28,7 +28,7 @@ export default function SampleAdminControls() {
               <p className="text-sm text-gray-600">Total Samples</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalSamples}</p>
             </div>
-            <Vial className="h-8 w-8 text-blue-500" />
+            <TestTube className="h-8 w-8 text-blue-500" />
           </div>
         </div>
 

@@ -10,7 +10,7 @@ export default function TestAdminControls() {
   const stats = {
     totalTests: tests.length,
     activeTests: tests.filter(t => t.isActive).length,
-    criticalTests: tests.filter(t => t.priority === 'critical').length,
+    criticalTests: tests.filter(t => t.criticalValues && (t.criticalValues.low || t.criticalValues.high)).length,
     testsNeedingReview: 8, // Mock data
   };
 

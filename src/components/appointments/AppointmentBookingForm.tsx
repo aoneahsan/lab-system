@@ -8,6 +8,9 @@ import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
 import { useAvailableSlots, useCreateAppointment } from '@/hooks/useAppointments';
 import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Label';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { SelectField, DateField, TimeField, TextField, TextareaField, CheckboxField } from '@/components/form-fields';
 
 const schema = yup.object({

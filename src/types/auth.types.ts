@@ -1,6 +1,8 @@
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { SystemRole } from '@/constants/tenant.constants';
 
+export type UserRole = SystemRole;
+
 export interface User {
   id: string;
   uid: string; // Firebase UID

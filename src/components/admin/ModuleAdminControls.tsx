@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, TestTube, Vial, FileText, DollarSign, Package } from 'lucide-react';
+import { Users, TestTube, FileText, DollarSign, Package } from 'lucide-react';
 import PatientAdminControls from './PatientAdminControls';
 import TestAdminControls from './TestAdminControls';
 import SampleAdminControls from './SampleAdminControls';
@@ -10,7 +10,7 @@ import InventoryAdminControls from './InventoryAdminControls';
 const modules = [
   { id: 'patients', label: 'Patients', icon: Users, component: PatientAdminControls },
   { id: 'tests', label: 'Tests', icon: TestTube, component: TestAdminControls },
-  { id: 'samples', label: 'Samples', icon: Vial, component: SampleAdminControls },
+  { id: 'samples', label: 'Samples', icon: TestTube, component: SampleAdminControls },
   { id: 'results', label: 'Results', icon: FileText, component: ResultAdminControls },
   { id: 'billing', label: 'Billing', icon: DollarSign, component: BillingAdminControls },
   { id: 'inventory', label: 'Inventory', icon: Package, component: InventoryAdminControls },

@@ -7,7 +7,8 @@ export default function PatientAdminControls() {
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
   // const [showMergeDialog, setShowMergeDialog] = useState(false);
   
-  const { data: patients = [] } = usePatients();
+  const { data } = usePatients();
+  const patients = data?.patients || [];
 
   const stats = {
     totalPatients: patients.length,

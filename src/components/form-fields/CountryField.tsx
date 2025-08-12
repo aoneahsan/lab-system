@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Country, State, City } from 'react-country-state-city';
+import { CountrySelect, StateSelect, CitySelect } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 import { BaseFormFieldProps, FormFieldWrapper } from './BaseFormField';
 
@@ -128,12 +128,12 @@ export const CountryField: React.FC<CountryFieldProps> = ({
         }
       `}</style>
       
-      <Country
-        name={name}
-        value={value}
+      <CountrySelect
         onChange={onChange}
-        disabled={disabled || loading}
-        placeholder={placeholder}
+        defaultValue={value}
+        containerClassName=""
+        inputClassName=""
+        placeHolder={placeholder}
         showFlag={showFlag}
       />
     </FormFieldWrapper>
@@ -180,13 +180,13 @@ export const StateField: React.FC<StateFieldProps> = ({
       errorClassName={errorClassName}
       showLabel={showLabel}
     >
-      <State
-        name={name}
-        countryId={countryId}
-        value={value}
+      <StateSelect
+        countryid={countryId}
         onChange={onChange}
-        disabled={isDisabled}
-        placeholder={placeholder}
+        defaultValue={value}
+        containerClassName=""
+        inputClassName=""
+        placeHolder={placeholder}
       />
     </FormFieldWrapper>
   );
@@ -234,14 +234,14 @@ export const CityField: React.FC<CityFieldProps> = ({
       errorClassName={errorClassName}
       showLabel={showLabel}
     >
-      <City
-        name={name}
-        countryId={countryId}
-        stateId={stateId}
-        value={value}
+      <CitySelect
+        countryid={countryId}
+        stateid={stateId}
         onChange={onChange}
-        disabled={isDisabled}
-        placeholder={placeholder}
+        defaultValue={value}
+        containerClassName=""
+        inputClassName=""
+        placeHolder={placeholder}
       />
     </FormFieldWrapper>
   );
