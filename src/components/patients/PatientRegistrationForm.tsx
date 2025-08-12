@@ -1,10 +1,22 @@
-import { useForm, Controller, FormProvider } from 'react-hook-form';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useCreatePatient } from '@/hooks/usePatients';
 import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { CreatePatientData } from '@/types/patient.types';
+import {
+  TextField,
+  EmailField,
+  PhoneField,
+  DateField,
+  SelectField,
+  TextareaField,
+  CountryField,
+  StateField,
+  CityField,
+  ZipCodeField,
+  RelationshipField,
+} from '@/components/form-fields';
+import { useState } from 'react';
 
 interface PatientRegistrationFormProps {
   onSuccess?: () => void;
@@ -30,7 +42,12 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
     handleSubmit,
     formState: { errors },
     setError,
+    watch,
+    setValue,
   } = formMethods;
+
+  const [selectedCountry, setSelectedCountry] = useState<any>(null);
+  const [selectedState, setSelectedState] = useState<any>(null);
 
   const onSubmit = (data: CreatePatientData) => {
     // Validate custom fields
@@ -65,133 +82,104 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="firstName" className="label">
-              First Name *
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              className={`input ${errors.firstName ? 'border-danger-500' : ''}`}
-              {...register('firstName', { required: 'First name is required' })}
-            />
-            {errors.firstName && (
-              <p className="text-sm text-danger-600 mt-1">{errors.firstName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="middleName" className="label">
-              Middle Name
-            </label>
-            <input id="middleName" type="text" className="input" {...register('middleName')} />
-          </div>
-
-          <div>
-            <label htmlFor="lastName" className="label">
-              Last Name *
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              className={`input ${errors.lastName ? 'border-danger-500' : ''}`}
-              {...register('lastName', { required: 'Last name is required' })}
-            />
-            {errors.lastName && (
-              <p className="text-sm text-danger-600 mt-1">{errors.lastName.message}</p>
-            )}
-          </div>
+          <TextField
+            label="First Name"
+            name="firstName"
+            register={register('firstName', { required: 'First name is required' })}
+            error={errors.firstName}
+            required
+          />
+          
+          <TextField
+            label="Middle Name"
+            name="middleName"
+            register={register('middleName')}
+            error={errors.middleName}
+          />
+          
+          <TextField
+            label="Last Name"
+            name="lastName"
+            register={register('lastName', { required: 'Last name is required' })}
+            error={errors.lastName}
+            required
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div>
-            <label htmlFor="dateOfBirth" className="label">
-              Date of Birth *
-            </label>
-            <Controller
-              name="dateOfBirth"
-              control={control}
-              rules={{ required: 'Date of birth is required' }}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={field.onChange}
-                  dateFormat="MM/dd/yyyy"
-                  showYearDropdown
-                  scrollableYearDropdown
-                  yearDropdownItemNumber={100}
-                  placeholderText="Select date"
-                  className={`input ${errors.dateOfBirth ? 'border-danger-500' : ''}`}
-                  maxDate={new Date()}
-                />
-              )}
-            />
-            {errors.dateOfBirth && (
-              <p className="text-sm text-danger-600 mt-1">{errors.dateOfBirth.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="gender" className="label">
-              Gender *
-            </label>
-            <select
-              id="gender"
-              className={`input ${errors.gender ? 'border-danger-500' : ''}`}
-              {...register('gender', { required: 'Gender is required' })}
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-              <option value="unknown">Prefer not to say</option>
-            </select>
-            {errors.gender && (
-              <p className="text-sm text-danger-600 mt-1">{errors.gender.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="bloodGroup" className="label">
-              Blood Group
-            </label>
-            <select id="bloodGroup" className="input" {...register('bloodGroup')}>
-              <option value="">Select Blood Group</option>
-              <option value="A+">A+</option>
-              <option value="A-">A-</option>
-              <option value="B+">B+</option>
-              <option value="B-">B-</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB-</option>
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </div>
+          <DateField
+            label="Date of Birth"
+            name="dateOfBirth"
+            control={control}
+            error={errors.dateOfBirth}
+            required
+            maxDate={new Date()}
+            showYearDropdown
+            showMonthDropdown
+            dropdownMode="select"
+          />
+          
+          <SelectField
+            label="Gender"
+            name="gender"
+            value={watch('gender')}
+            onChange={(value) => setValue('gender', value || '')}
+            options={[
+              { value: 'male', label: 'Male' },
+              { value: 'female', label: 'Female' },
+              { value: 'other', label: 'Other' },
+              { value: 'unknown', label: 'Prefer not to say' },
+            ]}
+            error={errors.gender}
+            required
+            placeholder="Select Gender"
+          />
+          
+          <SelectField
+            label="Blood Group"
+            name="bloodGroup"
+            value={watch('bloodGroup')}
+            onChange={(value) => setValue('bloodGroup', value || '')}
+            options={[
+              { value: 'A+', label: 'A+' },
+              { value: 'A-', label: 'A-' },
+              { value: 'B+', label: 'B+' },
+              { value: 'B-', label: 'B-' },
+              { value: 'AB+', label: 'AB+' },
+              { value: 'AB-', label: 'AB-' },
+              { value: 'O+', label: 'O+' },
+              { value: 'O-', label: 'O-' },
+              { value: 'unknown', label: 'Unknown' },
+            ]}
+            error={errors.bloodGroup}
+            placeholder="Select Blood Group"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-            <label htmlFor="maritalStatus" className="label">
-              Marital Status
-            </label>
-            <select id="maritalStatus" className="input" {...register('maritalStatus')}>
-              <option value="">Select Status</option>
-              <option value="single">Single</option>
-              <option value="married">Married</option>
-              <option value="divorced">Divorced</option>
-              <option value="widowed">Widowed</option>
-              <option value="separated">Separated</option>
-              <option value="unknown">Prefer not to say</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="nationality" className="label">
-              Nationality
-            </label>
-            <input id="nationality" type="text" className="input" {...register('nationality')} />
-          </div>
+          <SelectField
+            label="Marital Status"
+            name="maritalStatus"
+            value={watch('maritalStatus')}
+            onChange={(value) => setValue('maritalStatus', value || '')}
+            options={[
+              { value: 'single', label: 'Single' },
+              { value: 'married', label: 'Married' },
+              { value: 'divorced', label: 'Divorced' },
+              { value: 'widowed', label: 'Widowed' },
+              { value: 'separated', label: 'Separated' },
+              { value: 'unknown', label: 'Prefer not to say' },
+            ]}
+            error={errors.maritalStatus}
+            placeholder="Select Status"
+          />
+          
+          <TextField
+            label="Nationality"
+            name="nationality"
+            register={register('nationality')}
+            error={errors.nationality}
+          />
         </div>
       </div>
 
@@ -201,139 +189,91 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="phoneNumber" className="label">
-              Phone Number *
-            </label>
-            <input
-              id="phoneNumber"
-              type="tel"
-              className={`input ${errors.phoneNumber ? 'border-danger-500' : ''}`}
-              {...register('phoneNumber', {
-                required: 'Phone number is required',
-                pattern: {
-                  value: /^[\d\s\-+()]+$/,
-                  message: 'Invalid phone number format',
-                },
-              })}
-            />
-            {errors.phoneNumber && (
-              <p className="text-sm text-danger-600 mt-1">{errors.phoneNumber.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="email" className="label">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              className={`input ${errors.email ? 'border-danger-500' : ''}`}
-              {...register('email', {
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address',
-                },
-              })}
-            />
-            {errors.email && <p className="text-sm text-danger-600 mt-1">{errors.email.message}</p>}
-          </div>
+          <PhoneField
+            label="Phone Number"
+            name="phoneNumber"
+            value={watch('phoneNumber')}
+            onChange={(value) => setValue('phoneNumber', value || '')}
+            error={errors.phoneNumber}
+            required
+            defaultCountry="US"
+          />
+          
+          <EmailField
+            label="Email Address"
+            name="email"
+            register={register('email')}
+            error={errors.email}
+          />
         </div>
 
         <div className="space-y-4 mt-4">
           <h4 className="font-medium text-gray-900 dark:text-white">Address</h4>
 
-          <div>
-            <label htmlFor="line1" className="label">
-              Address Line 1 *
-            </label>
-            <input
-              id="line1"
-              type="text"
-              className={`input ${errors.address?.line1 ? 'border-danger-500' : ''}`}
-              {...register('address.line1', {
-                required: 'Address is required',
-              })}
-            />
-            {errors.address?.line1 && (
-              <p className="text-sm text-danger-600 mt-1">{errors.address.line1.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="line2" className="label">
-              Address Line 2
-            </label>
-            <input id="line2" type="text" className="input" {...register('address.line2')} />
-          </div>
+          <TextField
+            label="Address Line 1"
+            name="address.line1"
+            register={register('address.line1', { required: 'Address is required' })}
+            error={errors.address?.line1}
+            required
+          />
+          
+          <TextField
+            label="Address Line 2"
+            name="address.line2"
+            register={register('address.line2')}
+            error={errors.address?.line2}
+          />
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <label htmlFor="city" className="label">
-                City *
-              </label>
-              <input
-                id="city"
-                type="text"
-                className={`input ${errors.address?.city ? 'border-danger-500' : ''}`}
-                {...register('address.city', { required: 'City is required' })}
-              />
-              {errors.address?.city && (
-                <p className="text-sm text-danger-600 mt-1">{errors.address.city.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="state" className="label">
-                State *
-              </label>
-              <input
-                id="state"
-                type="text"
-                className={`input ${errors.address?.state ? 'border-danger-500' : ''}`}
-                {...register('address.state', {
-                  required: 'State is required',
-                })}
-              />
-              {errors.address?.state && (
-                <p className="text-sm text-danger-600 mt-1">{errors.address.state.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="country" className="label">
-                Country *
-              </label>
-              <input
-                id="country"
-                type="text"
-                className={`input ${errors.address?.country ? 'border-danger-500' : ''}`}
-                {...register('address.country', {
-                  required: 'Country is required',
-                })}
-              />
-              {errors.address?.country && (
-                <p className="text-sm text-danger-600 mt-1">{errors.address.country.message}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="postalCode" className="label">
-                Postal Code *
-              </label>
-              <input
-                id="postalCode"
-                type="text"
-                className={`input ${errors.address?.postalCode ? 'border-danger-500' : ''}`}
-                {...register('address.postalCode', {
-                  required: 'Postal code is required',
-                })}
-              />
-              {errors.address?.postalCode && (
-                <p className="text-sm text-danger-600 mt-1">{errors.address.postalCode.message}</p>
-              )}
-            </div>
+            <CountryField
+              label="Country"
+              name="address.country"
+              value={selectedCountry}
+              onChange={(country) => {
+                setSelectedCountry(country);
+                setValue('address.country', country?.name || '');
+                setSelectedState(null);
+                setValue('address.state', '');
+                setValue('address.city', '');
+              }}
+              error={errors.address?.country}
+              required
+            />
+            
+            <StateField
+              label="State"
+              name="address.state"
+              countryId={selectedCountry?.id}
+              value={selectedState}
+              onChange={(state) => {
+                setSelectedState(state);
+                setValue('address.state', state?.name || '');
+                setValue('address.city', '');
+              }}
+              error={errors.address?.state}
+              required
+            />
+            
+            <CityField
+              label="City"
+              name="address.city"
+              countryId={selectedCountry?.id}
+              stateId={selectedState?.id}
+              value={watch('address.city')}
+              onChange={(city) => setValue('address.city', city?.name || '')}
+              error={errors.address?.city}
+              required
+            />
+            
+            <ZipCodeField
+              label="Postal Code"
+              name="address.postalCode"
+              register={register('address.postalCode', { required: 'Postal code is required' })}
+              error={errors.address?.postalCode}
+              required
+              country={selectedCountry?.code || 'US'}
+            />
           </div>
         </div>
       </div>
@@ -344,41 +284,28 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="emergencyName" className="label">
-              Contact Name
-            </label>
-            <input
-              id="emergencyName"
-              type="text"
-              className="input"
-              {...register('emergencyContact.name')}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="emergencyRelationship" className="label">
-              Relationship
-            </label>
-            <input
-              id="emergencyRelationship"
-              type="text"
-              className="input"
-              {...register('emergencyContact.relationship')}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="emergencyPhone" className="label">
-              Phone Number
-            </label>
-            <input
-              id="emergencyPhone"
-              type="tel"
-              className="input"
-              {...register('emergencyContact.phone')}
-            />
-          </div>
+          <TextField
+            label="Contact Name"
+            name="emergencyContact.name"
+            register={register('emergencyContact.name')}
+            error={errors.emergencyContact?.name}
+          />
+          
+          <RelationshipField
+            label="Relationship"
+            name="emergencyContact.relationship"
+            value={watch('emergencyContact.relationship')}
+            onChange={(value) => setValue('emergencyContact.relationship', value || '')}
+            error={errors.emergencyContact?.relationship}
+          />
+          
+          <PhoneField
+            label="Phone Number"
+            name="emergencyContact.phone"
+            value={watch('emergencyContact.phone')}
+            onChange={(value) => setValue('emergencyContact.phone', value || '')}
+            error={errors.emergencyContact?.phone}
+          />
         </div>
       </div>
 
@@ -388,19 +315,20 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="occupation" className="label">
-              Occupation
-            </label>
-            <input id="occupation" type="text" className="input" {...register('occupation')} />
-          </div>
-
-          <div>
-            <label htmlFor="notes" className="label">
-              Notes
-            </label>
-            <textarea id="notes" rows={3} className="input" {...register('notes')} />
-          </div>
+          <TextField
+            label="Occupation"
+            name="occupation"
+            register={register('occupation')}
+            error={errors.occupation}
+          />
+          
+          <TextareaField
+            label="Notes"
+            name="notes"
+            register={register('notes')}
+            error={errors.notes}
+            rows={3}
+          />
         </div>
       </div>
 

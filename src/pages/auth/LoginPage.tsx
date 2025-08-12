@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
+import { EmailField, PasswordField, CheckboxField } from '@/components/form-fields';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -72,47 +73,32 @@ const LoginPage = () => {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="label">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            className="input"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="you@example.com"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password" className="label">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            required
-            className="input"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="••••••••"
-          />
-        </div>
-
+        <EmailField
+          label="Email address"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+          autoFocus
+        />
+        
+        <PasswordField
+          label="Password"
+          name="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+          autoComplete="current-password"
+        />
+        
         <div className="flex items-center justify-between">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
-              checked={formData.rememberMe}
-              onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-            />
-            <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
-          </label>
-
+          <CheckboxField
+            label="Remember me"
+            name="rememberMe"
+            checked={formData.rememberMe}
+            onChange={(checked) => setFormData({ ...formData, rememberMe: checked })}
+          />
+          
           <Link
             to="/forgot-password"
             className="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400"

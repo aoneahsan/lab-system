@@ -5,6 +5,14 @@ import { toast } from '@/stores/toast.store';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { CheckCircle, XCircle } from 'lucide-react';
+import {
+  TextField,
+  EmailField,
+  PhoneField,
+  PasswordField,
+  ConfirmPasswordField,
+  CheckboxField,
+} from '@/components/form-fields';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -168,225 +176,74 @@ const RegisterPage = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="firstName" className="label">
-              First name
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              required
-              className="input"
-              value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="lastName" className="label">
-              Last name
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              required
-              className="input"
-              value={formData.lastName}
-              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="email" className="label">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
+          <TextField
+            label="First name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             required
-            className="input"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
-        </div>
-
-        <div>
-          <label htmlFor="phoneNumber" className="label">
-            Phone number (optional)
-          </label>
-          <input
-            id="phoneNumber"
-            type="tel"
-            className="input"
-            value={formData.phoneNumber}
-            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="tenantCode" className="label">
-            Laboratory code (optional)
-          </label>
-          <div className="relative">
-            <input
-              id="tenantCode"
-              type="text"
-              className={`input pr-10 ${
-                formData.tenantCode && !tenantValidation.isChecking
-                  ? tenantValidation.isValid
-                    ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
-                    : 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : ''
-              }`}
-              value={formData.tenantCode}
-              onChange={(e) =>
-                setFormData({ ...formData, tenantCode: e.target.value.toUpperCase() })
-              }
-              placeholder="Enter DEMO or leave empty to create new"
-            />
-            {formData.tenantCode && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                {tenantValidation.isChecking ? (
-                  <div className="animate-spin h-5 w-5 border-2 border-gray-300 border-t-blue-600 rounded-full" />
-                ) : tenantValidation.isValid === true ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                ) : tenantValidation.isValid === false ? (
-                  <XCircle className="h-5 w-5 text-red-500" />
-                ) : null}
-              </div>
-            )}
-          </div>
-          {tenantValidation.message && (
-            <p
-              className={`mt-1 text-sm ${
-                tenantValidation.isValid ? 'text-green-600' : 'text-red-600'
-              }`}
-            >
-              {tenantValidation.message}
-            </p>
-          )}
-          <div className="mt-2">
-            <p className="text-xs text-gray-500">
-              Leave empty to create a new laboratory after registration, or use <span className="font-semibold">DEMO</span> for testing
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="password" className="label">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
+          
+          <TextField
+            label="Last name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             required
-            className="input"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            minLength={8}
           />
-          {formData.password &&
-            (() => {
-              const passwordInfo = getPasswordStrength();
-              if (!passwordInfo) return null;
-
-              return (
-                <>
-                  <div className="mt-2">
-                    <div className="flex gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-1 flex-1 rounded ${
-                            i < passwordInfo.strength
-                              ? passwordInfo.strength <= 2
-                                ? 'bg-red-500'
-                                : passwordInfo.strength <= 3
-                                  ? 'bg-yellow-500'
-                                  : 'bg-green-500'
-                              : 'bg-gray-200'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p
-                      className={`text-xs mt-1 ${
-                        passwordInfo.strength <= 2
-                          ? 'text-red-600'
-                          : passwordInfo.strength <= 3
-                            ? 'text-yellow-600'
-                            : 'text-green-600'
-                      }`}
-                    >
-                      {passwordInfo.strength <= 2
-                        ? 'Weak password'
-                        : passwordInfo.strength <= 3
-                          ? 'Medium password'
-                          : 'Strong password'}
-                    </p>
-                  </div>
-                  {passwordInfo.requirements.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Needs: {passwordInfo.requirements.join(', ')}
-                    </p>
-                  )}
-                </>
-              );
-            })()}
         </div>
 
-        <div>
-          <label htmlFor="confirmPassword" className="label">
-            Confirm password
-          </label>
-          <div className="relative">
-            <input
-              id="confirmPassword"
-              type="password"
-              required
-              className={`input pr-10 ${
-                formData.confirmPassword && formData.password
-                  ? formData.confirmPassword === formData.password
-                    ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
-                    : 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : ''
-              }`}
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            />
-            {formData.confirmPassword && formData.password && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                {formData.confirmPassword === formData.password ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-red-500" />
-                )}
-              </div>
-            )}
-          </div>
-          {formData.confirmPassword &&
-            formData.password &&
-            formData.confirmPassword !== formData.password && (
-              <p className="mt-1 text-sm text-red-600">Passwords do not match</p>
-            )}
-        </div>
+        <EmailField
+          label="Email address"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+        />
+        
+        <PhoneField
+          label="Phone number (optional)"
+          name="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={(value) => setFormData({ ...formData, phoneNumber: value || '' })}
+        />
 
-        <div className="flex items-center">
-          <input
-            id="acceptTerms"
-            type="checkbox"
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
-            checked={formData.acceptTerms}
-            onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
-          />
-          <label htmlFor="acceptTerms" className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-            I accept the{' '}
-            <a href="#" className="text-primary-600 hover:text-primary-500 dark:text-primary-400">
-              terms and conditions
-            </a>
-          </label>
-        </div>
+        <TextField
+          label="Laboratory code (optional)"
+          name="tenantCode"
+          value={formData.tenantCode}
+          onChange={(e) => setFormData({ ...formData, tenantCode: e.target.value.toUpperCase() })}
+          placeholder="Enter DEMO or leave empty to create new"
+          error={tenantValidation.isValid === false ? tenantValidation.message : undefined}
+          helpText="Leave empty to create a new laboratory after registration, or use DEMO for testing"
+        />
+
+        <PasswordField
+          label="Password"
+          name="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+          showStrength
+          minLength={8}
+          autoComplete="new-password"
+        />
+
+        <ConfirmPasswordField
+          label="Confirm password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+          originalPasswordValue={formData.password}
+          required
+        />
+
+        <CheckboxField
+          label="I accept the terms and conditions"
+          name="acceptTerms"
+          checked={formData.acceptTerms}
+          onChange={(checked) => setFormData({ ...formData, acceptTerms: checked })}
+        />
 
         <button type="submit" disabled={isLoading} className="w-full btn btn-primary">
           {isLoading ? (

@@ -4,6 +4,13 @@ import * as yup from 'yup';
 import type { User } from '@/types/auth.types';
 import type { UserFormData } from '@/types/user-management.types';
 import { SYSTEM_ROLES } from '@/constants/tenant.constants';
+import {
+  TextField,
+  EmailField,
+  PhoneField,
+  SelectField,
+  SwitchField,
+} from '@/components/form-fields';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -32,6 +39,8 @@ export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFor
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<UserFormData>({
     resolver: yupResolver(schema) as any,
@@ -58,70 +67,64 @@ export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFor
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              First Name
-            </label>
-            <input {...register('firstName')} className="input w-full" />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Last Name
-            </label>
-            <input {...register('lastName')} className="input w-full" />
-            {errors.lastName && (
-              <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
-            </label>
-            <input {...register('email')} type="email" className="input w-full" />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Phone Number
-            </label>
-            <input {...register('phoneNumber')} type="tel" className="input w-full" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Role
-            </label>
-            <select {...register('role')} className="input w-full">
-              <option value={SYSTEM_ROLES.CLINICIAN}>Clinician</option>
-              <option value={SYSTEM_ROLES.FRONT_DESK}>Front Desk</option>
-              <option value={SYSTEM_ROLES.PHLEBOTOMIST}>Phlebotomist</option>
-              <option value={SYSTEM_ROLES.LAB_TECHNICIAN}>Lab Technician</option>
-              <option value={SYSTEM_ROLES.LAB_MANAGER}>Lab Manager</option>
-              <option value={SYSTEM_ROLES.BILLING_STAFF}>Billing Staff</option>
-              <option value={SYSTEM_ROLES.LAB_ADMIN}>Lab Admin</option>
-            </select>
-            {errors.role && (
-              <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Status
-            </label>
-            <select {...register('isActive')} className="input w-full">
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-          </div>
+          <TextField
+            label="First Name"
+            name="firstName"
+            register={register('firstName')}
+            error={errors.firstName}
+            required
+          />
+          
+          <TextField
+            label="Last Name"
+            name="lastName"
+            register={register('lastName')}
+            error={errors.lastName}
+            required
+          />
+          
+          <EmailField
+            label="Email"
+            name="email"
+            register={register('email')}
+            error={errors.email}
+            required
+          />
+          
+          <PhoneField
+            label="Phone Number"
+            name="phoneNumber"
+            value={watch('phoneNumber')}
+            onChange={(value) => setValue('phoneNumber', value || '')}
+            error={errors.phoneNumber}
+          />
+          
+          <SelectField
+            label="Role"
+            name="role"
+            value={watch('role')}
+            onChange={(value) => setValue('role', value || SYSTEM_ROLES.CLINICIAN)}
+            options={[
+              { value: SYSTEM_ROLES.CLINICIAN, label: 'Clinician' },
+              { value: SYSTEM_ROLES.FRONT_DESK, label: 'Front Desk' },
+              { value: SYSTEM_ROLES.PHLEBOTOMIST, label: 'Phlebotomist' },
+              { value: SYSTEM_ROLES.LAB_TECHNICIAN, label: 'Lab Technician' },
+              { value: SYSTEM_ROLES.LAB_MANAGER, label: 'Lab Manager' },
+              { value: SYSTEM_ROLES.BILLING_STAFF, label: 'Billing Staff' },
+              { value: SYSTEM_ROLES.LAB_ADMIN, label: 'Lab Admin' },
+            ]}
+            error={errors.role}
+            required
+          />
+          
+          <SwitchField
+            label="Active Status"
+            name="isActive"
+            checked={watch('isActive')}
+            onChange={(checked) => setValue('isActive', checked)}
+            error={errors.isActive}
+            helpText="Enable or disable user access"
+          />
         </div>
       </div>
 
@@ -131,26 +134,26 @@ export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFor
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Employee ID
-            </label>
-            <input {...register('metadata.employeeId')} className="input w-full" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Department
-            </label>
-            <input {...register('metadata.department')} className="input w-full" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Designation
-            </label>
-            <input {...register('metadata.designation')} className="input w-full" />
-          </div>
+          <TextField
+            label="Employee ID"
+            name="metadata.employeeId"
+            register={register('metadata.employeeId')}
+            error={errors.metadata?.employeeId}
+          />
+          
+          <TextField
+            label="Department"
+            name="metadata.department"
+            register={register('metadata.department')}
+            error={errors.metadata?.department}
+          />
+          
+          <TextField
+            label="Designation"
+            name="metadata.designation"
+            register={register('metadata.designation')}
+            error={errors.metadata?.designation}
+          />
         </div>
       </div>
 
