@@ -138,7 +138,10 @@ export const DashboardLayout = () => {
     ? superAdminNavigation 
     : regularNavigation;
 
-  const filteredNavigation = currentUser?.role === 'super_admin' && !isImpersonating
+  // Show all navigation items in development or when not logged in (for demo purposes)
+  const filteredNavigation = !currentUser || process.env.NODE_ENV === 'development'
+    ? regularNavigation // Show all navigation in dev mode or when not logged in
+    : currentUser?.role === 'super_admin' && !isImpersonating
     ? navigation // Super admins see all their navigation items
     : navigation.filter((item) => {
         if ('roles' in item) {

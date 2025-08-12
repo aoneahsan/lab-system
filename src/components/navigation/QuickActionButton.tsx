@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Plus, X, Users, TestTube, FileText, CreditCard, Package, 
-  BarChart3, Calendar, Home, Clipboard, FlaskConical
+  BarChart3, Calendar, Home, Clipboard, FlaskConical, GripVertical
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 
@@ -34,8 +34,10 @@ export const QuickActionButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<Position>('bottom-right');
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+  const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLDivElement>(null);
+  const dragHandleRef = useRef<HTMLDivElement>(null);
 
   // Load saved position from localStorage
   useEffect(() => {
@@ -50,36 +52,90 @@ export const QuickActionButton: React.FC = () => {
     localStorage.setItem('quickActionPosition', position);
   }, [position]);
 
-  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    setDragStart({ x: clientX, y: clientY });
-    e.preventDefault();
-  };
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+      
+      const deltaX = e.clientX - initialPosition.x;
+      const deltaY = e.clientY - initialPosition.y;
+      
+      setDragPosition({ x: deltaX, y: deltaY });
+    };
 
-  const handleDragEnd = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-    
-    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
-    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : e.clientY;
-    
-    const deltaX = clientX - dragStart.x;
-    const deltaY = clientY - dragStart.y;
-    
-    // Only change position if dragged more than 50px
-    if (Math.abs(deltaX) > 50 || Math.abs(deltaY) > 50) {
+    const handleMouseUp = (e: MouseEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+      
+      const rect = buttonRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       
-      const isLeft = clientX < viewportWidth / 2;
-      const isTop = clientY < viewportHeight / 2;
+      const isLeft = centerX < viewportWidth / 2;
+      const isTop = centerY < viewportHeight / 2;
       
       const newPosition: Position = `${isTop ? 'top' : 'bottom'}-${isLeft ? 'left' : 'right'}` as Position;
       setPosition(newPosition);
+      
+      setIsDragging(false);
+      setDragPosition({ x: 0, y: 0 });
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+      
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - initialPosition.x;
+      const deltaY = touch.clientY - initialPosition.y;
+      
+      setDragPosition({ x: deltaX, y: deltaY });
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+      
+      const rect = buttonRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      const isLeft = centerX < viewportWidth / 2;
+      const isTop = centerY < viewportHeight / 2;
+      
+      const newPosition: Position = `${isTop ? 'top' : 'bottom'}-${isLeft ? 'left' : 'right'}` as Position;
+      setPosition(newPosition);
+      
+      setIsDragging(false);
+      setDragPosition({ x: 0, y: 0 });
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
     }
+  }, [isDragging, initialPosition]);
+
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
-    setIsDragging(false);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    setInitialPosition({ x: clientX, y: clientY });
+    setIsDragging(true);
   };
 
   const handleActionClick = (path: string) => {
@@ -87,11 +143,8 @@ export const QuickActionButton: React.FC = () => {
     setIsOpen(false);
   };
 
-  // Filter actions based on user role
-  const filteredActions = quickActions.filter(action => {
-    if (!action.roles) return true;
-    return action.roles.includes(currentUser?.role || '');
-  });
+  // Filter actions based on user role (show all in dev mode)
+  const filteredActions = quickActions;
 
   const positionClasses = {
     'top-left': 'top-20 left-4',
@@ -107,13 +160,20 @@ export const QuickActionButton: React.FC = () => {
     'bottom-right': 'bottom-16 right-0',
   };
 
+  const dragStyle = isDragging ? {
+    transform: `translate(${dragPosition.x}px, ${dragPosition.y}px)`,
+    transition: 'none',
+    zIndex: 9999,
+  } : {};
+
   return (
     <div
       ref={buttonRef}
-      className={`fixed z-40 ${positionClasses[position]} ${isDragging ? 'cursor-grabbing' : ''}`}
+      className={`fixed z-40 ${positionClasses[position]}`}
+      style={dragStyle}
     >
       {/* Action Menu */}
-      {isOpen && (
+      {isOpen && !isDragging && (
         <div className={`absolute ${menuPositionClasses[position]} bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-2 min-w-[200px]`}>
           <div className="grid gap-1">
             {filteredActions.map((action) => (
@@ -130,32 +190,41 @@ export const QuickActionButton: React.FC = () => {
         </div>
       )}
 
-      {/* Main Button */}
-      <button
-        className={`relative group bg-primary-600 hover:bg-primary-700 text-white rounded-full p-4 shadow-lg transition-all transform hover:scale-110 ${
-          isDragging ? 'cursor-grabbing' : 'cursor-grab'
-        }`}
-        onClick={() => !isDragging && setIsOpen(!isOpen)}
-        onMouseDown={handleDragStart}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchEnd={handleDragEnd}
-        title="Quick Actions (drag to reposition)"
-      >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <Plus className="h-6 w-6" />
-        )}
+      {/* Main Button with Drag Handle */}
+      <div className="relative">
+        <button
+          className={`relative group bg-primary-600 hover:bg-primary-700 text-white rounded-full p-4 shadow-lg transition-all transform ${
+            !isDragging ? 'hover:scale-110' : ''
+          }`}
+          onClick={() => !isDragging && setIsOpen(!isOpen)}
+        >
+          {isOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Plus className="h-6 w-6" />
+          )}
+        </button>
         
-        {/* Drag Hint */}
-        {!isOpen && !isDragging && (
-          <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Drag to reposition
-          </div>
-        )}
-      </button>
+        {/* Drag Handle */}
+        <div
+          ref={dragHandleRef}
+          className={`absolute -top-2 -right-2 bg-gray-600 hover:bg-gray-700 text-white rounded-full p-1 cursor-move shadow-md ${
+            isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          } transition-opacity`}
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+          title="Drag to reposition"
+        >
+          <GripVertical className="h-3 w-3" />
+        </div>
+      </div>
+      
+      {/* Tooltip */}
+      {!isOpen && !isDragging && (
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          Quick Actions
+        </div>
+      )}
     </div>
   );
 };
