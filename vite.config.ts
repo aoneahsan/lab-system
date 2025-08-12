@@ -143,7 +143,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 6293,
     // Enable HTTPS in development for PWA testing
-    https: false,
+    // https: false,
     // Improve HMR performance
     hmr: {
       overlay: true,
