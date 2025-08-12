@@ -3,9 +3,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button } from '@/components/ui/Button';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import type { InventoryItem } from '@/types';
+import { TextField, SelectField, NumberField, DateField, TextareaField, EmailField } from '@/components/form-fields';
 // TODO: Use Timestamp for date fields when needed
 // import { Timestamp } from 'firebase/firestore';
 

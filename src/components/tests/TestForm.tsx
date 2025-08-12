@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import LOINCBrowser from './LOINCBrowser';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { TestDefinitionFormData, LOINCCode } from '@/types/test.types';
+import { TextField, SelectField, NumberField, TextareaField, CheckboxField } from '@/components/form-fields';
 
 interface TestFormProps {
   initialData?: Partial<TestDefinitionFormData>;
@@ -26,7 +27,7 @@ const TestForm: React.FC<TestFormProps> = ({
     handleSubmit,
     formState: { errors },
     setValue,
-    // watch,
+    watch,
   } = useForm<TestDefinitionFormData>({
     defaultValues: initialData || {
       name: '',
@@ -65,39 +66,35 @@ const TestForm: React.FC<TestFormProps> = ({
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Test Code *</label>
-              <input
-                type="text"
-                {...register('code', { required: 'Test code is required' })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>}
-            </div>
+            <TextField
+              label="Test Code"
+              name="code"
+              register={register('code', { required: 'Test code is required' })}
+              error={errors.code}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Test Name *</label>
-              <input
-                type="text"
-                {...register('name', { required: 'Test name is required' })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
-            </div>
+            <TextField
+              label="Test Name"
+              name="name"
+              register={register('name', { required: 'Test name is required' })}
+              error={errors.name}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Category *</label>
-              <select
-                {...register('category', { required: 'Category is required' })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="chemistry">Chemistry</option>
-                <option value="hematology">Hematology</option>
-                <option value="microbiology">Microbiology</option>
-                <option value="immunology">Immunology</option>
-                <option value="pathology">Pathology</option>
-                <option value="genetics">Genetics</option>
-                <option value="other">Other</option>
+            <SelectField
+              label="Category"
+              name="category"
+              value={watch('category')}
+              onChange={(value) => setValue('category', value || 'chemistry')}
+              options={[
+                { value: 'chemistry', label: 'Chemistry' },
+                { value: 'hematology', label: 'Hematology' },
+                { value: 'microbiology', label: 'Microbiology' },
+                { value: 'immunology', label: 'Immunology' },
+                { value: 'pathology', label: 'Pathology' },
+                { value: 'genetics', label: 'Genetics' },
+                { value: 'other', label: 'Other' },
               </select>
             </div>
 

@@ -4,6 +4,7 @@ import { DollarSign, Plus, Trash2, User } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
 import type { InvoiceFormData, InvoiceItem } from '@/types/billing.types';
+import { SelectField, NumberField, DateField, TextareaField, TextField } from '@/components/form-fields';
 
 interface InvoiceFormProps {
   onSubmit: (data: InvoiceFormData) => void;

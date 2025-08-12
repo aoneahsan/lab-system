@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useRecordPayment } from '@/hooks/useBilling';
 import type { Invoice } from '@/types/billing.types';
+import { DateField, NumberField, SelectField, TextField, TextareaField } from '@/components/form-fields';
 
 interface PaymentModalProps {
   isOpen: boolean;

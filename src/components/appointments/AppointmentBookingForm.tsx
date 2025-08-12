@@ -8,9 +8,7 @@ import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
 import { useAvailableSlots, useCreateAppointment } from '@/hooks/useAppointments';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
+import { SelectField, DateField, TimeField, TextField, TextareaField, CheckboxField } from '@/components/form-fields';
 
 const schema = yup.object({
   patientId: yup.string().required('Patient is required'),

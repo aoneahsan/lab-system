@@ -6,6 +6,7 @@ import { usePatients } from '@/hooks/usePatients';
 import type { SampleFormData } from '@/types/sample.types';
 import type { TestOrder } from '@/types/test.types';
 import type { PatientListItem } from '@/types/patient.types';
+import { SelectField, TextField, DateTimeField, TextareaField, CheckboxField } from '@/components/form-fields';
 
 interface SampleCollectionFormProps {
   orderId?: string;

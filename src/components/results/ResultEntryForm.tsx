@@ -6,6 +6,7 @@ import { useTest } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
 import { useValidateResult } from '@/hooks/useResultValidation';
 import type { ResultEntryFormData, ResultFlag } from '@/types/result.types';
+import { TextField, NumberField, SelectField, TextareaField, DateTimeField } from '@/components/form-fields';
 
 interface ResultEntryFormProps {
   orderId: string;

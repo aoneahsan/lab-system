@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import CreateLaboratoryModal from '@/pages/auth/CreateLaboratoryModal';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { TextField } from '@/components/form-fields';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();

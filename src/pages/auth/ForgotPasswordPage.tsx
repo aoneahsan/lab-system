@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
+import { EmailField } from '@/components/form-fields';
 
 const ForgotPasswordPage = () => {
   const { resetPassword, isLoading } = useAuthStore();

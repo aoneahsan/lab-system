@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { toast } from 'sonner';
+import { EmailField, PasswordField, CheckboxField } from '@/components/form-fields';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
