@@ -1,4 +1,4 @@
-package com.labflow.app;
+package com.zaions.labflow;
 
 import com.getcapacitor.BridgeActivity;
 

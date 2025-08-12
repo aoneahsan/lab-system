@@ -264,7 +264,7 @@ graph LR
 ### Updates & News
 - [Release Notes](../releases)
 - [Blog](https://blog.labflow.app)
-- [Newsletter Signup](https://labflow.app/newsletter)
+- [Newsletter Signup](https://labsystem-a1.web.app/newsletter)
 
 ## 🎓 Certification
 

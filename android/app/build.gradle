@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.labflow.app"
+    namespace "com.zaions.labflow"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.labflow.app"
+        applicationId "com.zaions.labflow"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

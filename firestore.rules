@@ -1,0 +1,260 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+    
+    function isTenantUser(tenantId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/tenant_users/$(request.auth.uid + '_' + tenantId));
+    }
+    
+    function canAccessTenant(tenantId) {
+      return isTenantUser(tenantId) || hasRole('super_admin');
+    }
+    
+    function getTenantUser(tenantId) {
+      return get(/databases/$(database)/documents/tenant_users/$(request.auth.uid + '_' + tenantId));
+    }
+    
+    function hasRoleInTenant(tenantId, role) {
+      return isTenantUser(tenantId) && getTenantUser(tenantId).data.role == role;
+    }
+    
+    function hasAnyRoleInTenant(tenantId, roles) {
+      return isTenantUser(tenantId) && getTenantUser(tenantId).data.role in roles;
+    }
+    
+    // Extract tenant ID from collection name
+    function extractTenantId(collectionPath) {
+      // Expected format: labflow_TENANTID_collection
+      return collectionPath.split('_')[1];
+    }
+    
+    // Root collections
+    
+    // Tenant rules - Allow anyone to read tenants during registration
+    match /tenants/{tenantId} {
+      allow read: if true; // Public read for tenant verification during registration
+      // Allow creation of DEMO tenant by anyone (for initialization)
+      allow create: if tenantId == 'demo' && request.resource.data.code == 'DEMO';
+      // Tenant creation requires authentication and lab_admin role
+      allow create: if isAuthenticated() && 
+        request.resource.data.id == tenantId &&
+        request.resource.data.code != null &&
+        request.resource.data.name != null &&
+        request.resource.data.type != null;
+      allow update: if hasRole('super_admin') || 
+        (isAuthenticated() && hasAnyRoleInTenant(tenantId, ['lab_admin']));
+      allow delete: if hasRole('super_admin');
+    }
+    
+    // Tenant users collection
+    match /tenant_users/{document} {
+      allow read: if isAuthenticated() && 
+        (document.split('_')[0] == request.auth.uid || hasRole('super_admin'));
+      // Allow users to create their own tenant_user entries during registration
+      allow create: if isAuthenticated() && 
+        document.split('_')[0] == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+      allow update: if hasRole('super_admin') || 
+        (isAuthenticated() && document.split('_')[0] == request.auth.uid);
+      allow delete: if hasRole('super_admin');
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || hasRole('super_admin');
+      // Allow users to create their own user document during registration
+      allow create: if isAuthenticated() && request.auth.uid == userId &&
+        request.resource.data.id == userId &&
+        request.resource.data.email == request.auth.token.email;
+      allow update: if isOwner(userId) || hasRole('super_admin');
+      allow delete: if hasRole('super_admin');
+    }
+    
+    // Catch-all for tenant collections using a wildcard
+    match /{collection}/{document} {
+      // Check if this is a tenant-prefixed collection
+      allow read: if collection.matches('labflow_.*_.*') && 
+        canAccessTenant(extractTenantId(collection));
+      
+      // Write permissions based on collection type and role
+      allow write: if collection.matches('labflow_.*_patients') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'front_desk']);
+        
+      allow write: if collection.matches('labflow_.*_tests') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_test_orders') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'clinician', 'front_desk']);
+        
+      allow write: if collection.matches('labflow_.*_samples') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'phlebotomist']);
+        
+      allow write: if collection.matches('labflow_.*_results') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'pathologist', 'radiologist']);
+        
+      allow write: if collection.matches('labflow_.*_invoices') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_payments') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_inventory.*') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_qc.*') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']);
+        
+      allow write: if collection.matches('labflow_.*_reports') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow create: if collection.matches('labflow_.*_audit_logs') && 
+        canAccessTenant(extractTenantId(collection));
+        
+      allow write: if collection.matches('labflow_.*_settings') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      // New collections for recently added modules
+      allow write: if collection.matches('labflow_.*_resultValidations') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_sampleCollections') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'phlebotomist']);
+        
+      allow write: if collection.matches('labflow_.*_inventory_items') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_stock_transactions') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']);
+        
+      allow write: if collection.matches('labflow_.*_lots') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_purchase_orders') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_inventory_alerts') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_qc_tests') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_qc_results') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']);
+        
+      allow write: if collection.matches('labflow_.*_REPORT_TEMPLATES') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_REPORTS') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'pathologist', 'radiologist', 'clinician']);
+        
+      allow write: if collection.matches('labflow_.*_ANALYTICS_DASHBOARDS') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      // Missing collections
+      allow write: if collection.matches('labflow_.*_critical_notifications') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician', 'pathologist', 'radiologist']);
+        
+      allow write: if collection.matches('labflow_.*_batches') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'phlebotomist']);
+        
+      // Additional collections for EMR, webhooks, and others
+      allow write: if collection.matches('labflow_.*_emr_connections') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_emr_messages') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_webhooks') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_webhook_logs') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_insurance_providers') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_patient_insurance') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff', 'front_desk']);
+        
+      allow write: if collection.matches('labflow_.*_insurance_eligibility') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_insurance_claims') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_payment_reconciliations') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_payment_plans') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'billing_staff']);
+        
+      allow write: if collection.matches('labflow_.*_scheduled_reports') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin']);
+        
+      allow write: if collection.matches('labflow_.*_critical_values') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager']);
+        
+      allow write: if collection.matches('labflow_.*_patient_alerts') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'clinician']);
+        
+      allow write: if collection.matches('labflow_.*_result_groups') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'lab_technician']);
+        
+      allow write: if collection.matches('labflow_.*_result_reports') && 
+        hasAnyRoleInTenant(extractTenantId(collection), ['super_admin', 'lab_admin', 'lab_manager', 'pathologist', 'radiologist']);
+    }
+    
+    // Non-tenant prefixed collections
+    match /labflow_tests/{document} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+    
+    match /labflow_test_panels/{document} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('super_admin');
+    }
+    
+    match /labflow_test_orders/{document} {
+      allow read: if isAuthenticated() && canAccessTenant(resource.data.tenantId);
+      allow write: if isAuthenticated() && 
+        hasAnyRoleInTenant(request.resource.data.tenantId, ['super_admin', 'lab_admin', 'lab_manager', 'clinician', 'front_desk']);
+    }
+    
+    match /labflow_specimens/{document} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && hasRole('super_admin');
+    }
+    
+    // Webhook subcollections under tenants
+    match /tenants/{tenantId}/webhook_endpoints/{endpointId} {
+      allow read: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+      allow write: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+    }
+    
+    match /tenants/{tenantId}/webhook_events/{eventId} {
+      allow read: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+      allow write: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+    }
+    
+    match /tenants/{tenantId}/webhook_delivery_attempts/{attemptId} {
+      allow read: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+      allow write: if hasAnyRoleInTenant(tenantId, ['super_admin', 'lab_admin']);
+    }
+  }
+}

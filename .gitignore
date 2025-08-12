@@ -34,13 +34,10 @@ dist-ssr
 
 # Firebase
 .firebase/
-.firebaserc
 firebase-debug.log*
 firebase-debug.*.log
 firebase-export*
 firestore-debug.log*
-firestore.rules
-firestore.indexes.json
 ui-debug.log*
 database-debug.log*
 pubsub-debug.log*

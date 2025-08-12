@@ -1,26 +1,25 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.labflow.app',
+  appId: 'com.zaions.labflow',
   appName: 'LabFlow',
   webDir: 'dist',
-  bundledWebRuntime: false,
   backgroundColor: '#ffffff',
   server: {
-    url: 'https://labflow.app',
+    url: 'https://labsystem-a1.web.app',
     cleartext: false,
-    androidScheme: 'https'
+    androidScheme: 'https',
   },
   ios: {
     contentInset: 'automatic',
     limitsNavigationsToAppBoundDomains: true,
     backgroundColor: '#ffffff',
-    overrideUserAgent: 'LabFlow/1.0.0'
+    overrideUserAgent: 'LabFlow/1.0.0',
   },
   android: {
     allowMixedContent: false,
     backgroundColor: '#ffffff',
-    overrideUserAgent: 'LabFlow/1.0.0'
+    overrideUserAgent: 'LabFlow/1.0.0',
   },
   plugins: {
     SplashScreen: {

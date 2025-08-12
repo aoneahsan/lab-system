@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">LabFlow</string>
     <string name="title_activity_main">LabFlow</string>
-    <string name="package_name">com.labflow.app</string>
-    <string name="custom_url_scheme">com.labflow.app</string>
+    <string name="package_name">com.zaions.labflow</string>
+    <string name="custom_url_scheme">com.zaions.labflow</string>
     <string name="default_notification_channel_id">labflow_default_channel</string>
 </resources>

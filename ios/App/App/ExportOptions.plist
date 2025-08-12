@@ -25,7 +25,7 @@
     
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.labflow.app</key>
+        <key>com.zaions.labflow</key>
         <string>LabFlow Distribution Profile</string>
     </dict>
     

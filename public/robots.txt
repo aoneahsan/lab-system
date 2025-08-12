@@ -1,12 +1,12 @@
 # LabFlow Robots.txt
-# https://labflow.app
+# https://labsystem-a1.web.app
 
 # Allow all web crawlers
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://labflow.app/sitemap.xml
+Sitemap: https://labsystem-a1.web.app/sitemap.xml
 
 # Crawl-delay (optional, in seconds)
 Crawl-delay: 1

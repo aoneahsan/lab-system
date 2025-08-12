@@ -1,19 +1,19 @@
 # iOS Configuration
-app_identifier("com.labflow.app")
+app_identifier("com.zaions.labflow")
 apple_id(ENV["APPLE_ID"])
 itc_team_id(ENV["ITC_TEAM_ID"])
 team_id(ENV["TEAM_ID"])
 
 # Android Configuration
 for_platform :android do
-  package_name("com.labflow.app")
+  package_name("com.zaions.labflow")
 end
 
 # Environment-specific configurations
 for_lane :beta do
-  app_identifier("com.labflow.app.beta")
+  app_identifier("com.zaions.labflow.beta")
 end
 
 for_lane :release do
-  app_identifier("com.labflow.app")
+  app_identifier("com.zaions.labflow")
 end

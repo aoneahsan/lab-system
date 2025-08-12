@@ -9,11 +9,11 @@
       <TileColor>#0ea5e9</TileColor>
     </tile>
     <notification>
-      <polling-uri src="https://labflow.app/notifications/badge"/>
-      <polling-uri2 src="https://labflow.app/notifications/badge2"/>
-      <polling-uri3 src="https://labflow.app/notifications/badge3"/>
-      <polling-uri4 src="https://labflow.app/notifications/badge4"/>
-      <polling-uri5 src="https://labflow.app/notifications/badge5"/>
+      <polling-uri src="https://labsystem-a1.web.app/notifications/badge"/>
+      <polling-uri2 src="https://labsystem-a1.web.app/notifications/badge2"/>
+      <polling-uri3 src="https://labsystem-a1.web.app/notifications/badge3"/>
+      <polling-uri4 src="https://labsystem-a1.web.app/notifications/badge4"/>
+      <polling-uri5 src="https://labsystem-a1.web.app/notifications/badge5"/>
       <frequency>30</frequency>
       <cycle>1</cycle>
     </notification>
