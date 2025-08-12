@@ -396,8 +396,10 @@ const AdminPanel = () => {
                     { value: 'email-asc', label: 'Email A-Z' },
                     { value: 'email-desc', label: 'Email Z-A' },
                     { value: 'firstName-asc', label: 'Name A-Z' },
-                <option value="firstName-desc">Name Z-A</option>
-              </select>
+                    { value: 'firstName-desc', label: 'Name Z-A' },
+                  ]}
+                />
+              </div>
             </div>
           </div>
 

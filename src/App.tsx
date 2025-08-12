@@ -19,6 +19,7 @@ import { ErrorHandlingProvider } from '@/providers/ErrorHandlingProvider';
 import { initializeNotifications } from '@/services/app-notification.service';
 import { firebaseKit } from '@/services/firebase-kit.service';
 import { appUpdateService } from '@/services/app-update.service';
+import { HotkeyManager } from '@/components/navigation/HotkeyManager';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,7 @@ function App() {
             <TrackingProvider>
               <PerformanceProvider>
                 <InitializeDemoTenant />
+                <HotkeyManager />
                 <RouterComponent />
                 <Toaster />
                 <PerformanceMetrics />

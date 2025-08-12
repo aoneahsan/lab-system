@@ -95,8 +95,8 @@ const TestForm: React.FC<TestFormProps> = ({
                 { value: 'pathology', label: 'Pathology' },
                 { value: 'genetics', label: 'Genetics' },
                 { value: 'other', label: 'Other' },
-              </select>
-            </div>
+              ]}
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Department</label>

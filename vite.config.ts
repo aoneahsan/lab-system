@@ -18,15 +18,15 @@ export default defineConfig(({ mode }) => ({
       filename: 'dist/stats.html',
       gzipSize: true,
       brotliSize: true,
-    }),
+    }) as any,
     // Compression
     compression({
-      algorithm: 'gzip',
+      algorithms: ['gzip'],
       exclude: [/\.(png|jpg|jpeg|gif|webp|svg)$/i],
       threshold: 1024,
     }),
     compression({
-      algorithm: 'brotliCompress',
+      algorithms: ['brotliCompress'],
       exclude: [/\.(png|jpg|jpeg|gif|webp|svg)$/i],
       threshold: 1024,
     }),

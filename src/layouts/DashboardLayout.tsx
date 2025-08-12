@@ -4,6 +4,10 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { toast } from '@/stores/toast.store';
+import { Info } from 'lucide-react';
+import { QuickActionButton } from '@/components/navigation/QuickActionButton';
+import { FeatureInfoModal } from '@/components/navigation/FeatureInfoModal';
+import { useHotkeyAction } from '@/hooks/useHotkeys';
 
 // Define separate navigation for super admins
 const superAdminNavigation = [
@@ -110,11 +114,15 @@ const regularNavigation = [
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showFeatureModal, setShowFeatureModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuthStore();
   const { tenant } = useTenant();
   const { isImpersonating, impersonatedUser, endImpersonation } = useImpersonationStore();
+
+  // Register hotkey for help modal
+  useHotkeyAction('help', () => setShowFeatureModal(true), []);
 
   const handleEndImpersonation = () => {
     endImpersonation();
@@ -161,14 +169,41 @@ export const DashboardLayout = () => {
         </div>
       )}
 
-      {/* Mobile sidebar toggle */}
-      <div className={`lg:hidden fixed left-4 z-50 ${isImpersonating ? 'top-14' : 'top-4'}`}>
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-md bg-white dark:bg-gray-800 shadow-md"
-        >
-          <span className="text-2xl">{sidebarOpen ? '✕' : '☰'}</span>
-        </button>
+      {/* Header with mobile sidebar toggle and info icon */}
+      <div className={`fixed left-0 right-0 z-50 ${isImpersonating ? 'top-10' : 'top-0'} lg:left-64 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700`}>
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* Mobile sidebar toggle */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <span className="text-xl">{sidebarOpen ? '✕' : '☰'}</span>
+          </button>
+          
+          {/* Page Title (desktop only) */}
+          <div className="hidden lg:block flex-1">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {location.pathname === '/dashboard' ? 'Dashboard' :
+               location.pathname.startsWith('/patients') ? 'Patients' :
+               location.pathname.startsWith('/tests') ? 'Tests' :
+               location.pathname.startsWith('/results') ? 'Results' :
+               location.pathname.startsWith('/billing') ? 'Billing' :
+               location.pathname.startsWith('/inventory') ? 'Inventory' :
+               location.pathname.startsWith('/appointments') ? 'Appointments' :
+               location.pathname.startsWith('/reports') ? 'Reports' :
+               'LabFlow'}
+            </h2>
+          </div>
+          
+          {/* Info Icon */}
+          <button
+            onClick={() => setShowFeatureModal(true)}
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            title="App Features (Shift+?)"
+          >
+            <Info className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -242,11 +277,17 @@ export const DashboardLayout = () => {
       </div>
 
       {/* Main content */}
-      <div className={`lg:pl-64 ${isImpersonating ? 'pt-10' : ''}`}>
+      <div className={`lg:pl-64 ${isImpersonating ? 'pt-24' : 'pt-14'}`}>
         <main className="min-h-screen p-4 lg:p-8">
           <Outlet />
         </main>
       </div>
+
+      {/* Quick Action Button */}
+      <QuickActionButton />
+
+      {/* Feature Info Modal */}
+      <FeatureInfoModal isOpen={showFeatureModal} onClose={() => setShowFeatureModal(false)} />
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (

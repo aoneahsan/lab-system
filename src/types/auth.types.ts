@@ -52,6 +52,14 @@ export interface UserPreferences {
   defaultView?: string;
   dashboardLayout?: Record<string, unknown>;
   shortcuts?: string[];
+  // Navigation preferences
+  hotkeys?: Record<string, any>;
+  quickActionPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  quickActionExpanded?: boolean;
+  showWelcomeMessage?: boolean;
+  sidebarCollapsed?: boolean;
+  favoriteModules?: string[];
+  recentlyVisited?: Array<{ path: string; label: string; timestamp: number }>;
 }
 
 export interface AuthState {

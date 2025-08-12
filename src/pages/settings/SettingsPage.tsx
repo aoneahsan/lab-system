@@ -30,6 +30,12 @@ const settingCategories: SettingCategory[] = [
     icon: '🔔',
   },
   {
+    title: 'Keyboard Shortcuts',
+    description: 'Customize keyboard shortcuts for quick navigation and actions',
+    link: '/settings/hotkeys',
+    icon: '⌨️',
+  },
+  {
     title: 'Security & Privacy',
     description: 'Manage security settings, two-factor authentication, and privacy options',
     link: '/settings/security',
