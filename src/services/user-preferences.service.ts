@@ -30,9 +30,21 @@ class UserPreferencesService {
 
   async getUserPreferences(userId: string): Promise<UserPreferencesExtended | null> {
     try {
+      // Return null if no userId provided
+      if (!userId) {
+        return null;
+      }
+
       // Check cache first
       if (this.cache.has(userId)) {
         return this.cache.get(userId)!;
+      }
+
+      // Try to get from localStorage first (for offline support)
+      const localPrefs = this.loadFromLocalStorage(userId);
+      if (localPrefs) {
+        this.cache.set(userId, localPrefs);
+        return localPrefs;
       }
 
       const docRef = doc(db, this.collection, userId);
@@ -41,11 +53,26 @@ class UserPreferencesService {
       if (docSnap.exists()) {
         const preferences = docSnap.data() as UserPreferencesExtended;
         this.cache.set(userId, preferences);
+        this.syncToLocalStorage(userId, preferences);
         return preferences;
       }
 
-      return null;
+      // Return default preferences if document doesn't exist
+      const defaultPrefs = this.getDefaultPreferences();
+      this.cache.set(userId, defaultPrefs);
+      return defaultPrefs;
     } catch (error) {
+      // If Firebase permissions error, fallback to localStorage or defaults
+      if (error instanceof Error && error.message.includes('permissions')) {
+        const localPrefs = this.loadFromLocalStorage(userId);
+        if (localPrefs) {
+          this.cache.set(userId, localPrefs);
+          return localPrefs;
+        }
+        const defaultPrefs = this.getDefaultPreferences();
+        this.cache.set(userId, defaultPrefs);
+        return defaultPrefs;
+      }
       console.error('Error fetching user preferences:', error);
       return null;
     }

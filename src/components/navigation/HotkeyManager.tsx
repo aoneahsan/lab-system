@@ -15,6 +15,9 @@ export const HotkeyManager: React.FC = () => {
     // Load user's custom hotkeys if logged in
     if (currentUser?.id) {
       loadUserHotkeys(currentUser.id);
+    } else {
+      // Apply default hotkeys for non-authenticated users
+      hotkeysService.resetToDefaults();
     }
 
     return () => {

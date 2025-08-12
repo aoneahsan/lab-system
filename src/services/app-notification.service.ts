@@ -1,11 +1,11 @@
 import { notifications } from 'notification-kit';
-import { firebaseConfig } from '@/config/firebase.config';
+import app from '@/config/firebase.config';
 
 // Initialize notification kit with v2.0.3 API
 export const initializeNotifications = async () => {
   await notifications.init({
     provider: 'firebase',
-    config: firebaseConfig,
+    existingApp: app,
     inApp: {
       position: 'top-right',
       duration: 4000,
