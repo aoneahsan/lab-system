@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useModalState } from '@/hooks/useModalState';
 import { PERMISSIONS } from '@/constants/permissions.constants';
 import { toast } from '@/stores/toast.store';
 import { Info } from 'lucide-react';
@@ -109,7 +110,7 @@ const regularNavigation = [
 
 export const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showFeatureModal, setShowFeatureModal] = useState(false);
+  const featureModal = useModalState('feature-info');
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuthStore();
@@ -118,7 +119,7 @@ export const DashboardLayout = () => {
   const { hasAnyPermission, userRole } = usePermissions();
 
   // Register hotkey for help modal
-  useHotkeyAction('help', () => setShowFeatureModal(true), []);
+  useHotkeyAction('help', () => featureModal.openModal(), []);
 
   const handleEndImpersonation = () => {
     endImpersonation();
@@ -199,7 +200,7 @@ export const DashboardLayout = () => {
           
           {/* Info Icon */}
           <button
-            onClick={() => setShowFeatureModal(true)}
+            onClick={() => featureModal.openModal()}
             className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="App Features (Shift+?)"
           >
@@ -289,7 +290,7 @@ export const DashboardLayout = () => {
       <QuickActionButton />
 
       {/* Feature Info Modal */}
-      <FeatureInfoModal isOpen={showFeatureModal} onClose={() => setShowFeatureModal(false)} />
+      <FeatureInfoModal isOpen={featureModal.isOpen} onClose={() => featureModal.closeModal()} />
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (

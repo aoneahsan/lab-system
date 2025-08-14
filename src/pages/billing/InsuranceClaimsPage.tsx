@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useClaims, useClaimStatistics } from '@/hooks/useBilling';
+import { useModalState } from '@/hooks/useModalState';
 import CreateClaimModal from '@/components/billing/CreateClaimModal';
 import type { ClaimFilter, InsuranceClaim } from '@/types/billing.types';
 
 const InsuranceClaimsPage: React.FC = () => {
   const navigate = useNavigate();
   const [filters] = useState<ClaimFilter>({});
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const createModal = useModalState('create-claim');
   const [_selectedClaim] = useState<InsuranceClaim | null>(null);
 
   const { data: claims = [], isLoading } = useClaims(filters);
@@ -62,7 +63,7 @@ const InsuranceClaimsPage: React.FC = () => {
               Back to Billing
             </button>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => createModal.openModal()}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
@@ -134,7 +135,7 @@ const InsuranceClaimsPage: React.FC = () => {
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No insurance claims found.</p>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => createModal.openModal()}
               className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
             >
               Create First Claim
@@ -236,7 +237,7 @@ const InsuranceClaimsPage: React.FC = () => {
       </div>
 
       {/* Create Claim Modal */}
-      <CreateClaimModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <CreateClaimModal isOpen={createModal.isOpen} onClose={() => createModal.closeModal()} />
     </div>
   );
 };

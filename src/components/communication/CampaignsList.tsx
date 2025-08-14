@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Campaign } from '@/types/communication.types';
 import { useStartCampaign, usePauseCampaign } from '@/hooks/useCommunication';
+import { useModalState } from '@/hooks/useModalState';
 import CampaignModal from './CampaignModal';
 
 interface CampaignsListProps {
@@ -10,7 +11,7 @@ interface CampaignsListProps {
 
 export function CampaignsList({ campaigns, isLoading }: CampaignsListProps) {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const campaignModal = useModalState('campaign');
   const startCampaign = useStartCampaign();
   const pauseCampaign = usePauseCampaign();
 
@@ -31,14 +32,24 @@ export function CampaignsList({ campaigns, isLoading }: CampaignsListProps) {
     await pauseCampaign.mutateAsync(id);
   };
 
+  // Restore campaign from URL on modal open
+  useEffect(() => {
+    if (campaignModal.isOpen && campaignModal.modalData.campaignId && campaigns) {
+      const campaign = campaigns.find(c => c.id === campaignModal.modalData.campaignId);
+      if (campaign) setSelectedCampaign(campaign);
+    } else if (!campaignModal.isOpen) {
+      setSelectedCampaign(null);
+    }
+  }, [campaignModal.isOpen, campaignModal.modalData, campaigns]);
+
   const handleEdit = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
-    setIsModalOpen(true);
+    campaignModal.openModal({ campaignId: campaign.id });
   };
 
   const handleCloseModal = () => {
     setSelectedCampaign(null);
-    setIsModalOpen(false);
+    campaignModal.closeModal();
   };
 
   if (isLoading) {
@@ -54,7 +65,7 @@ export function CampaignsList({ campaigns, isLoading }: CampaignsListProps) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Campaigns</h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => campaignModal.openModal()}
           className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
         >
           Create Campaign
@@ -175,7 +186,7 @@ export function CampaignsList({ campaigns, isLoading }: CampaignsListProps) {
         </div>
       )}
 
-      {isModalOpen && (
+      {campaignModal.isOpen && (
         <CampaignModal
           campaign={selectedCampaign}
           onClose={handleCloseModal}

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWorkflowRules } from '@/hooks/useWorkflowAutomation';
 import { useUrlState } from '@/hooks/useUrlState';
+import { useModalState } from '@/hooks/useModalState';
 import { WorkflowRulesList } from '@/components/workflow/WorkflowRulesList';
 import { WorkflowRuleModal } from '@/components/workflow/WorkflowRuleModal';
 import { TATRulesList } from '@/components/workflow/TATRulesList';
@@ -12,18 +13,28 @@ export default function WorkflowAutomationPage() {
     defaultValue: 'rules',
     removeDefault: true
   });
-  const [showRuleModal, setShowRuleModal] = useState(false);
+  const ruleModal = useModalState('workflow-rule');
   const [editingRule, setEditingRule] = useState<WorkflowRule | null>(null);
   const { data: rules, isLoading } = useWorkflowRules();
 
+  // Restore editing rule from URL
+  useEffect(() => {
+    if (ruleModal.isOpen && ruleModal.modalData.ruleId && rules) {
+      const rule = rules.find(r => r.id === ruleModal.modalData.ruleId);
+      if (rule) setEditingRule(rule);
+    } else if (!ruleModal.isOpen) {
+      setEditingRule(null);
+    }
+  }, [ruleModal.isOpen, ruleModal.modalData, rules]);
+
   const handleCreateRule = () => {
     setEditingRule(null);
-    setShowRuleModal(true);
+    ruleModal.openModal();
   };
 
   const handleEditRule = (rule: WorkflowRule) => {
     setEditingRule(rule);
-    setShowRuleModal(true);
+    ruleModal.openModal({ ruleId: rule.id });
   };
 
   const tabs = [
@@ -105,10 +116,13 @@ export default function WorkflowAutomationPage() {
       </div>
 
       {/* Rule Modal */}
-      {showRuleModal && (
+      {ruleModal.isOpen && (
         <WorkflowRuleModal
           rule={editingRule}
-          onClose={() => setShowRuleModal(false)}
+          onClose={() => {
+            ruleModal.closeModal();
+            setEditingRule(null);
+          }}
         />
       )}
     </div>

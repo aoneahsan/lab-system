@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlusIcon, CalendarIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import { AppointmentCalendar } from '@/components/appointments/AppointmentCalendar';
 import { AppointmentList } from '@/components/appointments/AppointmentList';
@@ -7,13 +7,25 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useNavigate } from 'react-router-dom';
+import { useModalState } from '@/hooks/useModalState';
+import { useUrlState } from '@/hooks/useUrlState';
 import { Appointment } from '@/types/appointment.types';
 
 export const AppointmentsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [_selectedDate] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState('calendar');
+  const bookingModal = useModalState('booking');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'calendar',
+    removeDefault: true
+  });
+
+  // Restore selected date from URL on modal open
+  useEffect(() => {
+    if (bookingModal.isOpen && bookingModal.modalData.date) {
+      setSelectedDate(new Date(bookingModal.modalData.date));
+    }
+  }, [bookingModal.isOpen, bookingModal.modalData.date]);
 
   const handleAppointmentClick = (appointment: Appointment) => {
     navigate(`/appointments/${appointment.id}`);
@@ -22,12 +34,14 @@ export const AppointmentsPage: React.FC = () => {
   const handleNewAppointment = (date?: Date) => {
     if (date) {
       setSelectedDate(date);
+      bookingModal.openModal({ date: date.toISOString() });
+    } else {
+      bookingModal.openModal();
     }
-    setShowBookingModal(true);
   };
 
   const handleBookingSuccess = () => {
-    setShowBookingModal(false);
+    bookingModal.closeModal();
     setSelectedDate(null);
     // Appointments will refresh automatically via React Query
   };
@@ -72,9 +86,9 @@ export const AppointmentsPage: React.FC = () => {
 
       {/* Booking Modal */}
       <Modal
-        isOpen={showBookingModal}
+        isOpen={bookingModal.isOpen}
         onClose={() => {
-          setShowBookingModal(false);
+          bookingModal.closeModal();
           setSelectedDate(null);
         }}
         title="Book New Appointment"
@@ -82,7 +96,7 @@ export const AppointmentsPage: React.FC = () => {
         <AppointmentBookingForm
           onSuccess={handleBookingSuccess}
           onCancel={() => {
-            setShowBookingModal(false);
+            bookingModal.closeModal();
             setSelectedDate(null);
           }}
         />

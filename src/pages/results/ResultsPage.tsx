@@ -21,6 +21,7 @@ import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
 import { pdfService } from '@/services/pdf.service';
 import { toast } from '@/stores/toast.store';
+import { useMultiModalState } from '@/hooks/useModalState';
 import CriticalResultsDashboard from '@/components/results/CriticalResultsDashboard';
 import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
 import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
@@ -32,18 +33,12 @@ import type { Patient } from '@/types/patient.types';
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const modals = useMultiModalState();
   const [filters] = useState<ResultFilter>({});
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
-  const [showBatchApproval, setShowBatchApproval] = useState(false);
-  const [amendmentModal, setAmendmentModal] = useState<{
-    isOpen: boolean;
-    result: TestResult | null;
-  }>({ isOpen: false, result: null });
-  const [correctionModal, setCorrectionModal] = useState<{
-    isOpen: boolean;
-    result: TestResult | null;
-    test: TestDefinition | null;
-  }>({ isOpen: false, result: null, test: null });
+  const [amendmentResult, setAmendmentResult] = useState<TestResult | null>(null);
+  const [correctionResult, setCorrectionResult] = useState<TestResult | null>(null);
+  const [correctionTest, setCorrectionTest] = useState<TestDefinition | null>(null);
 
   const { data: resultsData, isLoading } = useResults(filters);
   const results = resultsData?.items || [];
@@ -57,7 +52,7 @@ const ResultsPage: React.FC = () => {
   const samples = samplesData || [];
   const tests = testsData || [];
 
-  // Handle URL query parameters
+  // Handle URL query parameters and restore modal states
   useEffect(() => {
     const action = searchParams.get('action');
     const view = searchParams.get('view');
@@ -74,13 +69,26 @@ const ResultsPage: React.FC = () => {
       }
     }
     
+    // Restore modal states from URL
+    if (modals.currentModal === 'amendment' && modals.modalData.resultId) {
+      const result = results.find(r => r.id === modals.modalData.resultId);
+      if (result) setAmendmentResult(result);
+    } else if (modals.currentModal === 'correction' && modals.modalData.resultId) {
+      const result = results.find(r => r.id === modals.modalData.resultId);
+      const test = tests.find(t => t.id === modals.modalData.testId);
+      if (result) {
+        setCorrectionResult(result);
+        setCorrectionTest(test || null);
+      }
+    }
+    
     // Clean up the URL
     if (action || view) {
       searchParams.delete('action');
       searchParams.delete('view');
       setSearchParams(searchParams);
     }
-  }, [searchParams, setSearchParams, navigate]);
+  }, [searchParams, setSearchParams, navigate, modals, results, tests]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -297,7 +305,8 @@ const ResultsPage: React.FC = () => {
       );
       return;
     }
-    setAmendmentModal({ isOpen: true, result });
+    setAmendmentResult(result);
+    modals.openModal('amendment', { resultId: result.id });
   };
 
   const handleCorrectResult = (result: TestResult) => {
@@ -313,7 +322,9 @@ const ResultsPage: React.FC = () => {
       toast.error('Test Not Found', 'Unable to find test information');
       return;
     }
-    setCorrectionModal({ isOpen: true, result, test });
+    setCorrectionResult(result);
+    setCorrectionTest(test);
+    modals.openModal('correction', { resultId: result.id, testId: test.id });
   };
 
   return (
@@ -329,7 +340,13 @@ const ResultsPage: React.FC = () => {
               {selectedResults.length > 0 && (
                 <>
                   <button
-                    onClick={() => setShowBatchApproval(!showBatchApproval)}
+                    onClick={() => {
+                      if (modals.isModalOpen('batch-approval')) {
+                        modals.closeModal();
+                      } else {
+                        modals.openModal('batch-approval', { count: selectedResults.length });
+                      }
+                    }}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
                   >
                     <CheckCircle className="h-4 w-4" />
@@ -426,15 +443,15 @@ const ResultsPage: React.FC = () => {
       )}
 
       {/* Batch Approval */}
-      {showBatchApproval && selectedResults.length > 0 && (
+      {modals.isModalOpen('batch-approval') && selectedResults.length > 0 && (
         <div className="mb-6">
           <BatchResultApproval
             results={results.filter(r => selectedResults.includes(r.id))}
             onComplete={() => {
-              setShowBatchApproval(false);
+              modals.closeModal();
               setSelectedResults([]);
             }}
-            onCancel={() => setShowBatchApproval(false)}
+            onCancel={() => modals.closeModal()}
           />
         </div>
       )}
@@ -587,21 +604,28 @@ const ResultsPage: React.FC = () => {
       </div>
 
       {/* Amendment Modal */}
-      {amendmentModal.result && (
+      {amendmentResult && (
         <ResultAmendmentModal
-          isOpen={amendmentModal.isOpen}
-          onClose={() => setAmendmentModal({ isOpen: false, result: null })}
-          result={amendmentModal.result}
+          isOpen={modals.isModalOpen('amendment')}
+          onClose={() => {
+            modals.closeModal();
+            setAmendmentResult(null);
+          }}
+          result={amendmentResult}
         />
       )}
 
       {/* Correction Modal */}
-      {correctionModal.result && correctionModal.test && (
+      {correctionResult && correctionTest && (
         <ResultCorrectionModal
-          isOpen={correctionModal.isOpen}
-          onClose={() => setCorrectionModal({ isOpen: false, result: null, test: null })}
-          result={correctionModal.result}
-          test={correctionModal.test}
+          isOpen={modals.isModalOpen('correction')}
+          onClose={() => {
+            modals.closeModal();
+            setCorrectionResult(null);
+            setCorrectionTest(null);
+          }}
+          result={correctionResult}
+          test={correctionTest}
         />
       )}
     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Search, X, Info, ExternalLink, Loader2 } from 'lucide-react';
 import { useLOINCSearch, useCommonLOINCTests } from '@/hooks/useTests';
 import { useUrlState } from '@/hooks/useUrlState';
+import { useModalState } from '@/hooks/useModalState';
 import { loincService } from '@/services/loinc.service';
 import type { LOINCCode } from '@/types/test.types';
 
@@ -12,16 +13,30 @@ interface LOINCBrowserProps {
 }
 
 const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selectedCode }) => {
-  const [searchTerm, setSearchTerm] = useUrlState('search', {
+  const loincModal = useModalState('loinc-browser');
+  const [searchTerm, setSearchTerm] = useUrlState('loincSearch', {
     defaultValue: '',
     removeDefault: true
   });
-  const [selectedCategory, setSelectedCategory] = useUrlState('category', {
+  const [selectedCategory, setSelectedCategory] = useUrlState('loincCategory', {
     defaultValue: '',
     removeDefault: true
   });
   const [categoryResults, setCategoryResults] = useState<LOINCCode[]>([]);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  
+  // Ensure modal state is in URL when component mounts
+  useEffect(() => {
+    if (!loincModal.isOpen) {
+      loincModal.openModal({ code: selectedCode });
+    }
+    return () => {
+      // Clean up URL state on unmount
+      if (loincModal.isOpen) {
+        loincModal.closeModal();
+      }
+    };
+  }, []);
 
   const { data: searchResults, isLoading: isSearching } = useLOINCSearch(searchTerm);
   const { data: commonTests, isLoading: isLoadingCommon } = useCommonLOINCTests();
@@ -75,7 +90,10 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selected
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">LOINC Code Browser</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+            <button onClick={() => {
+              loincModal.closeModal();
+              onClose();
+            }} className="text-gray-400 hover:text-gray-500">
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -178,7 +196,10 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selected
             </a>
             <div className="flex gap-3">
               <button
-                onClick={onClose}
+                onClick={() => {
+                  loincModal.closeModal();
+                  onClose();
+                }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Cancel

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageTemplate } from '@/types/communication.types';
 import { useDeleteTemplate } from '@/hooks/useCommunication';
+import { useModalState } from '@/hooks/useModalState';
 import MessageTemplateModal from './MessageTemplateModal';
 
 interface MessageTemplatesListProps {
@@ -10,7 +11,7 @@ interface MessageTemplatesListProps {
 
 export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesListProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<MessageTemplate | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const templateModal = useModalState('message-template');
   const deleteTemplate = useDeleteTemplate();
 
   const categoryIcons = {
@@ -28,9 +29,19 @@ export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesL
     push: '🔔'
   };
 
+  // Restore template from URL on modal open
+  useEffect(() => {
+    if (templateModal.isOpen && templateModal.modalData.templateId && templates) {
+      const template = templates.find(t => t.id === templateModal.modalData.templateId);
+      if (template) setSelectedTemplate(template);
+    } else if (!templateModal.isOpen) {
+      setSelectedTemplate(null);
+    }
+  }, [templateModal.isOpen, templateModal.modalData, templates]);
+
   const handleEdit = (template: MessageTemplate) => {
     setSelectedTemplate(template);
-    setIsModalOpen(true);
+    templateModal.openModal({ templateId: template.id });
   };
 
   const handleDelete = async (id: string) => {
@@ -41,7 +52,7 @@ export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesL
 
   const handleCloseModal = () => {
     setSelectedTemplate(null);
-    setIsModalOpen(false);
+    templateModal.closeModal();
   };
 
   if (isLoading) {
@@ -57,7 +68,7 @@ export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesL
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Message Templates</h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => templateModal.openModal()}
           className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
         >
           Create Template
@@ -143,7 +154,7 @@ export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesL
         </div>
       )}
 
-      {isModalOpen && (
+      {templateModal.isOpen && (
         <MessageTemplateModal
           template={selectedTemplate}
           onClose={handleCloseModal}

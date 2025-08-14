@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -11,12 +11,13 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useClaim, useSubmitClaim } from '@/hooks/useBilling';
+import { useModalState } from '@/hooks/useModalState';
 import AppealClaimModal from '@/components/billing/AppealClaimModal';
 
 const ClaimDetailPage: React.FC = () => {
   const { claimId } = useParams<{ claimId: string }>();
   const navigate = useNavigate();
-  const [showAppealModal, setShowAppealModal] = useState(false);
+  const appealModal = useModalState('appeal-claim');
 
   const { data: claim, isLoading } = useClaim(claimId!);
   const submitClaimMutation = useSubmitClaim();
@@ -121,7 +122,7 @@ const ClaimDetailPage: React.FC = () => {
 
             {claim.status === 'rejected' && (
               <button
-                onClick={() => setShowAppealModal(true)}
+                onClick={() => appealModal.openModal({ claimId })}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -326,10 +327,10 @@ const ClaimDetailPage: React.FC = () => {
       </div>
 
       {/* Appeal Modal */}
-      {showAppealModal && claim && (
+      {appealModal.isOpen && claim && (
         <AppealClaimModal
-          isOpen={showAppealModal}
-          onClose={() => setShowAppealModal(false)}
+          isOpen={appealModal.isOpen}
+          onClose={() => appealModal.closeModal()}
           claim={claim}
         />
       )}

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useSearchParams } from 'react-router-dom';
 import type { Patient, PatientAllergy, PatientMedication, PatientMedicalHistory } from '@/types/patient.types';
 import { AddAllergyModal } from '../modals/AddAllergyModal';
 import { AddMedicationModal } from '../modals/AddMedicationModal';
@@ -14,14 +15,45 @@ interface PatientMedicalHistoryTabProps {
 }
 
 export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalHistoryTabProps) => {
-  const [isAllergyModalOpen, setIsAllergyModalOpen] = useState(false);
-  const [isMedicationModalOpen, setIsMedicationModalOpen] = useState(false);
-  const [isMedicalHistoryModalOpen, setIsMedicalHistoryModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get modal states from URL
+  const modalType = searchParams.get('modal');
+  const modalAction = searchParams.get('action');
+  const editIndex = searchParams.get('editIndex');
+  
+  const isAllergyModalOpen = modalType === 'allergy';
+  const isMedicationModalOpen = modalType === 'medication';
+  const isMedicalHistoryModalOpen = modalType === 'medical-history';
+  const isDeleteModalOpen = modalType === 'delete';
   
   const [editingAllergy, setEditingAllergy] = useState<{ data: PatientAllergy; index: number } | undefined>();
   const [editingMedication, setEditingMedication] = useState<{ data: PatientMedication; index: number } | undefined>();
   const [editingHistory, setEditingHistory] = useState<{ data: PatientMedicalHistory; index: number } | undefined>();
+  
+  // Helper functions to manage modal URLs
+  const openModal = (type: string, action?: string, index?: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('modal', type);
+    if (action) params.set('action', action);
+    if (index !== undefined) params.set('editIndex', index.toString());
+    setSearchParams(params);
+  };
+  
+  const closeModal = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('modal');
+    params.delete('action');
+    params.delete('editIndex');
+    params.delete('deleteType');
+    params.delete('deleteIndex');
+    params.delete('deleteName');
+    setSearchParams(params);
+    setEditingAllergy(undefined);
+    setEditingMedication(undefined);
+    setEditingHistory(undefined);
+    setDeleteItem(null);
+  };
   
   const [deleteItem, setDeleteItem] = useState<{
     type: 'allergy' | 'medication' | 'history';
@@ -30,6 +62,34 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
   } | null>(null);
 
   const updatePatient = useUpdatePatient();
+  
+  // Restore modal state from URL on mount/URL change
+  useEffect(() => {
+    if (modalAction === 'edit' && editIndex !== null) {
+      const index = parseInt(editIndex);
+      
+      if (modalType === 'allergy' && patient.allergies[index]) {
+        setEditingAllergy({ data: patient.allergies[index], index });
+      } else if (modalType === 'medication' && patient.medications[index]) {
+        setEditingMedication({ data: patient.medications[index], index });
+      } else if (modalType === 'medical-history' && patient.medicalHistory[index]) {
+        setEditingHistory({ data: patient.medicalHistory[index], index });
+      }
+    }
+    
+    // Restore delete modal state
+    const deleteType = searchParams.get('deleteType');
+    const deleteIndex = searchParams.get('deleteIndex');
+    const deleteName = searchParams.get('deleteName');
+    
+    if (modalType === 'delete' && deleteType && deleteIndex !== null && deleteName) {
+      setDeleteItem({
+        type: deleteType as 'allergy' | 'medication' | 'history',
+        index: parseInt(deleteIndex),
+        name: deleteName
+      });
+    }
+  }, [modalType, modalAction, editIndex, searchParams, patient]);
 
   // Handle Allergy operations
   const handleAddAllergy = async (allergy: PatientAllergy) => {
@@ -44,7 +104,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
       });
       
       toast.success(editingAllergy ? 'Allergy updated successfully' : 'Allergy added successfully');
-      setEditingAllergy(undefined);
+      closeModal();
     } catch (error) {
       toast.error('Failed to save allergy');
       throw error;
@@ -53,7 +113,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
 
   const handleEditAllergy = (allergy: PatientAllergy, index: number) => {
     setEditingAllergy({ data: allergy, index });
-    setIsAllergyModalOpen(true);
+    openModal('allergy', 'edit', index);
   };
 
   // Handle Medication operations
@@ -69,7 +129,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
       });
       
       toast.success(editingMedication ? 'Medication updated successfully' : 'Medication added successfully');
-      setEditingMedication(undefined);
+      closeModal();
     } catch (error) {
       toast.error('Failed to save medication');
       throw error;
@@ -78,7 +138,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
 
   const handleEditMedication = (medication: PatientMedication, index: number) => {
     setEditingMedication({ data: medication, index });
-    setIsMedicationModalOpen(true);
+    openModal('medication', 'edit', index);
   };
 
   // Handle Medical History operations
@@ -94,7 +154,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
       });
       
       toast.success(editingHistory ? 'Medical condition updated successfully' : 'Medical condition added successfully');
-      setEditingHistory(undefined);
+      closeModal();
     } catch (error) {
       toast.error('Failed to save medical condition');
       throw error;
@@ -103,7 +163,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
 
   const handleEditHistory = (history: PatientMedicalHistory, index: number) => {
     setEditingHistory({ data: history, index });
-    setIsMedicalHistoryModalOpen(true);
+    openModal('medical-history', 'edit', index);
   };
 
   // Handle Delete operations
@@ -127,15 +187,20 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
       });
       
       toast.success(`${deleteItem.type} deleted successfully`);
-      setDeleteItem(null);
+      closeModal();
     } catch (error) {
       toast.error(`Failed to delete ${deleteItem.type}`);
     }
   };
 
   const openDeleteModal = (type: 'allergy' | 'medication' | 'history', index: number, name: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('modal', 'delete');
+    params.set('deleteType', type);
+    params.set('deleteIndex', index.toString());
+    params.set('deleteName', name);
+    setSearchParams(params);
     setDeleteItem({ type, index, name });
-    setIsDeleteModalOpen(true);
   };
   return (
     <div className="space-y-6">
@@ -146,7 +211,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           <button 
             onClick={() => {
               setEditingAllergy(undefined);
-              setIsAllergyModalOpen(true);
+              openModal('allergy', 'add');
             }}
             className="btn btn-sm btn-primary"
           >
@@ -242,7 +307,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           <button 
             onClick={() => {
               setEditingMedication(undefined);
-              setIsMedicationModalOpen(true);
+              openModal('medication', 'add');
             }}
             className="btn btn-sm btn-primary"
           >
@@ -337,7 +402,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           <button 
             onClick={() => {
               setEditingHistory(undefined);
-              setIsMedicalHistoryModalOpen(true);
+              openModal('medical-history', 'add');
             }}
             className="btn btn-sm btn-primary"
           >
@@ -468,40 +533,28 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
       {/* Modals */}
       <AddAllergyModal
         isOpen={isAllergyModalOpen}
-        onClose={() => {
-          setIsAllergyModalOpen(false);
-          setEditingAllergy(undefined);
-        }}
+        onClose={closeModal}
         onSubmit={handleAddAllergy}
         allergy={editingAllergy?.data}
       />
 
       <AddMedicationModal
         isOpen={isMedicationModalOpen}
-        onClose={() => {
-          setIsMedicationModalOpen(false);
-          setEditingMedication(undefined);
-        }}
+        onClose={closeModal}
         onSubmit={handleAddMedication}
         medication={editingMedication?.data}
       />
 
       <AddMedicalHistoryModal
         isOpen={isMedicalHistoryModalOpen}
-        onClose={() => {
-          setIsMedicalHistoryModalOpen(false);
-          setEditingHistory(undefined);
-        }}
+        onClose={closeModal}
         onSubmit={handleAddMedicalHistory}
         history={editingHistory?.data}
       />
 
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setDeleteItem(null);
-        }}
+        onClose={closeModal}
         onConfirm={handleDelete}
         title={`Delete ${deleteItem?.type || ''}`}
         message={`Are you sure you want to delete this ${deleteItem?.type || 'item'}?`}
