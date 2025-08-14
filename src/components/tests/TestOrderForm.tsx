@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Search, X, AlertCircle } from 'lucide-react';
 import { useTests, useTestPanels } from '@/hooks/useTests';
 import { usePatients } from '@/hooks/usePatients';
 import type { TestOrderFormData, TestDefinition, TestPanel } from '@/types/test.types';
 import type { PatientListItem } from '@/types/patient.types';
+import { TextField, SelectField, CheckboxField, LexicalEditorField } from '@/components/form-fields';
 
 interface TestOrderFormProps {
   onSubmit: (data: TestOrderFormData) => void;
@@ -24,7 +25,7 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({ onSubmit, onCancel, isLoa
   const { data: tests = [] } = useTests({ isActive: true });
   const { data: panels = [] } = useTestPanels();
 
-  const { register, handleSubmit, setValue, watch } = useForm<TestOrderFormData>({
+  const { register, handleSubmit, setValue, watch, control } = useForm<TestOrderFormData>({
     defaultValues: {
       priority: 'routine',
       fasting: false,
@@ -93,14 +94,15 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({ onSubmit, onCancel, isLoa
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Search Patient</label>
             <div className="relative">
-              <input
-                type="text"
+              <TextField
+                label=""
+                name="patientSearch"
                 value={patientSearch}
-                onChange={(e) => setPatientSearch(e.target.value)}
+                onChange={setPatientSearch}
                 placeholder="Search by name or MRN..."
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                showLabel={false}
+                icon={<Search className="h-5 w-5 text-gray-400" />}
               />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
 
             {patientSearch && filteredPatients.length > 0 && (
@@ -153,44 +155,69 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({ onSubmit, onCancel, isLoa
         <h3 className="text-lg font-medium text-gray-900 mb-4">Order Details</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Priority</label>
-            <select
-              {...register('priority')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="routine">Routine</option>
-              <option value="stat">STAT</option>
-              <option value="asap">ASAP</option>
-            </select>
-          </div>
+          <Controller
+            name="priority"
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                label="Priority"
+                name="priority"
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: 'routine', label: 'Routine' },
+                  { value: 'stat', label: 'STAT' },
+                  { value: 'asap', label: 'ASAP' },
+                ]}
+                showLabel
+              />
+            )}
+          />
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('fasting')}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          <Controller
+            name="fasting"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Fasting Required"
+                name="fasting"
+                checked={field.value}
+                onChange={field.onChange}
+                showLabel
+              />
+            )}
+          />
+
+          <div className="md:col-span-2">
+            <Controller
+              name="clinicalHistory"
+              control={control}
+              render={({ field }) => (
+                <LexicalEditorField
+                  label="Clinical History"
+                  name="clinicalHistory"
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  rows={2}
+                  showLabel
+                />
+              )}
             />
-            <label className="ml-2 block text-sm text-gray-900">Fasting Required</label>
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Clinical History</label>
-            <textarea
-              {...register('clinicalHistory')}
-              rows={2}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Diagnosis/Reason for Testing
-            </label>
-            <input
-              type="text"
-              {...register('diagnosis')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            <Controller
+              name="diagnosis"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Diagnosis/Reason for Testing"
+                  name="diagnosis"
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  showLabel
+                />
+              )}
             />
           </div>
         </div>
@@ -222,14 +249,15 @@ const TestOrderForm: React.FC<TestOrderFormProps> = ({ onSubmit, onCancel, isLoa
         {/* Test/Panel Search */}
         <div className="mb-4">
           <div className="relative">
-            <input
-              type="text"
+            <TextField
+              label=""
+              name="testSearch"
               value={testSearch}
-              onChange={(e) => setTestSearch(e.target.value)}
+              onChange={setTestSearch}
               placeholder={showPanels ? 'Search panels...' : 'Search tests...'}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              showLabel={false}
+              icon={<Search className="h-5 w-5 text-gray-400" />}
             />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
 
           {testSearch && (showPanels ? panels : filteredTests).length > 0 && (

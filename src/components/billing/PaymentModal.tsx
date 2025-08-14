@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
 import { useRecordPayment } from '@/hooks/useBilling';
 import type { Invoice } from '@/types/billing.types';
-import { DateField, NumberField, SelectField, TextField, TextareaField } from '@/components/form-fields';
+import { 
+  DateField, 
+  NumberField, 
+  SelectField, 
+  TextField, 
+  LexicalEditorField 
+} from '@/components/form-fields';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -10,33 +17,50 @@ interface PaymentModalProps {
   invoice: Invoice;
 }
 
+interface PaymentFormData {
+  paymentDate: string;
+  amount: number;
+  method: 'cash' | 'credit_card' | 'debit_card' | 'check' | 'insurance' | 'eft' | 'other';
+  referenceNumber: string;
+  notes: string;
+}
+
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice }) => {
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
-  const [amount, setAmount] = useState(invoice.balanceDue.toString());
-  const [method, setMethod] = useState<
-    'cash' | 'credit_card' | 'debit_card' | 'check' | 'insurance' | 'eft' | 'other'
-  >('cash');
-  const [referenceNumber, setReferenceNumber] = useState('');
-  const [notes, setNotes] = useState('');
-
   const recordPaymentMutation = useRecordPayment();
+  
+  const { control, handleSubmit, formState: { errors } } = useForm<PaymentFormData>({
+    defaultValues: {
+      paymentDate: new Date().toISOString().split('T')[0],
+      amount: invoice.balanceDue,
+      method: 'cash',
+      referenceNumber: '',
+      notes: '',
+    }
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const paymentMethods = [
+    { value: 'cash', label: 'Cash' },
+    { value: 'credit_card', label: 'Credit Card' },
+    { value: 'debit_card', label: 'Debit Card' },
+    { value: 'check', label: 'Check' },
+    { value: 'insurance', label: 'Insurance' },
+    { value: 'eft', label: 'EFT/Wire Transfer' },
+    { value: 'other', label: 'Other' },
+  ];
 
-    const paymentAmount = parseFloat(amount);
-    if (isNaN(paymentAmount) || paymentAmount <= 0) {
+  const onSubmit = async (data: PaymentFormData) => {
+    if (data.amount <= 0) {
       return;
     }
 
     try {
       await recordPaymentMutation.mutateAsync({
         invoiceId: invoice.id,
-        paymentDate: new Date(paymentDate),
-        amount: paymentAmount,
-        method,
-        referenceNumber,
-        notes,
+        paymentDate: new Date(data.paymentDate),
+        amount: data.amount,
+        method: data.method,
+        referenceNumber: data.referenceNumber,
+        notes: data.notes,
       });
       onClose();
     } catch (error) {
@@ -51,106 +75,113 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice })
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-30" onClick={onClose} />
 
-        <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
-          <div className="px-6 py-4 border-b flex items-center justify-between">
+        <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+          <div className="px-6 py-4 border-b dark:border-gray-700 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Record Payment</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
               <X className="h-6 w-6" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             {/* Invoice Info */}
-            <div className="mb-4 p-3 bg-gray-50 rounded">
+            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
               <div className="text-sm">
                 <p className="font-medium">Invoice #{invoice.invoiceNumber}</p>
-                <p className="text-gray-600">Balance Due: ${invoice.balanceDue.toFixed(2)}</p>
+                <p className="text-gray-600 dark:text-gray-400">Balance Due: ${invoice.balanceDue.toFixed(2)}</p>
               </div>
             </div>
 
             {/* Payment Date */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={paymentDate}
-                onChange={(e) => setPaymentDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
+            <Controller
+              name="paymentDate"
+              control={control}
+              rules={{ required: 'Payment date is required' }}
+              render={({ field }) => (
+                <DateField
+                  {...field}
+                  label="Payment Date"
+                  required
+                  error={errors.paymentDate?.message}
+                />
+              )}
+            />
 
             {/* Amount */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Amount <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="0.00"
-                required
-              />
-            </div>
+            <Controller
+              name="amount"
+              control={control}
+              rules={{ 
+                required: 'Amount is required',
+                min: { value: 0.01, message: 'Amount must be greater than 0' },
+                max: { value: invoice.balanceDue, message: `Amount cannot exceed balance due of $${invoice.balanceDue}` }
+              }}
+              render={({ field }) => (
+                <NumberField
+                  {...field}
+                  label="Amount"
+                  required
+                  min={0.01}
+                  max={invoice.balanceDue}
+                  step={0.01}
+                  placeholder="0.00"
+                  error={errors.amount?.message}
+                />
+              )}
+            />
 
             {/* Payment Method */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payment Method <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="cash">Cash</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="debit_card">Debit Card</option>
-                <option value="check">Check</option>
-                <option value="insurance">Insurance</option>
-                <option value="eft">EFT/Wire Transfer</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+            <Controller
+              name="method"
+              control={control}
+              rules={{ required: 'Payment method is required' }}
+              render={({ field }) => (
+                <SelectField
+                  {...field}
+                  label="Payment Method"
+                  options={paymentMethods}
+                  required
+                  error={errors.method?.message}
+                />
+              )}
+            />
 
             {/* Reference Number */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Reference Number
-              </label>
-              <input
-                type="text"
-                value={referenceNumber}
-                onChange={(e) => setReferenceNumber(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Check number, transaction ID, etc."
-              />
-            </div>
+            <Controller
+              name="referenceNumber"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Reference Number"
+                  placeholder="Check number, transaction ID, etc."
+                  error={errors.referenceNumber?.message}
+                />
+              )}
+            />
 
             {/* Notes */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Additional payment information..."
-              />
-            </div>
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <LexicalEditorField
+                  {...field}
+                  label="Notes"
+                  placeholder="Additional payment information..."
+                  minHeight="100px"
+                  showToolbar={false}
+                  error={errors.notes?.message}
+                />
+              )}
+            />
 
             {/* Actions */}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
                 disabled={recordPaymentMutation.isPending}
               >
                 Cancel

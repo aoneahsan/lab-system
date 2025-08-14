@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TestTube, Upload, Download, BarChart3, AlertTriangle, Activity } from 'lucide-react';
 import { useSamples } from '@/hooks/useSamples';
 import { toast } from '@/stores/toast.store';
+import { SelectField } from '@/components/form-fields';
 
 export default function SampleAdminControls() {
   const [timeRange, setTimeRange] = useState('7d');
@@ -92,15 +93,19 @@ export default function SampleAdminControls() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">Turnaround Time Analysis</h3>
-          <select 
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="text-sm border-gray-300 rounded-lg"
-          >
-            <option value="24h">Last 24 Hours</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-          </select>
+          <div className="w-48">
+            <SelectField
+              value={timeRange}
+              onValueChange={setTimeRange}
+              options={[
+                { value: '24h', label: 'Last 24 Hours' },
+                { value: '7d', label: 'Last 7 Days' },
+                { value: '30d', label: 'Last 30 Days' }
+              ]}
+              placeholder="Select time range"
+              className="text-sm"
+            />
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

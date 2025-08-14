@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import { TextField, SelectField, NumberField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 import type {
   InventoryItemFormData,
   UnitOfMeasure,
@@ -54,7 +55,7 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
   isLoading = false,
 }) => {
   const {
-    register,
+    control,
     handleSubmit,
     // watch,
     formState: { errors },
@@ -77,92 +78,107 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
         <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
-            <input
-              type="text"
-              {...register('name', { required: 'Item name is required' })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter item name"
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-            <select
-              {...register('category', { required: 'Category is required' })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select category</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ')}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Item name is required' }}
+            render={({ field }) => (
+              <TextField
+                label="Item Name *"
+                placeholder="Enter item name"
+                error={errors.name?.message}
+                {...field}
+              />
             )}
-          </div>
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Manufacturer</label>
-            <input
-              type="text"
-              {...register('manufacturer')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter manufacturer name"
-            />
-          </div>
+          <Controller
+            name="category"
+            control={control}
+            rules={{ required: 'Category is required' }}
+            render={({ field }) => (
+              <SelectField
+                label="Category *"
+                placeholder="Select category"
+                options={categories.map((cat) => ({
+                  value: cat,
+                  label: cat.charAt(0).toUpperCase() + cat.slice(1).replace(/_/g, ' ')
+                }))}
+                error={errors.category?.message}
+                {...field}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catalog Number</label>
-            <input
-              type="text"
-              {...register('catalogNumber')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter catalog number"
-            />
-          </div>
+          <Controller
+            name="manufacturer"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Manufacturer"
+                placeholder="Enter manufacturer name"
+                {...field}
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unit of Measure *
-            </label>
-            <select
-              {...register('unit', { required: 'Unit is required' })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select unit</option>
-              {units.map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
-            </select>
-            {errors.unit && <p className="text-red-500 text-sm mt-1">{errors.unit.message}</p>}
-          </div>
+          <Controller
+            name="catalogNumber"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Catalog Number"
+                placeholder="Enter catalog number"
+                {...field}
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost</label>
-            <input
-              type="number"
-              step="0.01"
-              {...register('unitCost', { valueAsNumber: true })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="0.00"
-            />
-          </div>
+          <Controller
+            name="unit"
+            control={control}
+            rules={{ required: 'Unit is required' }}
+            render={({ field }) => (
+              <SelectField
+                label="Unit of Measure *"
+                placeholder="Select unit"
+                options={units.map((unit) => ({
+                  value: unit,
+                  label: unit
+                }))}
+                error={errors.unit?.message}
+                {...field}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+
+          <Controller
+            name="unitCost"
+            control={control}
+            render={({ field }) => (
+              <NumberField
+                label="Unit Cost"
+                placeholder="0.00"
+                step={0.01}
+                {...field}
+              />
+            )}
+          />
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea
-            {...register('description')}
-            rows={3}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter item description"
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <LexicalEditorField
+                label="Description"
+                placeholder="Enter item description"
+                {...field}
+              />
+            )}
           />
         </div>
       </div>
@@ -172,68 +188,68 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
         <h3 className="text-lg font-semibold mb-4">Stock Levels</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Stock *</label>
-            <input
-              type="number"
-              {...register('minimumStock', {
-                required: 'Minimum stock is required',
-                valueAsNumber: true,
-                min: { value: 0, message: 'Must be 0 or greater' },
-              })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="0"
-            />
-            {errors.minimumStock && (
-              <p className="text-red-500 text-sm mt-1">{errors.minimumStock.message}</p>
+          <Controller
+            name="minimumStock"
+            control={control}
+            rules={{
+              required: 'Minimum stock is required',
+              min: { value: 0, message: 'Must be 0 or greater' },
+            }}
+            render={({ field }) => (
+              <NumberField
+                label="Minimum Stock *"
+                placeholder="0"
+                error={errors.minimumStock?.message}
+                {...field}
+              />
             )}
-          </div>
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Stock</label>
-            <input
-              type="number"
-              {...register('maximumStock', { valueAsNumber: true })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="0"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Point *</label>
-            <input
-              type="number"
-              {...register('reorderPoint', {
-                required: 'Reorder point is required',
-                valueAsNumber: true,
-                min: { value: 0, message: 'Must be 0 or greater' },
-              })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="0"
-            />
-            {errors.reorderPoint && (
-              <p className="text-red-500 text-sm mt-1">{errors.reorderPoint.message}</p>
+          <Controller
+            name="maximumStock"
+            control={control}
+            render={({ field }) => (
+              <NumberField
+                label="Maximum Stock"
+                placeholder="0"
+                {...field}
+              />
             )}
-          </div>
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reorder Quantity *
-            </label>
-            <input
-              type="number"
-              {...register('reorderQuantity', {
-                required: 'Reorder quantity is required',
-                valueAsNumber: true,
-                min: { value: 1, message: 'Must be 1 or greater' },
-              })}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="0"
-            />
-            {errors.reorderQuantity && (
-              <p className="text-red-500 text-sm mt-1">{errors.reorderQuantity.message}</p>
+          <Controller
+            name="reorderPoint"
+            control={control}
+            rules={{
+              required: 'Reorder point is required',
+              min: { value: 0, message: 'Must be 0 or greater' },
+            }}
+            render={({ field }) => (
+              <NumberField
+                label="Reorder Point *"
+                placeholder="0"
+                error={errors.reorderPoint?.message}
+                {...field}
+              />
             )}
-          </div>
+          />
+
+          <Controller
+            name="reorderQuantity"
+            control={control}
+            rules={{
+              required: 'Reorder quantity is required',
+              min: { value: 1, message: 'Must be 1 or greater' },
+            }}
+            render={({ field }) => (
+              <NumberField
+                label="Reorder Quantity *"
+                placeholder="0"
+                error={errors.reorderQuantity?.message}
+                {...field}
+              />
+            )}
+          />
         </div>
       </div>
 
@@ -247,72 +263,90 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
               Temperature Range (°C)
             </label>
             <div className="flex space-x-2">
-              <input
-                type="number"
-                {...register('storageCondition.temperatureMin', { valueAsNumber: true })}
-                className="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Min"
+              <Controller
+                name="storageCondition.temperatureMin"
+                control={control}
+                render={({ field }) => (
+                  <NumberField
+                    placeholder="Min"
+                    className="w-1/2"
+                    {...field}
+                  />
+                )}
               />
-              <input
-                type="number"
-                {...register('storageCondition.temperatureMax', { valueAsNumber: true })}
-                className="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Max"
+              <Controller
+                name="storageCondition.temperatureMax"
+                control={control}
+                render={({ field }) => (
+                  <NumberField
+                    placeholder="Max"
+                    className="w-1/2"
+                    {...field}
+                  />
+                )}
               />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Humidity Requirements
-            </label>
-            <input
-              type="text"
-              {...register('storageCondition.humidity')}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., 30-60%"
-            />
-          </div>
+          <Controller
+            name="storageCondition.humidity"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Humidity Requirements"
+                placeholder="e.g., 30-60%"
+                {...field}
+              />
+            )}
+          />
         </div>
 
         <div className="mt-4 space-y-2">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('storageCondition.lightSensitive')}
-              className="mr-2"
-            />
-            <span className="text-sm">Light sensitive</span>
-          </label>
+          <Controller
+            name="storageCondition.lightSensitive"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Light sensitive"
+                {...field}
+              />
+            )}
+          />
 
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('storageCondition.requiresRefrigeration')}
-              className="mr-2"
-            />
-            <span className="text-sm">Requires refrigeration (2-8°C)</span>
-          </label>
+          <Controller
+            name="storageCondition.requiresRefrigeration"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Requires refrigeration (2-8°C)"
+                {...field}
+              />
+            )}
+          />
 
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              {...register('storageCondition.requiresFreezing')}
-              className="mr-2"
-            />
-            <span className="text-sm">Requires freezing (-20°C or below)</span>
-          </label>
+          <Controller
+            name="storageCondition.requiresFreezing"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Requires freezing (-20°C or below)"
+                {...field}
+              />
+            )}
+          />
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Special Storage Instructions
-          </label>
-          <textarea
-            {...register('storageCondition.specialInstructions')}
-            rows={2}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter any special storage instructions"
+          <Controller
+            name="storageCondition.specialInstructions"
+            control={control}
+            render={({ field }) => (
+              <LexicalEditorField
+                label="Special Storage Instructions"
+                placeholder="Enter any special storage instructions"
+                {...field}
+              />
+            )}
           />
         </div>
       </div>
@@ -322,29 +356,52 @@ export const InventoryItemForm: React.FC<InventoryItemFormProps> = ({
         <h3 className="text-lg font-semibold mb-4">Compliance & Tracking</h3>
 
         <div className="space-y-2">
-          <label className="flex items-center">
-            <input type="checkbox" {...register('requiresLotTracking')} className="mr-2" />
-            <span className="text-sm">Requires lot tracking</span>
-          </label>
+          <Controller
+            name="requiresLotTracking"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Requires lot tracking"
+                {...field}
+              />
+            )}
+          />
 
-          <label className="flex items-center">
-            <input type="checkbox" {...register('requiresExpirationTracking')} className="mr-2" />
-            <span className="text-sm">Requires expiration date tracking</span>
-          </label>
+          <Controller
+            name="requiresExpirationTracking"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Requires expiration date tracking"
+                {...field}
+              />
+            )}
+          />
 
-          <label className="flex items-center">
-            <input type="checkbox" {...register('hazardous')} className="mr-2" />
-            <span className="text-sm">Hazardous material</span>
-          </label>
+          <Controller
+            name="hazardous"
+            control={control}
+            render={({ field }) => (
+              <CheckboxField
+                label="Hazardous material"
+                {...field}
+              />
+            )}
+          />
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">MSDS URL</label>
-          <input
-            type="url"
-            {...register('msdsUrl')}
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="https://example.com/msds/..."
+          <Controller
+            name="msdsUrl"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="MSDS URL"
+                placeholder="https://example.com/msds/..."
+                type="url"
+                {...field}
+              />
+            )}
           />
         </div>
       </div>

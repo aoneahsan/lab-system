@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Settings, GitBranch, FileText, Shield } from 'lucide-react';
 import AdvancedWorkflowBuilder from '@/components/workflow/AdvancedWorkflowBuilder';
 import DynamicFieldBuilder from '@/components/custom-fields/DynamicFieldBuilder';
+import { CheckboxField, NumberField } from '@/components/form-fields';
 
 export default function AdvancedFeaturesPage() {
   const [activeTab, setActiveTab] = useState<'workflow' | 'customFields' | 'security' | 'integrations'>('workflow');
@@ -86,29 +87,29 @@ export default function AdvancedFeaturesPage() {
                 <p className="text-sm text-gray-600 mb-3">
                   Require two-factor authentication for all users accessing sensitive data
                 </p>
-                <label className="flex items-center">
-                  <input type="checkbox" className="mr-2" />
-                  <span className="text-sm">Enable mandatory 2FA</span>
-                </label>
+                <CheckboxField
+                  name="enable2FA"
+                  label="Enable mandatory 2FA"
+                  className="text-sm"
+                />
               </div>
 
               <div className="border rounded-lg p-4">
                 <h3 className="font-medium text-gray-900 mb-2">Session Management</h3>
                 <div className="space-y-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Session Timeout (minutes)
-                    </label>
-                    <input
-                      type="number"
+                    <NumberField
+                      name="sessionTimeout"
+                      label="Session Timeout (minutes)"
                       defaultValue={30}
-                      className="w-32 px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-32"
                     />
                   </div>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    <span className="text-sm">Lock screen on inactivity</span>
-                  </label>
+                  <CheckboxField
+                    name="lockScreenInactivity"
+                    label="Lock screen on inactivity"
+                    className="text-sm"
+                  />
                 </div>
               </div>
 
@@ -118,18 +119,23 @@ export default function AdvancedFeaturesPage() {
                   Configure which actions should be logged for compliance
                 </p>
                 <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" defaultChecked className="mr-2" />
-                    <span className="text-sm">Log all data access</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" defaultChecked className="mr-2" />
-                    <span className="text-sm">Log all modifications</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    <span className="text-sm">Log all exports</span>
-                  </label>
+                  <CheckboxField
+                    name="logDataAccess"
+                    label="Log all data access"
+                    defaultChecked={true}
+                    className="text-sm"
+                  />
+                  <CheckboxField
+                    name="logModifications"
+                    label="Log all modifications"
+                    defaultChecked={true}
+                    className="text-sm"
+                  />
+                  <CheckboxField
+                    name="logExports"
+                    label="Log all exports"
+                    className="text-sm"
+                  />
                 </div>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/useToast';
 import { storage } from '@/config/firebase.config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getStoragePath } from '@/constants/tenant.constants';
+import { SelectField, LexicalEditorField } from '@/components/form-fields';
 import type { PatientDocument } from '@/types/patient.types';
 
 interface DocumentUploadProps {
@@ -23,7 +24,7 @@ export const DocumentUpload = ({ patientId, onUploadComplete, onCancel }: Docume
   const [selectedCategory, setSelectedCategory] = useState<PatientDocument['type']>('other');
   const [notes, setNotes] = useState('');
 
-  const categories: { value: PatientDocument['type']; label: string }[] = [
+  const categoryOptions = [
     { value: 'lab_report', label: 'Lab Report' },
     { value: 'prescription', label: 'Prescription' },
     { value: 'insurance_card', label: 'Insurance Card' },
@@ -117,39 +118,21 @@ export const DocumentUpload = ({ patientId, onUploadComplete, onCancel }: Docume
 
   return (
     <div className="space-y-4">
-      <div>
-        <label htmlFor="type" className="label">
-          Document Type
-        </label>
-        <select
-          id="type"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value as PatientDocument['type'])}
-          className="input"
-          disabled={isUploading}
-        >
-          {categories.map((cat) => (
-            <option key={cat.value} value={cat.value}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <SelectField
+        label="Document Type"
+        value={selectedCategory}
+        onValueChange={(value) => setSelectedCategory(value as PatientDocument['type'])}
+        options={categoryOptions}
+        disabled={isUploading}
+      />
 
-      <div>
-        <label htmlFor="notes" className="label">
-          Notes (Optional)
-        </label>
-        <textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="input"
-          rows={2}
-          placeholder="Add any notes about the document..."
-          disabled={isUploading}
-        />
-      </div>
+      <LexicalEditorField
+        label="Notes (Optional)"
+        value={notes}
+        onChange={setNotes}
+        placeholder="Add any notes about the document..."
+        disabled={isUploading}
+      />
 
       <div
         {...getRootProps()}

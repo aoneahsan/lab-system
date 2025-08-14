@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { TestTube, Eye, EyeOff, Wifi, WifiOff } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
 import { Network } from '@capacitor/network';
 import { toast } from '@/hooks/useToast';
+import { EmailField, PasswordField } from '@/components/form-fields';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email'),
@@ -25,7 +26,7 @@ const PhlebotomistLoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
@@ -105,40 +106,33 @@ const PhlebotomistLoginPage: React.FC = () => {
       {/* Login form */}
       <div className="flex-1 px-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              {...register('email')}
-              type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Enter your email"
-              autoComplete="email"
-            />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
-          </div>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <EmailField
+                label="Email"
+                placeholder="Enter your email"
+                autoComplete="email"
+                error={errors.email?.message}
+                {...field}
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <div className="relative">
-              <input
-                {...register('password')}
-                type={showPassword ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <PasswordField
+                label="Password"
                 placeholder="Enter your password"
                 autoComplete="current-password"
+                error={errors.password?.message}
+                {...field}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
             )}
-          </div>
+          />
 
           <button
             type="submit"

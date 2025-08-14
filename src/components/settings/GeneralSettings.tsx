@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { GeneralSettings as GeneralSettingsType } from '../../services/settings';
-import { TextField, TextareaField, UrlField, EmailField, PhoneField, SelectField, ZipCodeField } from '@/components/form-fields';
+import { TextField, UrlField, EmailField, PhoneField, SelectField, ZipCodeField, CountryField, StateField, CityField } from '@/components/form-fields';
 
 interface GeneralSettingsProps {
   settings: GeneralSettingsType;
@@ -42,26 +42,22 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, onSave, isS
         <h3 className="text-lg font-medium text-gray-900 mb-4">Laboratory Information</h3>
 
         <div className="grid grid-cols-1 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Laboratory Name</label>
-            <input
-              type="text"
-              value={formData.labName}
-              onChange={(e) => handleChange('labName', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              required
-            />
-          </div>
+          <TextField
+            label="Laboratory Name"
+            name="labName"
+            value={formData.labName}
+            onChange={(value) => handleChange('labName', value)}
+            required
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Logo URL</label>
-            <input
-              type="url"
-              value={formData.labLogo}
-              onChange={(e) => handleChange('labLogo', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <UrlField
+            label="Logo URL"
+            name="labLogo"
+            value={formData.labLogo}
+            onChange={(value) => handleChange('labLogo', value)}
+            showLabel
+          />
         </div>
       </div>
 
@@ -70,54 +66,46 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, onSave, isS
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Street Address</label>
-            <input
-              type="text"
+            <TextField
+              label="Street Address"
+              name="address.street"
               value={formData.address.street}
-              onChange={(e) => handleChange('address.street', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              onChange={(value) => handleChange('address.street', value)}
+              showLabel
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">City</label>
-            <input
-              type="text"
-              value={formData.address.city}
-              onChange={(e) => handleChange('address.city', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <CityField
+            label="City"
+            name="address.city"
+            value={formData.address.city}
+            onChange={(value) => handleChange('address.city', value)}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">State</label>
-            <input
-              type="text"
-              value={formData.address.state}
-              onChange={(e) => handleChange('address.state', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <StateField
+            label="State"
+            name="address.state"
+            value={formData.address.state}
+            onChange={(value) => handleChange('address.state', value)}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
-            <input
-              type="text"
-              value={formData.address.zipCode}
-              onChange={(e) => handleChange('address.zipCode', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <ZipCodeField
+            label="ZIP Code"
+            name="address.zipCode"
+            value={formData.address.zipCode}
+            onChange={(value) => handleChange('address.zipCode', value)}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Country</label>
-            <input
-              type="text"
-              value={formData.address.country}
-              onChange={(e) => handleChange('address.country', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <CountryField
+            label="Country"
+            name="address.country"
+            value={formData.address.country}
+            onChange={(value) => handleChange('address.country', value)}
+            showLabel
+          />
         </div>
       </div>
 
@@ -125,35 +113,29 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, onSave, isS
         <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              type="tel"
-              value={formData.contact.phone}
-              onChange={(e) => handleChange('contact.phone', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <PhoneField
+            label="Phone"
+            name="contact.phone"
+            value={formData.contact.phone}
+            onChange={(value) => handleChange('contact.phone', value)}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              value={formData.contact.email}
-              onChange={(e) => handleChange('contact.email', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <EmailField
+            label="Email"
+            name="contact.email"
+            value={formData.contact.email}
+            onChange={(value) => handleChange('contact.email', value)}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Website</label>
-            <input
-              type="url"
-              value={formData.contact.website}
-              onChange={(e) => handleChange('contact.website', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+          <UrlField
+            label="Website"
+            name="contact.website"
+            value={formData.contact.website}
+            onChange={(value) => handleChange('contact.website', value)}
+            showLabel
+          />
         </div>
       </div>
 
@@ -161,64 +143,64 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, onSave, isS
         <h3 className="text-lg font-medium text-gray-900 mb-4">Regional Settings</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Timezone</label>
-            <select
-              value={formData.timezone}
-              onChange={(e) => handleChange('timezone', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="America/New_York">Eastern Time</option>
-              <option value="America/Chicago">Central Time</option>
-              <option value="America/Denver">Mountain Time</option>
-              <option value="America/Los_Angeles">Pacific Time</option>
-              <option value="Europe/London">London</option>
-              <option value="Europe/Paris">Paris</option>
-              <option value="Asia/Tokyo">Tokyo</option>
-              <option value="Australia/Sydney">Sydney</option>
-            </select>
-          </div>
+          <SelectField
+            label="Timezone"
+            name="timezone"
+            value={formData.timezone}
+            onChange={(value) => handleChange('timezone', value)}
+            options={[
+              { value: 'America/New_York', label: 'Eastern Time' },
+              { value: 'America/Chicago', label: 'Central Time' },
+              { value: 'America/Denver', label: 'Mountain Time' },
+              { value: 'America/Los_Angeles', label: 'Pacific Time' },
+              { value: 'Europe/London', label: 'London' },
+              { value: 'Europe/Paris', label: 'Paris' },
+              { value: 'Asia/Tokyo', label: 'Tokyo' },
+              { value: 'Australia/Sydney', label: 'Sydney' },
+            ]}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Currency</label>
-            <select
-              value={formData.currency}
-              onChange={(e) => handleChange('currency', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
-              <option value="GBP">GBP (£)</option>
-              <option value="JPY">JPY (¥)</option>
-              <option value="AUD">AUD ($)</option>
-              <option value="CAD">CAD ($)</option>
-            </select>
-          </div>
+          <SelectField
+            label="Currency"
+            name="currency"
+            value={formData.currency}
+            onChange={(value) => handleChange('currency', value)}
+            options={[
+              { value: 'USD', label: 'USD ($)' },
+              { value: 'EUR', label: 'EUR (€)' },
+              { value: 'GBP', label: 'GBP (£)' },
+              { value: 'JPY', label: 'JPY (¥)' },
+              { value: 'AUD', label: 'AUD ($)' },
+              { value: 'CAD', label: 'CAD ($)' },
+            ]}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Date Format</label>
-            <select
-              value={formData.dateFormat}
-              onChange={(e) => handleChange('dateFormat', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-            </select>
-          </div>
+          <SelectField
+            label="Date Format"
+            name="dateFormat"
+            value={formData.dateFormat}
+            onChange={(value) => handleChange('dateFormat', value)}
+            options={[
+              { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
+              { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
+              { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
+            ]}
+            showLabel
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Time Format</label>
-            <select
-              value={formData.timeFormat}
-              onChange={(e) => handleChange('timeFormat', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="12h">12 Hour</option>
-              <option value="24h">24 Hour</option>
-            </select>
-          </div>
+          <SelectField
+            label="Time Format"
+            name="timeFormat"
+            value={formData.timeFormat}
+            onChange={(value) => handleChange('timeFormat', value)}
+            options={[
+              { value: '12h', label: '12 Hour' },
+              { value: '24h', label: '24 Hour' },
+            ]}
+            showLabel
+          />
         </div>
       </div>
 

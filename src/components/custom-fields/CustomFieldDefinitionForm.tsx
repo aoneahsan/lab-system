@@ -1,6 +1,7 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useState } from 'react';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { TextField, SelectField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 import type { CreateCustomFieldData, CustomFieldType, CustomFieldOption, CustomFieldValidation } from '@/types/custom-field.types';
 
 interface CustomFieldDefinitionFormProps {
@@ -43,7 +44,7 @@ export const CustomFieldDefinitionForm = ({
   // );
 
   const {
-    register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -110,90 +111,117 @@ export const CustomFieldDefinitionForm = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="label">Module *</label>
-          <select {...register('module', { required: 'Module is required' })} className="input" disabled={!!initialData}>
-            <option value="patient">Patient</option>
-            <option value="test">Test</option>
-            <option value="sample">Sample</option>
-            <option value="billing">Billing</option>
-            <option value="inventory">Inventory</option>
-          </select>
-          {errors.module && <p className="text-sm text-danger-600 mt-1">{errors.module.message}</p>}
-        </div>
+        <Controller
+          name="module"
+          control={control}
+          rules={{ required: 'Module is required' }}
+          render={({ field }) => (
+            <SelectField
+              label="Module *"
+              options={[
+                { value: 'patient', label: 'Patient' },
+                { value: 'test', label: 'Test' },
+                { value: 'sample', label: 'Sample' },
+                { value: 'billing', label: 'Billing' },
+                { value: 'inventory', label: 'Inventory' }
+              ]}
+              disabled={!!initialData}
+              error={errors.module?.message}
+              {...field}
+              onValueChange={field.onChange}
+            />
+          )}
+        />
 
-        <div>
-          <label className="label">Field Type *</label>
-          <select {...register('type', { required: 'Field type is required' })} className="input">
-            <option value="">Select Type</option>
-            {fieldTypes.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
-            ))}
-          </select>
-          {errors.type && <p className="text-sm text-danger-600 mt-1">{errors.type.message}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="label">Field Label *</label>
-          <input
-            type="text"
-            {...register('label', { required: 'Label is required' })}
-            className="input"
-            placeholder="e.g., SSN Number"
-          />
-          {errors.label && <p className="text-sm text-danger-600 mt-1">{errors.label.message}</p>}
-        </div>
-
-        <div>
-          <label className="label">Field Key</label>
-          <input
-            type="text"
-            {...register('fieldKey', {
-              pattern: {
-                value: /^[a-z0-9_]+$/,
-                message: 'Only lowercase letters, numbers, and underscores allowed'
-              }
-            })}
-            className="input"
-            placeholder="e.g., ssn_number (auto-generated if empty)"
-          />
-          {errors.fieldKey && <p className="text-sm text-danger-600 mt-1">{errors.fieldKey.message}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="label">Placeholder</label>
-          <input
-            type="text"
-            {...register('placeholder')}
-            className="input"
-            placeholder="Placeholder text"
-          />
-        </div>
-
-        <div>
-          <label className="label">Section</label>
-          <input
-            type="text"
-            {...register('section')}
-            className="input"
-            placeholder="e.g., Insurance Information"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="label">Helper Text</label>
-        <textarea
-          {...register('helperText')}
-          className="input"
-          rows={2}
-          placeholder="Additional help text for the field"
+        <Controller
+          name="type"
+          control={control}
+          rules={{ required: 'Field type is required' }}
+          render={({ field }) => (
+            <SelectField
+              label="Field Type *"
+              placeholder="Select Type"
+              options={fieldTypes}
+              error={errors.type?.message}
+              {...field}
+              onValueChange={field.onChange}
+            />
+          )}
         />
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Controller
+          name="label"
+          control={control}
+          rules={{ required: 'Label is required' }}
+          render={({ field }) => (
+            <TextField
+              label="Field Label *"
+              placeholder="e.g., SSN Number"
+              error={errors.label?.message}
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="fieldKey"
+          control={control}
+          rules={{
+            pattern: {
+              value: /^[a-z0-9_]+$/,
+              message: 'Only lowercase letters, numbers, and underscores allowed'
+            }
+          }}
+          render={({ field }) => (
+            <TextField
+              label="Field Key"
+              placeholder="e.g., ssn_number (auto-generated if empty)"
+              error={errors.fieldKey?.message}
+              {...field}
+            />
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Controller
+          name="placeholder"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Placeholder"
+              placeholder="Placeholder text"
+              {...field}
+            />
+          )}
+        />
+
+        <Controller
+          name="section"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Section"
+              placeholder="e.g., Insurance Information"
+              {...field}
+            />
+          )}
+        />
+      </div>
+
+      <Controller
+        name="helperText"
+        control={control}
+        render={({ field }) => (
+          <LexicalEditorField
+            label="Helper Text"
+            placeholder="Additional help text for the field"
+            {...field}
+          />
+        )}
+      />
 
       {showOptions && (
         <div>
@@ -207,30 +235,24 @@ export const CustomFieldDefinitionForm = ({
                 >
                   <GripVertical className="h-4 w-4" />
                 </button>
-                <input
-                  type="text"
+                <TextField
                   value={option.label}
-                  onChange={(e) => updateOption(index, 'label', e.target.value)}
-                  className="input flex-1"
+                  onChange={(value) => updateOption(index, 'label', value)}
                   placeholder="Label"
+                  className="flex-1"
                 />
-                <input
-                  type="text"
+                <TextField
                   value={option.value}
-                  onChange={(e) => updateOption(index, 'value', e.target.value)}
-                  className="input flex-1"
+                  onChange={(value) => updateOption(index, 'value', value)}
                   placeholder="Value"
+                  className="flex-1"
                 />
                 {['select', 'radio'].includes(fieldType) && (
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={option.isDefault}
-                      onChange={(e) => updateOption(index, 'isDefault', e.target.checked)}
-                      className="mr-2"
-                    />
-                    Default
-                  </label>
+                  <CheckboxField
+                    label="Default"
+                    checked={option.isDefault}
+                    onChange={(checked) => updateOption(index, 'isDefault', checked)}
+                  />
                 )}
                 <button
                   type="button"
@@ -254,38 +276,46 @@ export const CustomFieldDefinitionForm = ({
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('isRequired')}
-            className="mr-2"
-          />
-          Required Field
-        </label>
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('showInList')}
-            className="mr-2"
-          />
-          Show in Lists
-        </label>
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('showInSearch')}
-            className="mr-2"
-          />
-          Searchable
-        </label>
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('showInReports')}
-            className="mr-2"
-          />
-          Include in Reports
-        </label>
+        <Controller
+          name="isRequired"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField
+              label="Required Field"
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="showInList"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField
+              label="Show in Lists"
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="showInSearch"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField
+              label="Searchable"
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="showInReports"
+          control={control}
+          render={({ field }) => (
+            <CheckboxField
+              label="Include in Reports"
+              {...field}
+            />
+          )}
+        />
       </div>
 
       <div className="flex justify-end gap-4">

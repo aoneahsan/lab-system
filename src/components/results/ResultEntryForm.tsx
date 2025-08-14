@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { FlaskRound, AlertCircle, AlertTriangle } from 'lucide-react';
 import { useSample } from '@/hooks/useSamples';
 import { useTest } from '@/hooks/useTests';
 import { usePatient } from '@/hooks/usePatients';
 import { useValidateResult } from '@/hooks/useResultValidation';
 import type { ResultEntryFormData, ResultFlag } from '@/types/result.types';
-import { TextField, NumberField, SelectField, TextareaField, DateTimeField } from '@/components/form-fields';
+import { TextField, NumberField, SelectField, LexicalEditorField, DateTimeField } from '@/components/form-fields';
 
 interface ResultEntryFormProps {
   orderId: string;
@@ -40,6 +40,7 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
     formState: { errors },
     watch,
     setValue,
+    control,
   } = useForm<ResultEntryFormData>({
     defaultValues: {
       orderId,
@@ -178,50 +179,73 @@ const ResultEntryForm: React.FC<ResultEntryFormProps> = ({
         <h3 className="text-lg font-medium text-gray-900 mb-4">Result Entry</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Result Value *</label>
-            <input
-              type="text"
-              {...register('tests.0.value', { required: 'Result value is required' })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Enter result"
-            />
-            {errors.tests?.[0]?.value && (
-              <p className="mt-1 text-sm text-red-600">{errors.tests[0].value.message}</p>
+          <Controller
+            name="tests.0.value"
+            control={control}
+            rules={{ required: 'Result value is required' }}
+            render={({ field }) => (
+              <TextField
+                label="Result Value"
+                name="tests.0.value"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Enter result"
+                error={errors.tests?.[0]?.value?.message}
+                required
+                showLabel
+              />
             )}
-          </div>
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Unit</label>
-            <input
-              type="text"
-              {...register('tests.0.unit')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="e.g., mg/dL"
-            />
-          </div>
+          <Controller
+            name="tests.0.unit"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Unit"
+                name="tests.0.unit"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="e.g., mg/dL"
+                showLabel
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Flag *</label>
-            <select
-              {...register('tests.0.flag')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              {resultFlags.map((f) => (
-                <option key={f.value} value={f.value}>
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Controller
+            name="tests.0.flag"
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                label="Flag"
+                name="tests.0.flag"
+                value={field.value}
+                onChange={field.onChange}
+                options={resultFlags.map((f) => ({
+                  value: f.value,
+                  label: f.label,
+                }))}
+                required
+                showLabel
+              />
+            )}
+          />
 
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-gray-700">Comments</label>
-            <textarea
-              {...register('tests.0.comments')}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Additional comments or notes..."
+            <Controller
+              name="tests.0.comments"
+              control={control}
+              render={({ field }) => (
+                <LexicalEditorField
+                  label="Comments"
+                  name="tests.0.comments"
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  placeholder="Additional comments or notes..."
+                  rows={3}
+                  showLabel
+                />
+              )}
             />
           </div>
         </div>

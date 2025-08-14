@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button } from '@/components/ui/Button';
 import type { InventoryItem } from '@/types';
-import { TextField, SelectField, NumberField, DateField, TextareaField, EmailField } from '@/components/form-fields';
+import { TextField, SelectField, NumberField, DateField, LexicalEditorField, EmailField, CheckboxField } from '@/components/form-fields';
 // TODO: Use Timestamp for date fields when needed
 // import { Timestamp } from 'firebase/firestore';
 
@@ -130,78 +130,95 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           <h3 className="text-lg font-medium mb-4">Basic Information</h3>
           
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Item Name *
-              </label>
-              <input
-                {...register('itemCode')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., REA-001"
-              />
-              {errors.itemCode && (
-                <p className="text-red-500 text-xs mt-1">{errors.itemCode.message}</p>
+            <Controller
+              name="itemCode"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Item Code"
+                  name="itemCode"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="e.g., REA-001"
+                  error={errors.itemCode?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Item Name *
-              </label>
-              <input
-                {...register('name')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Glucose Reagent"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Item Name"
+                  name="name"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="e.g., Glucose Reagent"
+                  error={errors.name?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category *
-              </label>
-              <select
-                {...register('category')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="reagents">Reagents</option>
-                <option value="consumables">Consumables</option>
-                <option value="equipment">Equipment</option>
-                <option value="calibrators">Calibrators</option>
-                <option value="controls">Controls</option>
-                <option value="supplies">Supplies</option>
-              </select>
-              {errors.category && (
-                <p className="text-red-500 text-xs mt-1">{errors.category.message}</p>
+            <Controller
+              name="category"
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  label="Category"
+                  name="category"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: 'reagents', label: 'Reagents' },
+                    { value: 'consumables', label: 'Consumables' },
+                    { value: 'equipment', label: 'Equipment' },
+                    { value: 'calibrators', label: 'Calibrators' },
+                    { value: 'controls', label: 'Controls' },
+                    { value: 'supplies', label: 'Supplies' },
+                  ]}
+                  error={errors.category?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Unit *
-              </label>
-              <input
-                {...register('unit')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., mL, units, boxes"
-              />
-              {errors.unit && (
-                <p className="text-red-500 text-xs mt-1">{errors.unit.message}</p>
+            <Controller
+              name="unit"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Unit"
+                  name="unit"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="e.g., mL, units, boxes"
+                  error={errors.unit?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
-              <input
-                {...register('location')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Refrigerator A, Shelf 3"
-              />
-            </div>
+            <Controller
+              name="location"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Location"
+                  name="location"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="e.g., Refrigerator A, Shelf 3"
+                  showLabel
+                />
+              )}
+            />
           </div>
         </div>
 
@@ -210,34 +227,40 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           <h3 className="text-lg font-medium mb-4">Stock Information</h3>
           
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Current Quantity *
-              </label>
-              <input
-                type="number"
-                {...register('quantity', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
-              />
-              {errors.quantity && (
-                <p className="text-red-500 text-xs mt-1">{errors.quantity.message}</p>
+            <Controller
+              name="quantity"
+              control={control}
+              render={({ field }) => (
+                <NumberField
+                  label="Current Quantity"
+                  name="quantity"
+                  value={field.value}
+                  onChange={field.onChange}
+                  min={0}
+                  error={errors.quantity?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reorder Level *
-              </label>
-              <input
-                type="number"
-                {...register('reorderLevel', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
+              <Controller
+                name="reorderLevel"
+                control={control}
+                render={({ field }) => (
+                  <NumberField
+                    label="Reorder Level"
+                    name="reorderLevel"
+                    value={field.value}
+                    onChange={field.onChange}
+                    min={0}
+                    error={errors.reorderLevel?.message}
+                    required
+                    showLabel
+                  />
+                )}
               />
-              {errors.reorderLevel && (
-                <p className="text-red-500 text-xs mt-1">{errors.reorderLevel.message}</p>
-              )}
               {watch('quantity') && watch('reorderLevel') && watch('quantity') <= watch('reorderLevel') && watch('quantity') > 0 && (
                 <p className="text-yellow-600 text-xs mt-1">
                   Current quantity is at or below reorder level
@@ -245,47 +268,55 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reorder Quantity *
-              </label>
-              <input
-                type="number"
-                {...register('reorderQuantity', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
-              />
-              {errors.reorderQuantity && (
-                <p className="text-red-500 text-xs mt-1">{errors.reorderQuantity.message}</p>
+            <Controller
+              name="reorderQuantity"
+              control={control}
+              render={({ field }) => (
+                <NumberField
+                  label="Reorder Quantity"
+                  name="reorderQuantity"
+                  value={field.value}
+                  onChange={field.onChange}
+                  min={0}
+                  error={errors.reorderQuantity?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Unit Cost ($) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                {...register('unitCost', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="0"
-              />
-              {errors.unitCost && (
-                <p className="text-red-500 text-xs mt-1">{errors.unitCost.message}</p>
+            <Controller
+              name="unitCost"
+              control={control}
+              render={({ field }) => (
+                <NumberField
+                  label="Unit Cost ($)"
+                  name="unitCost"
+                  value={field.value}
+                  onChange={field.onChange}
+                  min={0}
+                  step={0.01}
+                  error={errors.unitCost?.message}
+                  required
+                  showLabel
+                />
               )}
-            </div>
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Lot Number
-              </label>
-              <input
-                {...register('lotNumber')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., LOT-2024-001"
-              />
-            </div>
+            <Controller
+              name="lotNumber"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Lot Number"
+                  name="lotNumber"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="e.g., LOT-2024-001"
+                  showLabel
+                />
+              )}
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -316,27 +347,35 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         <h3 className="text-lg font-medium mb-4">Vendor Information</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Vendor Name
-            </label>
-            <input
-              {...register('vendorName')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Lab Supplies Inc."
-            />
-          </div>
+          <Controller
+            name="vendorName"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Vendor Name"
+                name="vendorName"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="e.g., Lab Supplies Inc."
+                showLabel
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Vendor Item Code
-            </label>
-            <input
-              {...register('vendorItemCode')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., VEN-12345"
-            />
-          </div>
+          <Controller
+            name="vendorItemCode"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Vendor Item Code"
+                name="vendorItemCode"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="e.g., VEN-12345"
+                showLabel
+              />
+            )}
+          />
         </div>
       </div>
 
@@ -345,28 +384,36 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         <h3 className="text-lg font-medium mb-4">Additional Information</h3>
         
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Storage Conditions
-            </label>
-            <input
-              {...register('storageConditions')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Store at 2-8°C"
-            />
-          </div>
+          <Controller
+            name="storageConditions"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Storage Conditions"
+                name="storageConditions"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="e.g., Store at 2-8°C"
+                showLabel
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
-            </label>
-            <textarea
-              {...register('notes')}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Additional notes or special instructions..."
-            />
-          </div>
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field }) => (
+              <LexicalEditorField
+                label="Notes"
+                name="notes"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Additional notes or special instructions..."
+                rows={3}
+                showLabel
+              />
+            )}
+          />
         </div>
       </div>
 

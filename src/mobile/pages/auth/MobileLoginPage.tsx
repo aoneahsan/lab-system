@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Fingerprint, Eye, EyeOff } from 'lucide-react';
@@ -33,6 +33,7 @@ const MobileLoginPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<LoginFormData>({
     resolver: yupResolver(schema),
   });
@@ -122,49 +123,48 @@ const MobileLoginPage: React.FC = () => {
       {/* Login form */}
       <div className="flex-1 px-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              {...register('email')}
-              type="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your email"
-              autoComplete="email"
-            />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
-          </div>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <EmailField
+                label="Email"
+                name="email"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Enter your email"
+                autoComplete="email"
+                error={errors.email?.message}
+                showLabel
+              />
+            )}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <div className="relative">
-              <input
-                {...register('password')}
-                type={showPassword ? 'text' : 'password'}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <PasswordField
+                label="Password"
+                name="password"
+                value={field.value}
+                onChange={field.onChange}
                 placeholder="Enter your password"
                 autoComplete="current-password"
+                error={errors.password?.message}
+                showLabel
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
             )}
-          </div>
+          />
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
+            <CheckboxField
+              label="Remember me"
+              name="rememberMe"
+              checked={false}
+              onChange={() => {}}
+              showLabel
+            />
             <a href="#" className="text-sm text-blue-600 hover:text-blue-500">
               Forgot password?
             </a>

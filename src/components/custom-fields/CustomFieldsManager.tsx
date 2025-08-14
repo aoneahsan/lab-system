@@ -2,6 +2,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useCustomFieldSections } from '@/hooks/useCustomFields';
+import { TextField, EmailField, NumberField, LexicalEditorField, SelectField, CheckboxField, DateField } from '@/components/form-fields';
 import type { CustomFieldDefinition, CustomFieldSection } from '@/types/custom-field.types';
 import { Loader2 } from 'lucide-react';
 
@@ -56,59 +57,125 @@ export const CustomFieldsManager = ({
 
     switch (field.type) {
       case 'text':
+        return hasFormContext ? (
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <TextField
+                {...formField}
+                placeholder={field.placeholder}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
+          />
+        ) : (
+          <TextField
+            value={value}
+            onChange={handleChange}
+            placeholder={field.placeholder}
+            disabled={readOnly}
+            error={error}
+          />
+        );
+
       case 'email':
+        return hasFormContext ? (
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <EmailField
+                {...formField}
+                placeholder={field.placeholder}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
+          />
+        ) : (
+          <EmailField
+            value={value}
+            onChange={handleChange}
+            placeholder={field.placeholder}
+            disabled={readOnly}
+            error={error}
+          />
+        );
+
       case 'phone':
       case 'url':
         return hasFormContext ? (
-          <input
-            type={field.type === 'phone' ? 'tel' : field.type}
-            {...formContext.register(fieldKey)}
-            {...commonProps}
-            placeholder={field.placeholder}
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <TextField
+                {...formField}
+                type={field.type === 'phone' ? 'tel' : field.type}
+                placeholder={field.placeholder}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
           />
         ) : (
-          <input
-            type={field.type === 'phone' ? 'tel' : field.type}
+          <TextField
             value={value}
-            onChange={(e) => handleChange(e.target.value)}
-            {...commonProps}
+            onChange={handleChange}
+            type={field.type === 'phone' ? 'tel' : field.type}
             placeholder={field.placeholder}
+            disabled={readOnly}
+            error={error}
           />
         );
 
       case 'number':
         return hasFormContext ? (
-          <input
-            type="number"
-            {...formContext.register(fieldKey, { valueAsNumber: true })}
-            {...commonProps}
-            placeholder={field.placeholder}
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <NumberField
+                {...formField}
+                placeholder={field.placeholder}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
           />
         ) : (
-          <input
-            type="number"
+          <NumberField
             value={value}
-            onChange={(e) => handleChange(e.target.valueAsNumber || 0)}
-            {...commonProps}
+            onChange={handleChange}
             placeholder={field.placeholder}
+            disabled={readOnly}
+            error={error}
           />
         );
 
       case 'textarea':
         return hasFormContext ? (
-          <textarea
-            {...formContext.register(fieldKey)}
-            {...commonProps}
-            rows={3}
-            placeholder={field.placeholder}
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <LexicalEditorField
+                {...formField}
+                placeholder={field.placeholder}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
           />
         ) : (
-          <textarea
+          <LexicalEditorField
             value={value}
-            onChange={(e) => handleChange(e.target.value)}
-            {...commonProps}
-            rows={3}
+            onChange={handleChange}
             placeholder={field.placeholder}
+            disabled={readOnly}
+            error={error}
           />
         );
 
@@ -116,62 +183,58 @@ export const CustomFieldsManager = ({
       case 'datetime': {
         const dateValue = value instanceof Date ? value : value ? new Date(value) : null;
         
-        if (hasFormContext) {
-          return (
-            <Controller
-              name={fieldKey}
-              control={formContext.control}
-              render={({ field: formField }) => (
-                <DatePicker
-                  selected={formField.value as Date}
-                  onChange={(date: Date | null) => formField.onChange(date)}
-                  dateFormat={field.type === 'datetime' ? 'MM/dd/yyyy h:mm aa' : 'MM/dd/yyyy'}
-                  showTimeSelect={field.type === 'datetime'}
-                  disabled={readOnly}
-                  placeholderText={field.placeholder || 'Select date'}
-                  className={commonProps.className}
-                />
-              )}
-            />
-          );
-        }
-        
-        return (
-          <DatePicker
-            selected={dateValue}
-            onChange={(date: Date | null) => handleChange(date)}
-            dateFormat={field.type === 'datetime' ? 'MM/dd/yyyy h:mm aa' : 'MM/dd/yyyy'}
-            showTimeSelect={field.type === 'datetime'}
+        return hasFormContext ? (
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <DateField
+                {...formField}
+                value={formField.value as Date}
+                showTime={field.type === 'datetime'}
+                placeholder={field.placeholder || 'Select date'}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
+          />
+        ) : (
+          <DateField
+            value={dateValue}
+            onChange={handleChange}
+            showTime={field.type === 'datetime'}
+            placeholder={field.placeholder || 'Select date'}
             disabled={readOnly}
-            placeholderText={field.placeholder || 'Select date'}
-            className={commonProps.className}
+            error={error}
           />
         );
       }
 
       case 'select':
         return hasFormContext ? (
-          <select {...formContext.register(fieldKey)} {...commonProps}>
-            <option value="">Select {field.label}</option>
-            {field.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <SelectField
+                {...formField}
+                onValueChange={formField.onChange}
+                placeholder={`Select ${field.label}`}
+                options={field.options || []}
+                disabled={readOnly}
+                error={error}
+              />
+            )}
+          />
         ) : (
-          <select
+          <SelectField
             value={value}
-            onChange={(e) => handleChange(e.target.value)}
-            {...commonProps}
-          >
-            <option value="">Select {field.label}</option>
-            {field.options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onValueChange={handleChange}
+            placeholder={`Select ${field.label}`}
+            options={field.options || []}
+            disabled={readOnly}
+            error={error}
+          />
         );
 
       case 'multiselect': {
@@ -180,21 +243,18 @@ export const CustomFieldsManager = ({
         return (
           <div className="space-y-2">
             {field.options?.map((option) => (
-              <label key={option.value} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option.value)}
-                  onChange={(e) => {
-                    const newValues = e.target.checked
-                      ? [...selectedValues, option.value]
-                      : selectedValues.filter((v) => v !== option.value);
-                    handleChange(newValues);
-                  }}
-                  disabled={readOnly}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
-              </label>
+              <CheckboxField
+                key={option.value}
+                label={option.label}
+                checked={selectedValues.includes(option.value)}
+                onChange={(checked) => {
+                  const newValues = checked
+                    ? [...selectedValues, option.value]
+                    : selectedValues.filter((v) => v !== option.value);
+                  handleChange(newValues);
+                }}
+                disabled={readOnly}
+              />
             ))}
           </div>
         );
@@ -202,48 +262,39 @@ export const CustomFieldsManager = ({
 
       case 'checkbox':
         return hasFormContext ? (
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              {...formContext.register(fieldKey)}
-              disabled={readOnly}
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              {field.placeholder || 'Yes'}
-            </span>
-          </label>
+          <Controller
+            name={fieldKey}
+            control={formContext.control}
+            render={({ field: formField }) => (
+              <CheckboxField
+                {...formField}
+                label={field.placeholder || 'Yes'}
+                disabled={readOnly}
+              />
+            )}
+          />
         ) : (
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={!!value}
-              onChange={(e) => handleChange(e.target.checked)}
-              disabled={readOnly}
-              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-            />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              {field.placeholder || 'Yes'}
-            </span>
-          </label>
+          <CheckboxField
+            checked={!!value}
+            onChange={handleChange}
+            label={field.placeholder || 'Yes'}
+            disabled={readOnly}
+          />
         );
 
       case 'radio':
         return (
           <div className="space-y-2">
             {field.options?.map((option) => (
-              <label key={option.value} className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name={fieldKey}
-                  value={option.value}
-                  checked={value === option.value}
-                  onChange={(e) => handleChange(e.target.value)}
-                  disabled={readOnly}
-                  className="border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
-              </label>
+              <CheckboxField
+                key={option.value}
+                label={option.label}
+                checked={value === option.value}
+                onChange={(checked) => checked && handleChange(option.value)}
+                disabled={readOnly}
+                type="radio"
+                name={fieldKey}
+              />
             ))}
           </div>
         );
