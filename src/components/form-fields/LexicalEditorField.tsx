@@ -18,6 +18,7 @@ import { ListNode, ListItemNode } from '@lexical/list';
 import { CodeNode } from '@lexical/code';
 import { LinkNode, AutoLinkNode } from '@lexical/link';
 import { TableNode, TableCellNode, TableRowNode } from '@lexical/table';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { 
@@ -206,6 +207,7 @@ export const LexicalEditorField: React.FC<LexicalEditorFieldProps> = ({
       TableNode,
       TableCellNode,
       TableRowNode,
+      HorizontalRuleNode,
     ],
   };
 
