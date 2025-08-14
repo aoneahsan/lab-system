@@ -16,16 +16,12 @@ export const initializeNotifications = async () => {
       // Method 1: Try with existing Firebase app instance
       await notifications.init({
         provider: 'firebase',
-        config: firebaseConfig,
         inApp: {
           position: 'top-right',
           duration: 4000,
-          theme: {
-            success: '#10B981',
-            error: '#EF4444',
-            warning: '#F59E0B',
-            info: '#3B82F6',
-          },
+        },
+        config: {
+          app,
         },
       });
     } catch (appError) {
@@ -33,16 +29,13 @@ export const initializeNotifications = async () => {
       console.warn('App instance initialization failed, trying with config:', appError);
       await notifications.init({
         provider: 'firebase',
-        config: firebaseConfig,
+        config: {
+          app,
+          ...firebaseConfig,
+        },
         inApp: {
           position: 'top-right',
           duration: 4000,
-          theme: {
-            success: '#10B981',
-            error: '#EF4444',
-            warning: '#F59E0B',
-            info: '#3B82F6',
-          },
         },
       });
     }
