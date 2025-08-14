@@ -19,9 +19,9 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
   const [isMedicalHistoryModalOpen, setIsMedicalHistoryModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
-  const [editingAllergy, setEditingAllergy] = useState<PatientAllergy | undefined>();
-  const [editingMedication, setEditingMedication] = useState<PatientMedication | undefined>();
-  const [editingHistory, setEditingHistory] = useState<PatientMedicalHistory | undefined>();
+  const [editingAllergy, setEditingAllergy] = useState<{ data: PatientAllergy; index: number } | undefined>();
+  const [editingMedication, setEditingMedication] = useState<{ data: PatientMedication; index: number } | undefined>();
+  const [editingHistory, setEditingHistory] = useState<{ data: PatientMedicalHistory; index: number } | undefined>();
   
   const [deleteItem, setDeleteItem] = useState<{
     type: 'allergy' | 'medication' | 'history';
@@ -35,7 +35,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
   const handleAddAllergy = async (allergy: PatientAllergy) => {
     try {
       const updatedAllergies = editingAllergy 
-        ? patient.allergies.map((a, i) => i === patient.allergies.indexOf(editingAllergy) ? allergy : a)
+        ? patient.allergies.map((a, i) => i === editingAllergy.index ? allergy : a)
         : [...patient.allergies, allergy];
       
       await updatePatient.mutateAsync({
@@ -51,8 +51,8 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
     }
   };
 
-  const handleEditAllergy = (allergy: PatientAllergy) => {
-    setEditingAllergy(allergy);
+  const handleEditAllergy = (allergy: PatientAllergy, index: number) => {
+    setEditingAllergy({ data: allergy, index });
     setIsAllergyModalOpen(true);
   };
 
@@ -60,7 +60,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
   const handleAddMedication = async (medication: PatientMedication) => {
     try {
       const updatedMedications = editingMedication
-        ? patient.medications.map((m, i) => i === patient.medications.indexOf(editingMedication) ? medication : m)
+        ? patient.medications.map((m, i) => i === editingMedication.index ? medication : m)
         : [...patient.medications, medication];
       
       await updatePatient.mutateAsync({
@@ -76,8 +76,8 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
     }
   };
 
-  const handleEditMedication = (medication: PatientMedication) => {
-    setEditingMedication(medication);
+  const handleEditMedication = (medication: PatientMedication, index: number) => {
+    setEditingMedication({ data: medication, index });
     setIsMedicationModalOpen(true);
   };
 
@@ -85,7 +85,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
   const handleAddMedicalHistory = async (history: PatientMedicalHistory) => {
     try {
       const updatedHistory = editingHistory
-        ? patient.medicalHistory.map((h, i) => i === patient.medicalHistory.indexOf(editingHistory) ? history : h)
+        ? patient.medicalHistory.map((h, i) => i === editingHistory.index ? history : h)
         : [...patient.medicalHistory, history];
       
       await updatePatient.mutateAsync({
@@ -101,8 +101,8 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
     }
   };
 
-  const handleEditHistory = (history: PatientMedicalHistory) => {
-    setEditingHistory(history);
+  const handleEditHistory = (history: PatientMedicalHistory, index: number) => {
+    setEditingHistory({ data: history, index });
     setIsMedicalHistoryModalOpen(true);
   };
 
@@ -196,7 +196,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
                   </div>
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => handleEditAllergy(allergy)}
+                      onClick={() => handleEditAllergy(allergy, index)}
                       className="text-gray-400 hover:text-primary-600"
                       title="Edit"
                     >
@@ -291,7 +291,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button 
-                        onClick={() => handleEditMedication(medication)}
+                        onClick={() => handleEditMedication(medication, index)}
                         className="text-gray-400 hover:text-primary-600"
                         title="Edit"
                       >
@@ -391,7 +391,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
                   </div>
                   <div className="flex gap-2 ml-4">
                     <button 
-                      onClick={() => handleEditHistory(history)}
+                      onClick={() => handleEditHistory(history, index)}
                       className="text-gray-400 hover:text-primary-600"
                       title="Edit"
                     >
@@ -473,7 +473,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           setEditingAllergy(undefined);
         }}
         onSubmit={handleAddAllergy}
-        allergy={editingAllergy}
+        allergy={editingAllergy?.data}
       />
 
       <AddMedicationModal
@@ -483,7 +483,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           setEditingMedication(undefined);
         }}
         onSubmit={handleAddMedication}
-        medication={editingMedication}
+        medication={editingMedication?.data}
       />
 
       <AddMedicalHistoryModal
@@ -493,7 +493,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
           setEditingHistory(undefined);
         }}
         onSubmit={handleAddMedicalHistory}
-        history={editingHistory}
+        history={editingHistory?.data}
       />
 
       <DeleteConfirmModal
