@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { usePatient } from '@/hooks/usePatients';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { format } from 'date-fns';
@@ -49,9 +49,31 @@ const tabs = [
 const PatientDetailPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get active tab from URL or default to 'overview'
+  const activeTab = searchParams.get('tab') || 'overview';
+  
   const { data: patient, isLoading, error } = usePatient(patientId || '');
+
+  // Update the URL when tab changes
+  const setActiveTab = (tabId: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (tabId === 'overview') {
+      params.delete('tab'); // Remove tab param for default tab
+    } else {
+      params.set('tab', tabId);
+    }
+    setSearchParams(params);
+  };
+
+  // Validate tab parameter
+  useEffect(() => {
+    const validTabs = tabs.map(t => t.id);
+    if (activeTab && !validTabs.includes(activeTab)) {
+      setActiveTab('overview');
+    }
+  }, [activeTab]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -91,7 +113,7 @@ const PatientDetailPage = () => {
       case 'overview':
         return <PatientOverviewTab patient={patient} />;
       case 'medical-history':
-        return <PatientMedicalHistoryTab patient={patient} />;
+        return <PatientMedicalHistoryTab patient={patient} patientId={patient.id} />;
       case 'test-results':
         return <PatientTestResultsTab patientId={patient.id} />;
       case 'documents':
