@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form';
 import type { PatientMedicalHistory } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
 import { TextField } from '@/components/form-fields/TextField';
-import { TextareaField } from '@/components/form-fields/TextareaField';
+import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { DateField } from '@/components/form-fields/DateField';
+import { Controller } from 'react-hook-form';
 
 interface AddMedicalHistoryModalProps {
   isOpen: boolean;
@@ -67,13 +68,21 @@ export const AddMedicalHistoryModal = ({ isOpen, onClose, onSubmit, history }: A
           error={errors.condition?.message}
         />
 
-        <SelectField
+        <Controller
           name="status"
           control={control}
-          label="Status"
-          options={statusOptions}
           rules={{ required: 'Status is required' }}
-          error={errors.status?.message}
+          render={({ field }) => (
+            <SelectField
+              label="Status"
+              name="status"
+              options={statusOptions}
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.status?.message}
+              required
+            />
+          )}
         />
 
         <DateField
@@ -83,12 +92,12 @@ export const AddMedicalHistoryModal = ({ isOpen, onClose, onSubmit, history }: A
           maxDate={new Date()}
         />
 
-        <TextareaField
+        <LexicalEditorField
           name="notes"
           control={control}
           label="Notes (Optional)"
           placeholder="Additional information about the condition"
-          rows={4}
+          minHeight="120px"
         />
 
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">

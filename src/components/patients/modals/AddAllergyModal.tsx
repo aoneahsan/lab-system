@@ -3,9 +3,10 @@ import { useForm } from 'react-hook-form';
 import type { PatientAllergy } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
 import { TextField } from '@/components/form-fields/TextField';
-import { TextareaField } from '@/components/form-fields/TextareaField';
+import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { DateField } from '@/components/form-fields/DateField';
+import { Controller } from 'react-hook-form';
 
 interface AddAllergyModalProps {
   isOpen: boolean;
@@ -79,13 +80,21 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
             error={errors.reaction?.message}
           />
 
-          <SelectField
+          <Controller
             name="severity"
             control={control}
-            label="Severity"
-            options={severityOptions}
             rules={{ required: 'Severity is required' }}
-            error={errors.severity?.message}
+            render={({ field }) => (
+              <SelectField
+                label="Severity"
+                name="severity"
+                options={severityOptions}
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.severity?.message}
+                required
+              />
+            )}
           />
 
           <DateField
@@ -95,12 +104,12 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
             maxDate={new Date()}
           />
 
-          <TextareaField
+          <LexicalEditorField
             name="notes"
             control={control}
             label="Notes (Optional)"
             placeholder="Additional information about the allergy"
-            rows={3}
+            minHeight="100px"
           />
         </div>
 

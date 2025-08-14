@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import type { PatientMedication } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
 import { TextField } from '@/components/form-fields/TextField';
-import { TextareaField } from '@/components/form-fields/TextareaField';
+import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField';
 import { DateField } from '@/components/form-fields/DateField';
 
 interface AddMedicationModalProps {
@@ -118,12 +118,12 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
           placeholder="Reason for prescription"
         />
 
-        <TextareaField
+        <LexicalEditorField
           name="notes"
           control={control}
           label="Notes (Optional)"
           placeholder="Additional instructions or information"
-          rows={3}
+          minHeight="100px"
         />
 
         <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">

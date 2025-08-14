@@ -4,13 +4,17 @@ import type { Patient } from '@/types/patient.types';
 import { DocumentUpload } from '@/components/patients/DocumentUpload';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTenant } from '@/hooks/useTenant';
+import { useUrlState } from '@/hooks/useUrlState';
 
 interface PatientDocumentsTabProps {
   patient: Patient;
 }
 
 export const PatientDocumentsTab = ({ patient }: PatientDocumentsTabProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useUrlState('docCategory', {
+    defaultValue: 'all',
+    removeDefault: true
+  });
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const queryClient = useQueryClient();
   const { tenant: currentTenant } = useTenant();
