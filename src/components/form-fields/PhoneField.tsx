@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { BaseFormFieldProps, FormFieldWrapper } from './BaseFormField';
 import { PhoneIcon } from '@heroicons/react/24/outline';
+import { Input } from '@/components/ui/Input';
 
 interface PhoneFieldProps extends BaseFormFieldProps {
   value?: string;
@@ -15,12 +16,18 @@ interface PhoneFieldProps extends BaseFormFieldProps {
   autoFocus?: boolean;
 }
 
+// Custom input component to prevent re-renders
+const PhoneInputComponent = React.forwardRef<HTMLInputElement, any>((props, ref) => {
+  return <input {...props} ref={ref} className="PhoneInputInput pl-10" />;
+});
+PhoneInputComponent.displayName = 'PhoneInputComponent';
+
 export const PhoneField: React.FC<PhoneFieldProps> = ({
   label = 'Phone Number',
   name,
   value = '',
   onChange,
-  defaultCountry = 'US',
+  defaultCountry = 'PK',
   international = true,
   withCountryCallingCode = true,
   countrySelectProps,
@@ -36,10 +43,14 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
   errorClassName = '',
   showLabel = true,
 }) => {
-  const [localError, setLocalError] = React.useState<string>('');
-  const [touched, setTouched] = React.useState(false);
+  const [localError, setLocalError] = useState<string>('');
+  const [touched, setTouched] = useState(false);
+  const [localValue, setLocalValue] = useState(value || '');
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (newValue: string | undefined) => {
+  // Use a stable callback to prevent re-renders
+  const handleChange = useCallback((newValue: string | undefined) => {
+    setLocalValue(newValue || '');
     if (touched && newValue) {
       if (!isValidPhoneNumber(newValue)) {
         setLocalError('Please enter a valid phone number');
@@ -48,16 +59,16 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
       }
     }
     onChange?.(newValue);
-  };
+  }, [touched, onChange]);
 
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     setTouched(true);
-    if (value && !isValidPhoneNumber(value)) {
+    if (localValue && !isValidPhoneNumber(localValue)) {
       setLocalError('Please enter a valid phone number');
     } else {
       setLocalError('');
     }
-  };
+  }, [localValue]);
 
   const displayError = error || localError;
 
@@ -157,7 +168,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
         </div>
         
         <PhoneInput
-          value={value}
+          value={localValue}
           onChange={handleChange}
           onBlur={handleBlur}
           defaultCountry={defaultCountry as any}
@@ -167,9 +178,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
           placeholder={placeholder}
           disabled={disabled || loading}
           autoFocus={autoFocus}
-          inputComponent={React.forwardRef((props: any, ref) => (
-            <input {...props} ref={ref} className="PhoneInputInput pl-10" />
-          ))}
+          inputComponent={PhoneInputComponent}
         />
       </div>
     </FormFieldWrapper>

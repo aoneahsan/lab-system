@@ -50,8 +50,8 @@ const FirebaseKit = {
 
 // Initialize Firebase Kit for mobile platforms
 export const initializeFirebaseKit = async () => {
-  if (Capacitor.isNativePlatform()) {
-    try {
+  try {
+    if (Capacitor.isNativePlatform()) {
       // Initialize Analytics
       await FirebaseKit.analytics.setCollectionEnabled({ enabled: true });
       
@@ -70,9 +70,12 @@ export const initializeFirebaseKit = async () => {
       }
       
       console.log('📱 Firebase Kit initialized for native platform');
-    } catch (error) {
-      console.error('Failed to initialize Firebase Kit:', error);
+    } else {
+      console.log('🌐 Running on web platform - Firebase Kit not needed');
     }
+  } catch (error) {
+    console.error('Failed to initialize Firebase Kit:', error);
+    // Don't throw - allow app to continue
   }
 };
 

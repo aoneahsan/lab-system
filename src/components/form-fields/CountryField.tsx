@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { CountrySelect, StateSelect, CitySelect } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 import { BaseFormFieldProps, FormFieldWrapper } from './BaseFormField';
+import { pakistanCities, getCitiesForState } from '@/utils/city-data-pakistan';
+import { Select } from '@/components/ui/Select';
 
 interface CountryFieldProps extends BaseFormFieldProps {
   value?: any;
@@ -10,6 +12,7 @@ interface CountryFieldProps extends BaseFormFieldProps {
   onCityChange?: (value: any) => void;
   placeholder?: string;
   showFlag?: boolean;
+  onCountryNameChange?: (name: string) => void;
 }
 
 export const CountryField: React.FC<CountryFieldProps> = ({
@@ -145,6 +148,7 @@ interface StateFieldProps extends BaseFormFieldProps {
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
+  onStateNameChange?: (name: string) => void;
 }
 
 export const StateField: React.FC<StateFieldProps> = ({
@@ -198,6 +202,8 @@ interface CityFieldProps extends BaseFormFieldProps {
   value?: any;
   onChange?: (value: any) => void;
   placeholder?: string;
+  countryName?: string;
+  stateName?: string;
 }
 
 export const CityField: React.FC<CityFieldProps> = ({
@@ -218,8 +224,60 @@ export const CityField: React.FC<CityFieldProps> = ({
   errorClassName = '',
   showLabel = true,
 }) => {
+  const [countryName, setCountryName] = useState<string>('');
+  const [stateName, setStateName] = useState<string>('');
+  
+  // Check if we should use Pakistani cities data
+  const usePakistanData = useMemo(() => {
+    return countryName?.toLowerCase().includes('pakistan');
+  }, [countryName]);
+  
+  // Get Pakistani cities if applicable
+  const pakistaniCities = useMemo(() => {
+    if (usePakistanData && stateName) {
+      // Try to match state name with our data
+      const normalizedStateName = stateName.replace(/Province|Territory/gi, '').trim();
+      return getCitiesForState(normalizedStateName);
+    }
+    return [];
+  }, [usePakistanData, stateName]);
+  
   const isDisabled = disabled || loading || !countryId || !stateId;
   
+  // Use custom select for Pakistani cities
+  if (usePakistanData && pakistaniCities.length > 0) {
+    return (
+      <FormFieldWrapper
+        label={label}
+        name={name}
+        error={error}
+        required={required}
+        disabled={isDisabled}
+        loading={loading}
+        helpText={helpText}
+        containerClassName={containerClassName}
+        labelClassName={labelClassName}
+        errorClassName={errorClassName}
+        showLabel={showLabel}
+      >
+        <Select
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          disabled={isDisabled}
+          className={error ? 'border-red-500' : ''}
+        >
+          <option value="">{placeholder}</option>
+          {pakistaniCities.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </Select>
+      </FormFieldWrapper>
+    );
+  }
+  
+  // Fall back to default CitySelect for other countries
   return (
     <FormFieldWrapper
       label={label}

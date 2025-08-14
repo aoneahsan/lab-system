@@ -30,6 +30,10 @@ export {
   CreditCardField,
 } from './SpecializedFields';
 
+// Additional specialized fields
+export { OccupationField } from './OccupationField';
+export { LexicalEditorField } from './LexicalEditorField';
+
 // Re-import for field groups
 import { TextField } from './TextField';
 import { EmailField } from './EmailField';
@@ -40,6 +44,8 @@ import { RelationshipField } from './RelationshipField';
 import { AgeField, NumberField, CurrencyField } from './NumberField';
 import { CountryField, StateField, CityField } from './CountryField';
 import { ZipCodeField, UrlField, CreditCardField } from './SpecializedFields';
+import { OccupationField } from './OccupationField';
+import { LexicalEditorField } from './LexicalEditorField';
 
 // Commonly used field groups
 export const AddressFields = {
@@ -64,6 +70,8 @@ export const PersonalInfoFields = {
   SelectField,
   RelationshipField,
   AgeField,
+  OccupationField,
+  LexicalEditorField,
 };
 
 export const PaymentFields = {
