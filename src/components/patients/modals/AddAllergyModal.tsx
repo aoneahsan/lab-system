@@ -57,63 +57,65 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
       isOpen={isOpen}
       onClose={onClose}
       title={allergy ? 'Edit Allergy' : 'Add Allergy'}
-      size="md"
+      size="lg"
     >
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-        <TextField
-          name="allergen"
-          control={control}
-          label="Allergen"
-          placeholder="e.g., Penicillin, Peanuts, Dust"
-          rules={{ required: 'Allergen is required' }}
-          error={errors.allergen?.message}
-        />
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+        <div className="grid gap-5">
+          <TextField
+            name="allergen"
+            control={control}
+            label="Allergen"
+            placeholder="e.g., Penicillin, Peanuts, Dust"
+            rules={{ required: 'Allergen is required' }}
+            error={errors.allergen?.message}
+          />
 
-        <TextField
-          name="reaction"
-          control={control}
-          label="Reaction"
-          placeholder="e.g., Rash, Swelling, Difficulty breathing"
-          rules={{ required: 'Reaction is required' }}
-          error={errors.reaction?.message}
-        />
+          <TextField
+            name="reaction"
+            control={control}
+            label="Reaction"
+            placeholder="e.g., Rash, Swelling, Difficulty breathing"
+            rules={{ required: 'Reaction is required' }}
+            error={errors.reaction?.message}
+          />
 
-        <SelectField
-          name="severity"
-          control={control}
-          label="Severity"
-          options={severityOptions}
-          rules={{ required: 'Severity is required' }}
-          error={errors.severity?.message}
-        />
+          <SelectField
+            name="severity"
+            control={control}
+            label="Severity"
+            options={severityOptions}
+            rules={{ required: 'Severity is required' }}
+            error={errors.severity?.message}
+          />
 
-        <DateField
-          name="confirmedDate"
-          control={control}
-          label="Confirmed Date (Optional)"
-          maxDate={new Date()}
-        />
+          <DateField
+            name="confirmedDate"
+            control={control}
+            label="Confirmed Date (Optional)"
+            maxDate={new Date()}
+          />
 
-        <TextareaField
-          name="notes"
-          control={control}
-          label="Notes (Optional)"
-          placeholder="Additional information about the allergy"
-          rows={3}
-        />
+          <TextareaField
+            name="notes"
+            control={control}
+            label="Notes (Optional)"
+            placeholder="Additional information about the allergy"
+            rows={3}
+          />
+        </div>
 
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={onClose}
-            className="btn btn-secondary"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
             disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : allergy ? 'Update' : 'Add'} Allergy

@@ -55,9 +55,9 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
       isOpen={isOpen}
       onClose={onClose}
       title={medication ? 'Edit Medication' : 'Add Medication'}
-      size="md"
+      size="xl"
     >
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
         <TextField
           name="name"
           control={control}
@@ -126,18 +126,18 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
           rows={3}
         />
 
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={onClose}
-            className="btn btn-secondary"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
             disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : medication ? 'Update' : 'Add'} Medication
