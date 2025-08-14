@@ -17,6 +17,8 @@ import { useTenant } from '@/hooks/useTenant';
 import { usePatients } from '@/hooks/usePatients';
 import { useSamples } from '@/hooks/useSamples';
 import { useTests } from '@/hooks/useTests';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import { pdfService } from '@/services/pdf.service';
 import { toast } from '@/stores/toast.store';
 import CriticalResultsDashboard from '@/components/results/CriticalResultsDashboard';
@@ -323,45 +325,53 @@ const ResultsPage: React.FC = () => {
             <p className="text-gray-600 mt-2">Manage test results and reports</p>
           </div>
           <div className="flex gap-3">
-            {selectedResults.length > 0 && (
-              <>
-                <button
-                  onClick={() => setShowBatchApproval(!showBatchApproval)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Batch Approve ({selectedResults.length})
-                </button>
-                <button
-                  onClick={handleBatchPDF}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Download ({selectedResults.length})
-                </button>
-              </>
-            )}
-            <button
-              onClick={() => navigate('/results/validation-rules')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-              title="Manage validation rules"
-            >
-              <Settings className="h-4 w-4" />
-              Validation Rules
-            </button>
-            <button
-              onClick={() => navigate('/results/review')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Review Results
-            </button>
-            <button
-              onClick={() => navigate('/results/entry')}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Enter Result
-            </button>
+            <PermissionGate permission={PERMISSIONS.RESULTS_APPROVE} hideIfUnauthorized>
+              {selectedResults.length > 0 && (
+                <>
+                  <button
+                    onClick={() => setShowBatchApproval(!showBatchApproval)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Batch Approve ({selectedResults.length})
+                  </button>
+                  <button
+                    onClick={handleBatchPDF}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download ({selectedResults.length})
+                  </button>
+                </>
+              )}
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.RESULTS_VALIDATE} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/results/validation-rules')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+                title="Manage validation rules"
+              >
+                <Settings className="h-4 w-4" />
+                Validation Rules
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.RESULTS_VALIDATE} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/results/review')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Review Results
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.RESULTS_ENTER} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/results/entry')}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Enter Result
+              </button>
+            </PermissionGate>
           </div>
         </div>
       </div>

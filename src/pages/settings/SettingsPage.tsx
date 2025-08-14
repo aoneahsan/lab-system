@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 
 interface SettingCategory {
   title: string;
   description: string;
   link: string;
   icon: string;
-  roles?: string[];
+  permissions?: string[];
 }
 
 const settingCategories: SettingCategory[] = [
@@ -46,42 +48,42 @@ const settingCategories: SettingCategory[] = [
     description: 'Configure test panels, reference ranges, and lab-specific settings',
     link: '/settings/laboratory',
     icon: '🧪',
-    roles: ['admin', 'lab_manager'],
+    permissions: [PERMISSIONS.SETTINGS_VIEW_CLINICAL, PERMISSIONS.SETTINGS_UPDATE_CLINICAL],
   },
   {
     title: 'Custom Fields',
     description: 'Manage custom fields for patients, tests, samples, and other modules',
     link: '/settings/custom-fields',
     icon: '📋',
-    roles: ['admin'],
+    permissions: [PERMISSIONS.SETTINGS_MANAGE_TEMPLATES],
   },
   {
     title: 'Validation Rules',
     description: 'Configure result validation rules and quality control checks',
     link: '/settings/validation-rules',
     icon: '✅',
-    roles: ['admin', 'lab_manager', 'lab_technician'],
+    permissions: [PERMISSIONS.RESULTS_VALIDATE, PERMISSIONS.QC_MANAGE_RULES],
   },
   {
     title: 'Billing & Insurance',
     description: 'Set up billing codes, insurance providers, and payment settings',
     link: '/settings/billing',
     icon: '💳',
-    roles: ['admin', 'billing_staff'],
+    permissions: [PERMISSIONS.BILLING_MANAGE_PRICING, PERMISSIONS.SETTINGS_UPDATE_GENERAL],
   },
   {
     title: 'Integration Settings',
     description: 'Configure EMR integrations, HL7/FHIR settings, and API access',
     link: '/settings/integrations',
     icon: '🔗',
-    roles: ['admin'],
+    permissions: [PERMISSIONS.SETTINGS_MANAGE_TEMPLATES],
   },
   {
     title: 'System Administration',
     description: 'Manage users, roles, permissions, and system-wide settings',
     link: '/settings/admin',
     icon: '👥',
-    roles: ['admin', 'super_admin'],
+    permissions: [PERMISSIONS.USERS_MANAGE_PERMISSIONS, PERMISSIONS.ADMIN_SYSTEM_CONFIGURATION],
   },
   {
     title: 'App Updates',
@@ -92,13 +94,7 @@ const settingCategories: SettingCategory[] = [
 ];
 
 const SettingsPage: React.FC = () => {
-  const { currentUser } = useAuthStore();
-
-  // Filter categories based on user role
-  const availableCategories = settingCategories.filter((category) => {
-    if (!category.roles) return true;
-    return category.roles.includes(currentUser?.role || '');
-  });
+  // No need for manual filtering - PermissionGate will handle this
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">

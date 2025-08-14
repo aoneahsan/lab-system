@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserPlus, Shield, Search } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/auth.store';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import { UserListTable } from '@/components/users/UserListTable';
 import { UserForm } from '@/components/users/UserForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -22,20 +24,17 @@ const UsersPage = () => {
 
   const { data: users = [], isLoading } = useUsers(filters.role);
 
-  // Check if user has permission to manage users
-  const canManageUsers = currentUser?.role === 'lab_admin' || 
-                        currentUser?.role === 'super_admin' ||
-                        currentUser?.permissions?.includes('users.manage');
+  // This will be replaced by PermissionGate components
 
   // Handle URL query parameters
   useEffect(() => {
     const action = searchParams.get('action');
-    if (action === 'new' && canManageUsers) {
+    if (action === 'new') {
       setShowAddForm(true);
       searchParams.delete('action');
       setSearchParams(searchParams);
     }
-  }, [searchParams, setSearchParams, canManageUsers]);
+  }, [searchParams, setSearchParams]);
 
   const handleAddUser = async (data: UserFormData) => {
     try {
@@ -122,67 +121,61 @@ const UsersPage = () => {
     );
   });
 
-  if (!canManageUsers) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Access Denied
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            You don't have permission to manage users.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Removed - will be handled by PermissionGate
 
   if (showAddForm || editingUser) {
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {editingUser ? 'Edit User' : 'Add New User'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {editingUser ? 'Update user information' : 'Create a new user account'}
-          </p>
-        </div>
+      <PermissionGate 
+        permission={editingUser ? PERMISSIONS.USERS_UPDATE_ALL : PERMISSIONS.USERS_CREATE}
+        hideIfUnauthorized
+      >
+        <div className="max-w-4xl mx-auto py-8 px-4">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {editingUser ? 'Edit User' : 'Add New User'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              {editingUser ? 'Update user information' : 'Create a new user account'}
+            </p>
+          </div>
 
-        <UserForm
-          initialData={editingUser || undefined}
-          onSubmit={editingUser ? handleEditUser : handleAddUser}
-          onCancel={() => {
-            setShowAddForm(false);
-            setEditingUser(null);
-          }}
-          isLoading={false}
-        />
-      </div>
+          <UserForm
+            initialData={editingUser || undefined}
+            onSubmit={editingUser ? handleEditUser : handleAddUser}
+            onCancel={() => {
+              setShowAddForm(false);
+              setEditingUser(null);
+            }}
+            isLoading={false}
+          />
+        </div>
+      </PermissionGate>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            User Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage user accounts and permissions
-          </p>
+    <PermissionGate permission={PERMISSIONS.USERS_VIEW_ALL} hideIfUnauthorized>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              User Management
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Manage user accounts and permissions
+            </p>
+          </div>
+          <PermissionGate permission={PERMISSIONS.USERS_CREATE} hideIfUnauthorized>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="btn btn-primary flex items-center gap-2"
+            >
+              <UserPlus className="h-4 w-4" />
+              Add User
+            </button>
+          </PermissionGate>
         </div>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <UserPlus className="h-4 w-4" />
-          Add User
-        </button>
-      </div>
 
       {/* Search and Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
@@ -256,7 +249,8 @@ const UsersPage = () => {
           currentUserId={currentUser?.id}
         />
       )}
-    </div>
+      </div>
+    </PermissionGate>
   );
 };
 

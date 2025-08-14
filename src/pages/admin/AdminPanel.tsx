@@ -4,6 +4,8 @@ import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/fi
 import { firestore } from '@/config/firebase.config';
 import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity, Settings, GitBranch } from 'lucide-react';
 import { MicrophoneIcon } from '@heroicons/react/24/outline';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useImpersonationStore } from '@/stores/impersonation.store';
@@ -213,23 +215,8 @@ const AdminPanel = () => {
     navigate('/dashboard');
   };
 
-  if (!isSuperAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Access Denied
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            You need super admin privileges to access this page.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
+    <PermissionGate permission={PERMISSIONS.ADMIN_ACCESS_PANEL} hideIfUnauthorized>
     <div>
       <div className="mb-8">
         <div className="flex justify-between items-start">
@@ -693,6 +680,7 @@ const AdminPanel = () => {
         <AdvancedFeaturesPage />
       ) : null}
     </div>
+    </PermissionGate>
   );
 };
 

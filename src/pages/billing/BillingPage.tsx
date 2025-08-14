@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, DollarSign, CreditCard, FileText, TrendingUp, BarChart3 } from 'lucide-react';
 import { useInvoices, useBillingStatistics, useCreateInvoice } from '@/hooks/useBilling';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import InvoiceForm from '@/components/billing/InvoiceForm';
 import type { BillingFilter, InvoiceFormData } from '@/types/billing.types';
 
@@ -46,18 +48,20 @@ const BillingPage: React.FC = () => {
 
   if (showCreateForm) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Create Invoice</h1>
-          <p className="text-gray-600 mt-2">Generate a new invoice for services</p>
-        </div>
+      <PermissionGate permission={PERMISSIONS.BILLING_CREATE_INVOICE} hideIfUnauthorized>
+        <div className="container mx-auto p-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Create Invoice</h1>
+            <p className="text-gray-600 mt-2">Generate a new invoice for services</p>
+          </div>
 
-        <InvoiceForm
-          onSubmit={handleCreateInvoice}
-          onCancel={() => setShowCreateForm(false)}
-          isLoading={createInvoiceMutation.isPending}
-        />
-      </div>
+          <InvoiceForm
+            onSubmit={handleCreateInvoice}
+            onCancel={() => setShowCreateForm(false)}
+            isLoading={createInvoiceMutation.isPending}
+          />
+        </div>
+      </PermissionGate>
     );
   }
 
@@ -70,38 +74,47 @@ const BillingPage: React.FC = () => {
             <p className="text-gray-600 mt-2">Manage invoices, payments, and insurance claims</p>
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={() => navigate('/billing/payments')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Payment History
-            </button>
-            <button
-              onClick={() => navigate('/billing/claims')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Insurance Claims
-            </button>
-            <button
-              onClick={() => navigate('/billing/reports')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Financial Reports
-            </button>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Create Invoice
-            </button>
+            <PermissionGate permission={PERMISSIONS.BILLING_PROCESS_PAYMENT} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/billing/payments')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Payment History
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.BILLING_MANAGE_INSURANCE} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/billing/claims')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Insurance Claims
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.BILLING_VIEW_REPORTS} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/billing/reports')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Financial Reports
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.BILLING_CREATE_INVOICE} hideIfUnauthorized>
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Create Invoice
+              </button>
+            </PermissionGate>
           </div>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      {statistics && (
+      <PermissionGate anyPermission={[PERMISSIONS.BILLING_VIEW_ALL, PERMISSIONS.BILLING_VIEW_REPORTS]} hideIfUnauthorized>
+        {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
@@ -148,7 +161,8 @@ const BillingPage: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </PermissionGate>
 
       {/* Invoices Table */}
       <div className="bg-white rounded-lg shadow">
@@ -165,12 +179,14 @@ const BillingPage: React.FC = () => {
           <div className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No invoices found.</p>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              Create First Invoice
-            </button>
+            <PermissionGate permission={PERMISSIONS.BILLING_CREATE_INVOICE} hideIfUnauthorized>
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                Create First Invoice
+              </button>
+            </PermissionGate>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -241,18 +257,22 @@ const BillingPage: React.FC = () => {
                       {invoice.dueDate.toDate().toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => navigate(`/billing/invoices/${invoice.id}`)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => navigate(`/billing/payments/new?invoice=${invoice.id}`)}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        Payment
-                      </button>
+                      <PermissionGate anyPermission={[PERMISSIONS.BILLING_VIEW_ALL, PERMISSIONS.BILLING_VIEW_OWN]} hideIfUnauthorized>
+                        <button
+                          onClick={() => navigate(`/billing/invoices/${invoice.id}`)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                        >
+                          View
+                        </button>
+                      </PermissionGate>
+                      <PermissionGate permission={PERMISSIONS.BILLING_PROCESS_PAYMENT} hideIfUnauthorized>
+                        <button
+                          onClick={() => navigate(`/billing/payments/new?invoice=${invoice.id}`)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          Payment
+                        </button>
+                      </PermissionGate>
                     </td>
                   </tr>
                 ))}

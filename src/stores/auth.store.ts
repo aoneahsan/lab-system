@@ -16,6 +16,8 @@ import type { User, LoginCredentials, RegisterData, AuthState } from '@/types/au
 import { biometricService } from '@/services/biometric.service';
 import type { BiometricAuthResult } from '@/types/biometric.types';
 import { useImpersonationStore } from './impersonation.store';
+import { Permission } from '@/constants/permissions.constants';
+import { checkPermission, checkAnyPermission, checkAllPermissions, getUserPermissions, checkResourceAccess } from '@/utils/permission.utils';
 
 interface AuthStore extends AuthState {
   setFirebaseUser: (user: FirebaseUser | null) => void;
@@ -35,6 +37,14 @@ interface AuthStore extends AuthState {
   joinLaboratory: (tenantCode: string) => Promise<User>;
 
   initializeAuth: () => void;
+  
+  // Permission methods
+  hasPermission: (permission: Permission | Permission[]) => boolean;
+  hasAnyPermission: (permissions: Permission[]) => boolean;
+  hasAllPermissions: (permissions: Permission[]) => boolean;
+  canAccessResource: (permission: Permission, resourceOwnerId?: string) => boolean;
+  getUserPermissions: () => Permission[];
+  updateUserPermissions: (userId: string, permissions: Permission[]) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -352,6 +362,60 @@ export const useAuthStore = create<AuthStore>()(
 
           setLoading(false);
         });
+      },
+      
+      // Permission methods
+      hasPermission: (permission) => {
+        const { currentUser } = get();
+        const { impersonatingUser } = useImpersonationStore.getState();
+        const activeUser = impersonatingUser || currentUser;
+        return checkPermission(activeUser, permission);
+      },
+      
+      hasAnyPermission: (permissions) => {
+        const { currentUser } = get();
+        const { impersonatingUser } = useImpersonationStore.getState();
+        const activeUser = impersonatingUser || currentUser;
+        return checkAnyPermission(activeUser, permissions);
+      },
+      
+      hasAllPermissions: (permissions) => {
+        const { currentUser } = get();
+        const { impersonatingUser } = useImpersonationStore.getState();
+        const activeUser = impersonatingUser || currentUser;
+        return checkAllPermissions(activeUser, permissions);
+      },
+      
+      canAccessResource: (permission, resourceOwnerId) => {
+        const { currentUser } = get();
+        const { impersonatingUser } = useImpersonationStore.getState();
+        const activeUser = impersonatingUser || currentUser;
+        return checkResourceAccess(activeUser, permission, resourceOwnerId);
+      },
+      
+      getUserPermissions: () => {
+        const { currentUser } = get();
+        const { impersonatingUser } = useImpersonationStore.getState();
+        const activeUser = impersonatingUser || currentUser;
+        return getUserPermissions(activeUser);
+      },
+      
+      updateUserPermissions: async (userId, permissions) => {
+        const { setError, fetchUserData } = get();
+        
+        try {
+          setError(null);
+          
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, userId), {
+            permissions,
+            updatedAt: serverTimestamp(),
+          });
+          
+          await fetchUserData(userId);
+        } catch (error) {
+          setError(error as Error);
+          throw error;
+        }
       },
     }),
     {

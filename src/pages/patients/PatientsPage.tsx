@@ -4,6 +4,8 @@ import { usePatients, usePatientStats } from '@/hooks/usePatients';
 import { PatientSearchFilters } from '@/components/patients/PatientSearchFilters';
 import { PatientListTable } from '@/components/patients/PatientListTable';
 import { PatientRegistrationForm } from '@/components/patients/PatientRegistrationForm';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import type { PatientSearchFilters as Filters } from '@/types/patient.types';
 
 const PatientsPage = () => {
@@ -41,17 +43,20 @@ const PatientsPage = () => {
             Manage patient records and medical information
           </p>
         </div>
-        <button onClick={() => setShowRegistrationForm(true)} className="btn btn-primary">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          New Patient
-        </button>
+        <PermissionGate permission={PERMISSIONS.PATIENTS_CREATE} hideIfUnauthorized>
+          <button onClick={() => setShowRegistrationForm(true)} className="btn btn-primary">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Patient
+          </button>
+        </PermissionGate>
       </div>
 
       {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <PermissionGate permission={PERMISSIONS.PATIENTS_VIEW_ALL} hideIfUnauthorized>
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-1">
@@ -162,10 +167,12 @@ const PatientsPage = () => {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </PermissionGate>
 
       {/* Registration Form Modal */}
-      {showRegistrationForm && (
+      <PermissionGate permission={PERMISSIONS.PATIENTS_CREATE} hideIfUnauthorized>
+        {showRegistrationForm && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50 overflow-y-auto">
           <div className="bg-white dark:bg-gray-900 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
@@ -198,26 +205,32 @@ const PatientsPage = () => {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </PermissionGate>
 
       {/* Search and Filters */}
       <PatientSearchFilters onFiltersChange={setFilters} onSearch={handleSearch} />
 
       {/* Patient List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <PatientListTable
-          patients={patientsData?.patients || []}
-          isLoading={isLoading}
-          onPatientSelect={(patient) => navigate(`/patients/${patient.id}`)}
-        />
+      <PermissionGate 
+        anyPermission={[PERMISSIONS.PATIENTS_VIEW_ALL, PERMISSIONS.PATIENTS_VIEW_OWN, PERMISSIONS.PATIENTS_VIEW_ASSIGNED]}
+        hideIfUnauthorized
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <PatientListTable
+            patients={patientsData?.patients || []}
+            isLoading={isLoading}
+            onPatientSelect={(patient) => navigate(`/patients/${patient.id}`)}
+          />
 
-        {/* Pagination */}
-        {patientsData && patientsData.hasMore && (
-          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            <button className="btn btn-secondary">Load More</button>
-          </div>
-        )}
-      </div>
+          {/* Pagination */}
+          {patientsData && patientsData.hasMore && (
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+              <button className="btn btn-secondary">Load More</button>
+            </div>
+          )}
+        </div>
+      </PermissionGate>
     </div>
   );
 };

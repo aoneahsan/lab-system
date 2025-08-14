@@ -3,6 +3,8 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { useImpersonationStore } from '@/stores/impersonation.store';
+import { usePermissions } from '@/hooks/usePermissions';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import { toast } from '@/stores/toast.store';
 import { Info } from 'lucide-react';
 import { QuickActionButton } from '@/components/navigation/QuickActionButton';
@@ -16,99 +18,92 @@ const superAdminNavigation = [
   { name: 'Settings', href: '/settings', icon: '⚙️' },
 ];
 
-// Define navigation for regular users
+// Define navigation for regular users with permission requirements
 const regularNavigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: '📊', roles: 'all' },
+  { name: 'Dashboard', href: '/dashboard', icon: '📊', permissions: 'all' },
   {
     name: 'Appointments',
     href: '/appointments',
     icon: '📅',
-    roles: ['lab_admin', 'lab_manager', 'front_desk', 'phlebotomist', 'clinician'],
+    permissions: [PERMISSIONS.HOME_COLLECTION_VIEW_ALL, PERMISSIONS.HOME_COLLECTION_VIEW_ASSIGNED],
   },
   {
     name: 'Home Collection',
     href: '/home-collection',
     icon: '🏠',
-    roles: ['lab_admin', 'lab_manager', 'phlebotomist', 'front_desk'],
+    permissions: [PERMISSIONS.HOME_COLLECTION_VIEW_ALL, PERMISSIONS.HOME_COLLECTION_VIEW_ASSIGNED],
   },
   {
     name: 'Patients',
     href: '/patients',
     icon: '👥',
-    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'front_desk', 'clinician'],
+    permissions: [PERMISSIONS.PATIENTS_VIEW_ALL, PERMISSIONS.PATIENTS_VIEW_OWN, PERMISSIONS.PATIENTS_VIEW_ASSIGNED],
   },
   {
     name: 'Tests',
     href: '/tests',
     icon: '🧪',
-    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'clinician'],
+    permissions: [PERMISSIONS.TESTS_VIEW_ALL, PERMISSIONS.TESTS_VIEW_ASSIGNED],
   },
   {
     name: 'Samples',
     href: '/samples',
     icon: '🩸',
-    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'phlebotomist'],
+    permissions: [PERMISSIONS.SAMPLES_VIEW_ALL, PERMISSIONS.SAMPLES_COLLECT, PERMISSIONS.SAMPLES_RECEIVE],
   },
   {
     name: 'Results',
     href: '/results',
     icon: '📋',
-    roles: [
-      'lab_admin',
-      'lab_manager',
-      'lab_technician',
-      'pathologist',
-      'radiologist',
-      'clinician',
-    ],
+    permissions: [PERMISSIONS.RESULTS_VIEW_ALL, PERMISSIONS.RESULTS_VIEW_ASSIGNED],
   },
   {
     name: 'Billing',
     href: '/billing',
     icon: '💳',
-    roles: ['lab_admin', 'lab_manager', 'billing_staff'],
+    permissions: [PERMISSIONS.BILLING_VIEW_ALL, PERMISSIONS.BILLING_VIEW_OWN],
   },
   {
     name: 'Inventory',
     href: '/inventory',
     icon: '📦',
-    roles: ['lab_admin', 'lab_manager', 'lab_technician'],
+    permissions: [PERMISSIONS.INVENTORY_VIEW_ALL, PERMISSIONS.INVENTORY_VIEW_DEPARTMENT],
   },
   {
     name: 'Quality Control',
     href: '/quality-control',
     icon: '✅',
-    roles: ['lab_admin', 'lab_manager', 'lab_technician', 'pathologist'],
+    permissions: [PERMISSIONS.QC_VIEW_ALL],
   },
   {
     name: 'Reports',
     href: '/reports',
     icon: '📈',
-    roles: ['lab_admin', 'lab_manager'],
+    permissions: [PERMISSIONS.REPORTS_VIEW_CLINICAL, PERMISSIONS.REPORTS_VIEW_FINANCIAL, PERMISSIONS.REPORTS_VIEW_OPERATIONAL],
   },
   {
     name: 'Customer Portal',
     href: '/portal',
     icon: '🌐',
-    roles: ['patient'],
+    permissions: 'patient', // Special case for patient role
   },
   {
     name: 'Workflow',
     href: '/workflow',
     icon: '⚡',
-    roles: ['lab_admin', 'lab_manager'],
+    permissions: [PERMISSIONS.SETTINGS_MANAGE_WORKFLOWS],
   },
   {
     name: 'Users',
     href: '/users',
     icon: '👥',
-    roles: ['admin', 'lab_admin', 'lab_manager'],
+    permissions: [PERMISSIONS.USERS_VIEW_ALL],
   },
   {
     name: 'Settings',
     href: '/settings',
     icon: '⚙️',
-    roles: ['lab_admin'],
+    permissions: [PERMISSIONS.SETTINGS_VIEW_GENERAL, PERMISSIONS.SETTINGS_VIEW_CLINICAL],
   },
 ];
 
@@ -120,6 +115,7 @@ export const DashboardLayout = () => {
   const { currentUser, logout } = useAuthStore();
   const { tenant } = useTenant();
   const { isImpersonating, impersonatedUser, endImpersonation } = useImpersonationStore();
+  const { hasAnyPermission, userRole } = usePermissions();
 
   // Register hotkey for help modal
   useHotkeyAction('help', () => setShowFeatureModal(true), []);
@@ -138,15 +134,18 @@ export const DashboardLayout = () => {
     ? superAdminNavigation 
     : regularNavigation;
 
-  // Show all navigation items in development or when not logged in (for demo purposes)
+  // Filter navigation based on permissions
   const filteredNavigation = !currentUser || process.env.NODE_ENV === 'development'
     ? regularNavigation // Show all navigation in dev mode or when not logged in
     : currentUser?.role === 'super_admin' && !isImpersonating
     ? navigation // Super admins see all their navigation items
     : navigation.filter((item) => {
-        if ('roles' in item) {
-          if (item.roles === 'all') return true;
-          return Array.isArray(item.roles) && item.roles.includes(effectiveUser?.role || '');
+        if ('permissions' in item) {
+          if (item.permissions === 'all') return true;
+          if (item.permissions === 'patient') return userRole === 'patient';
+          if (Array.isArray(item.permissions)) {
+            return hasAnyPermission(item.permissions);
+          }
         }
         return true;
       });

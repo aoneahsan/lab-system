@@ -14,6 +14,8 @@ import TestForm from '@/components/tests/TestForm';
 import { ImportExportDialog } from '@/components/data-management/ImportExportDialog';
 import { TestCatalogImport } from '@/components/data-management/TestCatalogImport';
 import { TestCatalogExport } from '@/components/data-management/TestCatalogExport';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSIONS } from '@/constants/permissions.constants';
 import { ExportFormatter } from '@/utils/import-export/export-formatter';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
 import type { TestDefinition, TestDefinitionFormData, TestFilter } from '@/types/test.types';
@@ -83,33 +85,35 @@ const TestsPage: React.FC = () => {
 
   if (showAddForm || editingTest) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {editingTest ? 'Edit Test' : 'Add New Test'}
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {editingTest ? 'Update test information' : 'Create a new laboratory test'}
-          </p>
-        </div>
+      <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+        <div className="container mx-auto p-6">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">
+              {editingTest ? 'Edit Test' : 'Add New Test'}
+            </h1>
+            <p className="text-gray-600 mt-2">
+              {editingTest ? 'Update test information' : 'Create a new laboratory test'}
+            </p>
+          </div>
 
-        <TestForm
-          initialData={
-            editingTest
-              ? {
-                  ...editingTest,
-                  loincCode: editingTest.loincCode?.code,
-                }
-              : undefined
-          }
-          onSubmit={editingTest ? handleEditTest : handleAddTest}
-          onCancel={() => {
-            setShowAddForm(false);
-            setEditingTest(null);
-          }}
-          isLoading={createTestMutation.isPending || updateTestMutation.isPending}
-        />
-      </div>
+          <TestForm
+            initialData={
+              editingTest
+                ? {
+                    ...editingTest,
+                    loincCode: editingTest.loincCode?.code,
+                  }
+                : undefined
+            }
+            onSubmit={editingTest ? handleEditTest : handleAddTest}
+            onCancel={() => {
+              setShowAddForm(false);
+              setEditingTest(null);
+            }}
+            isLoading={createTestMutation.isPending || updateTestMutation.isPending}
+          />
+        </div>
+      </PermissionGate>
     );
   }
 
@@ -122,45 +126,56 @@ const TestsPage: React.FC = () => {
             <p className="text-gray-600 mt-2">Manage laboratory tests and panels</p>
           </div>
           <div className="flex gap-3">
-            <button
-              onClick={() => navigate('/tests/panels')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Manage Panels
-            </button>
-            <button
-              onClick={() => navigate('/tests/orders')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Test Orders
-            </button>
-            <button
-              onClick={handleImport}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              Import
-            </button>
-            <button
-              onClick={handleExport}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export
-            </button>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Test
-            </button>
+            <PermissionGate permission={PERMISSIONS.TESTS_CREATE_PANEL} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/tests/panels')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Manage Panels
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.TESTS_VIEW_ALL} hideIfUnauthorized>
+              <button
+                onClick={() => navigate('/tests/orders')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Test Orders
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+              <button
+                onClick={handleImport}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Import
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </button>
+            </PermissionGate>
+            <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Test
+              </button>
+            </PermissionGate>
           </div>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      {statistics && (
+      <PermissionGate permission={PERMISSIONS.TESTS_VIEW_ALL} hideIfUnauthorized>
+        {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
@@ -211,7 +226,8 @@ const TestsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+        )}
+      </PermissionGate>
 
       {/* Filters */}
       <TestSearchFilters filters={filters} onFiltersChange={setFilters} />
@@ -227,12 +243,14 @@ const TestsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <TestTube className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">No tests found. Add your first test to get started.</p>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              Add First Test
-            </button>
+            <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                Add First Test
+              </button>
+            </PermissionGate>
           </div>
         ) : (
           <TestListTable
@@ -245,14 +263,16 @@ const TestsPage: React.FC = () => {
       </div>
 
       {/* Import/Export Dialog */}
-      <ImportExportDialog
-        isOpen={showImportExport}
-        onClose={() => setShowImportExport(false)}
-        title="Import/Export Test Catalog"
-        importComponent={<TestCatalogImport />}
-        exportComponent={<TestCatalogExport />}
-        templateDownload={handleDownloadTemplate}
-      />
+      <PermissionGate permission={PERMISSIONS.TESTS_MANAGE_CATALOG} hideIfUnauthorized>
+        <ImportExportDialog
+          isOpen={showImportExport}
+          onClose={() => setShowImportExport(false)}
+          title="Import/Export Test Catalog"
+          importComponent={<TestCatalogImport />}
+          exportComponent={<TestCatalogExport />}
+          templateDownload={handleDownloadTemplate}
+        />
+      </PermissionGate>
     </div>
   );
 };
