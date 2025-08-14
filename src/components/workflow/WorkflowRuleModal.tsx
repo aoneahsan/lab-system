@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCreateWorkflowRule, useUpdateWorkflowRule } from '@/hooks/useWorkflowAutomation';
 import type { WorkflowRule, WorkflowRuleFormData, WorkflowAction } from '@/types/workflow-automation.types';
-import { TextField, TextareaField, SelectField, SwitchField, NumberField } from '@/components/form-fields';
+import { TextField, LexicalEditorField, SelectField, SwitchField, NumberField } from '@/components/form-fields';
 
 interface WorkflowRuleModalProps {
   rule: WorkflowRule | null;

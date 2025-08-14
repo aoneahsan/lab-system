@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Calendar, Clock, MapPin, User, AlertCircle } from 'lucide-react';
 import { useTestOrders } from '@/hooks/useTests';
 import { usePatients } from '@/hooks/usePatients';
 import type { SampleFormData } from '@/types/sample.types';
 import type { TestOrder } from '@/types/test.types';
 import type { PatientListItem } from '@/types/patient.types';
-import { SelectField, TextField, DateTimeField, TextareaField, CheckboxField } from '@/components/form-fields';
+import { SelectField, TextField, DateTimeField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 
 interface SampleCollectionFormProps {
   orderId?: string;
@@ -30,6 +30,7 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     setValue,
@@ -281,12 +282,12 @@ const SampleCollectionForm: React.FC<SampleCollectionFormProps> = ({
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Notes</label>
-            <textarea
-              {...register('notes')}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            <LexicalEditorField
+              name="notes"
+              control={control}
+              label="Notes"
               placeholder="Any special notes or observations..."
+              minHeight="100px"
             />
           </div>
         </div>

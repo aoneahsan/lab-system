@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import type { User } from '@/types/auth.types';
@@ -38,6 +38,7 @@ interface UserFormProps {
 export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFormProps) => {
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setValue,
@@ -99,22 +100,29 @@ export const UserForm = ({ initialData, onSubmit, onCancel, isLoading }: UserFor
             error={errors.phoneNumber}
           />
           
-          <SelectField
-            label="Role"
+          <Controller
             name="role"
-            value={watch('role')}
-            onChange={(value) => setValue('role', value || SYSTEM_ROLES.CLINICIAN)}
-            options={[
-              { value: SYSTEM_ROLES.CLINICIAN, label: 'Clinician' },
-              { value: SYSTEM_ROLES.FRONT_DESK, label: 'Front Desk' },
-              { value: SYSTEM_ROLES.PHLEBOTOMIST, label: 'Phlebotomist' },
-              { value: SYSTEM_ROLES.LAB_TECHNICIAN, label: 'Lab Technician' },
-              { value: SYSTEM_ROLES.LAB_MANAGER, label: 'Lab Manager' },
-              { value: SYSTEM_ROLES.BILLING_STAFF, label: 'Billing Staff' },
-              { value: SYSTEM_ROLES.LAB_ADMIN, label: 'Lab Admin' },
-            ]}
-            error={errors.role}
-            required
+            control={control}
+            rules={{ required: 'Role is required' }}
+            render={({ field }) => (
+              <SelectField
+                label="Role"
+                name="role"
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: SYSTEM_ROLES.CLINICIAN, label: 'Clinician' },
+                  { value: SYSTEM_ROLES.FRONT_DESK, label: 'Front Desk' },
+                  { value: SYSTEM_ROLES.PHLEBOTOMIST, label: 'Phlebotomist' },
+                  { value: SYSTEM_ROLES.LAB_TECHNICIAN, label: 'Lab Technician' },
+                  { value: SYSTEM_ROLES.LAB_MANAGER, label: 'Lab Manager' },
+                  { value: SYSTEM_ROLES.BILLING_STAFF, label: 'Billing Staff' },
+                  { value: SYSTEM_ROLES.LAB_ADMIN, label: 'Lab Admin' },
+                ]}
+                error={errors.role?.message}
+                required
+              />
+            )}
           />
           
           <SwitchField

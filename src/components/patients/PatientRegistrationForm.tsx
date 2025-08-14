@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useCreatePatient } from '@/hooks/usePatients';
 import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
@@ -9,7 +9,7 @@ import {
   PhoneField,
   DateField,
   SelectField,
-  TextareaField,
+  LexicalEditorField,
   CountryField,
   StateField,
   CityField,
@@ -119,59 +119,78 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
             dropdownMode="select"
           />
           
-          <SelectField
-            label="Gender"
+          <Controller
             name="gender"
-            value={watch('gender')}
-            onChange={(value) => setValue('gender', value as any || '')}
-            options={[
-              { value: 'male', label: 'Male' },
-              { value: 'female', label: 'Female' },
-              { value: 'other', label: 'Other' },
-              { value: 'unknown', label: 'Prefer not to say' },
-            ]}
-            error={errors.gender}
-            required
-            placeholder="Select Gender"
+            control={control}
+            rules={{ required: 'Gender is required' }}
+            render={({ field }) => (
+              <SelectField
+                label="Gender"
+                name="gender"
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                  { value: 'other', label: 'Other' },
+                  { value: 'unknown', label: 'Prefer not to say' },
+                ]}
+                error={errors.gender?.message}
+                required
+                placeholder="Select Gender"
+              />
+            )}
           />
           
-          <SelectField
-            label="Blood Group"
+          <Controller
             name="bloodGroup"
-            value={watch('bloodGroup')}
-            onChange={(value) => setValue('bloodGroup', value as any || '')}
-            options={[
-              { value: 'A+', label: 'A+' },
-              { value: 'A-', label: 'A-' },
-              { value: 'B+', label: 'B+' },
-              { value: 'B-', label: 'B-' },
-              { value: 'AB+', label: 'AB+' },
-              { value: 'AB-', label: 'AB-' },
-              { value: 'O+', label: 'O+' },
-              { value: 'O-', label: 'O-' },
-              { value: 'unknown', label: 'Unknown' },
-            ]}
-            error={errors.bloodGroup}
-            placeholder="Select Blood Group"
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                label="Blood Group"
+                name="bloodGroup"
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: 'A+', label: 'A+' },
+                  { value: 'A-', label: 'A-' },
+                  { value: 'B+', label: 'B+' },
+                  { value: 'B-', label: 'B-' },
+                  { value: 'AB+', label: 'AB+' },
+                  { value: 'AB-', label: 'AB-' },
+                  { value: 'O+', label: 'O+' },
+                  { value: 'O-', label: 'O-' },
+                  { value: 'unknown', label: 'Unknown' },
+                ]}
+                error={errors.bloodGroup?.message}
+                placeholder="Select Blood Group"
+              />
+            )}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <SelectField
-            label="Marital Status"
+          <Controller
             name="maritalStatus"
-            value={watch('maritalStatus')}
-            onChange={(value) => setValue('maritalStatus', value as any || '')}
-            options={[
-              { value: 'single', label: 'Single' },
-              { value: 'married', label: 'Married' },
-              { value: 'divorced', label: 'Divorced' },
-              { value: 'widowed', label: 'Widowed' },
-              { value: 'separated', label: 'Separated' },
-              { value: 'unknown', label: 'Prefer not to say' },
-            ]}
-            error={errors.maritalStatus}
-            placeholder="Select Status"
+            control={control}
+            render={({ field }) => (
+              <SelectField
+                label="Marital Status"
+                name="maritalStatus"
+                value={field.value}
+                onChange={field.onChange}
+                options={[
+                  { value: 'single', label: 'Single' },
+                  { value: 'married', label: 'Married' },
+                  { value: 'divorced', label: 'Divorced' },
+                  { value: 'widowed', label: 'Widowed' },
+                  { value: 'separated', label: 'Separated' },
+                  { value: 'unknown', label: 'Prefer not to say' },
+                ]}
+                error={errors.maritalStatus?.message}
+                placeholder="Select Status"
+              />
+            )}
           />
           
           <TextField
@@ -322,12 +341,12 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
             error={errors.occupation}
           />
           
-          <TextareaField
-            label="Notes"
+          <LexicalEditorField
             name="notes"
-            register={register('notes')}
-            error={errors.notes}
-            rows={3}
+            control={control}
+            label="Notes"
+            placeholder="Additional notes about the patient"
+            minHeight="100px"
           />
         </div>
       </div>

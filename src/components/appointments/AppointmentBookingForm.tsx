@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { CalendarIcon, HomeIcon, MapPinIcon } from '@heroicons/react/24/outline';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { SelectField, DateField, TimeField, TextField, TextareaField, CheckboxField } from '@/components/form-fields';
+import { SelectField, DateField, TimeField, TextField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 
 const schema = yup.object({
   patientId: yup.string().required('Patient is required'),
@@ -49,6 +49,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
   
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -254,18 +255,15 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
             Home Collection Details
           </h3>
           
-          <div>
-            <Label htmlFor="homeAddress">Address *</Label>
-            <textarea
-              id="homeAddress"
-              {...register('homeAddress')}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-            {errors.homeAddress && (
-              <p className="mt-1 text-sm text-red-600">{errors.homeAddress.message}</p>
-            )}
-          </div>
+          <LexicalEditorField
+            name="homeAddress"
+            control={control}
+            label="Address *"
+            rules={{ required: 'Address is required for home collection' }}
+            error={errors.homeAddress?.message}
+            minHeight="100px"
+            placeholder="Full address for home collection"
+          />
 
           <div>
             <Label htmlFor="homeLandmark">Landmark</Label>
@@ -290,15 +288,13 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       )}
 
       {/* Special Instructions */}
-      <div>
-        <Label htmlFor="specialInstructions">Special Instructions</Label>
-        <textarea
-          id="specialInstructions"
-          {...register('specialInstructions')}
-          rows={3}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+      <LexicalEditorField
+        name="specialInstructions"
+        control={control}
+        label="Special Instructions"
+        minHeight="100px"
+        placeholder="Any special instructions for the appointment"
         />
-      </div>
 
       {/* Actions */}
       <div className="flex justify-end gap-3">

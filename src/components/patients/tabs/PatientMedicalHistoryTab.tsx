@@ -111,7 +111,7 @@ export const PatientMedicalHistoryTab = ({ patient, patientId }: PatientMedicalH
     if (!deleteItem) return;
     
     try {
-      let updateData: any = {};
+      const updateData: any = {};
       
       if (deleteItem.type === 'allergy') {
         updateData.allergies = patient.allergies.filter((_, i) => i !== deleteItem.index);

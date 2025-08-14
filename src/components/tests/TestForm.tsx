@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Search } from 'lucide-react';
 import LOINCBrowser from './LOINCBrowser';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
 import type { TestDefinitionFormData, LOINCCode } from '@/types/test.types';
-import { TextField, SelectField, NumberField, TextareaField, CheckboxField } from '@/components/form-fields';
+import { TextField, SelectField, NumberField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 
 interface TestFormProps {
   initialData?: Partial<TestDefinitionFormData>;
@@ -24,6 +24,7 @@ const TestForm: React.FC<TestFormProps> = ({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
     setValue,
@@ -82,20 +83,27 @@ const TestForm: React.FC<TestFormProps> = ({
               required
             />
 
-            <SelectField
-              label="Category"
+            <Controller
               name="category"
-              value={watch('category')}
-              onChange={(value) => setValue('category', value || 'chemistry')}
-              options={[
-                { value: 'chemistry', label: 'Chemistry' },
-                { value: 'hematology', label: 'Hematology' },
-                { value: 'microbiology', label: 'Microbiology' },
-                { value: 'immunology', label: 'Immunology' },
-                { value: 'pathology', label: 'Pathology' },
-                { value: 'genetics', label: 'Genetics' },
-                { value: 'other', label: 'Other' },
-              ]}
+              control={control}
+              render={({ field }) => (
+                <SelectField
+                  label="Category"
+                  name="category"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: 'chemistry', label: 'Chemistry' },
+                    { value: 'hematology', label: 'Hematology' },
+                    { value: 'microbiology', label: 'Microbiology' },
+                    { value: 'immunology', label: 'Immunology' },
+                    { value: 'pathology', label: 'Pathology' },
+                    { value: 'genetics', label: 'Genetics' },
+                    { value: 'other', label: 'Other' },
+                  ]}
+                  error={errors.category?.message}
+                />
+              )}
             />
 
             <div>
