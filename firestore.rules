@@ -37,6 +37,25 @@ service cloud.firestore {
       return isTenantUser(tenantId) && getTenantUser(tenantId).data.role in roles;
     }
     
+    // Permission checking functions
+    function hasPermission(permission) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' ||
+         permission in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions);
+    }
+    
+    function hasAnyPermission(permissions) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'super_admin' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions.hasAny(permissions));
+    }
+    
+    function canManagePermissions() {
+      return hasRole('super_admin') || hasRole('lab_admin') || hasPermission('users.manage.permissions');
+    }
+    
     // Extract tenant ID from collection name
     function extractTenantId(collectionPath) {
       // Expected format: labflow_TENANTID_collection
@@ -76,12 +95,14 @@ service cloud.firestore {
     
     // Users collection
     match /users/{userId} {
-      allow read: if isOwner(userId) || hasRole('super_admin');
+      allow read: if isOwner(userId) || hasRole('super_admin') || canManagePermissions();
       // Allow users to create their own user document during registration
       allow create: if isAuthenticated() && request.auth.uid == userId &&
         request.resource.data.id == userId &&
         request.resource.data.email == request.auth.token.email;
-      allow update: if isOwner(userId) || hasRole('super_admin');
+      // Allow update if owner (but not permissions field) or has permission management rights
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['permissions', 'role'])) || 
+                      canManagePermissions();
       allow delete: if hasRole('super_admin');
     }
     

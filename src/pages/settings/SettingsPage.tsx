@@ -106,22 +106,27 @@ const SettingsPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {availableCategories.map((category) => (
-          <Link
+        {settingCategories.map((category) => (
+          <PermissionGate
             key={category.link}
-            to={category.link}
-            className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+            anyPermission={category.permissions || [PERMISSIONS.SETTINGS_VIEW_GENERAL]}
+            hideIfUnauthorized
           >
-            <div className="flex items-start space-x-4">
-              <div className="text-4xl">{category.icon}</div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {category.title}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{category.description}</p>
+            <Link
+              to={category.link}
+              className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="text-4xl">{category.icon}</div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    {category.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{category.description}</p>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </PermissionGate>
         ))}
       </div>
     </div>

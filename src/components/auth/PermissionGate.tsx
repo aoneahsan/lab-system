@@ -6,7 +6,7 @@
 import React from 'react';
 import { Permission } from '../../constants/permissions.constants';
 import { usePermissions } from '../../hooks/usePermissions';
-import { Alert, AlertDescription } from '../ui/alert';
+import { Alert, AlertDescription } from '../ui/Alert';
 import { Lock } from 'lucide-react';
 
 interface PermissionGateProps {

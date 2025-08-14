@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
-import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity, Settings, GitBranch } from 'lucide-react';
+import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity, Settings, GitBranch, Key } from 'lucide-react';
 import { MicrophoneIcon } from '@heroicons/react/24/outline';
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
@@ -15,6 +15,7 @@ import AdminDashboard from './AdminDashboard';
 import { PerformanceDashboard } from '@/components/admin/PerformanceDashboard';
 import ModuleAdminControls from '@/components/admin/ModuleAdminControls';
 import AdvancedFeaturesPage from './AdvancedFeaturesPage';
+import { PermissionManagementPage } from './PermissionManagementPage';
 import type { User } from '@/types/auth.types';
 import { TextField, SelectField } from '@/components/form-fields';
 
@@ -52,7 +53,7 @@ const AdminPanel = () => {
   const [updating, setUpdating] = useState<string | null>(null);
 
   // Get active tab from URL, default to 'dashboard'
-  const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue' | 'performance' | 'modules';
+  const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue' | 'performance' | 'modules' | 'permissions' | 'advanced';
   
   // Get pagination and filter params
   const page = parseInt(searchParams.get('page') || '1');
@@ -317,6 +318,17 @@ const AdminPanel = () => {
           >
             <Settings className="h-5 w-5 inline-block mr-2" />
             Module Controls
+          </button>
+          <button
+            onClick={() => setActiveTab('permissions')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              activeTab === 'permissions'
+                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+          >
+            <Key className="h-5 w-5 inline-block mr-2" />
+            Permissions
           </button>
           <button
             onClick={() => setActiveTab('advanced')}
@@ -676,6 +688,8 @@ const AdminPanel = () => {
         <PerformanceDashboard />
       ) : activeTab === 'modules' ? (
         <ModuleAdminControls />
+      ) : activeTab === 'permissions' ? (
+        <PermissionManagementPage />
       ) : activeTab === 'advanced' ? (
         <AdvancedFeaturesPage />
       ) : null}

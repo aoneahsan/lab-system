@@ -71,6 +71,7 @@ const RouteManagementPage = lazy(() => import('@/pages/home-collection/RouteMana
 // User Management Pages
 const UsersPage = lazy(() => import('@/pages/users/UsersPage'));
 const UserDetailPage = lazy(() => import('@/pages/users/UserDetailPage'));
+const PermissionManagementPage = lazy(() => import('@/pages/admin/PermissionManagementPage'));
 
 // Customer Portal
 const CustomerPortalPage = lazy(() => import('@/pages/customer-portal/CustomerPortalPage'));
