@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Settings, GitBranch, FileText, Shield } from 'lucide-react';
+import { useUrlState } from '@/hooks/useUrlState';
 import AdvancedWorkflowBuilder from '@/components/workflow/AdvancedWorkflowBuilder';
 import DynamicFieldBuilder from '@/components/custom-fields/DynamicFieldBuilder';
 import { CheckboxField, NumberField } from '@/components/form-fields';
 
 export default function AdvancedFeaturesPage() {
-  const [activeTab, setActiveTab] = useState<'workflow' | 'customFields' | 'security' | 'integrations'>('workflow');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'workflow',
+    removeDefault: true
+  });
 
   const tabs = [
     { id: 'workflow', name: 'Workflow Automation', icon: GitBranch },

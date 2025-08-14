@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useUrlState } from '@/hooks/useUrlState';
 import { dataExportService } from '../../services/dataExport';
 import type { ExportOptions, ImportOptions } from '../../services/dataExport';
 import {
@@ -22,7 +23,10 @@ const collections = [
 ];
 
 const DataImportExport: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'export' | 'import'>('export');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'export',
+    removeDefault: true
+  });
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [exportFormat, setExportFormat] = useState<'csv' | 'excel' | 'json' | 'pdf'>('excel');
   const [importFile, setImportFile] = useState<File | null>(null);

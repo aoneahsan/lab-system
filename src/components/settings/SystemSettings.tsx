@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useUrlState } from '@/hooks/useUrlState';
 import { settingsService } from '../../services/settings';
 import type { SystemSettings } from '../../services/settings';
 import GeneralSettings from './GeneralSettings';
@@ -32,7 +33,10 @@ const tabs = [
 ];
 
 const SystemSettingsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'general',
+    removeDefault: true
+  });
   const [importFile, setImportFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
 

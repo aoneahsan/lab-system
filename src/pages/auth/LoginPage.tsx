@@ -24,7 +24,7 @@ const LoginPage = () => {
     if (canUseBiometric) {
       handleBiometricLogin();
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   const handleBiometricLogin = async () => {
     if (!canUseBiometric) return;

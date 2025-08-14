@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUrlState, useUrlFilters } from '@/hooks/useUrlState';
 import type {
   PatientSearchFilters as Filters,
   PatientGender,
@@ -11,17 +12,20 @@ interface PatientSearchFiltersProps {
 }
 
 export const PatientSearchFilters = ({ onFiltersChange, onSearch }: PatientSearchFiltersProps) => {
-  const [filters, setFilters] = useState<Filters>({});
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [filters, setFilters] = useUrlFilters<Filters>({});
+  const [isExpanded, setIsExpanded] = useUrlState('filtersExpanded', {
+    defaultValue: 'false',
+    removeDefault: true
+  });
 
   const handleFilterChange = (key: keyof Filters, value: string | number | boolean | undefined) => {
-    const newFilters = { ...filters, [key]: value };
+    const newFilters = { [key]: value };
     setFilters(newFilters);
-    onFiltersChange(newFilters);
+    onFiltersChange({ ...filters, ...newFilters });
   };
 
   const handleClearFilters = () => {
-    setFilters({});
+    setFilters({}, true); // true to clear all
     onFiltersChange({});
   };
 
@@ -67,21 +71,21 @@ export const PatientSearchFilters = ({ onFiltersChange, onSearch }: PatientSearc
 
         <button
           type="button"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => setIsExpanded(isExpanded === 'true' ? 'false' : 'true')}
           className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700"
         >
           <svg
-            className={`h-4 w-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 transform transition-transform ${isExpanded === 'true' ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
-          {isExpanded ? 'Hide' : 'Show'} Advanced Filters
+          {isExpanded === 'true' ? 'Hide' : 'Show'} Advanced Filters
         </button>
 
-        {isExpanded && (
+        {isExpanded === 'true' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
               <label className="label">Gender</label>

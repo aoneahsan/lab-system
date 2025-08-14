@@ -39,7 +39,7 @@ export const useBiometricAuth = () => {
   useEffect(() => {
     checkStatus();
     loadPreferences();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   const authenticate = useCallback(
     async (config?: Partial<BiometricAuthConfig>): Promise<BiometricAuthResult> => {

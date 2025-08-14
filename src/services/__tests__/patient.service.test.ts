@@ -73,7 +73,7 @@ const {
   orderBy,
   limit,
   Timestamp,
-} = vi.mocked(require('firebase/firestore')); // eslint-disable-line @typescript-eslint/no-require-imports
+} = vi.mocked(require('firebase/firestore'));  
 
 describe('PatientService', () => {
   const tenantId = 'test-tenant';

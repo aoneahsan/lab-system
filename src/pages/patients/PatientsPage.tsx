@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePatients, usePatientStats } from '@/hooks/usePatients';
+import { useUrlFilters } from '@/hooks/useUrlState';
 import { PatientSearchFilters } from '@/components/patients/PatientSearchFilters';
 import { PatientListTable } from '@/components/patients/PatientListTable';
 import { PatientRegistrationForm } from '@/components/patients/PatientRegistrationForm';
@@ -12,7 +13,7 @@ const PatientsPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useUrlFilters<Filters>({});
 
   const { data: patientsData, isLoading } = usePatients(filters);
   const { data: stats } = usePatientStats();

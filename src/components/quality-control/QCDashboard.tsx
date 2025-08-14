@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Activity, AlertTriangle, CheckCircle, TrendingUp, FileText } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
+import { useUrlState } from '@/hooks/useUrlState';
 import QCTestList from './QCTestList';
 import QCResultEntry from './QCResultEntry';
 import LeveyJenningsChart from './LeveyJenningsChart';
 import QCStatistics from './QCStatistics';
 
 export default function QCDashboard() {
-  const [activeTab, setActiveTab] = useState('tests');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'tests',
+    removeDefault: true
+  });
   const { fetchQCTests } = useQualityControlStore();
 
   useEffect(() => {

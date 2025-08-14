@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
+import { useUrlState } from '@/hooks/useUrlState';
 import type { Patient, UpdatePatientData } from '@/types/patient.types';
 import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
@@ -34,7 +35,10 @@ export const PatientEditForm: React.FC<PatientEditFormProps> = ({
   onCancel,
   isSubmitting,
 }) => {
-  const [activeTab, setActiveTab] = useState('basic');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'basic',
+    removeDefault: true
+  });
   const { data: customFields = [] } = useCustomFieldsByModule('patient');
   const validateCustomFields = useValidateCustomFields();
   

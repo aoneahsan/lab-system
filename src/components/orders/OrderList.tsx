@@ -1,26 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useOrderStore } from '@/stores/order.store';
+import { useUrlFilters, useUrlState } from '@/hooks/useUrlState';
 import type { TestOrder } from '@/types/order';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function OrderList() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [filters, setFilters] = useUrlFilters({
+    searchTerm: null as string | null,
+    status: null as string | null,
+    priority: null as string | null
+  });
 
   const { orders, loading, fetchTestOrders, searchOrders } = useOrderStore();
 
   useEffect(() => {
-    if (searchTerm) {
-      searchOrders(searchTerm);
+    if (filters.searchTerm) {
+      searchOrders(filters.searchTerm);
     } else {
       fetchTestOrders({
-        status: filterStatus === 'all' ? undefined : filterStatus,
-        priority: filterPriority === 'all' ? undefined : filterPriority,
+        status: filters.status || undefined,
+        priority: filters.priority || undefined,
       });
     }
-  }, [filterStatus, filterPriority, searchTerm, fetchTestOrders, searchOrders]);
+  }, [filters.status, filters.priority, filters.searchTerm, fetchTestOrders, searchOrders]);
 
   const getStatusIcon = (status: TestOrder['status']) => {
     switch (status) {
