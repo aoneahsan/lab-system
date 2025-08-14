@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Clock, CheckCircle, AlertCircle, TestTubes } from 'lucide-react';
 import { useSampleStore } from '@/stores/sample.store';
+import { useUrlFilters } from '@/hooks/useUrlState';
 import { useAuthStore } from '@/stores/auth.store';
 import type { Sample } from '@/types/sample.types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function SampleList() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterType, setFilterType] = useState<string>('all');
+  const [filters, setFilters] = useUrlFilters({
+    searchTerm: null as string | null,
+    status: null as string | null,
+    type: null as string | null
+  });
   const { currentUser } = useAuthStore();
   const { samples, loading, fetchSamples } = useSampleStore();
   const tenantId = currentUser?.tenantId || '';
@@ -16,17 +19,18 @@ export default function SampleList() {
   useEffect(() => {
     if (tenantId) {
       fetchSamples(tenantId, {
-        status: filterStatus === 'all' ? undefined : filterStatus,
-        type: filterType === 'all' ? undefined : filterType,
+        status: filters.status || undefined,
+        type: filters.type || undefined,
       });
     }
-  }, [tenantId, filterStatus, filterType, fetchSamples]);
+  }, [tenantId, filters.status, filters.type, fetchSamples]);
 
   const filteredSamples = samples.filter(
     (sample) =>
-      sample.sampleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sample.barcode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sample.patientId.toLowerCase().includes(searchTerm.toLowerCase())
+      !filters.searchTerm ||
+      sample.sampleNumber.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      sample.barcode.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      sample.patientId.toLowerCase().includes(filters.searchTerm.toLowerCase())
   );
 
   const getStatusIcon = (status: Sample['status']) => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, FileText, Calendar, User, Bell, ChevronLeft } from 'lucide-react';
+import { useUrlState } from '@/hooks/useUrlState';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -27,7 +28,10 @@ const tabs: TabItem[] = [
 ];
 
 export const PatientApp: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'home',
+    removeDefault: true
+  });
   const [previousTab, setPreviousTab] = useState<string | null>(null);
   const [unreadNotifications] = useState(3);
 

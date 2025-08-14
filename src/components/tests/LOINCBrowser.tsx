@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, X, Info, ExternalLink, Loader2 } from 'lucide-react';
 import { useLOINCSearch, useCommonLOINCTests } from '@/hooks/useTests';
+import { useUrlState } from '@/hooks/useUrlState';
 import { loincService } from '@/services/loinc.service';
 import type { LOINCCode } from '@/types/test.types';
 
@@ -11,8 +12,14 @@ interface LOINCBrowserProps {
 }
 
 const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selectedCode }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useUrlState('search', {
+    defaultValue: '',
+    removeDefault: true
+  });
+  const [selectedCategory, setSelectedCategory] = useUrlState('category', {
+    defaultValue: '',
+    removeDefault: true
+  });
   const [categoryResults, setCategoryResults] = useState<LOINCCode[]>([]);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
 

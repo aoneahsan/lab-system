@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserPlus, Shield, Search } from 'lucide-react';
+import { useUrlFilters, useUrlState } from '@/hooks/useUrlState';
 import { useUsers } from '@/hooks/useUsers';
 import { useAuthStore } from '@/stores/auth.store';
 import { PermissionGate } from '@/components/auth/PermissionGate';
@@ -17,10 +18,13 @@ const UsersPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useAuthStore();
-  const [filters, setFilters] = useState<UserFilter>({});
+  const [filters, setFilters] = useUrlFilters<UserFilter>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useUrlState('search', {
+    defaultValue: '',
+    removeDefault: true
+  });
 
   const { data: users = [], isLoading } = useUsers(filters.role);
 

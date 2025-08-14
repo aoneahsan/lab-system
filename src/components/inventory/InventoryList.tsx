@@ -1,23 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Package, AlertTriangle } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
+import { useUrlFilters } from '@/hooks/useUrlState';
 import type { InventoryItem } from '@/types/inventory.types';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function InventoryList() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filters, setFilters] = useUrlFilters({
+    searchTerm: null as string | null,
+    category: null as string | null,
+    status: null as string | null
+  });
   const { items, loading, fetchInventoryItems } = useInventoryStore();
 
   useEffect(() => {
-    fetchInventoryItems({ category: filterCategory, status: filterStatus });
-  }, [filterCategory, filterStatus, fetchInventoryItems]);
+    fetchInventoryItems({ 
+      category: filters.category || undefined, 
+      status: filters.status || undefined 
+    });
+  }, [filters.category, filters.status, fetchInventoryItems]);
 
   const filteredItems = items.filter(
     (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.catalogNumber && item.catalogNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+      !filters.searchTerm ||
+      item.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      (item.catalogNumber && item.catalogNumber.toLowerCase().includes(filters.searchTerm.toLowerCase()))
   );
 
   const getLowStockItems = () => {

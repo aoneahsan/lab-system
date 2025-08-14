@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FileText, Download, Calendar, Filter, Plus, Clock, TrendingUp } from 'lucide-react';
 import { useReports, useGenerateReport } from '@/hooks/useReports';
+import { useUrlState, useUrlFilters } from '@/hooks/useUrlState';
 import ReportBuilder from './ReportBuilder';
 import ReportTemplates from './ReportTemplates';
 import ReportGeneration from './ReportGeneration';
@@ -11,10 +12,13 @@ import ReportAnalytics from './ReportAnalytics';
 import type { ReportFormData } from '@/types/report.types';
 
 export default function ReportsDashboard() {
-  const [activeTab, setActiveTab] = useState('generate');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'generate',
+    removeDefault: true
+  });
   const [showBuilder, setShowBuilder] = useState(false);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useUrlFilters({});
   
   const { data: reports = [], isLoading } = useReports(filters);
   const generateReport = useGenerateReport();

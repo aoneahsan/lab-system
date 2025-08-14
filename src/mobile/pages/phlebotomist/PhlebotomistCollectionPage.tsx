@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUrlState } from '@/hooks/useUrlState';
 import { Camera, Thermometer, MapPin, Save, X, CheckCircle, FileText, User } from 'lucide-react';
 import { QRScanner } from 'code-craft-studio';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
@@ -22,8 +23,15 @@ interface CollectionData {
 const PhlebotomistCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const { addCollection } = useOfflineStore();
-  const [step, setStep] = useState(1); // 1: Patient, 2: Sample, 3: Review
+  const [step, setStep] = useUrlState('step', {
+    defaultValue: '1',
+    removeDefault: true
+  }); // 1: Patient, 2: Sample, 3: Review
   const [isScanning, setIsScanning] = useState(false);
+  
+  const currentStep = parseInt(step || '1');
+  const nextStep = () => setStep(String(currentStep + 1));
+  const prevStep = () => setStep(String(currentStep - 1));
 
   const [collectionData, setCollectionData] = useState<CollectionData>({
     patientId: '',
@@ -89,7 +97,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
   };
 
   const renderStep = () => {
-    switch (step) {
+    switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
@@ -296,13 +304,13 @@ const PhlebotomistCollectionPage: React.FC = () => {
             <div key={i} className={`flex items-center ${i < 3 ? 'flex-1' : ''}`}>
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  i <= step ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-500'
+                  i <= currentStep ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-500'
                 }`}
               >
                 {i}
               </div>
               {i < 3 && (
-                <div className={`flex-1 h-1 mx-2 ${i < step ? 'bg-purple-600' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-1 mx-2 ${i < currentStep ? 'bg-purple-600' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -315,24 +323,24 @@ const PhlebotomistCollectionPage: React.FC = () => {
       {/* Bottom Actions */}
       <div className="px-6 py-4 bg-white border-t border-gray-200">
         <div className="flex gap-3">
-          {step > 1 && (
+          {currentStep > 1 && (
             <button
-              onClick={() => setStep(step - 1)}
+              onClick={prevStep}
               className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium"
             >
               Back
             </button>
           )}
 
-          {step < 3 ? (
+          {currentStep < 3 ? (
             <button
-              onClick={() => setStep(step + 1)}
+              onClick={nextStep}
               disabled={
-                (step === 1 &&
+                (currentStep === 1 &&
                   (!collectionData.patientId ||
                     !collectionData.patientName ||
                     !collectionData.consent)) ||
-                (step === 2 && !collectionData.barcode)
+                (currentStep === 2 && !collectionData.barcode)
               }
               className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >

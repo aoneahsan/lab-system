@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useUrlState } from '@/hooks/useUrlState';
 import {
   Settings,
   Activity,
@@ -20,7 +21,10 @@ import type { ConnectionStatus } from '@/types/emr.types';
 const EMRConnectionDetailPage: React.FC = () => {
   const { connectionId } = useParams<{ connectionId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'webhooks' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'overview',
+    removeDefault: true
+  });
 
   const { data: connection, isLoading } = useEMRConnection(connectionId!);
   const testConnection = useTestEMRConnection();

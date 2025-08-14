@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWorkflowRules } from '@/hooks/useWorkflowAutomation';
+import { useUrlState } from '@/hooks/useUrlState';
 import { WorkflowRulesList } from '@/components/workflow/WorkflowRulesList';
 import { WorkflowRuleModal } from '@/components/workflow/WorkflowRuleModal';
 import { TATRulesList } from '@/components/workflow/TATRulesList';
@@ -7,7 +8,10 @@ import { TasksList } from '@/components/workflow/TasksList';
 import type { WorkflowRule } from '@/types/workflow-automation.types';
 
 export default function WorkflowAutomationPage() {
-  const [activeTab, setActiveTab] = useState<'rules' | 'tat' | 'tasks' | 'routing'>('rules');
+  const [activeTab, setActiveTab] = useUrlState('tab', {
+    defaultValue: 'rules',
+    removeDefault: true
+  });
   const [showRuleModal, setShowRuleModal] = useState(false);
   const [editingRule, setEditingRule] = useState<WorkflowRule | null>(null);
   const { data: rules, isLoading } = useWorkflowRules();
