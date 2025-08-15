@@ -20,6 +20,7 @@ import { initializeNotifications } from '@/services/app-notification.service';
 import { firebaseKit } from '@/services/firebase-kit.service';
 import { appUpdateService } from '@/services/app-update.service';
 import { HotkeyManager } from '@/components/navigation/HotkeyManager';
+import { subscriptionService } from '@/services/subscription.service';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,9 @@ function App() {
         
         // Initialize app update service for native platforms
         await appUpdateService.initialize();
+        
+        // Initialize subscription plans
+        await subscriptionService.initializeDefaultPlans();
       } catch (error) {
         console.error('App initialization error:', error);
         // Continue app loading even if some services fail

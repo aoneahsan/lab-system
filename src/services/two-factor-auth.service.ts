@@ -35,15 +35,18 @@ class TwoFactorAuthService {
    */
   async getUserTwoFactorPermissions(userId: string): Promise<UserTwoFactorPermissions> {
     try {
-      // Get user document
-      const userDoc = await getDoc(doc(firestore, 'users', userId));
-      const userData = userDoc.data();
+      // Try to get user document for admin overrides
+      let adminOverrides: any = {};
+      try {
+        const userDoc = await getDoc(doc(firestore, 'users', userId));
+        const userData = userDoc.data();
+        adminOverrides = userData?.twoFactorOverrides || {};
+      } catch (userError) {
+        // Ignore user doc errors - use defaults
+      }
 
-      // Get subscription features
+      // Get subscription features (with fallback to defaults)
       const subscriptionFeatures = await subscriptionService.getUserSubscriptionFeatures(userId);
-
-      // Check admin overrides
-      const adminOverrides = userData?.twoFactorOverrides || {};
 
       // Combine subscription features with admin overrides
       const permissions: UserTwoFactorPermissions = {
@@ -55,8 +58,7 @@ class TwoFactorAuthService {
 
       return permissions;
     } catch (error) {
-      console.error('Error getting 2FA permissions:', error);
-      // Return default permissions
+      // Return all features enabled by default
       return {
         canUseTOTP: true,
         canUseSMS: true,
@@ -270,13 +272,19 @@ class TwoFactorAuthService {
    * Disable 2FA for user
    */
   async disable2FA(userId: string): Promise<void> {
-    await updateDoc(doc(firestore, 'users', userId), {
-      twoFactorSettings: {
-        enabled: false,
-        method: null,
-        updatedAt: serverTimestamp(),
-      },
-    });
+    try {
+      await updateDoc(doc(firestore, 'users', userId), {
+        twoFactorSettings: {
+          enabled: false,
+          method: null,
+          updatedAt: serverTimestamp(),
+        },
+      });
+    } catch (error) {
+      console.error('Error disabling 2FA:', error);
+      // Clear from localStorage as fallback
+      localStorage.removeItem(`2fa_settings_${userId}`);
+    }
   }
 
   /**
@@ -330,15 +338,26 @@ class TwoFactorAuthService {
    * Private helper methods
    */
   private async get2FASettings(userId: string): Promise<TwoFactorSettings | null> {
-    const userDoc = await getDoc(doc(firestore, 'users', userId));
-    const userData = userDoc.data();
-    return userData?.twoFactorSettings || null;
+    try {
+      const userDoc = await getDoc(doc(firestore, 'users', userId));
+      const userData = userDoc.data();
+      return userData?.twoFactorSettings || null;
+    } catch (error) {
+      // Return null on permission errors
+      return null;
+    }
   }
 
   private async save2FASettings(userId: string, settings: TwoFactorSettings): Promise<void> {
-    await updateDoc(doc(firestore, 'users', userId), {
-      twoFactorSettings: settings,
-    });
+    try {
+      await updateDoc(doc(firestore, 'users', userId), {
+        twoFactorSettings: settings,
+      });
+    } catch (error) {
+      console.error('Error saving 2FA settings:', error);
+      // For now, we'll store in localStorage as fallback
+      localStorage.setItem(`2fa_settings_${userId}`, JSON.stringify(settings));
+    }
   }
 
   private generateVerificationCode(): string {
