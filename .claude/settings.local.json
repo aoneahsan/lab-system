@@ -561,7 +561,9 @@
       "Bash(# Get all unique warning patterns\nyarn lint 2>&1 | grep \"\"warning\"\" | awk -F\"\"''\"\" ''{print $2}'' | sort | uniq -c | sort -nr | head -20)",
       "Bash(# Get files with Filter import warnings\nyarn lint 2>&1 | grep -E \"\"warning.*''Filter'' is defined but never used\"\" | awk -F'':'' ''{print $1}'' | sort -u)",
       "Bash(git push:*)",
-      "Bash(firebase login:*)"
+      "Bash(firebase login:*)",
+      "Bash(wc:*)",
+      "Bash(cloc:*)"
     ],
     "deny": []
   }
