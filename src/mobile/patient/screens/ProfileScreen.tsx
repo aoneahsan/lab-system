@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Bell, Shield, CreditCard, HelpCircle, LogOut, ChevronRight, Fingerprint } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
-import { toast } from '@/stores/toast.store';
+import { biometricAuth } from '@/services/biometric-auth.service';
+import { toast } from 'react-hot-toast';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuthStore();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+
+  useEffect(() => {
+    checkBiometricStatus();
+  }, []);
+
+  const checkBiometricStatus = async () => {
+    try {
+      const available = await biometricAuth.isAvailable();
+      setBiometricAvailable(available);
+      
+      if (available) {
+        const enabled = await biometricAuth.isBiometricEnabled();
+        setBiometricEnabled(enabled);
+      }
+    } catch (error) {
+      console.error('Error checking biometric status:', error);
+    }
+  };
 
   const handleLogout = async () => {
     if (confirm('Are you sure you want to sign out?')) {
@@ -18,14 +38,28 @@ export const ProfileScreen: React.FC = () => {
 
   const toggleBiometric = async () => {
     try {
-      // TODO: Implement actual biometric toggle using capacitor-biometric-authentication
-      setBiometricEnabled(!biometricEnabled);
-      toast.success(
-        'Biometric Updated',
-        `Biometric authentication ${!biometricEnabled ? 'enabled' : 'disabled'}`
-      );
-    } catch (_error) {
-      toast.error('Error', 'Failed to update biometric settings');
+      if (!biometricEnabled) {
+        // Enable biometric authentication
+        const success = await biometricAuth.enableBiometricAuth(
+          currentUser?.email || '',
+          'stored-password' // In real app, would need secure password handling
+        );
+        
+        if (success) {
+          setBiometricEnabled(true);
+          toast.success('Biometric authentication enabled');
+        } else {
+          toast.error('Failed to enable biometric authentication');
+        }
+      } else {
+        // Disable biometric authentication
+        await biometricAuth.disableBiometricAuth();
+        setBiometricEnabled(false);
+        toast.success('Biometric authentication disabled');
+      }
+    } catch (error) {
+      toast.error('Failed to update biometric settings');
+      console.error('Biometric toggle error:', error);
     }
   };
 

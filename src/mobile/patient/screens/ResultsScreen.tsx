@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-// import { useAuthStore } from '@/stores/auth.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { resultService } from '@/services/result.service';
 import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';

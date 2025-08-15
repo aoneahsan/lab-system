@@ -9,10 +9,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-// TODO: Implement user authentication
-// import { useAuthStore } from '@/stores/auth.store';
-// TODO: Implement offline patient data
-// import { useOfflinePatients } from '@/hooks/useOfflinePatients';
+import { useAuthStore } from '@/stores/auth.store';
+import { useOfflinePatients } from '@/hooks/useOfflinePatients';
 import { formatDistanceToNow } from 'date-fns';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -20,10 +18,15 @@ import { useQueryClient } from '@tanstack/react-query';
 
 export const HomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  // TODO: Get current user from auth store
-  // const { currentUser } = useAuthStore();
-  // TODO: Get recent results from offline patients hook
-  const recentResults: any[] = [];
+  const { currentUser } = useAuthStore();
+  const { 
+    patients, 
+    syncPatients, 
+    syncPendingChanges, 
+    lastSyncTime, 
+    pendingChanges,
+    isSyncing 
+  } = useOfflinePatients();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const queryClient = useQueryClient();
 

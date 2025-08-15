@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { QrCode, Camera, Package, User, AlertCircle, CheckCircle } from 'lucide-react';
-import { toast } from '@/stores/toast.store';
+import { barcodeScanner } from '@/services/barcode-scanner.service';
+import { toast } from 'react-hot-toast';
 
 export const ScanScreen: React.FC = () => {
   const [scanMode, setScanMode] = useState<'patient' | 'sample' | 'tube'>('patient');
@@ -10,40 +11,37 @@ export const ScanScreen: React.FC = () => {
   const handleScan = async () => {
     try {
       setIsScanning(true);
-      // TODO: Implement actual barcode scanning using capacitor plugin
-      // Simulating scan result
-      setTimeout(() => {
-        const mockResults = {
-          patient: {
-            type: 'patient',
-            patientId: 'P12345',
-            name: 'John Doe',
-            dob: '1980-05-15',
-            mrn: 'MRN123456',
-          },
-          sample: {
-            type: 'sample',
-            sampleId: 'S20241027001',
-            patientId: 'P12345',
-            collectionDate: new Date().toISOString(),
-            tests: ['CBC', 'Lipid Panel'],
-          },
-          tube: {
-            type: 'tube',
-            tubeId: 'T20241027001',
-            tubeType: 'EDTA',
-            color: 'purple',
-            expiry: '2025-12-31',
-          },
-        };
-
-        setLastScan(mockResults[scanMode]);
+      
+      // Check if barcode scanner is available
+      const available = await barcodeScanner.isAvailable();
+      if (!available) {
+        toast.error('Barcode scanner not available');
         setIsScanning(false);
-        toast.success('Scan Successful', `${scanMode} information captured`);
-      }, 1500);
-    } catch (_error) {
+        return;
+      }
+
+      // Start scanning
+      const result = await barcodeScanner.startScan();
+      
+      if (result.cancelled) {
+        toast.error('Scan cancelled');
+        setIsScanning(false);
+        return;
+      }
+
+      if (result.text) {
+        // Parse the scan result
+        const parsedResult = barcodeScanner.parseScanResult(result.text);
+        setLastScan(parsedResult.data);
+        
+        toast.success(`${parsedResult.type.charAt(0).toUpperCase() + parsedResult.type.slice(1)} scanned successfully`);
+      }
+      
       setIsScanning(false);
-      toast.error('Scan Failed', 'Please try again');
+    } catch (error: any) {
+      setIsScanning(false);
+      toast.error(error.message || 'Scan failed');
+      console.error('Scan error:', error);
     }
   };
 

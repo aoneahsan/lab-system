@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Home, FileText, Calendar, User, Bell } from 'lucide-react';
 import { useOffline } from '@/hooks/useOffline';
+import { useAuthStore } from '@/stores/auth.store';
 import { HomeScreen } from './screens/HomeScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { AppointmentsScreen } from './screens/AppointmentsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
+import { LoginScreen } from './screens/LoginScreen';
 
 interface TabItem {
   id: string;
@@ -16,8 +18,7 @@ interface TabItem {
 
 export const PatientMobileApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
-  // TODO: Implement user authentication
-  // const { currentUser } = useAuthStore();
+  const { currentUser, isAuthenticated } = useAuthStore();
   const { isOffline, pendingChanges } = useOffline();
   const [notificationCount] = useState(3);
 
@@ -63,6 +64,11 @@ export const PatientMobileApp: React.FC = () => {
         return <HomeScreen />;
     }
   };
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated || !currentUser) {
+    return <LoginScreen onLoginSuccess={() => {/* Login handled by auth store */}} />;
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
