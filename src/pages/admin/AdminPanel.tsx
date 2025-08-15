@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, query, orderBy, where, Timestamp } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { Shield, Users, Building2, CheckCircle, XCircle, Loader2, UserCheck, BarChart3, FileText, CreditCard, Activity, Settings, GitBranch, Key } from 'lucide-react';
 import { MicrophoneIcon } from '@heroicons/react/24/outline';
@@ -51,6 +51,12 @@ const AdminPanel = () => {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [revenueData, setRevenueData] = useState({
+    totalRevenue: 0,
+    monthlyRevenue: 0,
+    activeSubscriptions: 0,
+    pendingPayments: 0
+  });
 
   // Get active tab from URL, default to 'dashboard'
   const activeTab = (searchParams.get('tab') || 'dashboard') as 'dashboard' | 'users' | 'tenants' | 'reports' | 'revenue' | 'performance' | 'modules' | 'permissions' | 'advanced';
@@ -94,6 +100,8 @@ const AdminPanel = () => {
       fetchUsers();
     } else if (activeTab === 'tenants') {
       fetchTenants();
+    } else if (activeTab === 'revenue') {
+      fetchRevenueData();
     }
   }, [activeTab, page, search, status, sortBy, sortOrder]);
 
@@ -135,6 +143,71 @@ const AdminPanel = () => {
     } catch (error) {
       toast.error('Failed to load tenants', 'Unable to fetch tenant data');
       console.error('Error fetching tenants:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRevenueData = async () => {
+    setLoading(true);
+    try {
+      // Calculate total revenue from all tenant invoices
+      let totalRevenue = 0;
+      let monthlyRevenue = 0;
+      let activeSubscriptions = 0;
+      let pendingPayments = 0;
+
+      // Get current month start
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Fetch all tenant revenue data
+      for (const tenant of tenants) {
+        try {
+          // Fetch invoices for this tenant
+          const invoicesQuery = query(
+            collection(firestore, `labflow_${tenant.id}_invoices`),
+            orderBy('createdAt', 'desc')
+          );
+          const invoicesSnapshot = await getDocs(invoicesQuery);
+          
+          invoicesSnapshot.docs.forEach(doc => {
+            const invoice = doc.data();
+            const amount = invoice.total || 0;
+            
+            // Add to total revenue
+            totalRevenue += amount;
+            
+            // Add to monthly revenue if created this month
+            if (invoice.createdAt && invoice.createdAt.toDate() >= monthStart) {
+              monthlyRevenue += amount;
+            }
+            
+            // Count pending payments
+            if (invoice.status === 'pending' || invoice.status === 'overdue') {
+              pendingPayments += amount;
+            }
+          });
+
+          // Count active subscription
+          if (tenant.subscription?.status === 'active') {
+            activeSubscriptions++;
+          }
+        } catch (error) {
+          // Skip tenant if no access or error
+          console.warn(`Unable to fetch revenue data for tenant ${tenant.id}:`, error);
+        }
+      }
+
+      setRevenueData({
+        totalRevenue,
+        monthlyRevenue,
+        activeSubscriptions,
+        pendingPayments
+      });
+    } catch (error) {
+      toast.error('Failed to load revenue data', 'Unable to fetch financial information');
+      console.error('Error fetching revenue data:', error);
     } finally {
       setLoading(false);
     }
@@ -619,27 +692,63 @@ const AdminPanel = () => {
               Generate and view comprehensive reports across all tenants
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-3xl mx-auto">
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=user-activity&scope=admin');
+                  toast.info('Generating Report', 'User Activity Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 User Activity Report
               </button>
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=test-volume&scope=admin');
+                  toast.info('Generating Report', 'Test Volume Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Test Volume Report
               </button>
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=revenue-summary&scope=admin');
+                  toast.info('Generating Report', 'Revenue Summary Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Revenue Summary
               </button>
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=patient-demographics&scope=admin');
+                  toast.info('Generating Report', 'Patient Demographics Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Patient Demographics
               </button>
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=lab-performance&scope=admin');
+                  toast.info('Generating Report', 'Lab Performance Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Lab Performance
               </button>
-              <button className="btn btn-outline">
+              <button 
+                className="btn btn-outline"
+                onClick={() => {
+                  navigate('/reports?type=compliance&scope=admin');
+                  toast.info('Generating Report', 'Compliance Report is being generated...');
+                }}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Compliance Report
               </button>
@@ -656,12 +765,12 @@ const AdminPanel = () => {
             <p className="text-gray-500 dark:text-gray-400 mb-6">
               Track revenue, subscriptions, and billing across all tenants
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                 <div className="text-3xl mb-2">💰</div>
                 <h4 className="font-medium text-gray-900 dark:text-white">Total Revenue</h4>
                 <p className="text-2xl font-bold text-success-600 dark:text-success-400 mt-2">
-                  $0.00
+                  ${loading ? '...' : revenueData.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">All time</p>
               </div>
@@ -669,7 +778,7 @@ const AdminPanel = () => {
                 <div className="text-3xl mb-2">📊</div>
                 <h4 className="font-medium text-gray-900 dark:text-white">Monthly Revenue</h4>
                 <p className="text-2xl font-bold text-primary-600 dark:text-primary-400 mt-2">
-                  $0.00
+                  ${loading ? '...' : revenueData.monthlyRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current month</p>
               </div>
@@ -677,9 +786,17 @@ const AdminPanel = () => {
                 <div className="text-3xl mb-2">🔄</div>
                 <h4 className="font-medium text-gray-900 dark:text-white">Active Subscriptions</h4>
                 <p className="text-2xl font-bold text-info-600 dark:text-info-400 mt-2">
-                  0
+                  {loading ? '...' : revenueData.activeSubscriptions}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Recurring revenue</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                <div className="text-3xl mb-2">⏳</div>
+                <h4 className="font-medium text-gray-900 dark:text-white">Pending Payments</h4>
+                <p className="text-2xl font-bold text-warning-600 dark:text-warning-400 mt-2">
+                  ${loading ? '...' : revenueData.pendingPayments.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Outstanding invoices</p>
               </div>
             </div>
           </div>
