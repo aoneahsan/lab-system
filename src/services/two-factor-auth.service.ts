@@ -1,4 +1,3 @@
-import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 import * as OTPAuth from 'otpauth';
 import {
@@ -77,18 +76,14 @@ class TwoFactorAuthService {
       throw new Error('TOTP authentication is not available for your account');
     }
 
-    // Generate secret
-    const secret = speakeasy.generateSecret({
-      name: `${this.APP_NAME} (${userEmail})`,
-      issuer: this.APP_NAME,
-      length: 32,
-    });
+    // Generate a random secret using OTPAuth
+    const secret = new OTPAuth.Secret({ size: 20 });
 
-    // Create TOTP instance for OTPAuth URL
+    // Create TOTP instance
     const totp = new OTPAuth.TOTP({
       issuer: this.APP_NAME,
       label: userEmail,
-      secret: OTPAuth.Secret.fromBase32(secret.base32),
+      secret: secret,
       algorithm: 'SHA1',
       digits: this.TOTP_DIGITS,
       period: this.TOTP_PERIOD,
@@ -167,14 +162,25 @@ class TwoFactorAuthService {
    * Verify TOTP code
    */
   async verifyTOTPCode(secret: string, token: string): Promise<boolean> {
-    const verified = speakeasy.totp.verify({
-      secret: secret,
-      encoding: 'base32',
-      token: token,
-      window: 2, // Allow 2 time steps before/after
-    });
+    try {
+      // Create TOTP instance with the secret
+      const totp = new OTPAuth.TOTP({
+        secret: OTPAuth.Secret.fromBase32(secret),
+        algorithm: 'SHA1',
+        digits: this.TOTP_DIGITS,
+        period: this.TOTP_PERIOD,
+      });
 
-    return verified;
+      // Validate the token
+      // OTPAuth validates with a window of 1 by default
+      const delta = totp.validate({ token, window: 2 });
+      
+      // delta is null if invalid, or the time step difference if valid
+      return delta !== null;
+    } catch (error) {
+      console.error('Error verifying TOTP code:', error);
+      return false;
+    }
   }
 
   /**
