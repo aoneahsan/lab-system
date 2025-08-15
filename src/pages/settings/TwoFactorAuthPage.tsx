@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Smartphone, Mail, Shield, Check, X, Copy, Phone, MessageSquare } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useToast } from '@/hooks/useToast';
@@ -9,12 +9,17 @@ import type { TwoFactorMethod, UserTwoFactorPermissions, TwoFactorSetupData } fr
 
 const TwoFactorAuthPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useAuthStore();
   const { showToast } = useToast();
   
+  // Get initial state from URL params
+  const methodFromUrl = searchParams.get('method') as TwoFactorMethod | null;
+  const stepFromUrl = searchParams.get('step') as 'select' | 'verify' | 'backup' | 'complete' | null;
+  
   const [isEnabled, setIsEnabled] = useState(false);
-  const [setupStep, setSetupStep] = useState<'select' | 'verify' | 'backup' | 'complete'>('select');
-  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(null);
+  const [setupStep, setSetupStep] = useState<'select' | 'verify' | 'backup' | 'complete'>(stepFromUrl || 'select');
+  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(methodFromUrl);
   const [verificationCode, setVerificationCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +38,41 @@ const TwoFactorAuthPage: React.FC = () => {
     };
     loadPermissions();
   }, [currentUser]);
+
+  // Update URL when step or method changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (setupStep !== 'select') {
+      params.set('step', setupStep);
+    }
+    if (selectedMethod) {
+      params.set('method', selectedMethod);
+    }
+    const newSearch = params.toString();
+    if (newSearch !== searchParams.toString()) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [setupStep, selectedMethod, searchParams, setSearchParams]);
+
+  // Initialize setup data if method is selected from URL
+  useEffect(() => {
+    const initializeFromUrl = async () => {
+      if (methodFromUrl && stepFromUrl === 'verify' && !setupData && currentUser?.id && currentUser?.email) {
+        setIsLoading(true);
+        try {
+          if (methodFromUrl === 'totp') {
+            const setup = await twoFactorAuthService.generateTOTPSetup(currentUser.id, currentUser.email);
+            setSetupData(setup);
+          }
+        } catch (error) {
+          console.error('Error initializing from URL:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    initializeFromUrl();
+  }, [methodFromUrl, stepFromUrl, currentUser, setupData]);
 
   const methods = [
     {
@@ -72,32 +112,30 @@ const TwoFactorAuthPage: React.FC = () => {
     }
 
     setSelectedMethod(method);
+    setSetupStep('verify');
     setIsLoading(true);
 
     try {
-      let setup: TwoFactorSetupData;
-      
       if (method === 'totp') {
-        setup = await twoFactorAuthService.generateTOTPSetup(currentUser.id, currentUser.email);
+        const setup = await twoFactorAuthService.generateTOTPSetup(currentUser.id, currentUser.email);
+        setSetupData(setup);
       } else if (method === 'sms') {
-        if (!phoneNumber) {
-          setSetupStep('verify');
-          setIsLoading(false);
-          return;
-        }
-        setup = await twoFactorAuthService.setupSMS2FA(currentUser.id, phoneNumber);
+        // For SMS, we'll show the phone input first
+        setIsLoading(false);
+        return;
       } else {
-        setup = await twoFactorAuthService.setupEmail2FA(currentUser.id, email);
+        // For email, we can use the current email or let them change it
+        setIsLoading(false);
+        return;
       }
-      
-      setSetupData(setup);
-      setSetupStep('verify');
     } catch (error) {
       showToast({
         type: 'error',
         title: 'Setup Failed',
         message: error instanceof Error ? error.message : 'Failed to setup 2FA',
       });
+      setSetupStep('select');
+      setSelectedMethod(null);
     } finally {
       setIsLoading(false);
     }
@@ -193,6 +231,9 @@ const TwoFactorAuthPage: React.FC = () => {
       setIsEnabled(false);
       setSetupStep('select');
       setSelectedMethod(null);
+      setSetupData(null);
+      // Clear URL params
+      setSearchParams({});
       showToast({
         type: 'success',
         title: '2FA Disabled',
@@ -243,7 +284,11 @@ If you lose access to your authentication device, you can use one of these codes
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <button
-        onClick={() => navigate('/settings/security')}
+        onClick={() => {
+          // Clear URL params when going back
+          setSearchParams({});
+          navigate('/settings/security');
+        }}
         className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -321,7 +366,7 @@ If you lose access to your authentication device, you can use one of these codes
         </div>
       )}
 
-      {setupStep === 'verify' && selectedMethod === 'app' && (
+      {setupStep === 'verify' && selectedMethod === 'totp' && setupData?.qrCodeUrl && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Set up your authenticator app</h2>
           
@@ -331,12 +376,12 @@ If you lose access to your authentication device, you can use one of these codes
                 Scan this QR code with your authenticator app, or enter the secret key manually.
               </p>
               
-              {showQRCode && (
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="p-4 bg-white rounded-lg border-2 border-gray-300">
-                    <QrCode className="w-48 h-48 text-gray-800" />
-                  </div>
-                  
+              <div className="flex flex-col items-center space-y-4">
+                <div className="p-4 bg-white rounded-lg border-2 border-gray-300">
+                  <img src={setupData.qrCodeUrl} alt="2FA QR Code" className="w-48 h-48" />
+                </div>
+                
+                {setupData.secret && (
                   <div className="w-full max-w-md">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Or enter this secret key manually:
@@ -344,20 +389,20 @@ If you lose access to your authentication device, you can use one of these codes
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        value={secretKey}
+                        value={setupData.secret}
                         readOnly
                         className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-sm font-mono"
                       />
                       <button
-                        onClick={() => copyToClipboard(secretKey.replace(/\s/g, ''))}
+                        onClick={() => copyToClipboard(setupData.secret!)}
                         className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                       >
                         <Copy className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div>
