@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { useToast } from '@/hooks/useToast';
 
 export const BiometricSettingsPage = () => {
   const { isLoading, biometricStatus, preferences, updatePreferences, authenticate, checkStatus } =
     useBiometricAuth();
+  const { showToast } = useToast();
 
   const [isEnabling, setIsEnabling] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [requireRecentAuth, setRequireRecentAuth] = useState(true);
   const [authThreshold, setAuthThreshold] = useState(5);
 
@@ -20,31 +23,72 @@ export const BiometricSettingsPage = () => {
   const handleToggleBiometric = async () => {
     if (!biometricStatus) return;
 
-    if (!preferences?.enabled) {
-      // Enabling biometric authentication
-      if (!biometricStatus.isAvailable) {
-        return;
+    try {
+      if (!preferences?.enabled) {
+        // Enabling biometric authentication
+        if (!biometricStatus.isAvailable) {
+          showToast({
+            type: 'error',
+            title: 'Not Available',
+            message: 'Biometric authentication is not available on this device',
+          });
+          return;
+        }
+
+        if (!biometricStatus.isEnrolled) {
+          showToast({
+            type: 'warning',
+            title: 'Not Enrolled',
+            message: 'Please enroll biometrics in your device settings first',
+          });
+          return;
+        }
+
+        setIsEnabling(true);
+
+        // Authenticate first before enabling
+        const result = await authenticate({
+          reason: 'Authenticate to enable biometric login',
+        });
+
+        if (result.success) {
+          await updatePreferences({ enabled: true });
+        }
+      } else {
+        // Disabling biometric authentication
+        setIsEnabling(true);
+        await updatePreferences({ enabled: false });
       }
-
-      if (!biometricStatus.isEnrolled) {
-        return;
-      }
-
-      setIsEnabling(true);
-
-      // Authenticate first before enabling
-      const result = await authenticate({
-        reason: 'Authenticate to enable biometric login',
+    } catch (error) {
+      console.error('Error toggling biometric:', error);
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to update biometric settings',
       });
-
-      if (result.success) {
-        await updatePreferences({ enabled: true });
-      }
-
+    } finally {
       setIsEnabling(false);
-    } else {
-      // Disabling biometric authentication
-      await updatePreferences({ enabled: false });
+    }
+  };
+
+  const handleRefreshStatus = async () => {
+    try {
+      setIsRefreshing(true);
+      await checkStatus();
+      showToast({
+        type: 'success',
+        title: 'Status Updated',
+        message: 'Biometric status has been refreshed',
+      });
+    } catch (error) {
+      console.error('Error refreshing status:', error);
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to refresh biometric status',
+      });
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -111,11 +155,11 @@ export const BiometricSettingsPage = () => {
         </div>
 
         <button
-          onClick={checkStatus}
+          onClick={handleRefreshStatus}
           className="mt-4 btn btn-secondary btn-sm"
-          disabled={isLoading}
+          disabled={isLoading || isRefreshing}
         >
-          Refresh Status
+          {isRefreshing ? 'Refreshing...' : 'Refresh Status'}
         </button>
       </div>
 
@@ -129,21 +173,24 @@ export const BiometricSettingsPage = () => {
             </p>
           </div>
 
-          <label className="relative inline-flex items-center cursor-pointer">
+          <button
+            onClick={handleToggleBiometric}
+            disabled={
+              isLoading ||
+              isEnabling ||
+              !biometricStatus?.isAvailable ||
+              !biometricStatus?.isEnrolled
+            }
+            className="relative inline-flex items-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          >
             <input
               type="checkbox"
               className="sr-only peer"
               checked={preferences?.enabled || false}
-              onChange={handleToggleBiometric}
-              disabled={
-                isLoading ||
-                isEnabling ||
-                !biometricStatus?.isAvailable ||
-                !biometricStatus?.isEnrolled
-              }
+              readOnly
             />
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
-          </label>
+          </button>
         </div>
 
         {!biometricStatus?.isAvailable && (
