@@ -7,15 +7,16 @@ const BiometricAuthentication = {
       try {
         // Try to import the actual plugin
         const { BiometricAuth } = await import('capacitor-biometric-authentication');
-        return await BiometricAuth.isAvailable();
+        const result = await BiometricAuth.isAvailable();
+        return { isAvailable: result };
       } catch (error) {
         console.log('Biometric plugin not available:', error);
         return { isAvailable: false };
       }
     }
     // Web fallback - check for WebAuthn support
-    return { 
-      isAvailable: !!(navigator.credentials && window.PublicKeyCredential) 
+    return {
+      isAvailable: !!(navigator.credentials && window.PublicKeyCredential),
     };
   },
 
@@ -23,12 +24,13 @@ const BiometricAuthentication = {
     if (Capacitor.isNativePlatform()) {
       try {
         const { BiometricAuth } = await import('capacitor-biometric-authentication');
-        return await BiometricAuth.authenticate({ reason });
+        const result = await BiometricAuth.authenticate({ reason });
+        return { success: result.success, error: result.error?.message };
       } catch (error: any) {
         return { success: false, error: error.message };
       }
     }
-    
+
     // Web fallback - simulate biometric auth
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -41,10 +43,10 @@ const BiometricAuthentication = {
     if (Capacitor.isNativePlatform()) {
       try {
         // Store credentials securely for biometric access
-        const { Storage } = await import('@capacitor/storage');
-        await Storage.set({
+        const { Preferences } = await import('@capacitor/preferences');
+        await Preferences.set({
           key: 'biometric_credentials',
-          value: JSON.stringify(credentials)
+          value: JSON.stringify(credentials),
         });
         return true;
       } catch (error) {
@@ -52,7 +54,7 @@ const BiometricAuthentication = {
         return false;
       }
     }
-    
+
     // Web fallback - use localStorage (not secure, just for demo)
     try {
       localStorage.setItem('biometric_credentials', JSON.stringify(credentials));
@@ -65,14 +67,14 @@ const BiometricAuthentication = {
   async getStoredCredentials(): Promise<{ email: string; password: string } | null> {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { Storage } = await import('@capacitor/storage');
-        const result = await Storage.get({ key: 'biometric_credentials' });
+        const { Preferences } = await import('@capacitor/preferences');
+        const result = await Preferences.get({ key: 'biometric_credentials' });
         return result.value ? JSON.parse(result.value) : null;
       } catch (error) {
         return null;
       }
     }
-    
+
     // Web fallback
     try {
       const stored = localStorage.getItem('biometric_credentials');
@@ -85,8 +87,8 @@ const BiometricAuthentication = {
   async disableBiometric(): Promise<void> {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { Storage } = await import('@capacitor/storage');
-        await Storage.remove({ key: 'biometric_credentials' });
+        const { Preferences } = await import('@capacitor/preferences');
+        await Preferences.remove({ key: 'biometric_credentials' });
       } catch (error) {
         console.error('Failed to disable biometric auth:', error);
       }
@@ -94,7 +96,7 @@ const BiometricAuthentication = {
       // Web fallback
       localStorage.removeItem('biometric_credentials');
     }
-  }
+  },
 };
 
 class BiometricAuthService {
@@ -108,7 +110,9 @@ class BiometricAuthService {
     }
   }
 
-  async authenticate(reason: string = 'Please authenticate to continue'): Promise<{ success: boolean; error?: string }> {
+  async authenticate(
+    reason: string = 'Please authenticate to continue'
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       return await BiometricAuthentication.authenticate(reason);
     } catch (error: any) {

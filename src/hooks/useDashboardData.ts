@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTenant } from '@/hooks/useTenant';
-import { usePatientStats } from '@/hooks/usePatients';
+import { patientService } from '@/services/patient.service';
 import { testService } from '@/services/test.service';
 import { resultService } from '@/services/result.service';
 import { billingService } from '@/services/billing.service';
@@ -14,7 +14,6 @@ export interface DashboardSummary {
 
 export const useDashboardSummary = () => {
   const { tenant } = useTenant();
-  const { data: patientStats } = usePatientStats();
 
   return useQuery({
     queryKey: ['dashboardSummary', tenant?.id],
@@ -22,14 +21,13 @@ export const useDashboardSummary = () => {
       if (!tenant?.id) throw new Error('No tenant selected');
 
       try {
-        // Get test statistics
-        const testStats = await testService.getTestStatistics(tenant.id);
-        
-        // Get result statistics
-        const resultStats = await resultService.getResultStatistics(tenant.id);
-        
-        // Get billing statistics
-        const billingStats = await billingService.getBillingStatistics(tenant.id);
+        // Fetch all statistics in parallel
+        const [patientStats, testStats, resultStats, billingStats] = await Promise.all([
+          patientService.getPatientStats(tenant.id),
+          testService.getTestStatistics(tenant.id),
+          resultService.getResultStatistics(tenant.id),
+          billingService.getBillingStatistics(tenant.id),
+        ]);
 
         const summary: DashboardSummary = {
           totalPatients: patientStats?.totalPatients || 0,
@@ -43,7 +41,7 @@ export const useDashboardSummary = () => {
         console.error('Error fetching dashboard summary:', error);
         // Return default values on error
         return {
-          totalPatients: patientStats?.totalPatients || 0,
+          totalPatients: 0,
           testsToday: 0,
           pendingResults: 0,
           revenueToday: 0,
@@ -67,7 +65,7 @@ export const useRecentTests = (limit: number = 5) => {
 
       try {
         const orders = await testService.getTestOrders(tenant.id);
-        
+
         // Sort and limit manually
         const sortedOrders = orders
           .sort((a, b) => {
@@ -77,10 +75,10 @@ export const useRecentTests = (limit: number = 5) => {
           })
           .slice(0, limit);
 
-        return sortedOrders.map(order => ({
+        return sortedOrders.map((order) => ({
           id: order.id,
           patientName: 'Unknown Patient', // Patient info would need to be fetched separately
-          testNames: order.tests?.map(test => test.testName) || [],
+          testNames: order.tests?.map((test) => test.testName) || [],
           status: order.status,
           orderedAt: order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate(),
         }));
@@ -105,9 +103,9 @@ export const useCriticalResults = (limit: number = 3) => {
 
       try {
         const response = await resultService.getResults(tenant.id, {
-          flagType: 'critical'
+          flagType: 'critical',
         });
-        
+
         // Sort and limit manually
         const sortedResults = response.items
           .sort((a, b) => {
@@ -117,13 +115,17 @@ export const useCriticalResults = (limit: number = 3) => {
           })
           .slice(0, limit);
 
-        return sortedResults.map(result => ({
+        return sortedResults.map((result) => ({
           id: result.id,
           patientName: 'Test Patient',
           testName: result.testName || 'Unknown Test',
           value: `${result.value} ${result.unit || ''}`.trim(),
-          severity: (result.flag === 'critical_high' || result.flag === 'critical_low') ? 'critical' as const : 'high' as const,
-          reportedAt: result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
+          severity:
+            result.flag === 'critical_high' || result.flag === 'critical_low'
+              ? ('critical' as const)
+              : ('high' as const),
+          reportedAt:
+            result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
         }));
       } catch (error) {
         console.error('Error fetching critical results:', error);

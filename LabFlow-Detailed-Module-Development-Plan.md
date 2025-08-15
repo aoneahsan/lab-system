@@ -1477,10 +1477,10 @@ service cloud.firestore {
 ```javascript
 // Additional Capacitor Plugins
 {
-  "@capacitor/network": "^5.x",
-  "@capacitor/storage": "^1.x",
+  "@capacitor/network": "^7.x",
+  "@capacitor/preference": "^7.x",
   "@capacitor-community/sqlite": "^5.x",
-  "@capacitor/local-notifications": "^5.x"
+  "@capacitor/local-notifications": "^7.x"
 }
 
 // Features
