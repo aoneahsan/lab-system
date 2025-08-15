@@ -54,6 +54,8 @@ const CustomFieldsPage = lazy(() => import('@/pages/settings/CustomFieldsPage'))
 const ResultValidationRulesPage = lazy(() => import('@/pages/results/ValidationRulesPage'));
 const AppUpdateSettingsPage = lazy(() => import('@/components/settings/AppUpdateSettings').then(module => ({ default: module.AppUpdateSettings })));
 const HotkeysPage = lazy(() => import('@/pages/settings/HotkeysPage'));
+const SecuritySettingsPage = lazy(() => import('@/pages/settings/SecuritySettingsPage'));
+const TwoFactorAuthPage = lazy(() => import('@/pages/settings/TwoFactorAuthPage'));
 const SetupDemoPage = lazy(() => import('@/pages/setup/SetupDemoPage'));
 const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
@@ -162,6 +164,9 @@ export const AppRouter = () => {
             <Route path="/settings/custom-fields" element={<CustomFieldsPage />} />
             <Route path="/settings/updates" element={<AppUpdateSettingsPage />} />
             <Route path="/settings/hotkeys" element={<HotkeysPage />} />
+            <Route path="/settings/security" element={<SecuritySettingsPage />}>
+              <Route path="2fa" element={<TwoFactorAuthPage />} />
+            </Route>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/portal" element={<CustomerPortalPage />} />
             <Route path="/workflow" element={<WorkflowAutomationPage />} />
