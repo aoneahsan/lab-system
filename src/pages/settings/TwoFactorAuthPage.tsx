@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Smartphone, Mail, Shield, Check, X, QrCode, Copy } from 'lucide-react';
+import { ArrowLeft, Smartphone, Mail, Shield, Check, X, Copy, Phone, MessageSquare } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useToast } from '@/hooks/useToast';
-import { biometricAuthService } from '@/services/biometric-auth.service';
+import { twoFactorAuthService } from '@/services/two-factor-auth.service';
+import { subscriptionService } from '@/services/subscription.service';
+import type { TwoFactorMethod, UserTwoFactorPermissions, TwoFactorSetupData } from '@/types/two-factor.types';
 
 const TwoFactorAuthPage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,68 +14,101 @@ const TwoFactorAuthPage: React.FC = () => {
   
   const [isEnabled, setIsEnabled] = useState(false);
   const [setupStep, setSetupStep] = useState<'select' | 'verify' | 'backup' | 'complete'>('select');
-  const [selectedMethod, setSelectedMethod] = useState<'app' | 'sms' | 'email' | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(null);
   const [verificationCode, setVerificationCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [secretKey, setSecretKey] = useState('');
+  const [setupData, setSetupData] = useState<TwoFactorSetupData | null>(null);
+  const [permissions, setPermissions] = useState<UserTwoFactorPermissions | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState(currentUser?.email || '');
+
+  // Load user permissions on mount
+  useEffect(() => {
+    const loadPermissions = async () => {
+      if (currentUser?.id) {
+        const perms = await twoFactorAuthService.getUserTwoFactorPermissions(currentUser.id);
+        setPermissions(perms);
+      }
+    };
+    loadPermissions();
+  }, [currentUser]);
 
   const methods = [
     {
-      id: 'app',
+      id: 'totp' as TwoFactorMethod,
       name: 'Authenticator App',
       description: 'Use an app like Google Authenticator or Authy',
       icon: <Smartphone className="w-6 h-6" />,
       recommended: true,
+      enabled: permissions?.canUseTOTP ?? true,
     },
     {
-      id: 'sms',
+      id: 'sms' as TwoFactorMethod,
       name: 'SMS Text Message',
       description: 'Receive codes via text message',
-      icon: <Mail className="w-6 h-6" />,
+      icon: <Phone className="w-6 h-6" />,
       recommended: false,
+      enabled: permissions?.canUseSMS ?? true,
     },
     {
-      id: 'email',
+      id: 'email' as TwoFactorMethod,
       name: 'Email',
       description: 'Receive codes via email',
-      icon: <Mail className="w-6 h-6" />,
+      icon: <MessageSquare className="w-6 h-6" />,
       recommended: false,
+      enabled: permissions?.canUseEmail ?? true,
     },
   ];
 
-  const handleMethodSelect = (method: 'app' | 'sms' | 'email') => {
+  const handleMethodSelect = async (method: TwoFactorMethod) => {
+    if (!currentUser?.id || !currentUser?.email) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'User information not available',
+      });
+      return;
+    }
+
     setSelectedMethod(method);
-    if (method === 'app') {
-      // Generate secret key for authenticator app
-      const key = generateSecretKey();
-      setSecretKey(key);
-      setShowQRCode(true);
+    setIsLoading(true);
+
+    try {
+      let setup: TwoFactorSetupData;
+      
+      if (method === 'totp') {
+        setup = await twoFactorAuthService.generateTOTPSetup(currentUser.id, currentUser.email);
+      } else if (method === 'sms') {
+        if (!phoneNumber) {
+          setSetupStep('verify');
+          setIsLoading(false);
+          return;
+        }
+        setup = await twoFactorAuthService.setupSMS2FA(currentUser.id, phoneNumber);
+      } else {
+        setup = await twoFactorAuthService.setupEmail2FA(currentUser.id, email);
+      }
+      
+      setSetupData(setup);
+      setSetupStep('verify');
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Setup Failed',
+        message: error instanceof Error ? error.message : 'Failed to setup 2FA',
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setSetupStep('verify');
   };
 
-  const generateSecretKey = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-    let key = '';
-    for (let i = 0; i < 32; i++) {
-      key += chars[Math.floor(Math.random() * chars.length)];
-      if ((i + 1) % 4 === 0 && i !== 31) key += ' ';
-    }
-    return key;
-  };
-
-  const generateBackupCodes = () => {
-    const codes = [];
-    for (let i = 0; i < 10; i++) {
-      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      codes.push(code);
-    }
-    return codes;
-  };
 
   const handleVerification = async () => {
+    if (!currentUser?.id || !selectedMethod || !setupData) {
+      return;
+    }
+
     if (verificationCode.length !== 6) {
       showToast({
         type: 'error',
@@ -85,19 +120,28 @@ const TwoFactorAuthPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call to verify code
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Generate backup codes
-      const codes = generateBackupCodes();
-      setBackupCodes(codes);
-      setSetupStep('backup');
-      
-      showToast({
-        type: 'success',
-        title: 'Verification Successful',
-        message: 'Your two-factor authentication is being set up',
-      });
+      const result = await twoFactorAuthService.enable2FA(
+        currentUser.id,
+        selectedMethod,
+        verificationCode,
+        setupData
+      );
+
+      if (result.success) {
+        setBackupCodes(result.backupCodes || []);
+        setSetupStep('backup');
+        showToast({
+          type: 'success',
+          title: 'Verification Successful',
+          message: 'Your two-factor authentication is being set up',
+        });
+      } else {
+        showToast({
+          type: 'error',
+          title: 'Verification Failed',
+          message: result.error || 'The code you entered is invalid',
+        });
+      }
     } catch (error) {
       showToast({
         type: 'error',
@@ -338,6 +382,119 @@ If you lose access to your authentication device, you can use one of these codes
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {setupStep === 'verify' && selectedMethod === 'sms' && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Set up SMS authentication</h2>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Phone Number
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="+1234567890"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+                <button
+                  onClick={handleSendSMSCode}
+                  disabled={isLoading || !phoneNumber}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Sending...' : 'Send Code'}
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Enter your phone number with country code
+              </p>
+            </div>
+
+            {setupData && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enter the 6-digit code sent to your phone:
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    className="w-32 px-4 py-2 text-center text-lg font-mono border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    maxLength={6}
+                  />
+                  <button
+                    onClick={handleVerification}
+                    disabled={isLoading || verificationCode.length !== 6}
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Verifying...' : 'Verify'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {setupStep === 'verify' && selectedMethod === 'email' && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Set up Email authentication</h2>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email Address
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+                <button
+                  onClick={handleSendEmailCode}
+                  disabled={isLoading || !email}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Sending...' : 'Send Code'}
+                </button>
+              </div>
+            </div>
+
+            {setupData && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Enter the 6-digit code sent to your email:
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    className="w-32 px-4 py-2 text-center text-lg font-mono border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    maxLength={6}
+                  />
+                  <button
+                    onClick={handleVerification}
+                    disabled={isLoading || verificationCode.length !== 6}
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Verifying...' : 'Verify'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
