@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useAppealClaim } from '@/hooks/useBilling';
 import type { InsuranceClaim } from '@/types/billing.types';
@@ -15,6 +15,15 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const appealClaimMutation = useAppealClaim();
+
+  // Reset form data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setAppealReason('');
+      setAdditionalDocuments('');
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

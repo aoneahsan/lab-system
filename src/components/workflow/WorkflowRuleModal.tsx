@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateWorkflowRule, useUpdateWorkflowRule } from '@/hooks/useWorkflowAutomation';
 import type { WorkflowRule, WorkflowRuleFormData, WorkflowAction } from '@/types/workflow-automation.types';
 import { TextField, LexicalEditorField, SelectField, SwitchField, NumberField } from '@/components/form-fields';
@@ -13,19 +13,51 @@ export const WorkflowRuleModal: React.FC<WorkflowRuleModalProps> = ({ rule, onCl
   const updateMutation = useUpdateWorkflowRule();
   
   const [formData, setFormData] = useState<WorkflowRuleFormData>({
-    name: rule?.name || '',
-    description: rule?.description || '',
-    isActive: rule?.isActive ?? true,
-    trigger: rule?.trigger || {
+    name: '',
+    description: '',
+    isActive: true,
+    trigger: {
       type: 'sample_registered',
       conditions: []
     },
-    actions: rule?.actions || [],
-    priority: rule?.priority || 'medium',
-    maxRetries: rule?.maxRetries || 3,
-    retryDelay: rule?.retryDelay || 5,
-    stopOnError: rule?.stopOnError ?? true
+    actions: [],
+    priority: 'medium',
+    maxRetries: 3,
+    retryDelay: 5,
+    stopOnError: true
   });
+
+  // Reset form data when rule changes
+  useEffect(() => {
+    if (rule) {
+      setFormData({
+        name: rule.name,
+        description: rule.description || '',
+        isActive: rule.isActive,
+        trigger: rule.trigger,
+        actions: rule.actions || [],
+        priority: rule.priority || 'medium',
+        maxRetries: rule.maxRetries || 3,
+        retryDelay: rule.retryDelay || 5,
+        stopOnError: rule.stopOnError ?? true
+      });
+    } else {
+      setFormData({
+        name: '',
+        description: '',
+        isActive: true,
+        trigger: {
+          type: 'sample_registered',
+          conditions: []
+        },
+        actions: [],
+        priority: 'medium',
+        maxRetries: 3,
+        retryDelay: 5,
+        stopOnError: true
+      });
+    }
+  }, [rule]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

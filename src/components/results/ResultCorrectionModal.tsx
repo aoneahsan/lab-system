@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Edit } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -29,9 +29,19 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
-    value: result.value,
-    notes: result.comments || '',
+    value: '',
+    notes: '',
   });
+
+  // Reset form data when modal opens with result data
+  useEffect(() => {
+    if (isOpen && result) {
+      setFormData({
+        value: result.value,
+        notes: result.comments || '',
+      });
+    }
+  }, [isOpen, result]);
 
   const [validationResult, setValidationResult] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});

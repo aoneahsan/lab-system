@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { PatientMedication } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
@@ -23,7 +23,7 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
     reset,
     watch
   } = useForm<PatientMedication>({
-    defaultValues: medication || {
+    defaultValues: {
       name: '',
       dosage: '',
       frequency: '',
@@ -34,6 +34,26 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
       notes: ''
     }
   });
+
+  // Reset form when modal opens with medication data
+  useEffect(() => {
+    if (isOpen) {
+      if (medication) {
+        reset(medication);
+      } else {
+        reset({
+          name: '',
+          dosage: '',
+          frequency: '',
+          startDate: new Date(),
+          endDate: undefined,
+          prescribedBy: '',
+          reason: '',
+          notes: ''
+        });
+      }
+    }
+  }, [isOpen, medication, reset]);
 
   const startDate = watch('startDate');
 

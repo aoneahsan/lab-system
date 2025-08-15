@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { PatientMedicalHistory } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
@@ -24,13 +24,29 @@ export const AddMedicalHistoryModal = ({ isOpen, onClose, onSubmit, history }: A
     formState: { errors },
     reset
   } = useForm<PatientMedicalHistory>({
-    defaultValues: history || {
+    defaultValues: {
       condition: '',
       diagnosedDate: undefined,
       status: 'active',
       notes: ''
     }
   });
+
+  // Reset form when modal opens with history data
+  useEffect(() => {
+    if (isOpen) {
+      if (history) {
+        reset(history);
+      } else {
+        reset({
+          condition: '',
+          diagnosedDate: undefined,
+          status: 'active',
+          notes: ''
+        });
+      }
+    }
+  }, [isOpen, history, reset]);
 
   const statusOptions = [
     { value: 'active', label: 'Active' },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, FileText, Search } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Timestamp } from 'firebase/firestore';
@@ -31,15 +31,31 @@ const CreateClaimModal: React.FC<CreateClaimModalProps> = ({
   const patients = patientsData?.patients || [];
 
   const [formData, setFormData] = useState<Partial<ClaimFormData>>({
-    invoiceId: preSelectedInvoiceId || '',
+    invoiceId: '',
     insuranceId: '',
     serviceDate: new Date(),
     primaryDiagnosis: '',
     secondaryDiagnoses: [],
     services: [],
-    renderingProvider: user?.displayName || '',
+    renderingProvider: '',
     notes: '',
   });
+
+  // Reset form data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        invoiceId: preSelectedInvoiceId || '',
+        insuranceId: '',
+        serviceDate: new Date(),
+        primaryDiagnosis: '',
+        secondaryDiagnoses: [],
+        services: [],
+        renderingProvider: user?.displayName || '',
+        notes: '',
+      });
+    }
+  }, [isOpen, preSelectedInvoiceId, user]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { PatientAllergy } from '@/types/patient.types';
 import { Modal } from '@/components/ui/Modal';
@@ -24,7 +24,7 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
     formState: { errors },
     reset
   } = useForm<PatientAllergy>({
-    defaultValues: allergy || {
+    defaultValues: {
       allergen: '',
       reaction: '',
       severity: 'mild',
@@ -32,6 +32,23 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
       notes: ''
     }
   });
+
+  // Reset form when modal opens with allergy data
+  useEffect(() => {
+    if (isOpen) {
+      if (allergy) {
+        reset(allergy);
+      } else {
+        reset({
+          allergen: '',
+          reaction: '',
+          severity: 'mild',
+          confirmedDate: undefined,
+          notes: ''
+        });
+      }
+    }
+  }, [isOpen, allergy, reset]);
 
   const severityOptions = [
     { value: 'mild', label: 'Mild' },

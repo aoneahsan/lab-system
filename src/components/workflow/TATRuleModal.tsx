@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateTATRule, useUpdateTATRule } from '@/hooks/useWorkflowAutomation';
 import type { TATRule, TATRuleFormData } from '@/types/workflow-automation.types';
 
@@ -12,21 +12,60 @@ export const TATRuleModal: React.FC<TATRuleModalProps> = ({ rule, onClose }) => 
   const updateMutation = useUpdateTATRule();
   
   const [formData, setFormData] = useState<TATRuleFormData>({
-    name: rule?.name || '',
-    isActive: rule?.isActive ?? true,
-    testIds: rule?.testIds || [],
-    testCategories: rule?.testCategories || [],
-    applyToAll: rule?.applyToAll || false,
-    targetTAT: rule?.targetTAT || 120,
-    warningThreshold: rule?.warningThreshold || 90,
-    criticalThreshold: rule?.criticalThreshold || 105,
-    considerBusinessHours: rule?.considerBusinessHours || false,
-    businessHours: rule?.businessHours || {
+    name: '',
+    isActive: true,
+    testIds: [],
+    testCategories: [],
+    applyToAll: false,
+    targetTAT: 120,
+    warningThreshold: 90,
+    criticalThreshold: 105,
+    considerBusinessHours: false,
+    businessHours: {
       start: '08:00',
       end: '17:00',
       workingDays: [1, 2, 3, 4, 5]
     }
   });
+
+  // Reset form data when rule changes
+  useEffect(() => {
+    if (rule) {
+      setFormData({
+        name: rule.name,
+        isActive: rule.isActive,
+        testIds: rule.testIds || [],
+        testCategories: rule.testCategories || [],
+        applyToAll: rule.applyToAll || false,
+        targetTAT: rule.targetTAT,
+        warningThreshold: rule.warningThreshold,
+        criticalThreshold: rule.criticalThreshold,
+        considerBusinessHours: rule.considerBusinessHours || false,
+        businessHours: rule.businessHours || {
+          start: '08:00',
+          end: '17:00',
+          workingDays: [1, 2, 3, 4, 5]
+        }
+      });
+    } else {
+      setFormData({
+        name: '',
+        isActive: true,
+        testIds: [],
+        testCategories: [],
+        applyToAll: false,
+        targetTAT: 120,
+        warningThreshold: 90,
+        criticalThreshold: 105,
+        considerBusinessHours: false,
+        businessHours: {
+          start: '08:00',
+          end: '17:00',
+          workingDays: [1, 2, 3, 4, 5]
+        }
+      });
+    }
+  }, [rule]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

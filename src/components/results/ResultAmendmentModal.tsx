@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { doc, updateDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
@@ -30,10 +30,21 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({ isOpen, onC
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
-    newValue: result.value,
+    newValue: '',
     reason: '',
     notes: '',
   });
+
+  // Reset form data when modal opens with result data
+  useEffect(() => {
+    if (isOpen && result) {
+      setFormData({
+        newValue: result.value,
+        reason: '',
+        notes: '',
+      });
+    }
+  }, [isOpen, result]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 

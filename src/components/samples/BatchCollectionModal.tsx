@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
@@ -37,6 +37,21 @@ const BatchCollectionModal: React.FC<BatchCollectionModalProps> = ({
       priority: 'routine',
     },
   ]);
+
+  // Reset form data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSamples([
+        {
+          id: '1',
+          patientId: '',
+          tests: [],
+          type: 'blood',
+          priority: 'routine',
+        },
+      ]);
+    }
+  }, [isOpen]);
 
   const addSample = () => {
     setSamples([
