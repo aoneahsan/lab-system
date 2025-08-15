@@ -5,8 +5,7 @@ import * as yup from 'yup';
 import { Button } from '@/components/ui/Button';
 import type { InventoryItem } from '@/types';
 import { TextField, SelectField, NumberField, DateField, LexicalEditorField, EmailField, CheckboxField } from '@/components/form-fields';
-// TODO: Use Timestamp for date fields when needed
-// import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 const schema = yup.object({
   itemCode: yup.string().required('Item code is required'),

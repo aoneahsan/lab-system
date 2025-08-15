@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Plus, FileText, CheckCircle, XCircle, Clock, Package } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
+import { CreatePurchaseOrderModal } from './CreatePurchaseOrderModal';
 import type { PurchaseOrder, Vendor } from '@/types/inventory.types';
 
 export default function PurchaseOrders() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  // TODO: Implement create order modal functionality
-  // const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
   const { purchaseOrders, vendors, fetchPurchaseOrders, fetchVendors } = useInventoryStore();
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function PurchaseOrders() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-900">Purchase Orders</h2>
-        <button onClick={() => {/* TODO: Show create order modal */}} className="btn btn-primary">
+        <button onClick={() => setShowCreateOrder(true)} className="btn btn-primary">
           <Plus className="h-4 w-4" />
           Create Order
         </button>
@@ -164,6 +164,11 @@ export default function PurchaseOrders() {
           <div className="text-center py-12 text-gray-500">No purchase orders found</div>
         )}
       </div>
+
+      <CreatePurchaseOrderModal 
+        isOpen={showCreateOrder} 
+        onClose={() => setShowCreateOrder(false)} 
+      />
     </div>
   );
 }

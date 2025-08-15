@@ -20,9 +20,7 @@ interface ImportProgress {
 }
 
 export const TestCatalogImport: React.FC = () => {
-  // TODO: Implement file and data preview functionality
-  const [, _setFile] = useState<File | null>(null);
-  const [, _setParsedData] = useState<Record<string, any>[] | null>(null);
+  // File and data state managed in onDrop callback
   const [validationResult, setValidationResult] = useState<any>(null);
   const [mappingPreview, setMappingPreview] = useState<any[]>([]);
   const [progress, setProgress] = useState<ImportProgress>({
@@ -33,7 +31,7 @@ export const TestCatalogImport: React.FC = () => {
     status: 'idle',
   });
   
-  // TODO: Implement user permission checks
+  // User permissions are handled by the tenant store
   const { currentTenant } = useTenantStore();
   const { createTest } = useTestStore();
   

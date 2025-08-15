@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { sampleService } from '@/services/sample.service';
+import { useAuthStore } from '@/stores/auth.store';
+import { useTenant } from '@/hooks/useTenant';
 import type { Sample, SampleCollection } from '@/types/sample.types';
 
 interface SampleStore {
@@ -207,8 +209,22 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       if (sample) return sample;
 
       // If not found, fetch from service
-      // TODO: Implement in service
-      return null;
+      const { currentUser } = useAuthStore.getState();
+      const { tenant } = useTenant.getState();
+      
+      if (!currentUser || !tenant) {
+        console.warn('Cannot fetch sample: missing auth or tenant context');
+        return null;
+      }
+
+      const fetchedSample = await sampleService.getSampleByBarcode(tenant.id, barcode);
+      if (fetchedSample) {
+        // Add to local state
+        set((state) => ({
+          samples: [...state.samples, fetchedSample]
+        }));
+      }
+      return fetchedSample;
     } catch (error) {
       console.error('Error fetching sample by barcode:', error);
       return null;
@@ -218,9 +234,16 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
   updateBatchSamples: async (updates) => {
     set({ loading: true, error: null });
     try {
-      // TODO: Get tenantId and userId from auth context
-      const tenantId = 'default-tenant';
-      const userId = 'current-user';
+      // Get tenantId and userId from auth context
+      const { currentUser } = useAuthStore.getState();
+      const { tenant } = useTenant.getState();
+      
+      if (!currentUser || !tenant) {
+        throw new Error('Cannot update samples: missing auth or tenant context');
+      }
+      
+      const tenantId = tenant.id;
+      const userId = currentUser.id;
 
       // Group updates by operation type for efficiency
       await Promise.all(

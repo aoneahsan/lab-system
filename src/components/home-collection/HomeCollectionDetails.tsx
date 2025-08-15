@@ -1,11 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   useHomeCollection, 
-  useUpdateCollectionStatus
-  // TODO: Implement sample collection recording
-  // useRecordSampleCollection,
-  // TODO: Implement payment recording  
-  // useRecordPayment 
+  useUpdateCollectionStatus,
+  useRecordSampleCollection,
+  useRecordPayment 
 } from '@/hooks/useHomeCollection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
@@ -40,6 +38,8 @@ export function HomeCollectionDetails() {
   const navigate = useNavigate();
   const { data: collection, isLoading } = useHomeCollection(collectionId!);
   const updateStatus = useUpdateCollectionStatus();
+  const recordSampleCollection = useRecordSampleCollection();
+  const recordPayment = useRecordPayment();
 
   if (isLoading) return <div>Loading...</div>;
   if (!collection) return <div>Collection not found</div>;
@@ -48,6 +48,30 @@ export function HomeCollectionDetails() {
     await updateStatus.mutateAsync({
       collectionId: collection.id,
       status
+    });
+  };
+
+  const handleRecordSampleCollection = async () => {
+    // Generate sample data based on ordered tests
+    const samples = collection.testNames.map((testName, index) => ({
+      sampleId: `${collection.id}_sample_${index + 1}`,
+      tubeType: 'serum' // Default tube type, could be made dynamic
+    }));
+
+    await recordSampleCollection.mutateAsync({
+      collectionId: collection.id,
+      samples
+    });
+  };
+
+  const handleRecordPayment = async () => {
+    // Use the collection amount - would typically come from calculation
+    const amount = collection.totalAmount || 0;
+    
+    await recordPayment.mutateAsync({
+      collectionId: collection.id,
+      amount,
+      paymentMethod: collection.paymentMethod
     });
   };
 
@@ -216,14 +240,34 @@ export function HomeCollectionDetails() {
                 </Button>
               )}
               {collection.status === 'collecting' && (
-                <Button 
-                  onClick={() => handleStatusUpdate('completed')}
-                  disabled={updateStatus.isPending}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Complete Collection
-                </Button>
+                <>
+                  <Button 
+                    onClick={handleRecordSampleCollection}
+                    disabled={recordSampleCollection.isPending}
+                    variant="outline"
+                  >
+                    <TestTube className="h-4 w-4 mr-2" />
+                    Record Sample Collection
+                  </Button>
+                  {collection.paymentStatus !== 'collected' && collection.paymentMethod !== 'online' && (
+                    <Button 
+                      onClick={handleRecordPayment}
+                      disabled={recordPayment.isPending}
+                      variant="outline"
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Record Payment
+                    </Button>
+                  )}
+                  <Button 
+                    onClick={() => handleStatusUpdate('completed')}
+                    disabled={updateStatus.isPending}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Complete Collection
+                  </Button>
+                </>
               )}
               <Button 
                 variant="danger"
