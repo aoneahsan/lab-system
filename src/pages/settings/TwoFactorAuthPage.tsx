@@ -168,6 +168,8 @@ const TwoFactorAuthPage: React.FC = () => {
       if (result.success) {
         setBackupCodes(result.backupCodes || []);
         setSetupStep('backup');
+        setIsEnabled(true); // Mark as enabled after successful verification
+        setCurrentMethod(selectedMethod);
         showToast({
           type: 'success',
           title: 'Verification Successful',
@@ -318,9 +320,12 @@ If you lose access to your authentication device, you can use one of these codes
       {setupStep === 'select' && (
         <div className="space-y-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Choose your authentication method</h2>
-            <div className="space-y-3">
-              {methods.map((method) => (
+            <h2 className="text-xl font-semibold mb-4">
+              {isEnabled ? 'Two-Factor Authentication Status' : 'Choose your authentication method'}
+            </h2>
+            {!isEnabled && (
+              <div className="space-y-3">
+                {methods.map((method) => (
                 <button
                   key={method.id}
                   onClick={() => handleMethodSelect(method.id as 'app' | 'sms' | 'email')}
@@ -347,20 +352,46 @@ If you lose access to your authentication device, you can use one of these codes
                     </div>
                   </div>
                 </button>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {isEnabled && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Manage 2FA</h2>
-              <button
-                onClick={handleDisable2FA}
-                disabled={isLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Disabling...' : 'Disable Two-Factor Authentication'}
-              </button>
+              <h2 className="text-xl font-semibold mb-4">Current 2FA Settings</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded">
+                  <div>
+                    <p className="font-medium">Method</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {currentMethod === 'totp' ? 'Authenticator App' : 
+                       currentMethod === 'sms' ? 'SMS Text Message' :
+                       currentMethod === 'email' ? 'Email' : 'Unknown'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsEnabled(false);
+                      setCurrentMethod(null);
+                      localStorage.removeItem(`2fa_settings_${currentUser?.id}`);
+                    }}
+                    className="px-3 py-1 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400"
+                  >
+                    Change Method
+                  </button>
+                </div>
+                
+                <div className="pt-4 border-t dark:border-gray-700">
+                  <button
+                    onClick={handleDisable2FA}
+                    disabled={isLoading}
+                    className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Disabling...' : 'Disable Two-Factor Authentication'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

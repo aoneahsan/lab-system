@@ -269,6 +269,45 @@ class TwoFactorAuthService {
   }
 
   /**
+   * Get current 2FA status for user
+   */
+  async get2FAStatus(userId: string): Promise<{ enabled: boolean; method?: TwoFactorMethod }> {
+    try {
+      // First try to get from Firestore
+      const settings = await this.get2FASettings(userId);
+      if (settings) {
+        return {
+          enabled: settings.enabled,
+          method: settings.method || undefined,
+        };
+      }
+      
+      // Fallback to localStorage
+      const localSettings = localStorage.getItem(`2fa_settings_${userId}`);
+      if (localSettings) {
+        const parsed = JSON.parse(localSettings);
+        return {
+          enabled: parsed.enabled,
+          method: parsed.method,
+        };
+      }
+      
+      return { enabled: false };
+    } catch (error) {
+      // Check localStorage as fallback
+      const localSettings = localStorage.getItem(`2fa_settings_${userId}`);
+      if (localSettings) {
+        const parsed = JSON.parse(localSettings);
+        return {
+          enabled: parsed.enabled,
+          method: parsed.method,
+        };
+      }
+      return { enabled: false };
+    }
+  }
+
+  /**
    * Disable 2FA for user
    */
   async disable2FA(userId: string): Promise<void> {
@@ -280,6 +319,8 @@ class TwoFactorAuthService {
           updatedAt: serverTimestamp(),
         },
       });
+      // Also clear localStorage
+      localStorage.removeItem(`2fa_settings_${userId}`);
     } catch (error) {
       console.error('Error disabling 2FA:', error);
       // Clear from localStorage as fallback
@@ -349,14 +390,16 @@ class TwoFactorAuthService {
   }
 
   private async save2FASettings(userId: string, settings: TwoFactorSettings): Promise<void> {
+    // Always save to localStorage for immediate access
+    localStorage.setItem(`2fa_settings_${userId}`, JSON.stringify(settings));
+    
     try {
       await updateDoc(doc(firestore, 'users', userId), {
         twoFactorSettings: settings,
       });
     } catch (error) {
-      console.error('Error saving 2FA settings:', error);
-      // For now, we'll store in localStorage as fallback
-      localStorage.setItem(`2fa_settings_${userId}`, JSON.stringify(settings));
+      console.error('Error saving 2FA settings to Firestore:', error);
+      // Already saved to localStorage, so the feature still works
     }
   }
 
