@@ -382,8 +382,18 @@ class TwoFactorAuthService {
     try {
       const userDoc = await getDoc(doc(firestore, 'users', userId));
       const userData = userDoc.data();
-      return userData?.twoFactorSettings || null;
+      
+      if (!userData?.twoFactorSettings) {
+        return null;
+      }
+      
+      // Combine twoFactorSettings with totpSecret if it exists
+      return {
+        ...userData.twoFactorSettings,
+        totpSecret: userData.totpSecret || userData.twoFactorSettings.totpSecret,
+      };
     } catch (error) {
+      console.error('Error getting 2FA settings from Firestore:', error);
       // Return null on permission errors
       return null;
     }
@@ -394,8 +404,19 @@ class TwoFactorAuthService {
     localStorage.setItem(`2fa_settings_${userId}`, JSON.stringify(settings));
     
     try {
+      // Update the user document with 2FA settings
       await updateDoc(doc(firestore, 'users', userId), {
-        twoFactorSettings: settings,
+        twoFactorSettings: {
+          enabled: settings.enabled,
+          method: settings.method,
+          phoneNumber: settings.phoneNumber,
+          email: settings.email,
+          backupCodes: settings.backupCodes,
+          createdAt: settings.createdAt,
+          updatedAt: serverTimestamp(),
+        },
+        // Also store the totpSecret separately (encrypted in production)
+        ...(settings.totpSecret ? { totpSecret: settings.totpSecret } : {}),
       });
     } catch (error) {
       console.error('Error saving 2FA settings to Firestore:', error);

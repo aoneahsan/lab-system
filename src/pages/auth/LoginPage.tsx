@@ -4,6 +4,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { EmailField, PasswordField, CheckboxField } from '@/components/form-fields';
+import { twoFactorAuthService } from '@/services/two-factor-auth.service';
+import { Shield } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -15,6 +17,10 @@ const LoginPage = () => {
     rememberMe: false,
   });
   const [isAuthenticatingBiometric, setIsAuthenticatingBiometric] = useState(false);
+  const [show2FAStep, setShow2FAStep] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [is2FAVerifying, setIs2FAVerifying] = useState(false);
 
   // Check if user can use biometric (has a saved session)
   const canUseBiometric = firebaseUser && isBiometricEnabled;
@@ -50,28 +56,72 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      await login({
+      const userData = await login({
         email: formData.email,
         password: formData.password,
         rememberMe: formData.rememberMe,
       });
 
-      toast.success('Login successful', 'Welcome back to LabFlow!');
-      // Redirect based on user role
-      const user = useAuthStore.getState().currentUser;
-      navigate(user?.role === 'super_admin' ? '/admin' : '/dashboard');
+      // Check if 2FA is enabled for the user
+      const twoFactorStatus = await twoFactorAuthService.get2FAStatus(userData.id);
+      
+      if (twoFactorStatus.enabled) {
+        // Store user ID for 2FA verification
+        setPendingUserId(userData.id);
+        setShow2FAStep(true);
+        
+        // If it's SMS or email, send the code
+        if (twoFactorStatus.method === 'sms' || twoFactorStatus.method === 'email') {
+          await twoFactorAuthService.sendLoginCode(userData.id);
+          toast.info('2FA Required', `Verification code sent via ${twoFactorStatus.method}`);
+        } else {
+          toast.info('2FA Required', 'Enter your authenticator app code');
+        }
+      } else {
+        // No 2FA, proceed with login
+        toast.success('Login successful', 'Welcome back to LabFlow!');
+        navigate(userData.role === 'super_admin' ? '/admin' : '/dashboard');
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Invalid email or password';
       toast.error('Login failed', errorMessage);
     }
   };
 
+  const handle2FAVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!pendingUserId || twoFactorCode.length !== 6) {
+      toast.error('Invalid Code', 'Please enter a 6-digit code');
+      return;
+    }
+
+    setIs2FAVerifying(true);
+    try {
+      const isValid = await twoFactorAuthService.verifyLoginCode(pendingUserId, twoFactorCode);
+      
+      if (isValid) {
+        toast.success('Login successful', 'Welcome back to LabFlow!');
+        const user = useAuthStore.getState().currentUser;
+        navigate(user?.role === 'super_admin' ? '/admin' : '/dashboard');
+      } else {
+        toast.error('Invalid Code', 'The verification code is incorrect');
+        setTwoFactorCode('');
+      }
+    } catch (error) {
+      toast.error('Verification Failed', 'Failed to verify 2FA code');
+    } finally {
+      setIs2FAVerifying(false);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        Sign in to your account
+        {show2FAStep ? 'Two-Factor Authentication' : 'Sign in to your account'}
       </h2>
 
+      {!show2FAStep ? (
       <form onSubmit={handleSubmit} className="space-y-4">
         <EmailField
           label="Email address"
@@ -122,9 +172,62 @@ const LoginPage = () => {
           )}
         </button>
       </form>
+      ) : (
+        <form onSubmit={handle2FAVerification} className="space-y-4">
+          <div className="text-center mb-6">
+            <Shield className="w-12 h-12 mx-auto text-primary-600 dark:text-primary-400 mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">
+              Enter the 6-digit verification code from your authenticator app or the code sent to you
+            </p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Verification Code
+            </label>
+            <input
+              type="text"
+              value={twoFactorCode}
+              onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className="w-full px-4 py-3 text-center text-lg font-mono border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500"
+              maxLength={6}
+              autoFocus
+              required
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={is2FAVerifying || twoFactorCode.length !== 6}
+            className="w-full btn btn-primary"
+          >
+            {is2FAVerifying ? (
+              <span className="flex items-center justify-center">
+                <span className="loading-spinner mr-2"></span>
+                Verifying...
+              </span>
+            ) : (
+              'Verify & Sign In'
+            )}
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => {
+              setShow2FAStep(false);
+              setTwoFactorCode('');
+              setPendingUserId(null);
+            }}
+            className="w-full btn btn-outline"
+          >
+            Back to Login
+          </button>
+        </form>
+      )}
 
-      {/* Biometric Login Option */}
-      {canUseBiometric && (
+      {/* Biometric Login Option - Only show when not in 2FA step */}
+      {canUseBiometric && !show2FAStep && (
         <div className="mt-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -163,17 +266,19 @@ const LoginPage = () => {
         </div>
       )}
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account?{' '}
-          <Link
-            to="/register"
-            className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
-          >
-            Sign up
-          </Link>
-        </p>
-      </div>
+      {!show2FAStep && (
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Don't have an account?{' '}
+            <Link
+              to="/register"
+              className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
+      )}
     </div>
   );
 };

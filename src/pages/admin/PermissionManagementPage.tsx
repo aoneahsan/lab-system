@@ -47,6 +47,7 @@ import { SYSTEM_ROLES } from '@/constants/tenant.constants';
 import { formatPermissionName } from '@/utils/permission.utils';
 import { User, UserRole } from '@/types/auth.types';
 import { toast } from 'react-hot-toast';
+import PageHeader from '@/components/common/PageHeader';
 
 export const PermissionManagementPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -234,21 +235,18 @@ export const PermissionManagementPage: React.FC = () => {
     >
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8 text-blue-600" />
-              Permission Management
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Manage user roles and permissions across the system
-            </p>
-          </div>
-          <Button onClick={handleExportPermissions} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Config
-          </Button>
-        </div>
+        <PageHeader
+          title="Permission Management"
+          subtitle="Manage user roles and permissions across the system"
+          backTo="/admin"
+          backLabel="Back to Admin Panel"
+          actions={
+            <Button onClick={handleExportPermissions} variant="outline">
+              <Download className="h-4 w-4 mr-2" />
+              Export Config
+            </Button>
+          }
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* User List */}

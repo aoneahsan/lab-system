@@ -6,7 +6,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { PatientEditForm } from '@/components/patients/PatientEditForm';
 import type { UpdatePatientData } from '@/types/patient.types';
-import { ArrowLeft } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
 
 const PatientEditPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -75,24 +75,12 @@ const PatientEditPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(`/patients/${patientId}`)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Edit Patient
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Update patient information for {patient.firstName} {patient.lastName}
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Edit Patient"
+        subtitle={`Update patient information for ${patient.firstName} ${patient.lastName}`}
+        backTo={`/patients/${patientId}`}
+        backLabel="Back to Patient Details"
+      />
 
       {/* Form */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg">

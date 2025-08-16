@@ -4,10 +4,9 @@ import { useTenant } from '@/hooks/useTenant';
 import { useNavigate, Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
-import { doc, getDoc } from 'firebase/firestore';
-import { firestore } from '@/config/firebase.config';
 import { biometricService } from '@/services/biometric.service';
 import { Shield } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
 
 const ProfilePage = () => {
   const { currentUser, updateUserProfile } = useAuthStore();
@@ -30,10 +29,12 @@ const ProfilePage = () => {
       if (!currentUser?.id) return;
       
       try {
-        // Check 2FA status from user document
-        const userDoc = await getDoc(doc(firestore, 'users', currentUser.id));
-        const userData = userDoc.data();
-        setTwoFactorEnabled(userData?.twoFactorSettings?.enabled || false);
+        // Import the twoFactorAuthService dynamically to avoid circular dependencies
+        const { twoFactorAuthService } = await import('@/services/two-factor-auth.service');
+        
+        // Check 2FA status using the service method
+        const twoFactorStatus = await twoFactorAuthService.get2FAStatus(currentUser.id);
+        setTwoFactorEnabled(twoFactorStatus.enabled);
         
         // Check biometric status
         const biometricStatus = await biometricService.isBiometricAuthEnabled();
@@ -104,12 +105,12 @@ const ProfilePage = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Manage your personal information and account settings
-        </p>
-      </div>
+      <PageHeader
+        title="Profile"
+        subtitle="Manage your personal information and account settings"
+        backTo="/dashboard"
+        backLabel="Back to Dashboard"
+      />
 
       {/* Personal Information */}
       <div className="card">

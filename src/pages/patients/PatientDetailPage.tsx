@@ -4,6 +4,7 @@ import { usePatient } from '@/hooks/usePatients';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { format } from 'date-fns';
 import type { Patient } from '@/types/patient.types';
+import PageHeader from '@/components/common/PageHeader';
 
 // Tab Components
 import { PatientOverviewTab } from '@/components/patients/tabs/PatientOverviewTab';
@@ -129,7 +130,15 @@ const PatientDetailPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Page Header with Back Navigation */}
+      <PageHeader
+        title="Patient Details"
+        subtitle={`Viewing patient: ${patient.firstName} ${patient.lastName}`}
+        backTo="/patients"
+        backLabel="Back to Patients"
+      />
+      
+      {/* Patient Card */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
@@ -140,9 +149,9 @@ const PatientDetailPage = () => {
               </span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {patient.firstName} {patient.middleName} {patient.lastName}
-              </h1>
+              </h2>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="flex items-center gap-1">
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

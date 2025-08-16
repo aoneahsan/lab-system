@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useToast } from '@/hooks/useToast';
+import PageHeader from '@/components/common/PageHeader';
 
-export const BiometricSettingsPage = () => {
+const BiometricSettingsPage = () => {
   const { isLoading, biometricStatus, preferences, updatePreferences, authenticate, checkStatus } =
     useBiometricAuth();
   const { showToast } = useToast();
@@ -111,7 +112,12 @@ export const BiometricSettingsPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Biometric Settings</h1>
+      <PageHeader
+        title="Biometric Settings"
+        subtitle="Configure biometric authentication for your account"
+        backTo="/settings"
+        backLabel="Back to Settings"
+      />
 
       {/* Biometric Status Card */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Smartphone, Mail, Shield, Check, X, Copy, Phone, MessageSquare } from 'lucide-react';
+import { Smartphone, Mail, Shield, Check, X, Copy, Phone, MessageSquare } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
 import { useAuthStore } from '@/stores/auth.store';
 import { useToast } from '@/hooks/useToast';
 import { twoFactorAuthService } from '@/services/two-factor-auth.service';
@@ -18,6 +19,7 @@ const TwoFactorAuthPage: React.FC = () => {
   const stepFromUrl = searchParams.get('step') as 'select' | 'verify' | 'backup' | 'complete' | null;
   
   const [isEnabled, setIsEnabled] = useState(false);
+  const [currentMethod, setCurrentMethod] = useState<TwoFactorMethod | null>(null);
   const [setupStep, setSetupStep] = useState<'select' | 'verify' | 'backup' | 'complete'>(stepFromUrl || 'select');
   const [selectedMethod, setSelectedMethod] = useState<TwoFactorMethod | null>(methodFromUrl);
   const [verificationCode, setVerificationCode] = useState('');
@@ -28,15 +30,23 @@ const TwoFactorAuthPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState(currentUser?.email || '');
 
-  // Load user permissions on mount
+  // Load user permissions and 2FA status on mount
   useEffect(() => {
-    const loadPermissions = async () => {
+    const loadPermissionsAndStatus = async () => {
       if (currentUser?.id) {
+        // Load permissions
         const perms = await twoFactorAuthService.getUserTwoFactorPermissions(currentUser.id);
         setPermissions(perms);
+        
+        // Check current 2FA status
+        const status = await twoFactorAuthService.get2FAStatus(currentUser.id);
+        setIsEnabled(status.enabled);
+        if (status.enabled && status.method) {
+          setCurrentMethod(status.method);
+        }
       }
     };
-    loadPermissions();
+    loadPermissionsAndStatus();
   }, [currentUser]);
 
   // Update URL when step or method changes
@@ -196,10 +206,8 @@ const TwoFactorAuthPage: React.FC = () => {
   const handleComplete = async () => {
     setIsLoading(true);
     try {
-      // Save 2FA settings
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setIsEnabled(true);
+      // The 2FA is already enabled in handleVerification
+      // This step is just for showing the complete state
       setSetupStep('complete');
       
       showToast({
@@ -215,7 +223,7 @@ const TwoFactorAuthPage: React.FC = () => {
       showToast({
         type: 'error',
         title: 'Setup Failed',
-        message: 'Failed to enable two-factor authentication',
+        message: 'Failed to complete setup',
       });
     } finally {
       setIsLoading(false);
@@ -227,10 +235,20 @@ const TwoFactorAuthPage: React.FC = () => {
       return;
     }
 
+    if (!currentUser?.id) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'User not found',
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await twoFactorAuthService.disable2FA(currentUser.id);
       setIsEnabled(false);
+      setCurrentMethod(null);
       setSetupStep('select');
       setSelectedMethod(null);
       setSetupData(null);
@@ -285,26 +303,12 @@ If you lose access to your authentication device, you can use one of these codes
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <button
-        onClick={() => {
-          // Clear URL params when going back
-          setSearchParams({});
-          navigate('/settings/security');
-        }}
-        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Security Settings
-      </button>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Two-Factor Authentication
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Add an extra layer of security to your account
-        </p>
-      </div>
+      <PageHeader
+        title="Two-Factor Authentication"
+        subtitle="Add an extra layer of security to your account"
+        backTo="/settings/security"
+        backLabel="Back to Security Settings"
+      />
 
       {isEnabled && setupStep !== 'complete' && (
         <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -324,6 +328,7 @@ If you lose access to your authentication device, you can use one of these codes
               {isEnabled ? 'Two-Factor Authentication Status' : 'Choose your authentication method'}
             </h2>
             {!isEnabled && (
+              <>
               <div className="space-y-3">
                 {methods.map((method) => (
                 <button
@@ -354,6 +359,15 @@ If you lose access to your authentication device, you can use one of these codes
                 </button>
                 ))}
               </div>
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => navigate('/settings/security')}
+                  className="w-full px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+              </>
             )}
           </div>
 
@@ -371,10 +385,18 @@ If you lose access to your authentication device, you can use one of these codes
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      setIsEnabled(false);
-                      setCurrentMethod(null);
-                      localStorage.removeItem(`2fa_settings_${currentUser?.id}`);
+                    onClick={async () => {
+                      // Disable current 2FA to change method
+                      if (currentUser?.id) {
+                        await twoFactorAuthService.disable2FA(currentUser.id);
+                        setIsEnabled(false);
+                        setCurrentMethod(null);
+                        showToast({
+                          type: 'info',
+                          title: 'Method Reset',
+                          message: 'You can now set up a different 2FA method',
+                        });
+                      }
                     }}
                     className="px-3 py-1 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400"
                   >

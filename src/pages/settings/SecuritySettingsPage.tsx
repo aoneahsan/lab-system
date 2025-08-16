@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Shield, Key, Smartphone, History, Lock, AlertTriangle, Fingerprint } from 'lucide-react';
+import PageHeader from '@/components/common/PageHeader';
 
 interface SecurityOption {
   title: string;
@@ -60,17 +61,12 @@ const SecuritySettingsPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Shield className="w-8 h-8 text-primary-600" />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Security & Privacy
-          </h1>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage your account security settings and privacy preferences
-        </p>
-      </div>
+      <PageHeader
+        title="Security & Privacy"
+        subtitle="Manage your account security settings and privacy preferences"
+        backTo="/settings"
+        backLabel="Back to Settings"
+      />
 
       <div className="space-y-4">
         {securityOptions.map((option) => (
