@@ -567,6 +567,10 @@ class HotkeysService {
   }
 
   // Public methods
+  public getHotkeys(): HotkeyBinding[] {
+    return Array.from(this.hotkeys.values());
+  }
+  
   public getAllHotkeys(): HotkeyBinding[] {
     return Array.from(this.hotkeys.values());
   }
@@ -638,6 +642,34 @@ class HotkeysService {
     if (hotkey.meta) parts.push('Cmd');
     parts.push(hotkey.key);
     return parts.join('+');
+  }
+
+  public initialize(navigate?: any) {
+    // Store navigate function if provided for navigation actions
+    if (navigate) {
+      this.navigate = navigate;
+    }
+  }
+
+  private navigate?: any;
+
+  public registerCustomAction(actionId: string, handler: () => void) {
+    this.registerActionListener(actionId, handler as any);
+  }
+
+  public unregisterCustomAction(actionId: string) {
+    // Remove all listeners for this action
+    this.listeners.delete(actionId);
+  }
+
+  public addHotkey(hotkey: HotkeyBinding) {
+    this.hotkeys.set(hotkey.id, hotkey);
+    this.saveHotkeys();
+  }
+
+  public removeHotkey(id: string) {
+    this.hotkeys.delete(id);
+    this.saveHotkeys();
   }
 }
 

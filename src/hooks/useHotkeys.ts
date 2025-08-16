@@ -1,10 +1,10 @@
 import { useEffect, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { hotkeysService, Hotkey, HotkeyConfig } from '@/services/hotkeys.service';
+import { hotkeysService, HotkeyBinding } from '@/services/hotkeys.service';
 
 export const useHotkeys = () => {
   const navigate = useNavigate();
-  const [hotkeys, setHotkeys] = useState<HotkeyConfig>(hotkeysService.getHotkeys());
+  const [hotkeys, setHotkeys] = useState<HotkeyBinding[]>(hotkeysService.getHotkeys());
   const [enabled, setEnabled] = useState(hotkeysService.isEnabled());
 
   useEffect(() => {
@@ -24,12 +24,12 @@ export const useHotkeys = () => {
     hotkeysService.unregisterCustomAction(actionId);
   }, []);
 
-  const updateHotkey = useCallback((id: string, newHotkey: Partial<Hotkey>) => {
+  const updateHotkey = useCallback((id: string, newHotkey: Partial<HotkeyBinding>) => {
     hotkeysService.updateHotkey(id, newHotkey);
     setHotkeys(hotkeysService.getHotkeys());
   }, []);
 
-  const addHotkey = useCallback((hotkey: Hotkey) => {
+  const addHotkey = useCallback((hotkey: HotkeyBinding) => {
     hotkeysService.addHotkey(hotkey);
     setHotkeys(hotkeysService.getHotkeys());
   }, []);
@@ -50,7 +50,7 @@ export const useHotkeys = () => {
     setEnabled(newEnabled);
   }, [enabled]);
 
-  const formatHotkey = useCallback((hotkey: Hotkey) => {
+  const formatHotkey = useCallback((hotkey: HotkeyBinding) => {
     return hotkeysService.formatHotkeyDisplay(hotkey);
   }, []);
 
