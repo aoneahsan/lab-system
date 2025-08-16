@@ -1,0 +1,337 @@
+{
+  "summary": {
+    "totalPages": 63,
+    "successfulPages": 63,
+    "failedPages": 0,
+    "totalErrors": 9,
+    "totalWarnings": 0,
+    "totalInteractionsTested": 28,
+    "consoleErrors": 42,
+    "timestamp": "2025-08-16T14:48:07.414Z"
+  },
+  "details": {
+    "errors": [
+      {
+        "page": "should test all buttons and clickable elements on login page",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `[role=\"dialog\"], .modal, [data-modal]`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:46:01.904Z"
+      },
+      {
+        "page": "should test all buttons and clickable elements on login page",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `[role=\"dialog\"], .modal, [data-modal]`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:46:14.251Z"
+      },
+      {
+        "page": "should test all buttons and clickable elements on login page",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `[role=\"dialog\"], .modal, [data-modal]`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:46:26.695Z"
+      },
+      {
+        "page": "should test all dropdowns and selects on accessible pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `select`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:46:48.527Z"
+      },
+      {
+        "page": "should test all dropdowns and selects on accessible pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `select`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:47:00.498Z"
+      },
+      {
+        "page": "should test all dropdowns and selects on accessible pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `select`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:47:12.621Z"
+      },
+      {
+        "page": "should test basic accessibility on key pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `img`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:47:39.068Z"
+      },
+      {
+        "page": "should test basic accessibility on key pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `img`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:47:51.048Z"
+      },
+      {
+        "page": "should test basic accessibility on key pages",
+        "error": "Timed out retrying after 10000ms: Expected to find element: `img`, but never found it.",
+        "type": "cypress-failure",
+        "timestamp": "2025-08-16T14:48:04.126Z"
+      }
+    ],
+    "warnings": [],
+    "successfulPages": [
+      "Login Page (/login)",
+      "Register Page (/register)",
+      "Forgot Password Page (/forgot-password)",
+      "Setup Demo Page (/setup-demo)",
+      "Create Super Admin (/setup-super-admin)",
+      "Onboarding Page - Correctly protected",
+      "Dashboard Page - Correctly protected",
+      "Debug Dashboard - Correctly protected",
+      "Appointments Page - Correctly protected",
+      "Appointment Detail Page - Correctly protected",
+      "Home Collection Page - Correctly protected",
+      "Home Collection Form Page - Correctly protected",
+      "Home Collection Detail Page - Correctly protected",
+      "Route Management Page - Correctly protected",
+      "Patients Page - Correctly protected",
+      "Patient Detail Page - Correctly protected",
+      "Patient Edit Page - Correctly protected",
+      "Tests Page - Correctly protected",
+      "Test Panels Page - Correctly protected",
+      "Test Orders Page - Correctly protected",
+      "Test Order Detail Page - Correctly protected",
+      "Test Detail Page - Correctly protected",
+      "Order Dashboard Page - Correctly protected",
+      "Samples Dashboard - Correctly protected",
+      "Sample Registration - Correctly protected",
+      "Sample Collections Page - Correctly protected",
+      "Sample Scan Page - Correctly protected",
+      "Sample Detail Page - Correctly protected",
+      "Results Page - Correctly protected",
+      "Result Entry Page - Correctly protected",
+      "Result Review Page - Correctly protected",
+      "Result Validation Rules Page - Correctly protected",
+      "Billing Page - Correctly protected",
+      "Invoice Detail Page - Correctly protected",
+      "Payments Page - Correctly protected",
+      "Insurance Claims Page - Correctly protected",
+      "Claim Detail Page - Correctly protected",
+      "Financial Reports Page - Correctly protected",
+      "Inventory Dashboard - Correctly protected",
+      "Vendors Page - Correctly protected",
+      "Quality Control Page - Correctly protected",
+      "Report Dashboard - Correctly protected",
+      "Analytics Page - Correctly protected",
+      "Equipment Page - Correctly protected",
+      "Users Page - Correctly protected",
+      "User Detail Page - Correctly protected",
+      "EMR Connections Page - Correctly protected",
+      "EMR Connection Detail Page - Correctly protected",
+      "Settings Page - Correctly protected",
+      "Biometric Settings Page - Correctly protected",
+      "Validation Rules Page - Correctly protected",
+      "Custom Fields Page - Correctly protected",
+      "App Update Settings Page - Correctly protected",
+      "Hotkeys Page - Correctly protected",
+      "Security Settings Page - Correctly protected",
+      "Two Factor Auth Page - Correctly protected",
+      "Profile Page - Correctly protected",
+      "Customer Portal Page - Correctly protected",
+      "Workflow Automation Page - Correctly protected",
+      "Voice Dictation Demo - Correctly protected",
+      "Admin Panel - Correctly protected",
+      "Clinician App - Correctly protected",
+      "404 Not Found Page - 404 handling works"
+    ],
+    "failedPages": [],
+    "testedInteractions": [
+      "Login page - Button: Sign in",
+      "Login page - Button: Perf",
+      "Login page - Button: Sign in",
+      "Login page - Button: Perf",
+      "Login page - Button: Sign in",
+      "Login page - Button: Perf",
+      "Register form - Validation working",
+      "Register form - Input: firstName (text)",
+      "Register form - Input: lastName (text)",
+      "Register form - Input: email (email)",
+      "Register form - Input: unnamed (text)",
+      "Register form - Input: unnamed (tel)",
+      "Register form - Input: tenantCode (text)",
+      "Register form - Input: password (password)",
+      "Register form - Input: confirmPassword (password)",
+      "Register form - Input: acceptTerms (checkbox)",
+      "/login - mobile viewport OK",
+      "/register - mobile viewport OK",
+      "/dashboard - mobile viewport OK",
+      "/login - tablet viewport OK",
+      "/register - tablet viewport OK",
+      "/dashboard - tablet viewport OK",
+      "/login - desktop viewport OK",
+      "/register - desktop viewport OK",
+      "/dashboard - desktop viewport OK",
+      "/login - Load time: 639ms",
+      "/register - Load time: 607ms",
+      "/dashboard - Load time: 1404ms"
+    ],
+    "consoleErrors": [
+      {
+        "page": "/register",
+        "message": "[2025-08-16T14:43:50.379Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/register",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:44:21.905Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:44:38.755Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:44:40.570Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:15.179Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:16.985Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:18.770Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:28.027Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:29.954Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:34.422Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:44.394Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:46.165Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:45:47.967Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:46:33.251Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/register",
+        "message": "[2025-08-16T14:47:16.349Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/register",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:47:17.700Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:47:19.007Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:47:22.901Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:47:24.159Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/register",
+        "message": "[2025-08-16T14:47:26.109Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/register",
+        "message": "[Error] [object Object]"
+      },
+      {
+        "page": "/login",
+        "message": "[2025-08-16T14:47:27.314Z]  @firebase/firestore: Firestore (12.1.0): Could not reach Cloud Firestore backend. Connection failed 1 times. Most recent error: FirebaseError: [code=unavailable]: The operation could not be completed\nThis typically indicates that your device does not have a healthy Internet connection at the moment. The client will operate in offline mode until it is able to successfully connect to the backend."
+      },
+      {
+        "page": "/login",
+        "message": "[Error] [object Object]"
+      }
+    ]
+  }
+}
