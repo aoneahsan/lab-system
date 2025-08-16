@@ -285,6 +285,68 @@ const TwoFactorAuthPage: React.FC = () => {
     });
   };
 
+  const handleSendSMSCode = async () => {
+    if (!phoneNumber || !currentUser?.id) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter a valid phone number',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // For SMS, we need to send a code to the phone number
+      const setup = await twoFactorAuthService.sendSMSCode(currentUser.id, phoneNumber);
+      setSetupData(setup);
+      showToast({
+        type: 'success',
+        title: 'Code Sent',
+        message: `A verification code has been sent to ${phoneNumber}`,
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Failed to Send Code',
+        message: error instanceof Error ? error.message : 'Failed to send SMS code',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendEmailCode = async () => {
+    if (!email || !currentUser?.id) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter a valid email address',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // For email, we need to send a code to the email address
+      const setup = await twoFactorAuthService.sendEmailCode(currentUser.id, email);
+      setSetupData(setup);
+      showToast({
+        type: 'success',
+        title: 'Code Sent',
+        message: `A verification code has been sent to ${email}`,
+      });
+    } catch (error) {
+      showToast({
+        type: 'error',
+        title: 'Failed to Send Code',
+        message: error instanceof Error ? error.message : 'Failed to send email code',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const downloadBackupCodes = () => {
     const content = `LabFlow Two-Factor Authentication Backup Codes
 Account: ${currentUser?.email}

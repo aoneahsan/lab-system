@@ -17,6 +17,7 @@ const QuickTestOrder: React.FC<QuickTestOrderProps> = ({ preselectedPatientId, o
   const [selectedTests, setSelectedTests] = useState<string[]>([]);
   const [priority, setPriority] = useState<'routine' | 'stat' | 'asap'>('routine');
   const [notes, setNotes] = useState('');
+  const [testSearch, setTestSearch] = useState('');
 
   const { data: patientsData } = usePatients();
   const patients = patientsData?.patients || [];
@@ -54,10 +55,46 @@ const QuickTestOrder: React.FC<QuickTestOrderProps> = ({ preselectedPatientId, o
   );
 
   const handleQuickSelect = (testCodes: string[]) => {
-    const testIds = tests
-      .filter((test) => testCodes.includes(test.code))
-      .map((test) => test.id);
-    setSelectedTests([...new Set([...selectedTests, ...testIds])]);
+    // Try to match by test code or by test name (case-insensitive)
+    const matchedTests = tests.filter((test) => {
+      const testCode = test.code?.toUpperCase() || '';
+      const testName = test.name?.toUpperCase() || '';
+      
+      return testCodes.some(code => {
+        const upperCode = code.toUpperCase();
+        // Match by exact code
+        if (testCode === upperCode) return true;
+        // Match by code containing the search term
+        if (testCode.includes(upperCode)) return true;
+        // Match by name containing the search term
+        if (testName.includes(upperCode)) return true;
+        // Match by name starting with the search term
+        if (testName.startsWith(upperCode)) return true;
+        return false;
+      });
+    });
+    
+    if (matchedTests.length === 0) {
+      // If no matches found, show a helpful message
+      toast.error(
+        `No tests found matching: ${testCodes.join(', ')}. ` +
+        `Please ensure tests are configured in the system with these codes.`
+      );
+      return;
+    }
+    
+    // Get test IDs that are not already selected
+    const newTestIds = matchedTests
+      .map(test => test.id)
+      .filter(id => !selectedTests.includes(id));
+    
+    if (newTestIds.length === 0) {
+      toast.info('All tests from this panel are already selected');
+      return;
+    }
+    
+    setSelectedTests([...selectedTests, ...newTestIds]);
+    toast.success(`Added ${newTestIds.length} test(s) to the order`);
   };
 
   const handleSubmit = async () => {
@@ -201,21 +238,114 @@ const QuickTestOrder: React.FC<QuickTestOrderProps> = ({ preselectedPatientId, o
                     Quick Select Common Tests
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {commonTestGroups.map((group) => (
-                      <button
-                        key={group.name}
-                        onClick={() => handleQuickSelect(group.tests)}
-                        className="p-3 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
-                      >
-                        <div className="font-medium text-sm text-gray-900 dark:text-white">
-                          {group.name}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {group.tests.join(', ')}
-                        </div>
-                      </button>
-                    ))}
+                    {commonTestGroups.map((group) => {
+                      // Check if any tests from this group are already selected
+                      const groupTests = tests.filter((test) => {
+                        const testCode = test.code?.toUpperCase() || '';
+                        const testName = test.name?.toUpperCase() || '';
+                        
+                        return group.tests.some(code => {
+                          const upperCode = code.toUpperCase();
+                          return testCode === upperCode || 
+                                 testCode.includes(upperCode) || 
+                                 testName.includes(upperCode) ||
+                                 testName.startsWith(upperCode);
+                        });
+                      });
+                      const groupTestIds = groupTests.map(test => test.id);
+                      const isPartiallySelected = groupTestIds.some(id => selectedTests.includes(id));
+                      const isFullySelected = groupTestIds.length > 0 && groupTestIds.every(id => selectedTests.includes(id));
+                      
+                      return (
+                        <button
+                          key={group.name}
+                          onClick={() => handleQuickSelect(group.tests)}
+                          className={`p-3 text-left border rounded-lg transition-all ${
+                            isFullySelected 
+                              ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-400' 
+                              : isPartiallySelected 
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                              : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium text-sm text-gray-900 dark:text-white">
+                                {group.name}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {group.tests.join(', ')}
+                              </div>
+                            </div>
+                            {isFullySelected && (
+                              <span className="text-green-500 dark:text-green-400">✓</span>
+                            )}
+                            {isPartiallySelected && !isFullySelected && (
+                              <span className="text-blue-500 dark:text-blue-400">◐</span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
+                </div>
+
+                {/* Manual Test Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Search Tests
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={testSearch}
+                      onChange={(e) => setTestSearch(e.target.value)}
+                      placeholder="Search by test name or code..."
+                      className="input pl-10"
+                    />
+                    <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  </div>
+                  {testSearch && (
+                    <div className="mt-2 max-h-40 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
+                      {tests
+                        .filter(
+                          (test) =>
+                            !selectedTests.includes(test.id) &&
+                            (test.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+                              test.code.toLowerCase().includes(testSearch.toLowerCase()))
+                        )
+                        .slice(0, 10)
+                        .map((test) => (
+                          <button
+                            key={test.id}
+                            onClick={() => {
+                              setSelectedTests([...selectedTests, test.id]);
+                              setTestSearch('');
+                              toast.success(`Added ${test.name} to the order`);
+                            }}
+                            className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800 border-b last:border-b-0"
+                          >
+                            <div className="font-medium text-sm text-gray-900 dark:text-white">
+                              {test.name}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              Code: {test.code} | Category: {test.category}
+                            </div>
+                          </button>
+                        ))}
+                      {testSearch &&
+                        tests.filter(
+                          (test) =>
+                            !selectedTests.includes(test.id) &&
+                            (test.name.toLowerCase().includes(testSearch.toLowerCase()) ||
+                              test.code.toLowerCase().includes(testSearch.toLowerCase()))
+                        ).length === 0 && (
+                          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            No tests found matching "{testSearch}"
+                          </div>
+                        )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Selected Tests */}

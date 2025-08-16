@@ -126,7 +126,7 @@ class TwoFactorAuthService {
 
     // Send verification code
     const code = this.generateVerificationCode();
-    await this.sendSMSCode(phoneNumber, code);
+    await this._sendSMSCode(phoneNumber, code);
 
     // Store challenge for verification
     await this.storeChallenge(userId, 'sms', code);
@@ -149,7 +149,7 @@ class TwoFactorAuthService {
 
     // Send verification code
     const code = this.generateVerificationCode();
-    await this.sendEmailCode(email, code);
+    await this._sendEmailCode(email, code);
 
     // Store challenge for verification
     await this.storeChallenge(userId, 'email', code);
@@ -340,11 +340,11 @@ class TwoFactorAuthService {
 
     if (settings.method === 'sms' && settings.phoneNumber) {
       const code = this.generateVerificationCode();
-      await this.sendSMSCode(settings.phoneNumber, code);
+      await this._sendSMSCode(settings.phoneNumber, code);
       await this.storeChallenge(userId, 'sms', code);
     } else if (settings.method === 'email' && settings.email) {
       const code = this.generateVerificationCode();
-      await this.sendEmailCode(settings.email, code);
+      await this._sendEmailCode(settings.email, code);
       await this.storeChallenge(userId, 'email', code);
     }
     // TOTP doesn't need to send a code
@@ -464,11 +464,62 @@ class TwoFactorAuthService {
     return true;
   }
 
-  private async sendSMSCode(phoneNumber: string, code: string): Promise<void> {
+  /**
+   * Send SMS verification code for 2FA setup
+   */
+  async sendSMSCode(userId: string, phoneNumber: string): Promise<TwoFactorSetupData> {
+    // Check permissions
+    const permissions = await this.getUserTwoFactorPermissions(userId);
+    if (!permissions.canUseSMS) {
+      throw new Error('SMS authentication is not available for your account');
+    }
+
+    // Validate phone number
+    if (!this.isValidPhoneNumber(phoneNumber)) {
+      throw new Error('Invalid phone number format');
+    }
+
+    // Generate and send code
+    const code = this.generateVerificationCode();
+    await this._sendSMSCode(phoneNumber, code);
+    
+    // Store challenge for verification
+    await this.storeChallenge(userId, 'sms', code);
+    
+    return {
+      method: 'sms',
+      phoneNumber,
+    };
+  }
+
+  /**
+   * Send Email verification code for 2FA setup
+   */
+  async sendEmailCode(userId: string, email: string): Promise<TwoFactorSetupData> {
+    // Check permissions
+    const permissions = await this.getUserTwoFactorPermissions(userId);
+    if (!permissions.canUseEmail) {
+      throw new Error('Email authentication is not available for your account');
+    }
+
+    // Generate and send code
+    const code = this.generateVerificationCode();
+    await this._sendEmailCode(email, code);
+    
+    // Store challenge for verification
+    await this.storeChallenge(userId, 'email', code);
+    
+    return {
+      method: 'email',
+      email,
+    };
+  }
+
+  private async _sendSMSCode(phoneNumber: string, code: string): Promise<void> {
     await smsService.sendSMS(phoneNumber, `Your LabFlow verification code is: ${code}`);
   }
 
-  private async sendEmailCode(email: string, code: string): Promise<void> {
+  private async _sendEmailCode(email: string, code: string): Promise<void> {
     await emailService.sendEmail({
       to: email,
       subject: 'LabFlow Two-Factor Authentication Code',
