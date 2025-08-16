@@ -37,8 +37,8 @@ const ProfilePage = () => {
         setTwoFactorEnabled(twoFactorStatus.enabled);
         
         // Check biometric status
-        const biometricStatus = await biometricService.isBiometricAuthEnabled();
-        setBiometricEnabled(biometricStatus);
+        const preferences = await biometricService.getPreferences();
+        setBiometricEnabled(preferences.enabled);
       } catch (error) {
         console.error('Error checking security status:', error);
       }
