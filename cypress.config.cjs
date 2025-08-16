@@ -1,9 +1,8 @@
-import { defineConfig } from 'cypress';
-import viteConfig from './vite.config';
+const { defineConfig } = require('cypress');
 
-export default defineConfig({
+module.exports = defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:5173',
+    baseUrl: 'http://localhost:6294',
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'cypress/support/e2e.ts',
     video: true,
@@ -29,17 +28,17 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // Task to reset database for tests
       on('task', {
-        async resetDatabase() {
+        resetDatabase() {
           // Reset test database
           console.log('Resetting test database...');
           return null;
         },
-        async seedDatabase(data) {
+        seedDatabase(data) {
           // Seed test database with data
           console.log('Seeding database with:', data);
           return null;
         },
-        async getTestUsers() {
+        getTestUsers() {
           // Return test user credentials
           return {
             admin: {
@@ -84,7 +83,6 @@ export default defineConfig({
     devServer: {
       framework: 'react',
       bundler: 'vite',
-      viteConfig,
     },
     specPattern: 'src/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'cypress/support/component.ts',
