@@ -51,7 +51,7 @@ export default function SampleDashboard() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Sample Management</h1>
-        <button onClick={() => navigate('/samples/register')} className="btn btn-primary">
+        <button onClick={() => navigate('/samples/register')} className="btn btn-primary" data-new-sample>
           Register New Sample
         </button>
       </div>

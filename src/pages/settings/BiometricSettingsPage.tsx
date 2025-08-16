@@ -164,6 +164,7 @@ const BiometricSettingsPage = () => {
           onClick={handleRefreshStatus}
           className="mt-4 btn btn-secondary btn-sm"
           disabled={isLoading || isRefreshing}
+          data-refresh-button
         >
           {isRefreshing ? 'Refreshing...' : 'Refresh Status'}
         </button>

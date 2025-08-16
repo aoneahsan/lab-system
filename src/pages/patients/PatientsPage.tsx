@@ -7,6 +7,7 @@ import { PatientListTable } from '@/components/patients/PatientListTable';
 import { PatientRegistrationForm } from '@/components/patients/PatientRegistrationForm';
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
+import { KeyboardHint } from '@/components/common/KeyboardHint';
 import type { PatientSearchFilters as Filters } from '@/types/patient.types';
 
 const PatientsPage = () => {
@@ -45,11 +46,12 @@ const PatientsPage = () => {
           </p>
         </div>
         <PermissionGate permission={PERMISSIONS.PATIENTS_CREATE} hideIfUnauthorized>
-          <button onClick={() => setShowRegistrationForm(true)} className="btn btn-primary">
+          <button onClick={() => setShowRegistrationForm(true)} className="btn btn-primary" data-new-patient>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             New Patient
+            <KeyboardHint keys={['Ctrl', 'N']} />
           </button>
         </PermissionGate>
       </div>

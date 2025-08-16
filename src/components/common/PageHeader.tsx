@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { KeyboardHint } from './KeyboardHint';
 
 interface PageHeaderProps {
   title: string;
@@ -27,9 +28,11 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         <Link
           to={backTo}
           className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors"
+          data-back-button
         >
           <ArrowLeft className="w-4 h-4" />
           {backLabel}
+          <KeyboardHint keys={['Esc']} className="ml-2" />
         </Link>
       )}
       

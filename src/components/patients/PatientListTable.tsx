@@ -99,12 +99,14 @@ export const PatientListTable = ({
             <Link
               to={`/patients/${info.row.original.id}`}
               className="text-sm text-primary-600 hover:text-primary-700"
+              data-view-button
             >
               View
             </Link>
             <Link
               to={`/patients/${info.row.original.id}/edit`}
               className="text-sm text-primary-600 hover:text-primary-700"
+              data-edit-button
             >
               Edit
             </Link>

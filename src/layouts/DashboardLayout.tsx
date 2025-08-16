@@ -203,6 +203,7 @@ export const DashboardLayout = () => {
             onClick={() => featureModal.openModal()}
             className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="App Features (Shift+?)"
+            data-info-trigger
           >
             <Info className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </button>
@@ -211,6 +212,7 @@ export const DashboardLayout = () => {
 
       {/* Sidebar */}
       <div
+        data-sidebar
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 transition-transform duration-300 ${isImpersonating ? 'top-10' : 'top-0'}`}

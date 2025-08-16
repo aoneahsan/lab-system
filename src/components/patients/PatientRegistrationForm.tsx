@@ -2,6 +2,7 @@ import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useCreatePatient } from '@/hooks/usePatients';
 import { useCustomFieldsByModule, useValidateCustomFields } from '@/hooks/useCustomFields';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
+import { KeyboardHint } from '@/components/common/KeyboardHint';
 import type { CreatePatientData } from '@/types/patient.types';
 import {
   TextField,
@@ -361,8 +362,9 @@ export const PatientRegistrationForm = ({ onSuccess, onCancel }: PatientRegistra
         <button type="button" onClick={onCancel} className="btn btn-secondary" disabled={isPending}>
           Cancel
         </button>
-        <button type="submit" className="btn btn-primary" disabled={isPending}>
+        <button type="submit" className="btn btn-primary" disabled={isPending} data-save-button>
           {isPending ? 'Creating...' : 'Create Patient'}
+          <KeyboardHint keys={['Ctrl', 'S']} />
         </button>
       </div>
       </form>
