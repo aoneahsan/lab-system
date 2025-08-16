@@ -15,6 +15,7 @@ import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
 
@@ -131,13 +132,18 @@ const ResultReviewPage: React.FC = () => {
     approveResultsMutation.mutate(selectedResults);
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (selectedResults.length === 0) {
       toast.error('No Selection', 'Please select results to reject');
       return;
     }
 
-    const reason = prompt('Please provide a reason for rejection:');
+    const reason = await modalService.prompt({
+      title: 'Rejection Reason',
+      message: 'Please provide a reason for rejection:',
+      placeholder: 'Enter rejection reason...',
+      required: true
+    });
     if (reason) {
       rejectResultsMutation.mutate({ resultIds: selectedResults, reason });
     }

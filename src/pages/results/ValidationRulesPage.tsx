@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Settings, AlertTriangle, Trash2, Edit } from 'lucide-r
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { resultValidationService } from '@/services/result-validation.service';
 import { useTests } from '@/hooks/useTests';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 import ValidationRuleModal from '@/components/results/ValidationRuleModal';
 import type { ResultValidationRule } from '@/types/result.types';
@@ -45,8 +46,13 @@ const ValidationRulesPage: React.FC = () => {
     setShowRuleModal(true);
   };
 
-  const handleDeleteRule = (rule: ResultValidationRule) => {
-    if (confirm(`Are you sure you want to delete this ${rule.ruleType} rule?`)) {
+  const handleDeleteRule = async (rule: ResultValidationRule) => {
+    if (await modalService.confirmDanger({
+      title: 'Delete Validation Rule',
+      message: `Are you sure you want to delete this ${rule.ruleType} rule?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       deleteRuleMutation.mutate(rule.id);
     }
   };

@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { appUpdateService } from '@/services/app-update.service';
 import { Capacitor } from '@capacitor/core';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 
 export const AppUpdateSettings: React.FC = () => {
@@ -68,7 +69,12 @@ export const AppUpdateSettings: React.FC = () => {
   };
 
   const resetApp = async () => {
-    if (confirm('This will remove all live updates and reset the app to its original state. Continue?')) {
+    if (await modalService.confirm({
+      title: 'Reset App',
+      message: 'This will remove all live updates and reset the app to its original state. Continue?',
+      confirmText: 'Reset',
+      cancelText: 'Cancel'
+    })) {
       await appUpdateService.reset();
     }
   };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Mail, Download, Plus, Edit2, Trash2, Play, Pause } from 'lucide-react';
 import { format } from 'date-fns';
+import { modalService } from '@/services/modalService';
 
 interface ScheduledReport {
   id: string;
@@ -95,8 +96,13 @@ export default function ScheduledReports() {
     );
   };
 
-  const handleDelete = (reportId: string) => {
-    if (window.confirm('Are you sure you want to delete this scheduled report?')) {
+  const handleDelete = async (reportId: string) => {
+    if (await modalService.confirmDanger({
+      title: 'Delete Scheduled Report',
+      message: 'Are you sure you want to delete this scheduled report?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       setScheduledReports(reports => reports.filter(report => report.id !== reportId));
     }
   };

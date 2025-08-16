@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { modalService } from '@/services/modal.service';
 import { Plus, Download, Upload, TestTube, BarChart3 } from 'lucide-react';
 import {
   useTests,
@@ -61,7 +62,11 @@ const TestsPage: React.FC = () => {
   };
 
   const handleDeleteTest = async (test: TestDefinition) => {
-    if (window.confirm(`Are you sure you want to delete ${test.name}?`)) {
+    const confirmed = await modalService.confirmDanger(
+      `Are you sure you want to delete ${test.name}?`,
+      { title: 'Delete Test' }
+    );
+    if (confirmed) {
       await deleteTestMutation.mutateAsync(test.id);
     }
   };

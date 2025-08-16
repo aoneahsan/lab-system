@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTATRules, useDeleteTATRule } from '@/hooks/useWorkflowAutomation';
 import { TATRuleModal } from './TATRuleModal';
+import { modalService } from '@/services/modalService';
 import type { TATRule } from '@/types/workflow-automation.types';
 
 export const TATRulesList: React.FC = () => {
@@ -20,7 +21,12 @@ export const TATRulesList: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this TAT rule?')) {
+    if (await modalService.confirmDanger({
+      title: 'Delete TAT Rule',
+      message: 'Are you sure you want to delete this TAT rule?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteMutation.mutateAsync(id);
     }
   };

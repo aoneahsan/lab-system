@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Network } from '@capacitor/network';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/hooks/useToast';
 
 interface SyncStats {
@@ -82,12 +83,15 @@ const PhlebotomistSyncPage: React.FC = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedCollections.length === 0) return;
 
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${selectedCollections.length} collection(s)?`
-    );
+    const confirmDelete = await modalService.confirmDanger({
+      title: 'Delete Collections',
+      message: `Are you sure you want to delete ${selectedCollections.length} collection(s)?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    });
 
     if (confirmDelete) {
       selectedCollections.forEach((id) => removeCollection(id));

@@ -4,6 +4,7 @@ import { useInventoryStore } from '@/stores/inventory.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { VendorForm } from '@/components/inventory/VendorForm';
 import { Button } from '@/components/ui/Button';
+import { modalService } from '@/services/modalService';
 import type { Vendor } from '@/types/inventory.types';
 import { toast } from 'sonner';
 
@@ -48,7 +49,12 @@ const VendorsPage: React.FC = () => {
   const handleDeleteVendor = async (vendor: Vendor) => {
     if (!currentTenant) return;
     
-    if (window.confirm(`Are you sure you want to delete ${vendor.name}?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete Vendor',
+      message: `Are you sure you want to delete ${vendor.name}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       try {
         await deleteVendor(vendor.id);
         toast.success('Vendor deleted successfully');

@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
 import { biometricService } from '@/services/biometric.service';
+import { modalService } from '@/services/modalService';
 import { Shield, Keyboard, Eye } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
@@ -440,8 +441,13 @@ const ProfilePage = () => {
               </p>
             </div>
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+              onClick={async () => {
+                if (await modalService.confirmDanger({
+                  title: 'Delete Account',
+                  message: 'Are you sure you want to delete your account? This action cannot be undone.',
+                  confirmText: 'Delete',
+                  cancelText: 'Cancel'
+                })) {
                   toast.info('Account Deletion', 'Please contact your administrator to delete your account.');
                 }
               }}

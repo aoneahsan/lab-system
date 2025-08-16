@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
 import { useCustomFieldsByModule, useCreateCustomField, useUpdateCustomField, useDeleteCustomField } from '@/hooks/useCustomFields';
 import { CustomFieldDefinitionForm } from '@/components/custom-fields/CustomFieldDefinitionForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { modalService } from '@/services/modalService';
 import type { CustomFieldDefinition, CreateCustomFieldData, UpdateCustomFieldData } from '@/types/custom-field.types';
 
 const modules = [
@@ -39,7 +40,12 @@ const CustomFieldsPage = () => {
   };
 
   const handleDelete = async (field: CustomFieldDefinition) => {
-    if (!confirm(`Are you sure you want to delete the field "${field.label}"? This action cannot be undone.`)) {
+    if (!await modalService.confirmDanger({
+      title: 'Delete Custom Field',
+      message: `Are you sure you want to delete the field "${field.label}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       return;
     }
     await deleteMutation.mutateAsync(field.id);

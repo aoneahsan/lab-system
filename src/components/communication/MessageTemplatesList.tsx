@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageTemplate } from '@/types/communication.types';
 import { useDeleteTemplate } from '@/hooks/useCommunication';
 import { useModalState } from '@/hooks/useModalState';
+import { modalService } from '@/services/modalService';
 import MessageTemplateModal from './MessageTemplateModal';
 
 interface MessageTemplatesListProps {
@@ -45,7 +46,12 @@ export function MessageTemplatesList({ templates, isLoading }: MessageTemplatesL
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this template?')) {
+    if (await modalService.confirmDanger({
+      title: 'Delete Template',
+      message: 'Are you sure you want to delete this template?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteTemplate.mutateAsync(id);
     }
   };

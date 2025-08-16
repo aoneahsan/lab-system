@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
+import { modalService } from '@/services/modalService';
 import { format } from 'date-fns';
 
 interface PerformanceStats {
@@ -121,8 +122,13 @@ export const ProfileScreen: React.FC = () => {
     { icon: FileText, label: 'SOPs & Guidelines', action: '/protocols' },
   ];
 
-  const handleLogout = () => {
-    if (confirm('Are you sure you want to sign out?')) {
+  const handleLogout = async () => {
+    if (await modalService.confirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel'
+    })) {
       logout();
       navigate('/login');
     }

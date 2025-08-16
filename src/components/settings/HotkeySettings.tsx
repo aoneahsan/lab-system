@@ -3,6 +3,7 @@ import { Keyboard, RotateCcw, Save, Plus, Trash2 } from 'lucide-react';
 import { useHotkeys } from '@/hooks/useHotkeys';
 import { useAuthStore } from '@/stores/auth.store';
 import { userPreferencesService } from '@/services/user-preferences.service';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 import { Hotkey } from '@/services/hotkeys.service';
 
@@ -90,7 +91,12 @@ export const HotkeySettings: React.FC = () => {
   };
 
   const handleReset = async () => {
-    if (confirm('Are you sure you want to reset all hotkeys to defaults?')) {
+    if (await modalService.confirm({
+      title: 'Reset Hotkeys',
+      message: 'Are you sure you want to reset all hotkeys to defaults?',
+      confirmText: 'Reset',
+      cancelText: 'Cancel'
+    })) {
       resetToDefaults();
       if (currentUser) {
         await userPreferencesService.updateHotkeys(currentUser.id, {});

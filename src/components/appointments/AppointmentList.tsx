@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
+import { modalService } from '@/services/modalService';
 
 interface AppointmentListProps {
   onAppointmentClick?: (appointment: Appointment) => void;
@@ -67,7 +68,12 @@ export const AppointmentList: React.FC<AppointmentListProps> = ({
   };
 
   const handleCancel = async (appointment: Appointment) => {
-    const reason = prompt('Cancellation reason:');
+    const reason = await modalService.prompt({
+      title: 'Cancel Appointment',
+      message: 'Cancellation reason:',
+      placeholder: 'Enter reason for cancellation...',
+      required: true
+    });
     if (reason !== null) {
       await cancelAppointment.mutateAsync({ id: appointment.id, reason });
     }

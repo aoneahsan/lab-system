@@ -5,6 +5,7 @@ import { useTestOrders, useCreateTestOrder, useUpdateTestOrderStatus } from '@/h
 import TestOrderForm from '@/components/tests/TestOrderForm';
 import QuickTestOrder from '@/components/tests/QuickTestOrder';
 import { useTenant } from '@/hooks/useTenant';
+import { modalService } from '@/services/modalService';
 import type { TestOrder, TestOrderFormData, TestOrderFilter } from '@/types/test.types';
 
 const TestOrdersPage: React.FC = () => {
@@ -37,7 +38,12 @@ const TestOrdersPage: React.FC = () => {
   const handleStatusChange = async (order: TestOrder, newStatus: TestOrder['status']) => {
     let cancelReason;
     if (newStatus === 'cancelled') {
-      cancelReason = prompt('Please provide a reason for cancellation:');
+      cancelReason = await modalService.prompt({
+        title: 'Cancellation Reason',
+        message: 'Please provide a reason for cancellation:',
+        placeholder: 'Enter cancellation reason...',
+        required: true
+      });
       if (!cancelReason) return;
     }
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Package } from 'lucide-react';
+import { modalService } from '@/services/modal.service';
 import {
   useTestPanels,
   useCreateTestPanel,
@@ -62,7 +63,11 @@ const TestPanelsPage: React.FC = () => {
   };
 
   const handleDeletePanel = async (panel: TestPanel) => {
-    if (window.confirm(`Are you sure you want to delete ${panel.name}?`)) {
+    const confirmed = await modalService.confirmDanger(
+      `Are you sure you want to delete ${panel.name}?`,
+      { title: 'Delete Test Panel' }
+    );
+    if (confirmed) {
       await deleteTestPanelMutation.mutateAsync(panel.id);
     }
   };

@@ -1,5 +1,6 @@
 import type { WorkflowRule } from '@/types/workflow-automation.types';
 import { useDeleteWorkflowRule } from '@/hooks/useWorkflowAutomation';
+import { modalService } from '@/services/modalService';
 
 interface WorkflowRulesListProps {
   rules: WorkflowRule[];
@@ -15,7 +16,12 @@ export const WorkflowRulesList: React.FC<WorkflowRulesListProps> = ({
   const deleteMutation = useDeleteWorkflowRule();
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this rule?')) {
+    if (await modalService.confirmDanger({
+      title: 'Delete Workflow Rule',
+      message: 'Are you sure you want to delete this rule?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteMutation.mutateAsync(id);
     }
   };

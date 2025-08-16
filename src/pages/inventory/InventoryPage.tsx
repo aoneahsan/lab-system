@@ -11,6 +11,7 @@ import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { InventoryListTable } from '@/components/inventory/InventoryListTable';
 import { InventorySearchFilters } from '@/components/inventory/InventorySearchFilters';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
+import { modalService } from '@/services/modalService';
 import type { InventoryItem } from '@/types';
 import { toast } from 'sonner';
 
@@ -62,7 +63,12 @@ const InventoryPage: React.FC = () => {
   const handleDeleteItem = async (item: InventoryItem) => {
     if (!currentTenant) return;
     
-    if (window.confirm(`Are you sure you want to delete ${item.name}?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete Inventory Item',
+      message: `Are you sure you want to delete ${item.name}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       try {
         await deleteInventoryItem(item.id);
         toast.success('Inventory item deleted successfully');

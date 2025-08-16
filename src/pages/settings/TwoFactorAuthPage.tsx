@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useToast } from '@/hooks/useToast';
 import { twoFactorAuthService } from '@/services/two-factor-auth.service';
 import { subscriptionService } from '@/services/subscription.service';
+import { modalService } from '@/services/modalService';
 import type { TwoFactorMethod, UserTwoFactorPermissions, TwoFactorSetupData } from '@/types/two-factor.types';
 
 const TwoFactorAuthPage: React.FC = () => {
@@ -231,7 +232,12 @@ const TwoFactorAuthPage: React.FC = () => {
   };
 
   const handleDisable2FA = async () => {
-    if (!confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+    if (!await modalService.confirm({
+      title: 'Disable Two-Factor Authentication',
+      message: 'Are you sure you want to disable two-factor authentication? This will make your account less secure.',
+      confirmText: 'Disable',
+      cancelText: 'Cancel'
+    })) {
       return;
     }
 

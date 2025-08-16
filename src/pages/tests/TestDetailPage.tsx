@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Clock } from 'lucide-react';
 import { useTest, useDeleteTest } from '@/hooks/useTests';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
+import { modalService } from '@/services/modalService';
 
 const TestDetailPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -15,7 +16,12 @@ const TestDetailPage: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    if (test && window.confirm(`Are you sure you want to delete ${test.name}?`)) {
+    if (test && await modalService.confirmDanger({
+      title: 'Delete Test',
+      message: `Are you sure you want to delete ${test.name}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteTestMutation.mutateAsync(test.id);
       navigate('/tests');
     }

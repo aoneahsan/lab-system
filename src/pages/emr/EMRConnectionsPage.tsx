@@ -12,6 +12,7 @@ import {
   Edit,
 } from 'lucide-react';
 import { useEMRConnections, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
+import { modalService } from '@/services/modalService';
 import type {
   EMRConnectionFilter,
   ConnectionStatus,
@@ -59,7 +60,12 @@ const EMRConnectionsPage: React.FC = () => {
   };
 
   const handleDeleteConnection = async (connectionId: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete the connection "${name}"?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete EMR Connection',
+      message: `Are you sure you want to delete the connection "${name}"?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       deleteConnection.mutate(connectionId);
     }
   };

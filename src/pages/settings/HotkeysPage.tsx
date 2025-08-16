@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Keyboard, Smartphone, RotateCcw, Save, Info } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { hotkeysService, type HotkeyBinding, type GestureBinding } from '@/services/hotkeys.service';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 
 const HotkeysPage: React.FC = () => {
@@ -49,8 +50,13 @@ const HotkeysPage: React.FC = () => {
     loadSettings();
   };
 
-  const resetToDefaults = () => {
-    if (confirm('Are you sure you want to reset all shortcuts to their defaults?')) {
+  const resetToDefaults = async () => {
+    if (await modalService.confirm({
+      title: 'Reset Shortcuts',
+      message: 'Are you sure you want to reset all shortcuts to their defaults?',
+      confirmText: 'Reset',
+      cancelText: 'Cancel'
+    })) {
       hotkeysService.resetToDefaults();
       loadSettings();
       toast.success('Reset Complete', 'All shortcuts have been reset to defaults');

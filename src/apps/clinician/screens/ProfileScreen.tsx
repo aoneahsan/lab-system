@@ -17,6 +17,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
+import { modalService } from '@/services/modalService';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -25,7 +26,12 @@ export function ProfileScreen() {
   const { currentUser, logout } = useAuthStore();
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to logout?')) {
+    if (await modalService.confirm({
+      title: 'Logout',
+      message: 'Are you sure you want to logout?',
+      confirmText: 'Logout',
+      cancelText: 'Cancel'
+    })) {
       await logout();
       navigate('/login');
     }

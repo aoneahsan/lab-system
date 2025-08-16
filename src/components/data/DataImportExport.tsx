@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useUrlState } from '@/hooks/useUrlState';
 import { dataExportService } from '../../services/dataExport';
+import { modalService } from '@/services/modalService';
 import type { ExportOptions, ImportOptions } from '../../services/dataExport';
 import {
   ArrowDownTrayIcon,
@@ -37,7 +38,11 @@ const DataImportExport: React.FC = () => {
 
   const handleExport = async () => {
     if (selectedCollections.length === 0) {
-      alert('Please select at least one collection to export');
+      await modalService.alert({
+        title: 'No Collections Selected',
+        message: 'Please select at least one collection to export',
+        icon: 'warning'
+      });
       return;
     }
 
@@ -72,7 +77,11 @@ const DataImportExport: React.FC = () => {
 
   const handleImport = async () => {
     if (!importFile || !importCollection) {
-      alert('Please select a file and collection');
+      await modalService.alert({
+        title: 'Missing Information',
+        message: 'Please select a file and collection',
+        icon: 'warning'
+      });
       return;
     }
 

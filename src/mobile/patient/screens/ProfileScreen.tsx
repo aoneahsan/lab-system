@@ -3,6 +3,7 @@ import { User, Bell, Shield, CreditCard, HelpCircle, LogOut, ChevronRight, Finge
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { biometricAuth } from '@/services/biometric-auth.service';
+import { modalService } from '@/services/modalService';
 import { toast } from 'react-hot-toast';
 
 export const ProfileScreen: React.FC = () => {
@@ -30,7 +31,12 @@ export const ProfileScreen: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to sign out?')) {
+    if (await modalService.confirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel'
+    })) {
       await logout();
       navigate('/login');
     }

@@ -15,6 +15,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useEMRConnection, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
+import { modalService } from '@/services/modalService';
 import WebhookHandlers from '@/components/emr/WebhookHandlers';
 import type { ConnectionStatus } from '@/types/emr.types';
 
@@ -56,7 +57,12 @@ const EMRConnectionDetailPage: React.FC = () => {
   };
 
   const handleDeleteConnection = async () => {
-    if (window.confirm(`Are you sure you want to delete the connection "${connection.name}"?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete EMR Connection',
+      message: `Are you sure you want to delete the connection "${connection.name}"?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteConnection.mutateAsync(connectionId!);
       navigate('/emr/connections');
     }

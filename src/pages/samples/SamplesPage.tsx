@@ -10,6 +10,7 @@ import {
 } from '@/hooks/useSamples';
 import { usePatients } from '@/hooks/usePatients';
 import { qrcodeService } from '@/services/qrcode.service';
+import { modalService } from '@/services/modalService';
 import SampleListTable from '@/components/samples/SampleListTable';
 import SampleSearchFilters from '@/components/samples/SampleSearchFilters';
 import SampleCollectionForm from '@/components/samples/SampleCollectionForm';
@@ -48,7 +49,12 @@ const SamplesPage: React.FC = () => {
   };
 
   const handleDeleteSample = async (sample: Sample) => {
-    if (window.confirm(`Are you sure you want to delete sample ${sample.sampleNumber}?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete Sample',
+      message: `Are you sure you want to delete sample ${sample.sampleNumber}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       await deleteSampleMutation.mutateAsync(sample.id);
     }
   };

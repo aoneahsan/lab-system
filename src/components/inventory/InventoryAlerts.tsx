@@ -7,6 +7,7 @@ import React from 'react';
 import type { InventoryAlert } from '@/types/inventory.types';
 import { AlertTriangle, Package, Clock, TrendingDown, CheckCircle, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { modalService } from '@/services/modalService';
 
 interface InventoryAlertsProps {
   alerts: InventoryAlert[];
@@ -121,8 +122,13 @@ export const InventoryAlerts: React.FC<InventoryAlertsProps> = ({
               </div>
             </div>
             <button
-              onClick={() => {
-                const actionTaken = window.prompt('Action taken (optional):');
+              onClick={async () => {
+                const actionTaken = await modalService.prompt({
+                  title: 'Acknowledge Alert',
+                  message: 'Action taken (optional):',
+                  placeholder: 'Describe the action taken...',
+                  required: false
+                });
                 onAcknowledge(alert.id, actionTaken || undefined);
               }}
               className="ml-4 p-1 hover:bg-white rounded-full transition-colors"

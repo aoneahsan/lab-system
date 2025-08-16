@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TestTube, Upload, Download, Trash2, Shield, Activity, AlertTriangle, Plus } from 'lucide-react';
 import { useTests } from '@/hooks/useTests';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 
 export default function TestAdminControls() {
@@ -20,7 +21,12 @@ export default function TestAdminControls() {
       return;
     }
     
-    if (!confirm(`Delete ${selectedTests.length} tests?`)) return;
+    if (!await modalService.confirmDanger({
+      title: 'Delete Tests',
+      message: `Delete ${selectedTests.length} tests?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) return;
     
     toast.success('Tests deleted', `${selectedTests.length} tests have been deleted`);
     setSelectedTests([]);

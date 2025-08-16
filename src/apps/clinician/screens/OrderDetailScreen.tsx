@@ -16,6 +16,7 @@ import {
 import { useOrder } from '@/hooks/useOrder';
 import { format } from 'date-fns';
 import { useCancelOrder } from '@/hooks/useCancelOrder';
+import { modalService } from '@/services/modalService';
 import { toast } from 'sonner';
 
 export function OrderDetailScreen() {
@@ -24,10 +25,15 @@ export function OrderDetailScreen() {
   const { data: order, isLoading } = useOrder(orderId!);
   const { mutate: cancelOrder } = useCancelOrder();
 
-  const handleCancelOrder = () => {
+  const handleCancelOrder = async () => {
     if (!order || order.status !== 'pending') return;
 
-    if (confirm('Are you sure you want to cancel this order?')) {
+    if (await modalService.confirmDanger({
+      title: 'Cancel Order',
+      message: 'Are you sure you want to cancel this order?',
+      confirmText: 'Cancel Order',
+      cancelText: 'Keep Order'
+    })) {
       cancelOrder(orderId!, {
         onSuccess: () => {
           toast.success('Order cancelled successfully');

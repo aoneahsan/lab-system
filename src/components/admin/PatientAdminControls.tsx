@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Users, Upload, Download, Trash2, Shield, Activity, AlertTriangle } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
+import { modalService } from '@/services/modalService';
 import { toast } from '@/stores/toast.store';
 
 export default function PatientAdminControls() {
@@ -23,7 +24,12 @@ export default function PatientAdminControls() {
       return;
     }
     
-    if (!confirm(`Are you sure you want to delete ${selectedPatients.length} patients? This action cannot be undone.`)) {
+    if (!await modalService.confirmDanger({
+      title: 'Delete Patients',
+      message: `Are you sure you want to delete ${selectedPatients.length} patients? This action cannot be undone.`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       return;
     }
 

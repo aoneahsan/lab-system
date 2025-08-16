@@ -10,6 +10,7 @@ import { UserListTable } from '@/components/users/UserListTable';
 import { UserForm } from '@/components/users/UserForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { userService } from '@/services/users/userService';
+import { modalService } from '@/services/modalService';
 import { toast } from 'sonner';
 import type { User } from '@/types/auth.types';
 import type { UserFormData, UserFilter } from '@/types/user-management.types';
@@ -75,7 +76,12 @@ const UsersPage = () => {
   };
 
   const handleDeleteUser = async (user: User) => {
-    if (window.confirm(`Are you sure you want to delete ${user.displayName}?`)) {
+    if (await modalService.confirmDanger({
+      title: 'Delete User',
+      message: `Are you sure you want to delete ${user.displayName}?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel'
+    })) {
       try {
         await userService.deleteUser(user.id);
         toast.success('User Deleted', {
