@@ -23,6 +23,8 @@
     "node_modules",
     "lib",
     "**/*.bak/**/*",
-    "src/*.bak/**/*"
+    "src/*.bak/**/*",
+    "../src/**/*",
+    "../node_modules/**/*"
   ]
 }

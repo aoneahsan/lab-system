@@ -1,7 +1,5 @@
 import * as admin from 'firebase-admin';
-import { onCall } from 'firebase-functions/v2/https';
-import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { onDocumentWritten, onDocumentCreated } from 'firebase-functions/v2/firestore';
+import * as functions from 'firebase-functions';
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -17,41 +15,68 @@ import { checkInsuranceEligibility } from './workflows/insuranceEligibilityCheck
 import { billingAutomation } from './workflows/billingAutomation';
 
 // Export critical results monitoring
-export const monitorCriticalResults = onDocumentWritten('labflow_*_results/{resultId}', criticalResultsMonitor);
+export const monitorCriticalResults = functions.firestore
+  .document('labflow_results/{resultId}')
+  .onWrite(criticalResultsMonitor);
 
 // Export sample expiration monitoring (runs every 6 hours)
-export const checkSampleExpiration = onSchedule('every 6 hours', sampleExpirationMonitor);
+export const checkSampleExpiration = functions.pubsub
+  .schedule('every 6 hours')
+  .onRun(sampleExpirationMonitor);
 
 // Export quality control monitoring
-export const monitorQualityControl = onDocumentCreated('labflow_*_qc_results/{qcResultId}', qualityControlMonitor);
+export const monitorQualityControl = functions.firestore
+  .document('labflow_qc_results/{qcResultId}')
+  .onCreate(qualityControlMonitor);
 
 // Export result validation workflow
-export const validateResults = onDocumentCreated('labflow_*_results/{resultId}', resultValidationWorkflow);
+export const validateResults = functions.firestore
+  .document('labflow_results/{resultId}')
+  .onCreate(resultValidationWorkflow);
 
 // Export inventory monitoring (runs daily at 8 AM)
-export const checkInventoryLevels = onSchedule('0 8 * * *', inventoryAlerts);
+export const checkInventoryLevels = functions.pubsub
+  .schedule('0 8 * * *')
+  .timeZone('America/New_York')
+  .onRun(inventoryAlerts);
 
 // Export appointment reminders (runs daily at 9 AM)
-export const sendAppointmentReminders = onSchedule('0 9 * * *', appointmentReminders);
+export const sendAppointmentReminders = functions.pubsub
+  .schedule('0 9 * * *')
+  .timeZone('America/New_York')
+  .onRun(appointmentReminders);
 
 // Export insurance eligibility checker (callable function)
-export const verifyInsurance = onCall(checkInsuranceEligibility);
+export const verifyInsurance = functions.https.onCall(checkInsuranceEligibility);
 
 // Export billing automation
-export const processBilling = onDocumentWritten('labflow_*_results/{resultId}', billingAutomation);
+export const processBilling = functions.firestore
+  .document('labflow_results/{resultId}')
+  .onWrite(billingAutomation);
 
 // Keep existing functions for backward compatibility
-export const createOrder = onCall(async (request) => {
+export const createOrder = functions.https.onCall(async (data, context) => {
   console.log('Creating order');
   return { success: true, orderId: 'test-order' };
 });
 
-export const processResults = onCall(async (request) => {
+export const processResults = functions.https.onCall(async (data, context) => {
   console.log('Processing results');
   return { success: true, message: 'Results processed' };
 });
 
-export const dailyBackup = onSchedule('every 24 hours', async (event) => {
-  console.log('Running daily backup');
-  return null;
+export const dailyBackup = functions.pubsub
+  .schedule('every 24 hours')
+  .onRun(async (context) => {
+    console.log('Running daily backup');
+    return null;
+  });
+
+// Health check endpoint
+export const healthCheck = functions.https.onRequest((req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'LabFlow Cloud Functions'
+  });
 });

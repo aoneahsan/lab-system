@@ -564,7 +564,8 @@
       "Bash(firebase login:*)",
       "Bash(wc:*)",
       "Bash(cloc:*)",
-      "Bash(./scripts/deploy.sh:*)"
+      "Bash(./scripts/deploy.sh:*)",
+      "Bash(firebase hosting:sites:list:*)"
     ],
     "deny": []
   }
