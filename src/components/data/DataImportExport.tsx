@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useUrlState } from '@/hooks/useUrlState';
 import { dataExportService } from '../../services/dataExport';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { ExportOptions, ImportOptions } from '../../services/dataExport';
 import {
   ArrowDownTrayIcon,

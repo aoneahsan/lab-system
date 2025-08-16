@@ -3,7 +3,7 @@ import { User, Bell, Shield, CreditCard, HelpCircle, LogOut, ChevronRight, Finge
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { biometricAuth } from '@/services/biometric-auth.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from 'react-hot-toast';
 
 export const ProfileScreen: React.FC = () => {

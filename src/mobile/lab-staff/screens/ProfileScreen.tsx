@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useNavigate } from 'react-router-dom';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { format } from 'date-fns';
 
 interface PerformanceStats {

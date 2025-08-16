@@ -10,7 +10,7 @@ import {
 } from '@/hooks/useSamples';
 import { usePatients } from '@/hooks/usePatients';
 import { qrcodeService } from '@/services/qrcode.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import SampleListTable from '@/components/samples/SampleListTable';
 import SampleSearchFilters from '@/components/samples/SampleSearchFilters';
 import SampleCollectionForm from '@/components/samples/SampleCollectionForm';

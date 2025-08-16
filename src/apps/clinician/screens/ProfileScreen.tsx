@@ -17,7 +17,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 

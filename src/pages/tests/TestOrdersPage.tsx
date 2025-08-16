@@ -5,7 +5,7 @@ import { useTestOrders, useCreateTestOrder, useUpdateTestOrderStatus } from '@/h
 import TestOrderForm from '@/components/tests/TestOrderForm';
 import QuickTestOrder from '@/components/tests/QuickTestOrder';
 import { useTenant } from '@/hooks/useTenant';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { TestOrder, TestOrderFormData, TestOrderFilter } from '@/types/test.types';
 
 const TestOrdersPage: React.FC = () => {

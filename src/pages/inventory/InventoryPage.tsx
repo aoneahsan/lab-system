@@ -11,7 +11,7 @@ import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { InventoryListTable } from '@/components/inventory/InventoryListTable';
 import { InventorySearchFilters } from '@/components/inventory/InventorySearchFilters';
 import { InventoryForm } from '@/components/inventory/InventoryForm';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { InventoryItem } from '@/types';
 import { toast } from 'sonner';
 

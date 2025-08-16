@@ -15,7 +15,7 @@ import { firestore } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
 

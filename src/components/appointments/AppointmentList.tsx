@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 
 interface AppointmentListProps {
   onAppointmentClick?: (appointment: Appointment) => void;

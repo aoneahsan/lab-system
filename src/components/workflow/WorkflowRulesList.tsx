@@ -1,6 +1,6 @@
 import type { WorkflowRule } from '@/types/workflow-automation.types';
 import { useDeleteWorkflowRule } from '@/hooks/useWorkflowAutomation';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 
 interface WorkflowRulesListProps {
   rules: WorkflowRule[];

@@ -3,7 +3,7 @@ import { Keyboard, RotateCcw, Save, Plus, Trash2 } from 'lucide-react';
 import { useHotkeys } from '@/hooks/useHotkeys';
 import { useAuthStore } from '@/stores/auth.store';
 import { userPreferencesService } from '@/services/user-preferences.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 import { Hotkey } from '@/services/hotkeys.service';
 

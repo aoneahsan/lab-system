@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Clock } from 'lucide-react';
 import { useTest, useDeleteTest } from '@/hooks/useTests';
 import { CustomFieldsManager } from '@/components/custom-fields/CustomFieldsManager';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 
 const TestDetailPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();

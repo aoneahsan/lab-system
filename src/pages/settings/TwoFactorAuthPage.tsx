@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useToast } from '@/hooks/useToast';
 import { twoFactorAuthService } from '@/services/two-factor-auth.service';
 import { subscriptionService } from '@/services/subscription.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { TwoFactorMethod, UserTwoFactorPermissions, TwoFactorSetupData } from '@/types/two-factor.types';
 
 const TwoFactorAuthPage: React.FC = () => {

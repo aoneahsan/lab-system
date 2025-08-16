@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TestTube, Upload, Download, Trash2, Shield, Activity, AlertTriangle, Plus } from 'lucide-react';
 import { useTests } from '@/hooks/useTests';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 
 export default function TestAdminControls() {

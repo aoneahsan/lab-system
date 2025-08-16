@@ -7,7 +7,7 @@ import React from 'react';
 import type { InventoryAlert } from '@/types/inventory.types';
 import { AlertTriangle, Package, Clock, TrendingDown, CheckCircle, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 
 interface InventoryAlertsProps {
   alerts: InventoryAlert[];

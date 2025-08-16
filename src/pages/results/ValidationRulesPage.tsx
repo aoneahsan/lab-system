@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, Settings, AlertTriangle, Trash2, Edit } from 'lucide-r
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { resultValidationService } from '@/services/result-validation.service';
 import { useTests } from '@/hooks/useTests';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 import ValidationRuleModal from '@/components/results/ValidationRuleModal';
 import type { ResultValidationRule } from '@/types/result.types';

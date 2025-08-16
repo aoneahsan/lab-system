@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Mail, Download, Plus, Edit2, Trash2, Play, Pause } from 'lucide-react';
 import { format } from 'date-fns';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 
 interface ScheduledReport {
   id: string;

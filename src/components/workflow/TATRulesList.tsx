@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTATRules, useDeleteTATRule } from '@/hooks/useWorkflowAutomation';
 import { TATRuleModal } from './TATRuleModal';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { TATRule } from '@/types/workflow-automation.types';
 
 export const TATRulesList: React.FC = () => {

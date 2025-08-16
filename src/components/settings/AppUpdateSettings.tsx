@@ -11,7 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { appUpdateService } from '@/services/app-update.service';
 import { Capacitor } from '@capacitor/core';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 
 export const AppUpdateSettings: React.FC = () => {

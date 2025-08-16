@@ -10,7 +10,7 @@ import { UserListTable } from '@/components/users/UserListTable';
 import { UserForm } from '@/components/users/UserForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { userService } from '@/services/users/userService';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from 'sonner';
 import type { User } from '@/types/auth.types';
 import type { UserFormData, UserFilter } from '@/types/user-management.types';

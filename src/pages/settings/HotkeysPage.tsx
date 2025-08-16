@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Keyboard, Smartphone, RotateCcw, Save, Info } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 import { hotkeysService, type HotkeyBinding, type GestureBinding } from '@/services/hotkeys.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 
 const HotkeysPage: React.FC = () => {

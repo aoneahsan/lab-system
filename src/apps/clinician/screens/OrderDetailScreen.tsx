@@ -16,7 +16,7 @@ import {
 import { useOrder } from '@/hooks/useOrder';
 import { format } from 'date-fns';
 import { useCancelOrder } from '@/hooks/useCancelOrder';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from 'sonner';
 
 export function OrderDetailScreen() {

@@ -12,7 +12,7 @@ import {
   Edit,
 } from 'lucide-react';
 import { useEMRConnections, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type {
   EMRConnectionFilter,
   ConnectionStatus,

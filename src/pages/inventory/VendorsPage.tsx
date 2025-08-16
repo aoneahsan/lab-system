@@ -4,7 +4,7 @@ import { useInventoryStore } from '@/stores/inventory.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { VendorForm } from '@/components/inventory/VendorForm';
 import { Button } from '@/components/ui/Button';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { Vendor } from '@/types/inventory.types';
 import { toast } from 'sonner';
 

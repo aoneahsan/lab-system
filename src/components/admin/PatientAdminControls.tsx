@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Users, Upload, Download, Trash2, Shield, Activity, AlertTriangle } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 
 export default function PatientAdminControls() {

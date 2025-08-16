@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Network } from '@capacitor/network';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { toast } from '@/hooks/useToast';
 
 interface SyncStats {

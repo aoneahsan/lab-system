@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageTemplate } from '@/types/communication.types';
 import { useDeleteTemplate } from '@/hooks/useCommunication';
 import { useModalState } from '@/hooks/useModalState';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import MessageTemplateModal from './MessageTemplateModal';
 
 interface MessageTemplatesListProps {

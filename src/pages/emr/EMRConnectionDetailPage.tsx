@@ -15,7 +15,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useEMRConnection, useTestEMRConnection, useDeleteEMRConnection } from '@/hooks/useEMR';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import WebhookHandlers from '@/components/emr/WebhookHandlers';
 import type { ConnectionStatus } from '@/types/emr.types';
 

@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
 import { biometricService } from '@/services/biometric.service';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import { Shield, Keyboard, Eye } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 

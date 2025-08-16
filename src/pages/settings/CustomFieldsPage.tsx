@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
 import { useCustomFieldsByModule, useCreateCustomField, useUpdateCustomField, useDeleteCustomField } from '@/hooks/useCustomFields';
 import { CustomFieldDefinitionForm } from '@/components/custom-fields/CustomFieldDefinitionForm';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { modalService } from '@/services/modalService';
+import { modalService } from '@/services/modal.service';
 import type { CustomFieldDefinition, CreateCustomFieldData, UpdateCustomFieldData } from '@/types/custom-field.types';
 
 const modules = [
