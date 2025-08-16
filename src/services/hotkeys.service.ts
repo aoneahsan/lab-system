@@ -1,275 +1,643 @@
-import { NavigateFunction } from 'react-router-dom';
+import { toast } from '@/stores/toast.store';
 
-export interface Hotkey {
+export interface HotkeyBinding {
   id: string;
   key: string;
-  ctrlKey?: boolean;
-  altKey?: boolean;
-  shiftKey?: boolean;
-  metaKey?: boolean;
-  description: string;
+  ctrl?: boolean;
+  alt?: boolean;
+  shift?: boolean;
+  meta?: boolean; // Command key on Mac
   action: string;
-  category: 'navigation' | 'action' | 'custom';
+  description: string;
+  category: 'navigation' | 'actions' | 'search' | 'forms' | 'custom';
+  customizable: boolean;
+  enabled: boolean;
 }
 
-export interface HotkeyConfig {
-  [key: string]: Hotkey;
+export interface GestureBinding {
+  id: string;
+  gesture: 'swipe-left' | 'swipe-right' | 'swipe-up' | 'swipe-down' | 'double-tap' | 'long-press' | 'pinch' | 'spread';
+  action: string;
+  description: string;
+  enabled: boolean;
 }
 
-// Default hotkeys configuration
-export const defaultHotkeys: HotkeyConfig = {
-  navigatePatients: {
-    id: 'navigatePatients',
-    key: 'p',
-    altKey: true,
-    description: 'Go to Patients',
-    action: '/patients',
-    category: 'navigation',
-  },
-  navigateTests: {
-    id: 'navigateTests',
-    key: 't',
-    altKey: true,
-    description: 'Go to Tests',
-    action: '/tests',
-    category: 'navigation',
-  },
-  navigateSamples: {
-    id: 'navigateSamples',
-    key: 's',
-    altKey: true,
-    description: 'Go to Samples',
-    action: '/samples',
-    category: 'navigation',
-  },
-  navigateResults: {
-    id: 'navigateResults',
-    key: 'r',
-    altKey: true,
-    description: 'Go to Results',
-    action: '/results',
-    category: 'navigation',
-  },
-  navigateBilling: {
-    id: 'navigateBilling',
-    key: 'b',
-    altKey: true,
-    description: 'Go to Billing',
-    action: '/billing',
-    category: 'navigation',
-  },
-  navigateDashboard: {
-    id: 'navigateDashboard',
+// Default keyboard shortcuts
+const DEFAULT_HOTKEYS: HotkeyBinding[] = [
+  // Navigation shortcuts
+  {
+    id: 'nav-dashboard',
     key: 'd',
-    altKey: true,
+    alt: true,
+    action: 'navigate.dashboard',
     description: 'Go to Dashboard',
-    action: '/dashboard',
     category: 'navigation',
+    customizable: true,
+    enabled: true,
   },
-  navigateAppointments: {
-    id: 'navigateAppointments',
-    key: 'a',
-    altKey: true,
-    description: 'Go to Appointments',
-    action: '/appointments',
+  {
+    id: 'nav-patients',
+    key: 'p',
+    alt: true,
+    action: 'navigate.patients',
+    description: 'Go to Patients',
     category: 'navigation',
+    customizable: true,
+    enabled: true,
   },
-  navigateInventory: {
-    id: 'navigateInventory',
-    key: 'i',
-    altKey: true,
-    description: 'Go to Inventory',
-    action: '/inventory',
-    category: 'navigation',
-  },
-  newPatient: {
-    id: 'newPatient',
-    key: 'n',
-    altKey: true,
-    shiftKey: true,
-    description: 'New Patient',
-    action: '/patients?action=new',
-    category: 'action',
-  },
-  newTestOrder: {
-    id: 'newTestOrder',
+  {
+    id: 'nav-tests',
     key: 't',
-    altKey: true,
-    shiftKey: true,
-    description: 'New Test Order',
-    action: '/tests/orders?action=new',
-    category: 'action',
+    alt: true,
+    action: 'navigate.tests',
+    description: 'Go to Tests',
+    category: 'navigation',
+    customizable: true,
+    enabled: true,
   },
-  quickSearch: {
-    id: 'quickSearch',
+  {
+    id: 'nav-samples',
+    key: 's',
+    alt: true,
+    action: 'navigate.samples',
+    description: 'Go to Samples',
+    category: 'navigation',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'nav-results',
+    key: 'r',
+    alt: true,
+    action: 'navigate.results',
+    description: 'Go to Results',
+    category: 'navigation',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'nav-billing',
+    key: 'b',
+    alt: true,
+    action: 'navigate.billing',
+    description: 'Go to Billing',
+    category: 'navigation',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'nav-back',
+    key: 'Escape',
+    action: 'navigate.back',
+    description: 'Go Back',
+    category: 'navigation',
+    customizable: true,
+    enabled: true,
+  },
+  
+  // Action shortcuts
+  {
+    id: 'action-new',
+    key: 'n',
+    ctrl: true,
+    action: 'action.new',
+    description: 'Create New (context-aware)',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'action-save',
+    key: 's',
+    ctrl: true,
+    action: 'action.save',
+    description: 'Save',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'action-delete',
+    key: 'Delete',
+    action: 'action.delete',
+    description: 'Delete Selected',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'action-edit',
+    key: 'e',
+    ctrl: true,
+    action: 'action.edit',
+    description: 'Edit',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'action-refresh',
+    key: 'r',
+    ctrl: true,
+    action: 'action.refresh',
+    description: 'Refresh Data',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'action-print',
+    key: 'p',
+    ctrl: true,
+    action: 'action.print',
+    description: 'Print',
+    category: 'actions',
+    customizable: true,
+    enabled: true,
+  },
+  
+  // Search shortcuts
+  {
+    id: 'search-global',
+    key: 'k',
+    ctrl: true,
+    action: 'search.global',
+    description: 'Global Search',
+    category: 'search',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'search-patients',
     key: '/',
-    ctrlKey: true,
-    description: 'Quick Search',
-    action: 'search',
-    category: 'action',
+    action: 'search.patients',
+    description: 'Quick Patient Search',
+    category: 'search',
+    customizable: true,
+    enabled: true,
   },
-  help: {
-    id: 'help',
+  {
+    id: 'search-filter',
+    key: 'f',
+    ctrl: true,
+    shift: true,
+    action: 'search.filter',
+    description: 'Toggle Filters',
+    category: 'search',
+    customizable: true,
+    enabled: true,
+  },
+  
+  // Form shortcuts
+  {
+    id: 'form-submit',
+    key: 'Enter',
+    ctrl: true,
+    action: 'form.submit',
+    description: 'Submit Form',
+    category: 'forms',
+    customizable: false,
+    enabled: true,
+  },
+  {
+    id: 'form-cancel',
+    key: 'Escape',
+    action: 'form.cancel',
+    description: 'Cancel/Close',
+    category: 'forms',
+    customizable: false,
+    enabled: true,
+  },
+  {
+    id: 'form-next-field',
+    key: 'Tab',
+    action: 'form.nextField',
+    description: 'Next Field',
+    category: 'forms',
+    customizable: false,
+    enabled: true,
+  },
+  {
+    id: 'form-prev-field',
+    key: 'Tab',
+    shift: true,
+    action: 'form.prevField',
+    description: 'Previous Field',
+    category: 'forms',
+    customizable: false,
+    enabled: true,
+  },
+  
+  // Custom shortcuts
+  {
+    id: 'toggle-theme',
+    key: 't',
+    ctrl: true,
+    shift: true,
+    action: 'toggle.theme',
+    description: 'Toggle Dark Mode',
+    category: 'custom',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'toggle-sidebar',
+    key: 'b',
+    ctrl: true,
+    action: 'toggle.sidebar',
+    description: 'Toggle Sidebar',
+    category: 'custom',
+    customizable: true,
+    enabled: true,
+  },
+  {
+    id: 'show-help',
     key: '?',
-    shiftKey: true,
-    description: 'Show Help/Features',
-    action: 'help',
-    category: 'action',
+    shift: true,
+    action: 'show.help',
+    description: 'Show Help',
+    category: 'custom',
+    customizable: true,
+    enabled: true,
   },
-};
+  {
+    id: 'show-shortcuts',
+    key: 'h',
+    ctrl: true,
+    shift: true,
+    action: 'show.shortcuts',
+    description: 'Show Keyboard Shortcuts',
+    category: 'custom',
+    customizable: true,
+    enabled: true,
+  },
+];
+
+// Default phone gestures
+const DEFAULT_GESTURES: GestureBinding[] = [
+  {
+    id: 'gesture-back',
+    gesture: 'swipe-right',
+    action: 'navigate.back',
+    description: 'Go Back',
+    enabled: true,
+  },
+  {
+    id: 'gesture-forward',
+    gesture: 'swipe-left',
+    action: 'navigate.forward',
+    description: 'Go Forward',
+    enabled: true,
+  },
+  {
+    id: 'gesture-refresh',
+    gesture: 'swipe-down',
+    action: 'action.refresh',
+    description: 'Pull to Refresh',
+    enabled: true,
+  },
+  {
+    id: 'gesture-menu',
+    gesture: 'long-press',
+    action: 'show.contextMenu',
+    description: 'Show Context Menu',
+    enabled: true,
+  },
+  {
+    id: 'gesture-zoom-in',
+    gesture: 'spread',
+    action: 'zoom.in',
+    description: 'Zoom In',
+    enabled: true,
+  },
+  {
+    id: 'gesture-zoom-out',
+    gesture: 'pinch',
+    action: 'zoom.out',
+    description: 'Zoom Out',
+    enabled: true,
+  },
+];
 
 class HotkeysService {
-  private hotkeys: HotkeyConfig = { ...defaultHotkeys };
-  private listeners: Map<string, (event: KeyboardEvent) => void> = new Map();
-  private navigate: NavigateFunction | null = null;
-  private customActions: Map<string, () => void> = new Map();
+  private hotkeys: Map<string, HotkeyBinding> = new Map();
+  private gestures: Map<string, GestureBinding> = new Map();
+  private listeners: Map<string, Set<(event: KeyboardEvent) => void>> = new Map();
+  private gestureListeners: Map<string, Set<(event: TouchEvent) => void>> = new Map();
   private enabled: boolean = true;
+  private touchStartX: number = 0;
+  private touchStartY: number = 0;
+  private touchStartTime: number = 0;
+  private lastTap: number = 0;
 
-  initialize(navigate: NavigateFunction) {
-    this.navigate = navigate;
-    this.loadUserHotkeys();
-    this.setupGlobalListener();
+  constructor() {
+    this.loadHotkeys();
+    this.loadGestures();
+    this.initializeKeyboardListener();
+    this.initializeGestureListeners();
   }
 
-  private setupGlobalListener() {
-    const globalListener = (event: KeyboardEvent) => {
+  private loadHotkeys() {
+    // Load custom hotkeys from localStorage
+    const customHotkeys = localStorage.getItem('labflow_custom_hotkeys');
+    if (customHotkeys) {
+      try {
+        const parsed = JSON.parse(customHotkeys) as HotkeyBinding[];
+        parsed.forEach(hotkey => {
+          this.hotkeys.set(hotkey.id, hotkey);
+        });
+      } catch (error) {
+        console.error('Failed to load custom hotkeys:', error);
+      }
+    } else {
+      // Load defaults
+      DEFAULT_HOTKEYS.forEach(hotkey => {
+        this.hotkeys.set(hotkey.id, hotkey);
+      });
+    }
+  }
+
+  private loadGestures() {
+    // Load custom gestures from localStorage
+    const customGestures = localStorage.getItem('labflow_custom_gestures');
+    if (customGestures) {
+      try {
+        const parsed = JSON.parse(customGestures) as GestureBinding[];
+        parsed.forEach(gesture => {
+          this.gestures.set(gesture.id, gesture);
+        });
+      } catch (error) {
+        console.error('Failed to load custom gestures:', error);
+      }
+    } else {
+      // Load defaults
+      DEFAULT_GESTURES.forEach(gesture => {
+        this.gestures.set(gesture.id, gesture);
+      });
+    }
+  }
+
+  private saveHotkeys() {
+    const hotkeysArray = Array.from(this.hotkeys.values());
+    localStorage.setItem('labflow_custom_hotkeys', JSON.stringify(hotkeysArray));
+  }
+
+  private saveGestures() {
+    const gesturesArray = Array.from(this.gestures.values());
+    localStorage.setItem('labflow_custom_gestures', JSON.stringify(gesturesArray));
+  }
+
+  private initializeKeyboardListener() {
+    document.addEventListener('keydown', (event) => {
       if (!this.enabled) return;
       
-      // Skip if user is typing in an input field
+      // Don't trigger shortcuts when typing in inputs
       const target = event.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true') {
+        // Allow Escape to work in forms
+        if (event.key !== 'Escape') {
+          return;
+        }
+      }
+
+      // Check each hotkey
+      this.hotkeys.forEach(hotkey => {
+        if (!hotkey.enabled) return;
+
+        const matches = 
+          event.key === hotkey.key &&
+          (hotkey.ctrl === undefined || event.ctrlKey === hotkey.ctrl) &&
+          (hotkey.alt === undefined || event.altKey === hotkey.alt) &&
+          (hotkey.shift === undefined || event.shiftKey === hotkey.shift) &&
+          (hotkey.meta === undefined || event.metaKey === hotkey.meta);
+
+        if (matches) {
+          event.preventDefault();
+          this.triggerAction(hotkey.action, event);
+        }
+      });
+    });
+  }
+
+  private initializeGestureListeners() {
+    // Touch start
+    document.addEventListener('touchstart', (event) => {
+      if (!this.enabled) return;
+      
+      this.touchStartX = event.touches[0].clientX;
+      this.touchStartY = event.touches[0].clientY;
+      this.touchStartTime = Date.now();
+      
+      // Check for double tap
+      const now = Date.now();
+      if (now - this.lastTap < 300) {
+        this.handleGesture('double-tap', event);
+      }
+      this.lastTap = now;
+    }, { passive: false });
+
+    // Touch end for swipe detection
+    document.addEventListener('touchend', (event) => {
+      if (!this.enabled) return;
+      
+      const touchEndX = event.changedTouches[0].clientX;
+      const touchEndY = event.changedTouches[0].clientY;
+      const touchDuration = Date.now() - this.touchStartTime;
+      
+      const deltaX = touchEndX - this.touchStartX;
+      const deltaY = touchEndY - this.touchStartY;
+      const threshold = 50; // Minimum distance for swipe
+      
+      // Check for long press
+      if (touchDuration > 500 && Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+        this.handleGesture('long-press', event);
         return;
       }
-
-      Object.values(this.hotkeys).forEach((hotkey) => {
-        if (this.matchesHotkey(event, hotkey)) {
-          event.preventDefault();
-          this.executeHotkey(hotkey);
+      
+      // Check for swipes
+      if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          // Horizontal swipe
+          if (deltaX > 0) {
+            this.handleGesture('swipe-right', event);
+          } else {
+            this.handleGesture('swipe-left', event);
+          }
+        } else {
+          // Vertical swipe
+          if (deltaY > 0) {
+            this.handleGesture('swipe-down', event);
+          } else {
+            this.handleGesture('swipe-up', event);
+          }
         }
-      });
-    };
-
-    document.addEventListener('keydown', globalListener);
-    this.listeners.set('global', globalListener);
-  }
-
-  private matchesHotkey(event: KeyboardEvent, hotkey: Hotkey): boolean {
-    const keyMatches = event.key.toLowerCase() === hotkey.key.toLowerCase();
-    const ctrlMatches = (hotkey.ctrlKey || false) === (event.ctrlKey || event.metaKey);
-    const altMatches = (hotkey.altKey || false) === event.altKey;
-    const shiftMatches = (hotkey.shiftKey || false) === event.shiftKey;
-    const metaMatches = (hotkey.metaKey || false) === event.metaKey;
-
-    return keyMatches && ctrlMatches && altMatches && shiftMatches && metaMatches;
-  }
-
-  private executeHotkey(hotkey: Hotkey) {
-    if (hotkey.category === 'navigation' && this.navigate) {
-      this.navigate(hotkey.action);
-    } else if (hotkey.category === 'action') {
-      const customAction = this.customActions.get(hotkey.action);
-      if (customAction) {
-        customAction();
-      } else if (hotkey.action.startsWith('/') && this.navigate) {
-        this.navigate(hotkey.action);
       }
-    }
-  }
+    }, { passive: false });
 
-  registerCustomAction(actionId: string, handler: () => void) {
-    this.customActions.set(actionId, handler);
-  }
-
-  unregisterCustomAction(actionId: string) {
-    this.customActions.delete(actionId);
-  }
-
-  updateHotkey(id: string, newHotkey: Partial<Hotkey>) {
-    if (this.hotkeys[id]) {
-      this.hotkeys[id] = { ...this.hotkeys[id], ...newHotkey };
-      this.saveUserHotkeys();
-    }
-  }
-
-  addHotkey(hotkey: Hotkey) {
-    this.hotkeys[hotkey.id] = hotkey;
-    this.saveUserHotkeys();
-  }
-
-  removeHotkey(id: string) {
-    delete this.hotkeys[id];
-    this.saveUserHotkeys();
-  }
-
-  getHotkeys(): HotkeyConfig {
-    return { ...this.hotkeys };
-  }
-
-  getHotkeysByCategory(category: 'navigation' | 'action' | 'custom'): Hotkey[] {
-    return Object.values(this.hotkeys).filter((h) => h.category === category);
-  }
-
-  resetToDefaults() {
-    this.hotkeys = { ...defaultHotkeys };
-    this.saveUserHotkeys();
-  }
-
-  private loadUserHotkeys() {
-    try {
-      const saved = localStorage.getItem('userHotkeys');
-      if (saved) {
-        const userHotkeys = JSON.parse(saved);
-        this.hotkeys = { ...defaultHotkeys, ...userHotkeys };
-      }
-    } catch (error) {
-      console.error('Failed to load user hotkeys:', error);
-    }
-  }
-
-  private saveUserHotkeys() {
-    try {
-      // Only save customizations (differences from defaults)
-      const customizations: HotkeyConfig = {};
-      Object.keys(this.hotkeys).forEach((key) => {
-        if (
-          !defaultHotkeys[key] ||
-          JSON.stringify(this.hotkeys[key]) !== JSON.stringify(defaultHotkeys[key])
-        ) {
-          customizations[key] = this.hotkeys[key];
+    // Pinch/spread detection
+    let initialDistance = 0;
+    document.addEventListener('touchmove', (event) => {
+      if (!this.enabled) return;
+      
+      if (event.touches.length === 2) {
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        );
+        
+        if (initialDistance === 0) {
+          initialDistance = distance;
+        } else {
+          const delta = distance - initialDistance;
+          if (Math.abs(delta) > 30) {
+            if (delta > 0) {
+              this.handleGesture('spread', event);
+            } else {
+              this.handleGesture('pinch', event);
+            }
+            initialDistance = distance; // Reset for continuous gestures
+          }
         }
-      });
-      localStorage.setItem('userHotkeys', JSON.stringify(customizations));
-    } catch (error) {
-      console.error('Failed to save user hotkeys:', error);
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', () => {
+      initialDistance = 0; // Reset when touches end
+    });
+  }
+
+  private handleGesture(gestureType: GestureBinding['gesture'], event: TouchEvent) {
+    this.gestures.forEach(gesture => {
+      if (gesture.enabled && gesture.gesture === gestureType) {
+        event.preventDefault();
+        this.triggerAction(gesture.action, event);
+      }
+    });
+  }
+
+  private triggerAction(action: string, event: KeyboardEvent | TouchEvent) {
+    // Notify all listeners for this action
+    const listeners = this.listeners.get(action);
+    if (listeners) {
+      listeners.forEach(listener => listener(event as KeyboardEvent));
+    }
+    
+    // Handle built-in actions
+    switch (action) {
+      case 'navigate.dashboard':
+        window.location.href = '/dashboard';
+        break;
+      case 'navigate.patients':
+        window.location.href = '/patients';
+        break;
+      case 'navigate.tests':
+        window.location.href = '/tests';
+        break;
+      case 'navigate.samples':
+        window.location.href = '/samples';
+        break;
+      case 'navigate.results':
+        window.location.href = '/results';
+        break;
+      case 'navigate.billing':
+        window.location.href = '/billing';
+        break;
+      case 'navigate.back':
+        window.history.back();
+        break;
+      case 'navigate.forward':
+        window.history.forward();
+        break;
+      case 'toggle.theme':
+        document.documentElement.classList.toggle('dark');
+        break;
+      case 'show.shortcuts':
+        this.showShortcutsModal();
+        break;
+      case 'action.refresh':
+        window.location.reload();
+        break;
     }
   }
 
-  setEnabled(enabled: boolean) {
+  private showShortcutsModal() {
+    toast.info('Keyboard Shortcuts', 'Press Ctrl+Shift+H to view all shortcuts');
+  }
+
+  // Public methods
+  public getAllHotkeys(): HotkeyBinding[] {
+    return Array.from(this.hotkeys.values());
+  }
+
+  public getAllGestures(): GestureBinding[] {
+    return Array.from(this.gestures.values());
+  }
+
+  public getHotkeysByCategory(category: HotkeyBinding['category']): HotkeyBinding[] {
+    return Array.from(this.hotkeys.values()).filter(h => h.category === category);
+  }
+
+  public updateHotkey(id: string, updates: Partial<HotkeyBinding>) {
+    const hotkey = this.hotkeys.get(id);
+    if (hotkey && hotkey.customizable) {
+      const updated = { ...hotkey, ...updates };
+      this.hotkeys.set(id, updated);
+      this.saveHotkeys();
+    }
+  }
+
+  public updateGesture(id: string, enabled: boolean) {
+    const gesture = this.gestures.get(id);
+    if (gesture) {
+      gesture.enabled = enabled;
+      this.gestures.set(id, gesture);
+      this.saveGestures();
+    }
+  }
+
+  public resetToDefaults() {
+    this.hotkeys.clear();
+    DEFAULT_HOTKEYS.forEach(hotkey => {
+      this.hotkeys.set(hotkey.id, hotkey);
+    });
+    this.saveHotkeys();
+    
+    this.gestures.clear();
+    DEFAULT_GESTURES.forEach(gesture => {
+      this.gestures.set(gesture.id, gesture);
+    });
+    this.saveGestures();
+  }
+
+  public registerActionListener(action: string, callback: (event: KeyboardEvent) => void) {
+    if (!this.listeners.has(action)) {
+      this.listeners.set(action, new Set());
+    }
+    this.listeners.get(action)?.add(callback);
+  }
+
+  public unregisterActionListener(action: string, callback: (event: KeyboardEvent) => void) {
+    this.listeners.get(action)?.delete(callback);
+  }
+
+  public setEnabled(enabled: boolean) {
     this.enabled = enabled;
   }
 
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return this.enabled;
   }
 
-  formatHotkeyDisplay(hotkey: Hotkey): string {
+  public formatHotkeyDisplay(hotkey: HotkeyBinding): string {
     const parts: string[] = [];
-    if (hotkey.ctrlKey) parts.push('Ctrl');
-    if (hotkey.altKey) parts.push('Alt');
-    if (hotkey.shiftKey) parts.push('Shift');
-    if (hotkey.metaKey) parts.push('Cmd');
-    parts.push(hotkey.key.toUpperCase());
+    if (hotkey.ctrl) parts.push('Ctrl');
+    if (hotkey.alt) parts.push('Alt');
+    if (hotkey.shift) parts.push('Shift');
+    if (hotkey.meta) parts.push('Cmd');
+    parts.push(hotkey.key);
     return parts.join('+');
-  }
-
-  destroy() {
-    this.listeners.forEach((listener, key) => {
-      if (key === 'global') {
-        document.removeEventListener('keydown', listener);
-      }
-    });
-    this.listeners.clear();
-    this.customActions.clear();
   }
 }
 

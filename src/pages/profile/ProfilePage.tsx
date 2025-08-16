@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
 import { biometricService } from '@/services/biometric.service';
-import { Shield } from 'lucide-react';
+import { Shield, Keyboard, Eye } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
 
 const ProfilePage = () => {
@@ -318,6 +318,57 @@ const ProfilePage = () => {
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Shortcuts & Accessibility */}
+      <div className="card">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Shortcuts & Accessibility
+          </h2>
+        </div>
+        
+        <div className="p-6 space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center gap-4">
+              <Keyboard className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  Keyboard Shortcuts
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Customize keyboard shortcuts for quick navigation
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/settings/hotkeys"
+              className="btn btn-outline btn-sm"
+            >
+              Customize
+            </Link>
+          </div>
+          
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-center gap-4">
+              <Eye className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  Accessibility Options
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Configure display and interaction preferences
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/settings/accessibility')}
+              className="btn btn-outline btn-sm"
+            >
+              Configure
+            </button>
+          </div>
         </div>
       </div>
 

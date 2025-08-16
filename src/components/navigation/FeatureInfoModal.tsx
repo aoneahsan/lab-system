@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { 
   X, ChevronLeft, ChevronRight, Users, TestTube, FileText, 
   CreditCard, Package, BarChart3, Smartphone, Shield, Activity,
-  Globe, Zap, ClipboardCheck
+  Globe, Zap, ClipboardCheck, Keyboard, Hand
 } from 'lucide-react';
+import { hotkeysService } from '@/services/hotkeys.service';
+import { Link } from 'react-router-dom';
 
 interface FeatureSlide {
   id: string;
@@ -90,6 +92,39 @@ const featureSlides: FeatureSlide[] = [
       'Westgard rules implementation',
       'Corrective action documentation',
       'Proficiency testing management',
+    ],
+  },
+  {
+    id: 'keyboard-shortcuts',
+    title: 'Keyboard Shortcuts',
+    icon: <Keyboard className="h-12 w-12 text-primary-600" />,
+    description: 'Quick navigation and actions with keyboard shortcuts',
+    features: [
+      'Alt+D: Go to Dashboard',
+      'Alt+P: Go to Patients',
+      'Alt+T: Go to Tests',
+      'Alt+S: Go to Samples',
+      'Alt+R: Go to Results',
+      'Ctrl+N: Create New (context-aware)',
+      'Ctrl+S: Save current form',
+      'Ctrl+K: Open global search',
+      'Ctrl+Shift+H: Show all shortcuts',
+      'Escape: Go back or close modal',
+    ],
+  },
+  {
+    id: 'touch-gestures',
+    title: 'Touch Gestures (Mobile)',
+    icon: <Hand className="h-12 w-12 text-primary-600" />,
+    description: 'Intuitive touch gestures for mobile devices',
+    features: [
+      'Swipe Right: Go back',
+      'Swipe Left: Go forward',
+      'Swipe Down: Pull to refresh',
+      'Long Press: Show context menu',
+      'Pinch: Zoom out',
+      'Spread: Zoom in',
+      'Double Tap: Quick action',
     ],
   },
   {
@@ -233,9 +268,20 @@ export const FeatureInfoModal: React.FC<FeatureInfoModalProps> = ({ isOpen, onCl
 
               {/* Features List */}
               <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-4">
-                  Key Features
-                </h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Key Features
+                  </h4>
+                  {(slide.id === 'keyboard-shortcuts' || slide.id === 'touch-gestures') && (
+                    <Link
+                      to="/settings/hotkeys"
+                      onClick={onClose}
+                      className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                    >
+                      Customize Shortcuts →
+                    </Link>
+                  )}
+                </div>
                 <ul className="space-y-3">
                   {slide.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
@@ -250,7 +296,7 @@ export const FeatureInfoModal: React.FC<FeatureInfoModalProps> = ({ isOpen, onCl
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300 font-mono text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
