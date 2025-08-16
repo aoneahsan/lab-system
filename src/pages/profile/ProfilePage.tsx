@@ -1,15 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date-utils';
 import { toast } from '@/stores/toast.store';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '@/config/firebase.config';
+import { biometricService } from '@/services/biometric.service';
+import { Shield } from 'lucide-react';
 
 const ProfilePage = () => {
   const { currentUser, updateUserProfile } = useAuthStore();
   const { tenant } = useTenant();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [formData, setFormData] = useState({
     firstName: currentUser?.firstName || '',
     lastName: currentUser?.lastName || '',
@@ -17,6 +23,28 @@ const ProfilePage = () => {
     professionalId: '',
     specialization: '',
   });
+
+  // Check 2FA and biometric status
+  useEffect(() => {
+    const checkSecurityStatus = async () => {
+      if (!currentUser?.id) return;
+      
+      try {
+        // Check 2FA status from user document
+        const userDoc = await getDoc(doc(firestore, 'users', currentUser.id));
+        const userData = userDoc.data();
+        setTwoFactorEnabled(userData?.twoFactorSettings?.enabled || false);
+        
+        // Check biometric status
+        const biometricStatus = await biometricService.isBiometricAuthEnabled();
+        setBiometricEnabled(biometricStatus);
+      } catch (error) {
+        console.error('Error checking security status:', error);
+      }
+    };
+    
+    checkSecurityStatus();
+  }, [currentUser]);
 
   const handleSave = async () => {
     try {
@@ -33,14 +61,14 @@ const ProfilePage = () => {
     {
       title: 'Two-Factor Authentication',
       description: 'Add an extra layer of security to your account',
-      status: 'Disabled',
+      status: twoFactorEnabled ? 'Enabled' : 'Disabled',
       action: () => navigate('/settings/security/2fa'),
       icon: '🔐',
     },
     {
       title: 'Biometric Authentication',
       description: 'Use fingerprint or face recognition to sign in',
-      status: 'Disabled',
+      status: biometricEnabled ? 'Enabled' : 'Disabled',
       action: () => navigate('/settings/biometric'),
       icon: '👆',
     },
@@ -241,9 +269,18 @@ const ProfilePage = () => {
       {/* Security Settings */}
       <div className="card">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Security Settings
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Security Settings
+            </h2>
+            <Link
+              to="/settings/security"
+              className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              <Shield className="h-4 w-4" />
+              Manage All Security Settings
+            </Link>
+          </div>
         </div>
         
         <div className="p-6 space-y-4">
@@ -276,7 +313,7 @@ const ProfilePage = () => {
                 onClick={feature.action}
                 className="btn btn-outline btn-sm"
               >
-                {feature.status === 'Enabled' ? 'Manage' : 'Enable'}
+                {feature.status === 'Enabled' ? 'Manage' : feature.title === 'Change Password' ? 'Change' : 'Configure'}
               </button>
             </div>
           ))}

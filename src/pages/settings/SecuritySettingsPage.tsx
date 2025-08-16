@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Shield, Key, Smartphone, History, Lock, AlertTriangle } from 'lucide-react';
+import { Shield, Key, Smartphone, History, Lock, AlertTriangle, Fingerprint } from 'lucide-react';
 
 interface SecurityOption {
   title: string;
@@ -20,6 +20,12 @@ const SecuritySettingsPage: React.FC = () => {
       description: 'Add an extra layer of security to your account',
       link: '/settings/security/2fa',
       icon: <Smartphone className="w-5 h-5" />,
+    },
+    {
+      title: 'Biometric Authentication',
+      description: 'Use fingerprint or face recognition to sign in',
+      link: '/settings/biometric',
+      icon: <Fingerprint className="w-5 h-5" />,
     },
     {
       title: 'Password & Security',
