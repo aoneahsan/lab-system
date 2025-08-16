@@ -48,6 +48,7 @@ const EMRConnectionsPage = lazy(() => import('@/pages/emr/EMRConnectionsPage'));
 const EMRConnectionDetailPage = lazy(() => import('@/pages/emr/EMRConnectionDetailPage'));
 const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const BiometricSettingsPage = lazy(() => import('@/pages/settings/BiometricSettingsPage'));
 const ValidationRulesPage = lazy(() => import('@/pages/settings/ValidationRulesPage'));
 const CustomFieldsPage = lazy(() => import('@/pages/settings/CustomFieldsPage'));
@@ -200,20 +201,7 @@ export const AppRouter = () => {
         <Route path="/" element={<DefaultRedirect />} />
 
         {/* 404 page */}
-        <Route
-          path="*"
-          element={
-            <div className="flex justify-center items-center min-h-screen">
-              <div className="text-center">
-                <h1 className="text-6xl font-bold text-gray-300 dark:text-gray-700">404</h1>
-                <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">Page not found</p>
-                <a href="/" className="mt-6 btn btn-primary">
-                  Go to Home
-                </a>
-              </div>
-            </div>
-          }
-        />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );

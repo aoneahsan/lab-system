@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs, QueryConstraint } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
 

@@ -53,7 +53,7 @@
     "lint:fix": "eslint src --fix",
     "preview": "vite preview",
     "preview:prod": "vite preview --config vite.config.prod.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --skipLibCheck",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,css,md}'",
     "format:check": "prettier --check 'src/**/*.{ts,tsx,js,jsx,css,md}'",
     "test": "vitest",

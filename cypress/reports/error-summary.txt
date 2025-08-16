@@ -1,0 +1,6 @@
+Error Summary - 2025-08-16T11:59:00.550Z
+Total Errors: 8
+Pages with Errors: 2
+
+/login: 6 error(s)
+/settings/profile: 2 error(s)

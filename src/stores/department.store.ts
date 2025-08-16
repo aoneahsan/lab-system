@@ -12,7 +12,7 @@ import {
   onSnapshot,
   type Unsubscribe,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { useAuthStore } from './auth.store';
 import { useTenantStore } from './tenant.store';
 import { PROJECT_PREFIX } from '@/constants/tenant.constants';

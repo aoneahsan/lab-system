@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import {
   collection,
   doc,
@@ -15,7 +15,7 @@ import {
   writeBatch,
   increment
 } from 'firebase/firestore';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/config/firebase.config';
 import type {
   HomeCollection,
   HomeCollectionFilters,

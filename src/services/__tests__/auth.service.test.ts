@@ -12,12 +12,12 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import * as authService from '../auth.service';
-import { auth, db } from '@/lib/firebase';
+import { auth, db } from '@/config/firebase.config';
 
 // Mock Firebase modules
 vi.mock('firebase/auth');
 vi.mock('firebase/firestore');
-vi.mock('@/lib/firebase', () => ({
+vi.mock('@/config/firebase.config', () => ({
   auth: {
     currentUser: { uid: 'test-uid', email: 'test@example.com' },
   },

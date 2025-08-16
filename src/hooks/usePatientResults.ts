@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { useTenantStore } from '@/stores/tenant.store';
 
 interface PatientResult {

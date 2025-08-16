@@ -4,7 +4,7 @@
  */
 
 import { type PerformanceTrace, trace } from 'firebase/performance';
-import { performance } from '@/config/firebase';
+import { performance } from '@/config/firebase.config';
 
 // Web Vitals thresholds
 const WEB_VITALS_THRESHOLDS = {

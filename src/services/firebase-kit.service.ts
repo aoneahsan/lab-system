@@ -46,7 +46,7 @@ const FirebaseKit = {
 //   onAuthStateChanged as webOnAuthStateChanged,
 //   User as FirebaseUser
 // } from 'firebase/auth';
-// import { auth } from '@/lib/firebase';
+// import { auth } from '@/config/firebase.config';
 
 // Initialize Firebase Kit for mobile platforms
 export const initializeFirebaseKit = async () => {
@@ -86,7 +86,7 @@ export const analytics = {
       await FirebaseKit.analytics.logEvent({ name: eventName, params });
     } else {
       // Web implementation using Firebase Analytics
-      const { analytics } = await import('@/lib/firebase');
+      const { analytics } = await import('@/config/firebase.config');
       if (analytics) {
         const { logEvent } = await import('firebase/analytics');
         logEvent(analytics, eventName, params);
@@ -98,7 +98,7 @@ export const analytics = {
     if (Capacitor.isNativePlatform()) {
       await FirebaseKit.analytics.setUserId({ userId });
     } else {
-      const { analytics } = await import('@/lib/firebase');
+      const { analytics } = await import('@/config/firebase.config');
       if (analytics) {
         const { setUserId } = await import('firebase/analytics');
         setUserId(analytics, userId);
@@ -110,7 +110,7 @@ export const analytics = {
     if (Capacitor.isNativePlatform()) {
       await FirebaseKit.analytics.setUserProperty({ name, value });
     } else {
-      const { analytics } = await import('@/lib/firebase');
+      const { analytics } = await import('@/config/firebase.config');
       if (analytics) {
         const { setUserProperties } = await import('firebase/analytics');
         setUserProperties(analytics, { [name]: value });
@@ -230,7 +230,7 @@ export const remoteConfig = {
       return result.isFetchedRemote;
     } else {
       // Web: Use Firebase Remote Config
-      const { remoteConfig } = await import('@/lib/firebase');
+      const { remoteConfig } = await import('@/config/firebase.config');
       const { fetchAndActivate } = await import('firebase/remote-config');
       return await fetchAndActivate(remoteConfig);
     }
@@ -241,7 +241,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getString({ key });
       return result.value;
     } else {
-      const { remoteConfig } = await import('@/lib/firebase');
+      const { remoteConfig } = await import('@/config/firebase.config');
       const { getString } = await import('firebase/remote-config');
       return getString(remoteConfig, key);
     }
@@ -252,7 +252,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getBoolean({ key });
       return result.value;
     } else {
-      const { remoteConfig } = await import('@/lib/firebase');
+      const { remoteConfig } = await import('@/config/firebase.config');
       const { getBoolean } = await import('firebase/remote-config');
       return getBoolean(remoteConfig, key);
     }
@@ -263,7 +263,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getNumber({ key });
       return result.value;
     } else {
-      const { remoteConfig } = await import('@/lib/firebase');
+      const { remoteConfig } = await import('@/config/firebase.config');
       const { getNumber } = await import('firebase/remote-config');
       return getNumber(remoteConfig, key);
     }

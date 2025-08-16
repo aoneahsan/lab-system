@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { collection, query, addDoc, updateDoc, deleteDoc, doc, getDocs, orderBy, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import type { TestDefinition } from '@/types/test.types';
 import { toast } from 'sonner';
 

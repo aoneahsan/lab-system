@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { startOfDay } from 'date-fns';

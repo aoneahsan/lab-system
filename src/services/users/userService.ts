@@ -16,7 +16,7 @@ import {
   sendPasswordResetEmail,
   updateProfile
 } from 'firebase/auth';
-import { db, auth, functions } from '@/lib/firebase';
+import { db, auth, functions } from '@/config/firebase.config';
 import { httpsCallable } from 'firebase/functions';
 import { logger } from '@/services/monitoring/logger';
 import type { User, UserRole } from '@/types/auth.types';

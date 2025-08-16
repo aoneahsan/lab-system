@@ -12,7 +12,7 @@ import {
   serverTimestamp,
   limit
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { useTenantStore } from '@/stores/tenant.store';
 import { FIREBASE_COLLECTIONS } from '@/config/firebase-collections';
 import type {

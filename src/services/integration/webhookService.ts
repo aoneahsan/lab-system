@@ -1,5 +1,5 @@
 import { logger } from '@/services/monitoring/logger';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 
 export interface Webhook {

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/config/firebase.config';
 import type { User } from '@/types/auth.types';
 
 const PROJECT_PREFIX = 'labflow_';

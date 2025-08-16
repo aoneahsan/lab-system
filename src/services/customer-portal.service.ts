@@ -1,4 +1,4 @@
-import { db, storage } from '@/lib/firebase';
+import { db, storage } from '@/config/firebase.config';
 import {
   collection,
   doc,
@@ -13,7 +13,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/config/firebase.config';
 import type {
   CustomerPortalAccess,
   SharedResult,

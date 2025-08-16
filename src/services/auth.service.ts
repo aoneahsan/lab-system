@@ -9,7 +9,7 @@ import {
   reauthenticateWithCredential,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { auth, db } from '@/config/firebase.config';
 import type { User } from '@/types/auth.types';
 import { SystemRole } from '@/constants/tenant.constants';
 
