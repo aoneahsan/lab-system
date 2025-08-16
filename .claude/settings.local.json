@@ -563,7 +563,8 @@
       "Bash(git push:*)",
       "Bash(firebase login:*)",
       "Bash(wc:*)",
-      "Bash(cloc:*)"
+      "Bash(cloc:*)",
+      "Bash(./scripts/deploy.sh:*)"
     ],
     "deny": []
   }
