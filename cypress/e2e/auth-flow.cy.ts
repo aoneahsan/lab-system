@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Authentication Flow', () => {
   beforeEach(() => {
     cy.visit('/');
@@ -45,10 +47,10 @@ describe('Authentication Flow', () => {
     it('should toggle password visibility', () => {
       cy.get('input[type="password"]').type('password123');
       cy.get('input[type="password"]').should('have.attr', 'type', 'password');
-      
+
       cy.get('[data-testid="toggle-password"]').click();
       cy.get('input[name="password"]').should('have.attr', 'type', 'text');
-      
+
       cy.get('[data-testid="toggle-password"]').click();
       cy.get('input[name="password"]').should('have.attr', 'type', 'password');
     });
@@ -70,7 +72,7 @@ describe('Authentication Flow', () => {
 
     it('should validate registration form', () => {
       cy.contains('button', 'Sign up').click();
-      
+
       cy.contains('Name is required').should('be.visible');
       cy.contains('Email is required').should('be.visible');
       cy.contains('Password is required').should('be.visible');
@@ -89,7 +91,7 @@ describe('Authentication Flow', () => {
 
     it('should register successfully', () => {
       const uniqueEmail = `test${Date.now()}@example.com`;
-      
+
       cy.get('input[name="name"]').type('Test User');
       cy.get('input[type="email"]').type(uniqueEmail);
       cy.get('input[type="password"]').type('password123');
@@ -156,10 +158,10 @@ describe('Authentication Flow', () => {
 
     it('should redirect to requested page after login', () => {
       cy.visit('/patients');
-      
+
       // Should redirect to login
       cy.url().should('eq', Cypress.config().baseUrl + '/');
-      
+
       // Login
       cy.get('input[type="email"]').type('labstaff@example.com');
       cy.get('input[type="password"]').type('password123');
@@ -178,7 +180,7 @@ describe('Authentication Flow', () => {
       cy.get('input[type="password"]').type('password123');
       cy.contains('button', 'Sign in').click();
       cy.url().should('include', '/dashboard');
-      
+
       // Navigate to settings
       cy.visit('/settings/biometric');
     });

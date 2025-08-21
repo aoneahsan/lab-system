@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check, FileText } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
@@ -40,6 +40,12 @@ const steps: SetupStep[] = [
     title: 'Initial Settings',
     description: 'Timezone, currency, and features',
     icon: Settings,
+  },
+  {
+    id: 'custom',
+    title: 'Custom Configuration',
+    description: 'Additional fields and preferences',
+    icon: FileText,
   },
 ];
 
@@ -82,6 +88,17 @@ const SetupLaboratoryPage = () => {
     qualityControl: true,
     emrIntegration: true,
     mobileApps: true,
+    // Custom configuration fields
+    defaultTestTurnaround: '24',
+    referenceLabName: '',
+    referenceLabContact: '',
+    enablePatientPortal: true,
+    enableSMSNotifications: false,
+    enableEmailNotifications: true,
+    autoReleaseNormalResults: false,
+    requirePhysicianApproval: true,
+    customReportHeader: '',
+    customReportFooter: '',
   });
 
   const [codeValidation, setCodeValidation] = useState<{
@@ -220,6 +237,9 @@ const SetupLaboratoryPage = () => {
           currency: formData.currency,
           resultFormat: formData.resultFormat,
           criticalValueNotification: formData.criticalValueNotification,
+          defaultTestTurnaround: parseInt(formData.defaultTestTurnaround) || 24,
+          autoReleaseNormalResults: formData.autoReleaseNormalResults,
+          requirePhysicianApproval: formData.requirePhysicianApproval,
         },
         features: {
           billing: formData.billing,
@@ -227,6 +247,15 @@ const SetupLaboratoryPage = () => {
           qualityControl: formData.qualityControl,
           emrIntegration: formData.emrIntegration,
           mobileApps: formData.mobileApps,
+          patientPortal: formData.enablePatientPortal,
+          smsNotifications: formData.enableSMSNotifications,
+          emailNotifications: formData.enableEmailNotifications,
+        },
+        customConfiguration: {
+          referenceLabName: formData.referenceLabName,
+          referenceLabContact: formData.referenceLabContact,
+          reportHeader: formData.customReportHeader,
+          reportFooter: formData.customReportFooter,
         },
         subscription: {
           plan: 'trial',
@@ -624,6 +653,165 @@ const SetupLaboratoryPage = () => {
                   Mobile Applications
                 </span>
               </label>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+              <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
+                Custom Configuration
+              </h3>
+              <p className="text-sm text-blue-700 dark:text-blue-400">
+                Configure additional settings specific to your laboratory's workflow and requirements.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                  Laboratory Operations
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Default Test Turnaround (hours)</label>
+                    <input
+                      type="number"
+                      className="input"
+                      value={formData.defaultTestTurnaround}
+                      onChange={(e) => setFormData({ ...formData, defaultTestTurnaround: e.target.value })}
+                      placeholder="24"
+                      min="1"
+                      max="720"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Reference Laboratory Name</label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={formData.referenceLabName}
+                      onChange={(e) => setFormData({ ...formData, referenceLabName: e.target.value })}
+                      placeholder="e.g., Quest Diagnostics"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <label className="label">Reference Laboratory Contact</label>
+                  <input
+                    type="text"
+                    className="input"
+                    value={formData.referenceLabContact}
+                    onChange={(e) => setFormData({ ...formData, referenceLabContact: e.target.value })}
+                    placeholder="Phone or email for reference lab"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                  Patient Communication
+                </h4>
+                <div className="space-y-3">
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      checked={formData.enablePatientPortal}
+                      onChange={(e) => setFormData({ ...formData, enablePatientPortal: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Enable Patient Portal Access
+                    </span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      checked={formData.enableSMSNotifications}
+                      onChange={(e) => setFormData({ ...formData, enableSMSNotifications: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Enable SMS Notifications
+                    </span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      checked={formData.enableEmailNotifications}
+                      onChange={(e) => setFormData({ ...formData, enableEmailNotifications: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Enable Email Notifications
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                  Result Management
+                </h4>
+                <div className="space-y-3">
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      checked={formData.autoReleaseNormalResults}
+                      onChange={(e) => setFormData({ ...formData, autoReleaseNormalResults: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Auto-release Normal Results
+                    </span>
+                  </label>
+
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      checked={formData.requirePhysicianApproval}
+                      onChange={(e) => setFormData({ ...formData, requirePhysicianApproval: e.target.checked })}
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Require Physician Approval for Critical Results
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
+                  Report Customization
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="label">Custom Report Header</label>
+                    <textarea
+                      className="input"
+                      rows={3}
+                      value={formData.customReportHeader}
+                      onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
+                      placeholder="Enter custom text to appear at the top of all reports (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Custom Report Footer</label>
+                    <textarea
+                      className="input"
+                      rows={3}
+                      value={formData.customReportFooter}
+                      onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
+                      placeholder="Enter custom text to appear at the bottom of all reports (optional)"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
