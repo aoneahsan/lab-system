@@ -133,7 +133,7 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lexical": "^0.34.0",
-    "libphonenumber-js": "^1.12.12",
+    "libphonenumber-js": "^1.12.13",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.540.0",
     "notification-kit": "^2.0.5",

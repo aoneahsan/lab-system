@@ -9,7 +9,7 @@ import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
-import { PhoneField } from '@/components/form-fields/PhoneField';
+import { CustomPhoneField } from '@/components/form-fields/CustomPhoneField';
 import { EmailField } from '@/components/form-fields/EmailField';
 import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFields';
 import { TextField } from '@/components/form-fields/TextField';
@@ -496,22 +496,22 @@ const SetupLaboratoryPage = () => {
             />
 
             <div className="grid grid-cols-2 gap-4">
-              <PhoneField
+              <CustomPhoneField
                 label="Phone Number *"
                 name="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="(555) 123-4567"
-                country={formData.country === 'United States' ? 'US' : formData.country}
+                country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
                 required
               />
-              <PhoneField
+              <CustomPhoneField
                 label="Fax Number"
                 name="fax"
                 value={formData.fax}
                 onChange={(e) => setFormData({ ...formData, fax: e.target.value })}
                 placeholder="(555) 123-4568"
-                country={formData.country === 'United States' ? 'US' : formData.country}
+                country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
               />
             </div>
 

@@ -8,6 +8,7 @@ export { EmailField } from './EmailField';
 export { PasswordField, ConfirmPasswordField } from './PasswordField';
 export { NumberField, AgeField, PercentageField, CurrencyField } from './NumberField';
 export { PhoneField } from './PhoneField';
+export { CustomPhoneField } from './CustomPhoneField';
 export { TextareaField } from './TextareaField';
 
 // Date and time components
