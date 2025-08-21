@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
@@ -44,9 +44,18 @@ const steps: SetupStep[] = [
 
 const SetupLaboratoryPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useAuthStore();
-  const [currentStep, setCurrentStep] = useState(0);
+  
+  // Get initial step from URL
+  const stepFromUrl = parseInt(searchParams.get('step') || '0');
+  const [currentStep, setCurrentStep] = useState(stepFromUrl);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Update URL when step changes
+  useEffect(() => {
+    setSearchParams({ step: currentStep.toString() });
+  }, [currentStep, setSearchParams]);
   
   const [formData, setFormData] = useState({
     code: '',
@@ -177,7 +186,7 @@ const SetupLaboratoryPage = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     } else {
-      navigate('/onboarding');
+      navigate('/onboarding?option=create');
     }
   };
 

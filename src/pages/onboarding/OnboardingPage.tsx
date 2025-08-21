@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Building2, Users, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
@@ -7,10 +7,23 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser, isLoading } = useAuthStore();
-  const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
+  
+  // Get initial option from URL
+  const optionFromUrl = searchParams.get('option') as 'join' | 'create' | null;
+  const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(optionFromUrl);
   const [tenantCode, setTenantCode] = useState('');
   const [isJoining, setIsJoining] = useState(false);
+
+  // Update URL when option changes
+  useEffect(() => {
+    if (selectedOption) {
+      setSearchParams({ option: selectedOption });
+    } else {
+      setSearchParams({});
+    }
+  }, [selectedOption, setSearchParams]);
 
   const handleJoinLaboratory = async () => {
     if (!tenantCode.trim()) {
