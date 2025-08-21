@@ -19,7 +19,7 @@ import { CustomPhoneField } from '@/components/form-fields/CustomPhoneField';
 import { EmailField } from '@/components/form-fields/EmailField';
 import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFields';
 import { TextField } from '@/components/form-fields/TextField';
-import { TextareaField } from '@/components/form-fields/TextareaField';
+import { RichTextEditorField } from '@/components/form-fields/RichTextEditorField';
 import { FeatureToggleField, FeatureOption } from '@/components/form-fields/FeatureToggleField';
 import { CheckboxCardField, CheckboxOption } from '@/components/form-fields/CheckboxCardField';
 import { RadioCardField, RadioOption } from '@/components/form-fields/RadioCardField';
@@ -893,24 +893,26 @@ const SetupLaboratoryPage = () => {
                 Report Customization
               </h4>
               
-              <TextareaField
+              <RichTextEditorField
                 label="Custom Report Header"
                 name="customReportHeader"
                 value={formData.customReportHeader}
-                onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, customReportHeader: value })}
                 placeholder="Enter text to appear at the top of all patient reports (e.g., lab motto, certification info)"
                 rows={3}
-                helpText="This text will appear on all generated reports"
+                helpText="This text will appear on all generated reports. You can use rich formatting like bold, italic, lists, etc."
+                toolbar="minimal"
               />
               
-              <TextareaField
+              <RichTextEditorField
                 label="Custom Report Footer"
                 name="customReportFooter"
                 value={formData.customReportFooter}
-                onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
+                onChange={(value) => setFormData({ ...formData, customReportFooter: value })}
                 placeholder="Enter text for report footer (e.g., disclaimer, contact information)"
                 rows={3}
-                helpText="Footer text for all reports"
+                helpText="Footer text for all reports. Rich formatting is supported."
+                toolbar="minimal"
               />
             </div>
           </div>

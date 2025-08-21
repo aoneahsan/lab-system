@@ -63,6 +63,7 @@ const CreateSuperAdmin = lazy(() => import('@/pages/setup/CreateSuperAdmin'));
 const EquipmentPage = lazy(() => import('@/pages/equipment/EquipmentPage'));
 const AdminPanel = lazy(() => import('@/pages/admin/AdminPanel'));
 const VoiceDictationDemo = lazy(() => import('@/pages/demo/VoiceDictationDemo'));
+const RichTextEditorExample = lazy(() => import('@/pages/test/RichTextEditorExample'));
 const AppointmentsPage = lazy(() => import('@/pages/appointments/AppointmentsPage'));
 const AppointmentDetailPage = lazy(() => import('@/pages/appointments/AppointmentDetailPage'));
 
@@ -180,6 +181,7 @@ export const AppRouter = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/demo/voice-dictation" element={<VoiceDictationDemo />} />
+            <Route path="/test/rich-text-editor" element={<RichTextEditorExample />} />
           </Route>
         </Route>
 
