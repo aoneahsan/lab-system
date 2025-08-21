@@ -79,7 +79,9 @@ const SetupLaboratoryPageV2 = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser, refreshUser } = useAuthStore();
   
-  const [currentStep, setCurrentStep] = useState(0);
+  // Get initial step from URL
+  const stepFromUrl = parseInt(searchParams.get('step') || '0');
+  const [currentStep, setCurrentStep] = useState(stepFromUrl);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -168,11 +170,19 @@ const SetupLaboratoryPageV2 = () => {
           // Set completed steps
           setCompletedSteps(progress.completedSteps || []);
 
-          // Navigate to next incomplete step
-          const nextStep = await onboardingService.getNextIncompleteStep(currentUser.id);
-          if (nextStep >= 0) {
-            setCurrentStep(nextStep);
-            setSearchParams({ step: nextStep.toString() });
+          // Check if there's a step in the URL first
+          const urlStep = parseInt(searchParams.get('step') || '-1');
+          
+          if (urlStep >= 0 && (progress.completedSteps?.includes(urlStep) || urlStep === 0)) {
+            // Use the step from URL if it's valid
+            setCurrentStep(urlStep);
+          } else {
+            // Navigate to next incomplete step
+            const nextStep = await onboardingService.getNextIncompleteStep(currentUser.id);
+            if (nextStep >= 0) {
+              setCurrentStep(nextStep);
+              setSearchParams({ step: nextStep.toString() });
+            }
           }
         }
       } catch (error) {
@@ -185,6 +195,14 @@ const SetupLaboratoryPageV2 = () => {
 
     loadProgress();
   }, [currentUser, navigate]);
+
+  // Update URL when step changes
+  useEffect(() => {
+    const currentUrlStep = parseInt(searchParams.get('step') || '0');
+    if (currentUrlStep !== currentStep && !isLoading) {
+      setSearchParams({ step: currentStep.toString() });
+    }
+  }, [currentStep, isLoading]);
 
   // Auto-save with debounce
   const autoSave = useCallback(
