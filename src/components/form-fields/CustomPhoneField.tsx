@@ -370,13 +370,29 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
   const customStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
-      minHeight: '38px',
+      minHeight: '36px',
+      height: '36px',
       backgroundColor: 'white',
       borderColor: error || localError ? '#ef4444' : state.isFocused ? '#3b82f6' : '#d1d5db',
       boxShadow: state.isFocused ? '0 0 0 2px rgba(59, 130, 246, 0.1)' : 'none',
       '&:hover': {
         borderColor: error || localError ? '#ef4444' : '#9ca3af',
       },
+      fontSize: '0.875rem',
+    }),
+    valueContainer: (provided: any) => ({
+      ...provided,
+      height: '34px',
+      padding: '0 8px',
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      margin: '0px',
+      padding: '0px',
+    }),
+    indicatorsContainer: (provided: any) => ({
+      ...provided,
+      height: '34px',
     }),
     menu: (provided: any) => ({
       ...provided,
@@ -386,25 +402,36 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
       ...provided,
       display: 'flex',
       alignItems: 'center',
-      padding: '8px 12px',
+      padding: '6px 10px',
       backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#f3f4f6' : 'white',
       color: state.isSelected ? 'white' : '#111827',
       cursor: 'pointer',
+      fontSize: '0.875rem',
     }),
     singleValue: (provided: any) => ({
       ...provided,
       display: 'flex',
       alignItems: 'center',
+      margin: '0px',
     }),
     placeholder: (provided: any) => ({
       ...provided,
       color: '#9ca3af',
+      margin: '0px',
+    }),
+    dropdownIndicator: (provided: any) => ({
+      ...provided,
+      padding: '4px',
+    }),
+    clearIndicator: (provided: any) => ({
+      ...provided,
+      padding: '4px',
     }),
   };
 
   const formatOptionLabel = (option: CountryOption) => (
     <div className="flex items-center space-x-2">
-      <span className="text-lg">{option.flag}</span>
+      <span className="text-base">{option.flag}</span>
       <span className="text-sm">{option.label}</span>
       <span className="text-xs text-gray-500">{option.dialCode}</span>
     </div>
@@ -412,7 +439,7 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
 
   const formatSingleValue = (option: CountryOption) => (
     <div className="flex items-center space-x-1">
-      <span className="text-lg">{option.flag}</span>
+      <span className="text-sm">{option.flag}</span>
       <span className="text-xs text-gray-600">{option.dialCode}</span>
     </div>
   );
@@ -434,7 +461,7 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
       showLabel={showLabel}
     >
       <div className="flex space-x-2">
-        <div className="w-32">
+        <div className="w-28">
           <Select
             value={selectedCountry}
             onChange={handleCountryChange}
@@ -443,7 +470,7 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
             styles={customStyles}
             isDisabled={disabled || loading}
             isSearchable
-            placeholder="Country"
+            placeholder="Code"
             className="react-select-container"
             classNamePrefix="react-select"
             menuPlacement="auto"
@@ -454,8 +481,8 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
         </div>
 
         <div className="flex-1 relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Phone className="h-4 w-4 text-gray-400" />
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <Phone className="h-3.5 w-3.5 text-gray-400" />
           </div>
           <input
             type="tel"
@@ -467,7 +494,7 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
             disabled={disabled || loading || !selectedCountry}
             autoFocus={autoFocus}
             className={`
-              block w-full pl-10 pr-3 py-2 text-sm border rounded-lg
+              block w-full h-9 pl-8 pr-3 py-1.5 text-sm border rounded-lg
               focus:ring-2 focus:ring-primary-500 focus:border-primary-500
               ${
                 displayError
