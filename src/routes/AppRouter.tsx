@@ -14,6 +14,7 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
+const SetupLaboratoryPage = lazy(() => import('@/pages/onboarding/SetupLaboratoryPage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const DebugDashboard = lazy(() => import('@/pages/dashboard/DebugDashboard'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));
@@ -113,8 +114,9 @@ export const AppRouter = () => {
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
-          {/* Onboarding route - outside dashboard layout */}
+          {/* Onboarding routes - outside dashboard layout */}
           <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/onboarding/setup-laboratory" element={<SetupLaboratoryPage />} />
           
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />

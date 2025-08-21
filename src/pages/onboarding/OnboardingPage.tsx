@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Building2, Users, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
-import CreateLaboratoryModal from '@/pages/auth/CreateLaboratoryModal';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { TextField } from '@/components/form-fields';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const { currentUser, isLoading } = useAuthStore();
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [tenantCode, setTenantCode] = useState('');
   const [isJoining, setIsJoining] = useState(false);
 
@@ -33,10 +30,6 @@ const OnboardingPage = () => {
     }
   };
 
-  const handleCreateSuccess = (code: string) => {
-    toast.success('Laboratory created!', `Your laboratory code is: ${code}`);
-    navigate('/dashboard');
-  };
 
   // Use effect to handle navigation after component mounts
   useEffect(() => {
@@ -177,7 +170,7 @@ const OnboardingPage = () => {
               </p>
 
               <button
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => navigate('/onboarding/setup-laboratory')}
                 className="w-full btn btn-primary"
               >
                 Continue to Setup
@@ -185,12 +178,6 @@ const OnboardingPage = () => {
             </div>
           ) : null}
         </div>
-
-        <CreateLaboratoryModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
       </div>
     </div>
   );
