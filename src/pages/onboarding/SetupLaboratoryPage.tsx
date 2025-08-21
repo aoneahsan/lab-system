@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check, FileText } from 'lucide-react';
+import { 
+  ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check, FileText,
+  CreditCard, Package, CheckCircle, Wifi, Smartphone, Bell, BarChart3, Users,
+  Mail, MessageSquare, FileBarChart, Shield, Clock, Zap
+} from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
@@ -14,6 +18,7 @@ import { EmailField } from '@/components/form-fields/EmailField';
 import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFields';
 import { TextField } from '@/components/form-fields/TextField';
 import { TextareaField } from '@/components/form-fields/TextareaField';
+import { FeatureToggleField, FeatureOption } from '@/components/form-fields/FeatureToggleField';
 
 interface SetupStep {
   id: string;
@@ -108,6 +113,8 @@ const SetupLaboratoryPage = () => {
     requirePhysicianApproval: true,
     customReportHeader: '',
     customReportFooter: '',
+    // Features as array for FeatureToggleField
+    enabledFeatures: ['billing', 'inventory', 'qualityControl', 'emrIntegration', 'mobileApps', 'criticalAlerts'],
   });
 
   const [codeValidation, setCodeValidation] = useState<{
@@ -251,14 +258,18 @@ const SetupLaboratoryPage = () => {
           requirePhysicianApproval: formData.requirePhysicianApproval,
         },
         features: {
-          billing: formData.billing,
-          inventory: formData.inventory,
-          qualityControl: formData.qualityControl,
-          emrIntegration: formData.emrIntegration,
-          mobileApps: formData.mobileApps,
-          patientPortal: formData.enablePatientPortal,
-          smsNotifications: formData.enableSMSNotifications,
-          emailNotifications: formData.enableEmailNotifications,
+          billing: formData.enabledFeatures.includes('billing'),
+          inventory: formData.enabledFeatures.includes('inventory'),
+          qualityControl: formData.enabledFeatures.includes('qualityControl'),
+          emrIntegration: formData.enabledFeatures.includes('emrIntegration'),
+          mobileApps: formData.enabledFeatures.includes('mobileApps'),
+          patientPortal: formData.enabledFeatures.includes('patientPortal'),
+          smsNotifications: formData.enabledFeatures.includes('smsNotifications'),
+          emailNotifications: formData.enabledFeatures.includes('emailNotifications'),
+          criticalAlerts: formData.enabledFeatures.includes('criticalAlerts'),
+          analytics: formData.enabledFeatures.includes('analytics'),
+          customReports: formData.enabledFeatures.includes('customReports'),
+          auditLogs: formData.enabledFeatures.includes('auditLogs'),
         },
         customConfiguration: {
           referenceLabName: formData.referenceLabName,
@@ -525,7 +536,100 @@ const SetupLaboratoryPage = () => {
           </div>
         );
 
-      case 3:
+      case 3: {
+        const featureOptions: FeatureOption[] = [
+          {
+            id: 'billing',
+            title: 'Billing & Insurance',
+            description: 'Process claims, track payments, and manage insurance',
+            icon: CreditCard,
+            recommended: true,
+          },
+          {
+            id: 'inventory',
+            title: 'Inventory Management',
+            description: 'Track reagents, supplies, and automatic reordering',
+            icon: Package,
+            recommended: true,
+          },
+          {
+            id: 'qualityControl',
+            title: 'Quality Control',
+            description: 'QC runs, Levey-Jennings charts, Westgard rules',
+            icon: CheckCircle,
+            recommended: true,
+          },
+          {
+            id: 'emrIntegration',
+            title: 'EMR Integration',
+            description: 'Connect with electronic medical record systems',
+            icon: Wifi,
+          },
+          {
+            id: 'mobileApps',
+            title: 'Mobile Applications',
+            description: 'iOS and Android apps for staff and patients',
+            icon: Smartphone,
+          },
+          {
+            id: 'criticalAlerts',
+            title: 'Critical Value Alerts',
+            description: 'Instant notifications for critical test results',
+            icon: Bell,
+            recommended: true,
+          },
+          {
+            id: 'analytics',
+            title: 'Advanced Analytics',
+            description: 'Deep insights and predictive analytics',
+            icon: BarChart3,
+          },
+          {
+            id: 'patientPortal',
+            title: 'Patient Portal',
+            description: 'Self-service portal for patients to view results',
+            icon: Users,
+          },
+          {
+            id: 'smsNotifications',
+            title: 'SMS Notifications',
+            description: 'Text message alerts for results and appointments',
+            icon: MessageSquare,
+          },
+          {
+            id: 'emailNotifications',
+            title: 'Email Notifications',
+            description: 'Automated email updates and reports',
+            icon: Mail,
+          },
+          {
+            id: 'customReports',
+            title: 'Custom Reports',
+            description: 'Build and schedule custom report templates',
+            icon: FileBarChart,
+          },
+          {
+            id: 'auditLogs',
+            title: 'Audit & Compliance',
+            description: 'Complete audit trails and compliance tracking',
+            icon: Shield,
+          },
+          {
+            id: 'autoScheduling',
+            title: 'Auto Scheduling',
+            description: 'Intelligent appointment and resource scheduling',
+            icon: Clock,
+            comingSoon: true,
+          },
+          {
+            id: 'aiAssistant',
+            title: 'AI Assistant',
+            description: 'AI-powered insights and recommendations',
+            icon: Zap,
+            comingSoon: true,
+          },
+        ];
+
         return (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
@@ -573,87 +677,18 @@ const SetupLaboratoryPage = () => {
               isClearable={false}
             />
 
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Features to Enable
-              </label>
-              
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.criticalValueNotification}
-                  onChange={(e) =>
-                    setFormData({ ...formData, criticalValueNotification: e.target.checked })
-                  }
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Critical Value Notifications
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.billing}
-                  onChange={(e) => setFormData({ ...formData, billing: e.target.checked })}
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Billing & Insurance
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.inventory}
-                  onChange={(e) => setFormData({ ...formData, inventory: e.target.checked })}
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Inventory Management
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.qualityControl}
-                  onChange={(e) => setFormData({ ...formData, qualityControl: e.target.checked })}
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Quality Control
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.emrIntegration}
-                  onChange={(e) => setFormData({ ...formData, emrIntegration: e.target.checked })}
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  EMR Integration
-                </span>
-              </label>
-
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  checked={formData.mobileApps}
-                  onChange={(e) => setFormData({ ...formData, mobileApps: e.target.checked })}
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Mobile Applications
-                </span>
-              </label>
-            </div>
+            <FeatureToggleField
+              label="Features to Enable"
+              name="features"
+              options={featureOptions}
+              value={formData.enabledFeatures}
+              onChange={(features) => setFormData({ ...formData, enabledFeatures: features })}
+              columns={2}
+              helpText="Select the features you want to enable for your laboratory. You can change these settings later."
+            />
           </div>
         );
+      }
 
       case 4:
         return (

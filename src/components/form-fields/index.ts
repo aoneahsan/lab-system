@@ -10,6 +10,8 @@ export { NumberField, AgeField, PercentageField, CurrencyField } from './NumberF
 export { PhoneField } from './PhoneField';
 export { CustomPhoneField } from './CustomPhoneField';
 export { TextareaField } from './TextareaField';
+export { FeatureToggleField } from './FeatureToggleField';
+export type { FeatureOption } from './FeatureToggleField';
 
 // Date and time components
 export { DateField, DateTimeField, TimeField } from './DateField';
