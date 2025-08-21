@@ -39,7 +39,6 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       '/inventory',
       '/quality-control',
       '/reports',
-      '/onboarding',
       '/clinician',
       '/equipment',
       '/emr',
@@ -59,8 +58,8 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
     return <Outlet />;
   }
 
-  // Allow onboarding page to be accessed without a tenant
-  if (location.pathname === '/onboarding') {
+  // Allow onboarding pages to be accessed without a tenant
+  if (location.pathname.startsWith('/onboarding')) {
     return <Outlet />;
   }
 
