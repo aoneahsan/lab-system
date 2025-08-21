@@ -204,14 +204,15 @@ const SetupLaboratoryPageV2 = () => {
     }
   }, [currentStep, isLoading]);
 
-  // Auto-save with debounce
+  // Auto-save with debounce (saves data but doesn't mark as complete)
   const autoSave = useCallback(
     debounce(async (step: number, data: any) => {
       if (!currentUser) return;
       
       setIsSaving(true);
       try {
-        await onboardingService.saveStepProgress(currentUser.id, step, data);
+        // Use saveStepData which doesn't mark step as complete
+        await onboardingService.saveStepData(currentUser.id, step, data);
         setLastSaved(new Date());
       } catch (error) {
         console.error('Auto-save failed:', error);
@@ -336,7 +337,11 @@ const SetupLaboratoryPageV2 = () => {
   };
 
   const validateCurrentStep = () => {
-    const validation = onboardingService.validateStepData(currentStep, getStepData(currentStep));
+    // Get step data for validation
+    const stepData = getStepData(currentStep);
+    
+    // First use the service validation
+    const validation = onboardingService.validateStepData(currentStep, stepData);
     
     if (!validation.isValid) {
       validation.errors.forEach(error => {
@@ -345,34 +350,139 @@ const SetupLaboratoryPageV2 = () => {
       return false;
     }
 
-    // Additional validation for step 0
-    if (currentStep === 0 && !codeValidation.isAvailable) {
-      toast.error('Invalid code', 'Please choose an available laboratory code');
-      return false;
+    // Additional specific validations per step
+    switch (currentStep) {
+      case 0: // Basic Info
+        if (!formData.code || formData.code.length < 3) {
+          toast.error('Invalid Code', 'Laboratory code must be at least 3 characters');
+          return false;
+        }
+        if (!codeValidation.isAvailable) {
+          toast.error('Invalid code', 'Please choose an available laboratory code');
+          return false;
+        }
+        if (!formData.name || formData.name.trim().length < 3) {
+          toast.error('Invalid Name', 'Laboratory name must be at least 3 characters');
+          return false;
+        }
+        if (!formData.type) {
+          toast.error('Missing Type', 'Please select a laboratory type');
+          return false;
+        }
+        break;
+        
+      case 1: // Address
+        if (!formData.street || formData.street.trim().length < 5) {
+          toast.error('Invalid Address', 'Please enter a valid street address');
+          return false;
+        }
+        if (!formData.country || !formData.countryId) {
+          toast.error('Missing Country', 'Please select a country');
+          return false;
+        }
+        if (!formData.state || !formData.stateId) {
+          toast.error('Missing State', 'Please select a state/province');
+          return false;
+        }
+        if (!formData.city || !formData.cityId) {
+          toast.error('Missing City', 'Please select a city');
+          return false;
+        }
+        if (!formData.zipCode || formData.zipCode.trim().length < 3) {
+          toast.error('Invalid ZIP Code', 'Please enter a valid ZIP/postal code');
+          return false;
+        }
+        break;
+        
+      case 2: // Contact
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!formData.email || !emailRegex.test(formData.email)) {
+          toast.error('Invalid Email', 'Please enter a valid email address');
+          return false;
+        }
+        // Phone validation
+        if (!formData.phone || formData.phone.replace(/\D/g, '').length < 10) {
+          toast.error('Invalid Phone', 'Please enter a valid phone number');
+          return false;
+        }
+        // Website validation (optional but if provided, should be valid)
+        if (formData.website && !formData.website.match(/^https?:\/\/.+/)) {
+          toast.error('Invalid Website', 'Website URL must start with http:// or https://');
+          return false;
+        }
+        break;
+        
+      case 3: // Settings
+        if (!formData.timezone) {
+          toast.error('Missing Timezone', 'Please select a timezone');
+          return false;
+        }
+        if (!formData.currency) {
+          toast.error('Missing Currency', 'Please select a currency');
+          return false;
+        }
+        if (!formData.resultFormat) {
+          toast.error('Missing Result Format', 'Please select a result format');
+          return false;
+        }
+        if (!formData.enabledFeatures || formData.enabledFeatures.length === 0) {
+          toast.error('No Features Selected', 'Please select at least one feature to enable');
+          return false;
+        }
+        break;
+        
+      case 4: // Custom Configuration
+        // All fields are optional in this step, but validate if provided
+        if (formData.referenceLabContact && formData.referenceLabContact.trim()) {
+          // Check if it's an email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(formData.referenceLabContact)) {
+            // If not email, check if it's a phone
+            const phoneDigits = formData.referenceLabContact.replace(/\D/g, '');
+            if (phoneDigits.length < 10) {
+              toast.error('Invalid Contact', 'Reference lab contact must be a valid email or phone number');
+              return false;
+            }
+          }
+        }
+        // Step 4 has no required fields, so it's always valid
+        break;
     }
 
     return true;
   };
 
   const handleNext = async () => {
-    if (!validateCurrentStep()) return;
+    // Validate current step before proceeding
+    if (!validateCurrentStep()) {
+      return;
+    }
 
-    // Mark current step as completed
+    // Only mark step as completed if validation passed
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps(prev => [...prev, currentStep]);
     }
 
-    // Save progress
+    // Save progress with validated data
     if (currentUser) {
-      await onboardingService.saveStepProgress(
-        currentUser.id,
-        currentStep,
-        getStepData(currentStep)
-      );
+      try {
+        await onboardingService.saveStepProgress(
+          currentUser.id,
+          currentStep,
+          getStepData(currentStep)
+        );
+      } catch (error) {
+        console.error('Failed to save progress:', error);
+        toast.error('Save Failed', 'Failed to save progress. Please try again.');
+        return;
+      }
     }
 
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      setSearchParams({ step: nextStep.toString() });
     } else {
       handleSubmit();
     }
@@ -387,9 +497,27 @@ const SetupLaboratoryPageV2 = () => {
   };
 
   const handleStepClick = (stepIndex: number) => {
-    // Allow navigation to completed steps or current step
-    if (completedSteps.includes(stepIndex) || stepIndex === currentStep) {
+    // Can't navigate to future incomplete steps
+    if (stepIndex > currentStep && !completedSteps.includes(stepIndex)) {
+      toast.warning('Step Locked', 'Please complete the current step first');
+      return;
+    }
+    
+    // If trying to navigate forward from current step, validate first
+    if (stepIndex > currentStep) {
+      // Check if all steps between current and target are completed
+      for (let i = currentStep; i < stepIndex; i++) {
+        if (!completedSteps.includes(i)) {
+          toast.warning('Incomplete Steps', `Please complete step ${i + 1} first`);
+          return;
+        }
+      }
+    }
+    
+    // Allow navigation to completed steps or going back
+    if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       setCurrentStep(stepIndex);
+      setSearchParams({ step: stepIndex.toString() });
     }
   };
 

@@ -86,15 +86,21 @@ class OnboardingService {
   async saveStepProgress(
     userId: string,
     step: number,
-    stepData: Partial<OnboardingData['laboratoryData']>
+    stepData: Partial<OnboardingData['laboratoryData']>,
+    markAsComplete: boolean = true
   ): Promise<void> {
     try {
       const docRef = doc(firestore, this.COLLECTION_NAME, userId);
       const existingData = await this.getProgress(userId);
       
       const completedSteps = existingData?.completedSteps || [];
-      if (!completedSteps.includes(step)) {
-        completedSteps.push(step);
+      
+      // Only add to completed steps if markAsComplete is true and validation passes
+      if (markAsComplete && !completedSteps.includes(step)) {
+        const validation = this.validateStepData(step, stepData);
+        if (validation.isValid) {
+          completedSteps.push(step);
+        }
       }
       
       const updatedData: OnboardingData = {
@@ -122,8 +128,13 @@ class OnboardingService {
       // Save to localStorage as fallback
       const existingData = this.getFromLocalStorage(userId);
       const completedSteps = existingData?.completedSteps || [];
-      if (!completedSteps.includes(step)) {
-        completedSteps.push(step);
+      
+      // Only add to completed steps if markAsComplete is true and validation passes
+      if (markAsComplete && !completedSteps.includes(step)) {
+        const validation = this.validateStepData(step, stepData);
+        if (validation.isValid) {
+          completedSteps.push(step);
+        }
       }
       
       const updatedData: OnboardingData = {
@@ -140,6 +151,17 @@ class OnboardingService {
       
       this.saveToLocalStorage(updatedData);
     }
+  }
+
+  /**
+   * Save data without marking step as complete (for auto-save)
+   */
+  async saveStepData(
+    userId: string,
+    step: number,
+    stepData: Partial<OnboardingData['laboratoryData']>
+  ): Promise<void> {
+    return this.saveStepProgress(userId, step, stepData, false);
   }
 
   /**
