@@ -382,19 +382,32 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
     }),
     valueContainer: (provided: any) => ({
       ...provided,
-      height: '34px',
-      padding: '0 8px',
+      height: '36px',
+      padding: '0 4px',
+      display: 'flex',
+      alignItems: 'center',
     }),
     input: (provided: any) => ({
       ...provided,
       margin: '0px',
       padding: '0px',
+      height: 'auto',
     }),
     indicatorsContainer: (provided: any) => ({
       ...provided,
-      height: '34px',
+      height: '36px',
     }),
     menu: (provided: any) => ({
+      ...provided,
+      zIndex: 9999,
+      minWidth: '280px',
+      width: 'auto',
+    }),
+    menuList: (provided: any) => ({
+      ...provided,
+      maxHeight: '200px',
+    }),
+    menuPortal: (provided: any) => ({
       ...provided,
       zIndex: 9999,
     }),
@@ -402,17 +415,21 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
       ...provided,
       display: 'flex',
       alignItems: 'center',
-      padding: '6px 10px',
+      padding: '8px 12px',
       backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#f3f4f6' : 'white',
       color: state.isSelected ? 'white' : '#111827',
       cursor: 'pointer',
       fontSize: '0.875rem',
+      whiteSpace: 'nowrap',
     }),
     singleValue: (provided: any) => ({
       ...provided,
       display: 'flex',
       alignItems: 'center',
       margin: '0px',
+      position: 'static',
+      transform: 'none',
+      maxWidth: '100%',
     }),
     placeholder: (provided: any) => ({
       ...provided,
@@ -421,26 +438,32 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
     }),
     dropdownIndicator: (provided: any) => ({
       ...provided,
-      padding: '4px',
+      padding: '0 4px',
+      height: '36px',
+      display: 'flex',
+      alignItems: 'center',
     }),
     clearIndicator: (provided: any) => ({
       ...provided,
-      padding: '4px',
+      padding: '0 4px',
+      height: '36px',
+      display: 'flex',
+      alignItems: 'center',
     }),
   };
 
   const formatOptionLabel = (option: CountryOption) => (
-    <div className="flex items-center space-x-2">
-      <span className="text-base">{option.flag}</span>
-      <span className="text-sm">{option.label}</span>
-      <span className="text-xs text-gray-500">{option.dialCode}</span>
+    <div className="flex items-center space-x-2 w-full">
+      <span className="text-lg flex-shrink-0">{option.flag}</span>
+      <span className="text-sm flex-grow">{option.label}</span>
+      <span className="text-xs text-gray-500 flex-shrink-0">{option.dialCode}</span>
     </div>
   );
 
   const formatSingleValue = (option: CountryOption) => (
     <div className="flex items-center space-x-1">
-      <span className="text-sm">{option.flag}</span>
-      <span className="text-xs text-gray-600">{option.dialCode}</span>
+      <span className="text-base">{option.flag}</span>
+      <span className="text-xs text-gray-600 font-medium">{option.dialCode}</span>
     </div>
   );
 
@@ -461,7 +484,7 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
       showLabel={showLabel}
     >
       <div className="flex space-x-2">
-        <div className="w-28">
+        <div className="w-24" style={{ minWidth: '96px' }}>
           <Select
             value={selectedCountry}
             onChange={handleCountryChange}
@@ -470,10 +493,12 @@ export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
             styles={customStyles}
             isDisabled={disabled || loading}
             isSearchable
-            placeholder="Code"
+            placeholder="+"
             className="react-select-container"
             classNamePrefix="react-select"
-            menuPlacement="auto"
+            menuPlacement="bottom"
+            menuPosition="absolute"
+            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
             components={{
               SingleValue: ({ data }) => formatSingleValue(data as CountryOption),
             }}
