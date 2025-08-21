@@ -7,6 +7,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { SelectField } from '@/components/form-fields/SelectField';
 
 interface SetupStep {
   id: string;
@@ -335,19 +336,20 @@ const SetupLaboratoryPage = () => {
               />
             </div>
 
-            <div>
-              <label className="label">Laboratory Type *</label>
-              <select
-                className="input"
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              >
-                <option value="clinical_lab">Clinical Laboratory</option>
-                <option value="reference_lab">Reference Laboratory</option>
-                <option value="research_lab">Research Laboratory</option>
-                <option value="hospital_lab">Hospital Laboratory</option>
-              </select>
-            </div>
+            <SelectField
+              label="Laboratory Type *"
+              name="type"
+              value={formData.type}
+              onChange={(value) => setFormData({ ...formData, type: value as string })}
+              options={[
+                { value: 'clinical_lab', label: 'Clinical Laboratory' },
+                { value: 'reference_lab', label: 'Reference Laboratory' },
+                { value: 'research_lab', label: 'Research Laboratory' },
+                { value: 'hospital_lab', label: 'Hospital Laboratory' },
+              ]}
+              required
+              isClearable={false}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -500,49 +502,49 @@ const SetupLaboratoryPage = () => {
         return (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">Timezone</label>
-                <select
-                  className="input"
-                  value={formData.timezone}
-                  onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                >
-                  <option value="America/New_York">Eastern Time</option>
-                  <option value="America/Chicago">Central Time</option>
-                  <option value="America/Denver">Mountain Time</option>
-                  <option value="America/Los_Angeles">Pacific Time</option>
-                  <option value="America/Phoenix">Arizona Time</option>
-                  <option value="Pacific/Honolulu">Hawaii Time</option>
-                </select>
-              </div>
-              <div>
-                <label className="label">Currency</label>
-                <select
-                  className="input"
-                  value={formData.currency}
-                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                >
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="CAD">CAD - Canadian Dollar</option>
-                  <option value="AUD">AUD - Australian Dollar</option>
-                </select>
-              </div>
+              <SelectField
+                label="Timezone"
+                name="timezone"
+                value={formData.timezone}
+                onChange={(value) => setFormData({ ...formData, timezone: value as string })}
+                options={[
+                  { value: 'America/New_York', label: 'Eastern Time' },
+                  { value: 'America/Chicago', label: 'Central Time' },
+                  { value: 'America/Denver', label: 'Mountain Time' },
+                  { value: 'America/Los_Angeles', label: 'Pacific Time' },
+                  { value: 'America/Phoenix', label: 'Arizona Time' },
+                  { value: 'Pacific/Honolulu', label: 'Hawaii Time' },
+                ]}
+                isClearable={false}
+              />
+              <SelectField
+                label="Currency"
+                name="currency"
+                value={formData.currency}
+                onChange={(value) => setFormData({ ...formData, currency: value as string })}
+                options={[
+                  { value: 'USD', label: 'USD - US Dollar' },
+                  { value: 'EUR', label: 'EUR - Euro' },
+                  { value: 'GBP', label: 'GBP - British Pound' },
+                  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+                  { value: 'AUD', label: 'AUD - Australian Dollar' },
+                ]}
+                isClearable={false}
+              />
             </div>
 
-            <div>
-              <label className="label">Result Format</label>
-              <select
-                className="input"
-                value={formData.resultFormat}
-                onChange={(e) => setFormData({ ...formData, resultFormat: e.target.value })}
-              >
-                <option value="standard">Standard Format</option>
-                <option value="detailed">Detailed Format</option>
-                <option value="compact">Compact Format</option>
-              </select>
-            </div>
+            <SelectField
+              label="Result Format"
+              name="resultFormat"
+              value={formData.resultFormat}
+              onChange={(value) => setFormData({ ...formData, resultFormat: value as string })}
+              options={[
+                { value: 'standard', label: 'Standard Format' },
+                { value: 'detailed', label: 'Detailed Format' },
+                { value: 'compact', label: 'Compact Format' },
+              ]}
+              isClearable={false}
+            />
 
             <div className="space-y-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
