@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import { ProtectedRouteV2 } from '@/routes/ProtectedRouteV2';
 import { DefaultRedirect } from '@/components/routing/DefaultRedirect';
 import { AdminRouteGuard } from '@/components/routing/AdminRouteGuard';
 
@@ -14,7 +14,7 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
-const SetupLaboratoryPage = lazy(() => import('@/pages/onboarding/SetupLaboratoryPage'));
+const SetupLaboratoryPage = lazy(() => import('@/pages/onboarding/SetupLaboratoryPageV2'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const DebugDashboard = lazy(() => import('@/pages/dashboard/DebugDashboard'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));
@@ -114,7 +114,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRouteV2 />}>
           {/* Onboarding routes - outside dashboard layout */}
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/onboarding/setup-laboratory" element={<SetupLaboratoryPage />} />
@@ -178,7 +178,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Demo Routes */}
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRouteV2 />}>
           <Route element={<DashboardLayout />}>
             <Route path="/demo/voice-dictation" element={<VoiceDictationDemo />} />
             <Route path="/test/rich-text-editor" element={<RichTextEditorExample />} />
@@ -186,7 +186,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Admin Panel Route - Now uses DashboardLayout */}
-        <Route element={<ProtectedRoute allowedRoles={['super_admin']} />}>
+        <Route element={<ProtectedRouteV2 allowedRoles={['super_admin']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/admin/*" element={
               <AdminRouteGuard>
@@ -197,7 +197,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Clinician App Routes */}
-        <Route element={<ProtectedRoute allowedRoles={['clinician']} />}>
+        <Route element={<ProtectedRouteV2 allowedRoles={['clinician']} />}>
           <Route path="/clinician/*" element={<ClinicianApp />} />
         </Route>
 
