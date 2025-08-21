@@ -476,9 +476,600 @@ const SetupLaboratoryPageV2 = () => {
   };
 
   const renderStepContent = () => {
-    // Step content rendering logic (same as original but with formData updates)
-    // ... (keeping the same content as the original file for brevity)
-    return null; // Placeholder
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="label">Laboratory Code *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  minLength={3}
+                  maxLength={10}
+                  className={`input ${
+                    formData.code && !codeValidation.isChecking
+                      ? codeValidation.isAvailable
+                        ? 'border-green-500 focus:border-green-500'
+                        : 'border-red-500 focus:border-red-500'
+                      : ''
+                  }`}
+                  value={formData.code}
+                  onChange={handleCodeChange}
+                  placeholder="e.g., LAB001"
+                />
+                {formData.code && (
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    {codeValidation.isChecking ? (
+                      <LoadingSpinner size="sm" />
+                    ) : codeValidation.isAvailable ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <span className="text-red-500">✗</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              {codeValidation.message && (
+                <p
+                  className={`mt-1 text-sm ${
+                    codeValidation.isAvailable ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
+                  {codeValidation.message}
+                </p>
+              )}
+              <p className="mt-1 text-sm text-gray-500">
+                A unique 3-10 character code for your laboratory
+              </p>
+            </div>
+
+            <TextField
+              label="Laboratory Name *"
+              name="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g., Central Medical Laboratory"
+              required
+            />
+
+            <SelectField
+              label="Laboratory Type *"
+              name="type"
+              value={formData.type}
+              onChange={(value) => setFormData({ ...formData, type: value as string })}
+              options={[
+                { value: 'clinical_lab', label: 'Clinical Laboratory' },
+                { value: 'reference_lab', label: 'Reference Laboratory' },
+                { value: 'research_lab', label: 'Research Laboratory' },
+                { value: 'hospital_lab', label: 'Hospital Laboratory' },
+              ]}
+              required
+              isClearable={false}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <TextField
+                label="License Number"
+                name="licenseNumber"
+                value={formData.licenseNumber}
+                onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                placeholder="e.g., LAB-2024-001"
+              />
+              <TextField
+                label="Accreditation Number"
+                name="accreditationNumber"
+                value={formData.accreditationNumber}
+                onChange={(e) => setFormData({ ...formData, accreditationNumber: e.target.value })}
+                placeholder="e.g., CAP-123456"
+              />
+            </div>
+          </div>
+        );
+
+      case 1:
+        return (
+          <div className="space-y-6">
+            <TextField
+              label="Street Address *"
+              name="street"
+              value={formData.street}
+              onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+              placeholder="123 Medical Center Drive"
+              required
+            />
+
+            <CountryField
+              label="Country *"
+              name="country"
+              value={formData.countryId}
+              onChange={(value) => {
+                setFormData({ 
+                  ...formData, 
+                  countryId: value?.id || '',
+                  country: value?.name || '',
+                  // Reset state and city when country changes
+                  stateId: '',
+                  state: '',
+                  cityId: '',
+                  city: ''
+                });
+              }}
+              required
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <StateField
+                label="State/Province *"
+                name="state"
+                countryId={formData.countryId}
+                value={formData.stateId}
+                onChange={(value) => {
+                  setFormData({ 
+                    ...formData, 
+                    stateId: value?.id || '',
+                    state: value?.name || '',
+                    // Reset city when state changes
+                    cityId: '',
+                    city: ''
+                  });
+                }}
+                required
+              />
+              
+              <CityField
+                label="City *"
+                name="city"
+                countryId={formData.countryId}
+                stateId={formData.stateId}
+                value={formData.cityId}
+                onChange={(value) => {
+                  setFormData({ 
+                    ...formData, 
+                    cityId: value?.id || '',
+                    city: value?.name || ''
+                  });
+                }}
+                required
+              />
+            </div>
+
+            <ZipCodeField
+              label="ZIP/Postal Code *"
+              name="zipCode"
+              value={formData.zipCode}
+              onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+              country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'UK' : 'US'}
+              required
+            />
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <EmailField
+              label="Contact Email *"
+              name="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="admin@laboratory.com"
+              required
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <CustomPhoneField
+                label="Phone Number *"
+                name="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="(555) 123-4567"
+                country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
+                required
+              />
+              <CustomPhoneField
+                label="Fax Number"
+                name="fax"
+                value={formData.fax}
+                onChange={(e) => setFormData({ ...formData, fax: e.target.value })}
+                placeholder="(555) 123-4568"
+                country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
+              />
+            </div>
+
+            <UrlField
+              label="Website"
+              name="website"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              placeholder="https://laboratory.com"
+            />
+          </div>
+        );
+
+      case 3: {
+        const featureOptions: FeatureOption[] = [
+          {
+            id: 'billing',
+            title: 'Billing & Insurance',
+            description: 'Process claims, track payments, and manage insurance',
+            icon: CreditCard,
+            recommended: true,
+          },
+          {
+            id: 'inventory',
+            title: 'Inventory Management',
+            description: 'Track reagents, supplies, and automatic reordering',
+            icon: Package,
+            recommended: true,
+          },
+          {
+            id: 'qualityControl',
+            title: 'Quality Control',
+            description: 'QC runs, Levey-Jennings charts, Westgard rules',
+            icon: CheckCircle,
+            recommended: true,
+          },
+          {
+            id: 'emrIntegration',
+            title: 'EMR Integration',
+            description: 'Connect with electronic medical record systems',
+            icon: Wifi,
+          },
+          {
+            id: 'mobileApps',
+            title: 'Mobile Applications',
+            description: 'iOS and Android apps for staff and patients',
+            icon: Smartphone,
+          },
+          {
+            id: 'criticalAlerts',
+            title: 'Critical Value Alerts',
+            description: 'Instant notifications for critical test results',
+            icon: Bell,
+            recommended: true,
+          },
+          {
+            id: 'analytics',
+            title: 'Advanced Analytics',
+            description: 'Deep insights and predictive analytics',
+            icon: BarChart3,
+          },
+          {
+            id: 'patientPortal',
+            title: 'Patient Portal',
+            description: 'Self-service portal for patients to view results',
+            icon: Users,
+          },
+          {
+            id: 'smsNotifications',
+            title: 'SMS Notifications',
+            description: 'Text message alerts for results and appointments',
+            icon: MessageSquare,
+          },
+          {
+            id: 'emailNotifications',
+            title: 'Email Notifications',
+            description: 'Automated email updates and reports',
+            icon: Mail,
+          },
+          {
+            id: 'customReports',
+            title: 'Custom Reports',
+            description: 'Build and schedule custom report templates',
+            icon: FileBarChart,
+          },
+          {
+            id: 'auditLogs',
+            title: 'Audit & Compliance',
+            description: 'Complete audit trails and compliance tracking',
+            icon: Shield,
+          },
+          {
+            id: 'autoScheduling',
+            title: 'Auto Scheduling',
+            description: 'Intelligent appointment and resource scheduling',
+            icon: Clock,
+            comingSoon: true,
+          },
+          {
+            id: 'aiAssistant',
+            title: 'AI Assistant',
+            description: 'AI-powered insights and recommendations',
+            icon: Zap,
+            comingSoon: true,
+          },
+        ];
+
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SelectField
+                label="Timezone"
+                name="timezone"
+                value={formData.timezone}
+                onChange={(value) => setFormData({ ...formData, timezone: value as string })}
+                options={[
+                  { value: 'America/New_York', label: 'Eastern Time' },
+                  { value: 'America/Chicago', label: 'Central Time' },
+                  { value: 'America/Denver', label: 'Mountain Time' },
+                  { value: 'America/Los_Angeles', label: 'Pacific Time' },
+                  { value: 'America/Phoenix', label: 'Arizona Time' },
+                  { value: 'Pacific/Honolulu', label: 'Hawaii Time' },
+                ]}
+                isClearable={false}
+              />
+              <SelectField
+                label="Currency"
+                name="currency"
+                value={formData.currency}
+                onChange={(value) => setFormData({ ...formData, currency: value as string })}
+                options={[
+                  { value: 'USD', label: 'USD - US Dollar' },
+                  { value: 'EUR', label: 'EUR - Euro' },
+                  { value: 'GBP', label: 'GBP - British Pound' },
+                  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+                  { value: 'AUD', label: 'AUD - Australian Dollar' },
+                ]}
+                isClearable={false}
+              />
+            </div>
+
+            <SelectField
+              label="Result Format"
+              name="resultFormat"
+              value={formData.resultFormat}
+              onChange={(value) => setFormData({ ...formData, resultFormat: value as string })}
+              options={[
+                { value: 'standard', label: 'Standard Format' },
+                { value: 'detailed', label: 'Detailed Format' },
+                { value: 'compact', label: 'Compact Format' },
+              ]}
+              isClearable={false}
+            />
+
+            <FeatureToggleField
+              label="Features to Enable"
+              name="features"
+              options={featureOptions}
+              value={formData.enabledFeatures}
+              onChange={(features) => setFormData({ ...formData, enabledFeatures: features })}
+              columns={2}
+              helpText="Select the features you want to enable for your laboratory. You can change these settings later."
+            />
+          </div>
+        );
+      }
+
+      case 4: {
+        const turnaroundOptions: RadioOption[] = [
+          {
+            id: 'express',
+            title: 'Express (2-6 hours)',
+            description: 'Fastest processing for urgent cases',
+            icon: Zap,
+            badge: 'Premium',
+            badgeColor: 'yellow',
+          },
+          {
+            id: 'standard',
+            title: 'Standard (24 hours)',
+            description: 'Regular processing time for most tests',
+            icon: Timer,
+            badge: 'Recommended',
+            badgeColor: 'green',
+          },
+          {
+            id: 'extended',
+            title: 'Extended (48-72 hours)',
+            description: 'For complex tests and specialized panels',
+            icon: Clock,
+          },
+        ];
+
+        const communicationOptions: CheckboxOption[] = [
+          {
+            id: 'patientPortal',
+            title: 'Patient Portal',
+            description: 'Allow patients to view results online',
+            icon: Users,
+          },
+          {
+            id: 'smsNotifications',
+            title: 'SMS Notifications',
+            description: 'Send text alerts for results and appointments',
+            icon: MessageSquare,
+          },
+          {
+            id: 'emailNotifications',
+            title: 'Email Notifications',
+            description: 'Automated email updates for results',
+            icon: Mail,
+          },
+          {
+            id: 'whatsappIntegration',
+            title: 'WhatsApp Integration',
+            description: 'Send updates via WhatsApp Business',
+            icon: SendHorizontal,
+            badge: 'New',
+            badgeColor: 'blue',
+          },
+        ];
+
+        const resultManagementOptions: CheckboxOption[] = [
+          {
+            id: 'autoRelease',
+            title: 'Auto-release Normal Results',
+            description: 'Automatically publish results within normal range',
+            icon: Bot,
+          },
+          {
+            id: 'physicianApproval',
+            title: 'Physician Approval Required',
+            description: 'All results need doctor review before release',
+            icon: UserCheck,
+          },
+          {
+            id: 'criticalAlerts',
+            title: 'Critical Value Alerts',
+            description: 'Immediate notification for critical results',
+            icon: AlertCircle,
+            badge: 'Important',
+            badgeColor: 'red',
+          },
+          {
+            id: 'deltaChecks',
+            title: 'Delta Check Validation',
+            description: 'Compare with previous results for accuracy',
+            icon: ClipboardCheck,
+          },
+        ];
+
+        return (
+          <div className="space-y-6">
+            {/* Info Banner */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300">
+                    Custom Configuration
+                  </h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                    Configure operational preferences for your laboratory. These settings can be modified later from the settings panel.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Laboratory Operations Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <FlaskConical className="h-5 w-5 mr-2 text-primary-500" />
+                Laboratory Operations
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField
+                  label="Reference Laboratory Name"
+                  name="referenceLabName"
+                  value={formData.referenceLabName}
+                  onChange={(e) => setFormData({ ...formData, referenceLabName: e.target.value })}
+                  placeholder="e.g., Quest Diagnostics"
+                  helpText="Partner lab for specialized testing"
+                  icon={Building}
+                />
+                
+                <TextField
+                  label="Reference Lab Contact"
+                  name="referenceLabContact"
+                  value={formData.referenceLabContact}
+                  onChange={(e) => setFormData({ ...formData, referenceLabContact: e.target.value })}
+                  placeholder="contact@referencelab.com"
+                  helpText="Email or phone for coordination"
+                  icon={PhoneCall}
+                />
+              </div>
+
+              <RadioCardField
+                label="Default Test Turnaround Time"
+                name="turnaroundMode"
+                options={turnaroundOptions}
+                value={formData.defaultTurnaroundMode}
+                onChange={(value) => setFormData({ ...formData, defaultTurnaroundMode: value })}
+                columns={3}
+                cardSize="sm"
+                helpText="Sets the expected processing time for standard tests"
+              />
+
+              <NumberField
+                label="Custom Turnaround Hours (if not using presets)"
+                name="customTurnaround"
+                value={parseInt(formData.defaultTestTurnaround)}
+                onChange={(value) => setFormData({ ...formData, defaultTestTurnaround: value?.toString() || '24' })}
+                min={1}
+                max={720}
+                placeholder="24"
+                helpText="Specify exact hours if none of the presets match your needs"
+                icon={Timer}
+              />
+            </div>
+
+            {/* Patient Communication Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <Users className="h-5 w-5 mr-2 text-primary-500" />
+                Patient Communication
+              </h4>
+              
+              <CheckboxCardField
+                label="Communication Channels"
+                name="communicationOptions"
+                options={communicationOptions}
+                value={formData.communicationOptions}
+                onChange={(value) => setFormData({ ...formData, communicationOptions: value })}
+                columns={2}
+                cardSize="sm"
+                helpText="Select how you want to communicate with patients"
+              />
+            </div>
+
+            {/* Result Management Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <FileCheck className="h-5 w-5 mr-2 text-primary-500" />
+                Result Management
+              </h4>
+              
+              <CheckboxCardField
+                label="Result Processing Rules"
+                name="resultManagementOptions"
+                options={resultManagementOptions}
+                value={formData.resultManagementOptions}
+                onChange={(value) => setFormData({ ...formData, resultManagementOptions: value })}
+                columns={2}
+                cardSize="sm"
+                helpText="Define how test results should be processed and validated"
+              />
+            </div>
+
+            {/* Report Customization Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <LayoutTemplate className="h-5 w-5 mr-2 text-primary-500" />
+                Report Customization
+              </h4>
+              
+              <RichTextEditorFieldV2
+                label="Custom Report Header"
+                name="customReportHeader"
+                value={formData.customReportHeader}
+                onChange={(value) => setFormData({ ...formData, customReportHeader: value })}
+                placeholder="Enter text to appear at the top of all patient reports (e.g., lab motto, certification info)"
+                rows={3}
+                helpText="This text will appear on all generated reports. Full rich text formatting available."
+                toolbar="full"
+              />
+              
+              <RichTextEditorFieldV2
+                label="Custom Report Footer"
+                name="customReportFooter"
+                value={formData.customReportFooter}
+                onChange={(value) => setFormData({ ...formData, customReportFooter: value })}
+                placeholder="Enter text for report footer (e.g., disclaimer, contact information)"
+                rows={3}
+                helpText="Footer text for all reports. Full rich text formatting available."
+                toolbar="full"
+              />
+            </div>
+          </div>
+        );
+      }
+
+      default:
+        return null;
+    }
   };
 
   if (isLoading) {
@@ -579,10 +1170,7 @@ const SetupLaboratoryPageV2 = () => {
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
             {steps[currentStep].title}
           </h2>
-          {/* Render step content here - same as original implementation */}
-          <div className="text-gray-600 dark:text-gray-400">
-            Step content would be rendered here...
-          </div>
+          {renderStepContent()}
         </div>
 
         {/* Navigation Buttons */}
