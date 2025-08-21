@@ -8,6 +8,12 @@ import { useAuthStore } from '@/stores/auth.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
+import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
+import { PhoneField } from '@/components/form-fields/PhoneField';
+import { EmailField } from '@/components/form-fields/EmailField';
+import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFields';
+import { TextField } from '@/components/form-fields/TextField';
+import { TextareaField } from '@/components/form-fields/TextareaField';
 
 interface SetupStep {
   id: string;
@@ -72,9 +78,12 @@ const SetupLaboratoryPage = () => {
     accreditationNumber: '',
     street: '',
     city: '',
+    cityId: '',
     state: '',
+    stateId: '',
     zipCode: '',
     country: 'USA',
+    countryId: '233',  // USA country ID for react-country-state-city
     email: '',
     phone: '',
     fax: '',
@@ -353,17 +362,14 @@ const SetupLaboratoryPage = () => {
               </p>
             </div>
 
-            <div>
-              <label className="label">Laboratory Name *</label>
-              <input
-                type="text"
-                required
-                className="input"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Central Medical Laboratory"
-              />
-            </div>
+            <TextField
+              label="Laboratory Name *"
+              name="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g., Central Medical Laboratory"
+              required
+            />
 
             <SelectField
               label="Laboratory Type *"
@@ -381,26 +387,20 @@ const SetupLaboratoryPage = () => {
             />
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">License Number</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={formData.licenseNumber}
-                  onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                  placeholder="e.g., LAB-2024-001"
-                />
-              </div>
-              <div>
-                <label className="label">Accreditation Number</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={formData.accreditationNumber}
-                  onChange={(e) => setFormData({ ...formData, accreditationNumber: e.target.value })}
-                  placeholder="e.g., CAP-123456"
-                />
-              </div>
+              <TextField
+                label="License Number"
+                name="licenseNumber"
+                value={formData.licenseNumber}
+                onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                placeholder="e.g., LAB-2024-001"
+              />
+              <TextField
+                label="Accreditation Number"
+                name="accreditationNumber"
+                value={formData.accreditationNumber}
+                onChange={(e) => setFormData({ ...formData, accreditationNumber: e.target.value })}
+                placeholder="e.g., CAP-123456"
+              />
             </div>
           </div>
         );
@@ -408,122 +408,120 @@ const SetupLaboratoryPage = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <div>
-              <label className="label">Street Address *</label>
-              <input
-                type="text"
+            <TextField
+              label="Street Address *"
+              name="street"
+              value={formData.street}
+              onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+              placeholder="123 Medical Center Drive"
+              required
+            />
+
+            <CountryField
+              label="Country *"
+              name="country"
+              value={formData.countryId}
+              onChange={(value) => {
+                setFormData({ 
+                  ...formData, 
+                  countryId: value?.id || '',
+                  country: value?.name || '',
+                  // Reset state and city when country changes
+                  stateId: '',
+                  state: '',
+                  cityId: '',
+                  city: ''
+                });
+              }}
+              required
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <StateField
+                label="State/Province *"
+                name="state"
+                countryId={formData.countryId}
+                value={formData.stateId}
+                onChange={(value) => {
+                  setFormData({ 
+                    ...formData, 
+                    stateId: value?.id || '',
+                    state: value?.name || '',
+                    // Reset city when state changes
+                    cityId: '',
+                    city: ''
+                  });
+                }}
                 required
-                className="input"
-                value={formData.street}
-                onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                placeholder="123 Medical Center Drive"
+              />
+              
+              <CityField
+                label="City *"
+                name="city"
+                countryId={formData.countryId}
+                stateId={formData.stateId}
+                value={formData.cityId}
+                onChange={(value) => {
+                  setFormData({ 
+                    ...formData, 
+                    cityId: value?.id || '',
+                    city: value?.name || ''
+                  });
+                }}
+                required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">City *</label>
-                <input
-                  type="text"
-                  required
-                  className="input"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="New York"
-                />
-              </div>
-              <div>
-                <label className="label">State *</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={2}
-                  className="input"
-                  value={formData.state}
-                  onChange={(e) =>
-                    setFormData({ ...formData, state: e.target.value.toUpperCase() })
-                  }
-                  placeholder="NY"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">ZIP Code *</label>
-                <input
-                  type="text"
-                  required
-                  className="input"
-                  value={formData.zipCode}
-                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-                  placeholder="10001"
-                />
-              </div>
-              <div>
-                <label className="label">Country *</label>
-                <input
-                  type="text"
-                  required
-                  className="input"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  placeholder="USA"
-                />
-              </div>
-            </div>
+            <ZipCodeField
+              label="ZIP/Postal Code *"
+              name="zipCode"
+              value={formData.zipCode}
+              onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+              country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'UK' : 'US'}
+              required
+            />
           </div>
         );
 
       case 2:
         return (
           <div className="space-y-6">
-            <div>
-              <label className="label">Contact Email *</label>
-              <input
-                type="email"
-                required
-                className="input"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="admin@laboratory.com"
-              />
-            </div>
+            <EmailField
+              label="Contact Email *"
+              name="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="admin@laboratory.com"
+              required
+            />
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">Phone Number *</label>
-                <input
-                  type="tel"
-                  required
-                  className="input"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-              <div>
-                <label className="label">Fax Number</label>
-                <input
-                  type="tel"
-                  className="input"
-                  value={formData.fax}
-                  onChange={(e) => setFormData({ ...formData, fax: e.target.value })}
-                  placeholder="(555) 123-4568"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="label">Website</label>
-              <input
-                type="url"
-                className="input"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="https://laboratory.com"
+              <PhoneField
+                label="Phone Number *"
+                name="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="(555) 123-4567"
+                country={formData.country === 'United States' ? 'US' : formData.country}
+                required
+              />
+              <PhoneField
+                label="Fax Number"
+                name="fax"
+                value={formData.fax}
+                onChange={(e) => setFormData({ ...formData, fax: e.target.value })}
+                placeholder="(555) 123-4568"
+                country={formData.country === 'United States' ? 'US' : formData.country}
               />
             </div>
+
+            <UrlField
+              label="Website"
+              name="website"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              placeholder="https://laboratory.com"
+            />
           </div>
         );
 
@@ -790,26 +788,22 @@ const SetupLaboratoryPage = () => {
                   Report Customization
                 </h4>
                 <div className="space-y-4">
-                  <div>
-                    <label className="label">Custom Report Header</label>
-                    <textarea
-                      className="input"
-                      rows={3}
-                      value={formData.customReportHeader}
-                      onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
-                      placeholder="Enter custom text to appear at the top of all reports (optional)"
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Custom Report Footer</label>
-                    <textarea
-                      className="input"
-                      rows={3}
-                      value={formData.customReportFooter}
-                      onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
-                      placeholder="Enter custom text to appear at the bottom of all reports (optional)"
-                    />
-                  </div>
+                  <TextareaField
+                    label="Custom Report Header"
+                    name="customReportHeader"
+                    value={formData.customReportHeader}
+                    onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
+                    placeholder="Enter custom text to appear at the top of all reports (optional)"
+                    rows={3}
+                  />
+                  <TextareaField
+                    label="Custom Report Footer"
+                    name="customReportFooter"
+                    value={formData.customReportFooter}
+                    onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
+                    placeholder="Enter custom text to appear at the bottom of all reports (optional)"
+                    rows={3}
+                  />
                 </div>
               </div>
             </div>
