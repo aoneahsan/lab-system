@@ -3,7 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check, FileText,
   CreditCard, Package, CheckCircle, Wifi, Smartphone, Bell, BarChart3, Users,
-  Mail, MessageSquare, FileBarChart, Shield, Clock, Zap
+  Mail, MessageSquare, FileBarChart, Shield, Clock, Zap,
+  FlaskConical, Building, PhoneCall, UserCheck, ClipboardCheck, AlertCircle,
+  FileCheck, Bot, Timer, SendHorizontal, Database, LayoutTemplate
 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
@@ -19,6 +21,9 @@ import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFiel
 import { TextField } from '@/components/form-fields/TextField';
 import { TextareaField } from '@/components/form-fields/TextareaField';
 import { FeatureToggleField, FeatureOption } from '@/components/form-fields/FeatureToggleField';
+import { CheckboxCardField, CheckboxOption } from '@/components/form-fields/CheckboxCardField';
+import { RadioCardField, RadioOption } from '@/components/form-fields/RadioCardField';
+import { NumberField } from '@/components/form-fields/NumberField';
 
 interface SetupStep {
   id: string;
@@ -106,15 +111,14 @@ const SetupLaboratoryPage = () => {
     defaultTestTurnaround: '24',
     referenceLabName: '',
     referenceLabContact: '',
-    enablePatientPortal: true,
-    enableSMSNotifications: false,
-    enableEmailNotifications: true,
-    autoReleaseNormalResults: false,
-    requirePhysicianApproval: true,
     customReportHeader: '',
     customReportFooter: '',
     // Features as array for FeatureToggleField
     enabledFeatures: ['billing', 'inventory', 'qualityControl', 'emrIntegration', 'mobileApps', 'criticalAlerts'],
+    // New fields for step 4
+    communicationOptions: ['patientPortal', 'emailNotifications'],
+    resultManagementOptions: [],
+    defaultTurnaroundMode: 'standard',
   });
 
   const [codeValidation, setCodeValidation] = useState<{
@@ -690,160 +694,228 @@ const SetupLaboratoryPage = () => {
         );
       }
 
-      case 4:
+      case 4: {
+        const turnaroundOptions: RadioOption[] = [
+          {
+            id: 'express',
+            title: 'Express (2-6 hours)',
+            description: 'Fastest processing for urgent cases',
+            icon: Zap,
+            badge: 'Premium',
+            badgeColor: 'yellow',
+          },
+          {
+            id: 'standard',
+            title: 'Standard (24 hours)',
+            description: 'Regular processing time for most tests',
+            icon: Timer,
+            badge: 'Recommended',
+            badgeColor: 'green',
+          },
+          {
+            id: 'extended',
+            title: 'Extended (48-72 hours)',
+            description: 'For complex tests and specialized panels',
+            icon: Clock,
+          },
+        ];
+
+        const communicationOptions: CheckboxOption[] = [
+          {
+            id: 'patientPortal',
+            title: 'Patient Portal',
+            description: 'Allow patients to view results online',
+            icon: Users,
+          },
+          {
+            id: 'smsNotifications',
+            title: 'SMS Notifications',
+            description: 'Send text alerts for results and appointments',
+            icon: MessageSquare,
+          },
+          {
+            id: 'emailNotifications',
+            title: 'Email Notifications',
+            description: 'Automated email updates for results',
+            icon: Mail,
+          },
+          {
+            id: 'whatsappIntegration',
+            title: 'WhatsApp Integration',
+            description: 'Send updates via WhatsApp Business',
+            icon: SendHorizontal,
+            badge: 'New',
+            badgeColor: 'blue',
+          },
+        ];
+
+        const resultManagementOptions: CheckboxOption[] = [
+          {
+            id: 'autoRelease',
+            title: 'Auto-release Normal Results',
+            description: 'Automatically publish results within normal range',
+            icon: Bot,
+          },
+          {
+            id: 'physicianApproval',
+            title: 'Physician Approval Required',
+            description: 'All results need doctor review before release',
+            icon: UserCheck,
+          },
+          {
+            id: 'criticalAlerts',
+            title: 'Critical Value Alerts',
+            description: 'Immediate notification for critical results',
+            icon: AlertCircle,
+            badge: 'Important',
+            badgeColor: 'red',
+          },
+          {
+            id: 'deltaChecks',
+            title: 'Delta Check Validation',
+            description: 'Compare with previous results for accuracy',
+            icon: ClipboardCheck,
+          },
+        ];
+
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-              <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
-                Custom Configuration
-              </h3>
-              <p className="text-sm text-blue-700 dark:text-blue-400">
-                Configure additional settings specific to your laboratory's workflow and requirements.
-              </p>
+            {/* Info Banner */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex items-start space-x-3">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <div>
+                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300">
+                    Custom Configuration
+                  </h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                    Configure operational preferences for your laboratory. These settings can be modified later from the settings panel.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
-                  Laboratory Operations
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="label">Default Test Turnaround (hours)</label>
-                    <input
-                      type="number"
-                      className="input"
-                      value={formData.defaultTestTurnaround}
-                      onChange={(e) => setFormData({ ...formData, defaultTestTurnaround: e.target.value })}
-                      placeholder="24"
-                      min="1"
-                      max="720"
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Reference Laboratory Name</label>
-                    <input
-                      type="text"
-                      className="input"
-                      value={formData.referenceLabName}
-                      onChange={(e) => setFormData({ ...formData, referenceLabName: e.target.value })}
-                      placeholder="e.g., Quest Diagnostics"
-                    />
-                  </div>
-                </div>
+            {/* Laboratory Operations Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <FlaskConical className="h-5 w-5 mr-2 text-primary-500" />
+                Laboratory Operations
+              </h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TextField
+                  label="Reference Laboratory Name"
+                  name="referenceLabName"
+                  value={formData.referenceLabName}
+                  onChange={(e) => setFormData({ ...formData, referenceLabName: e.target.value })}
+                  placeholder="e.g., Quest Diagnostics"
+                  helpText="Partner lab for specialized testing"
+                  icon={Building}
+                />
                 
-                <div className="mt-4">
-                  <label className="label">Reference Laboratory Contact</label>
-                  <input
-                    type="text"
-                    className="input"
-                    value={formData.referenceLabContact}
-                    onChange={(e) => setFormData({ ...formData, referenceLabContact: e.target.value })}
-                    placeholder="Phone or email for reference lab"
-                  />
-                </div>
+                <TextField
+                  label="Reference Lab Contact"
+                  name="referenceLabContact"
+                  value={formData.referenceLabContact}
+                  onChange={(e) => setFormData({ ...formData, referenceLabContact: e.target.value })}
+                  placeholder="contact@referencelab.com"
+                  helpText="Email or phone for coordination"
+                  icon={PhoneCall}
+                />
               </div>
 
-              <div>
-                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
-                  Patient Communication
-                </h4>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      checked={formData.enablePatientPortal}
-                      onChange={(e) => setFormData({ ...formData, enablePatientPortal: e.target.checked })}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Enable Patient Portal Access
-                    </span>
-                  </label>
+              <RadioCardField
+                label="Default Test Turnaround Time"
+                name="turnaroundMode"
+                options={turnaroundOptions}
+                value={formData.defaultTurnaroundMode}
+                onChange={(value) => setFormData({ ...formData, defaultTurnaroundMode: value })}
+                columns={3}
+                cardSize="sm"
+                helpText="Sets the expected processing time for standard tests"
+              />
 
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      checked={formData.enableSMSNotifications}
-                      onChange={(e) => setFormData({ ...formData, enableSMSNotifications: e.target.checked })}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Enable SMS Notifications
-                    </span>
-                  </label>
+              <NumberField
+                label="Custom Turnaround Hours (if not using presets)"
+                name="customTurnaround"
+                value={parseInt(formData.defaultTestTurnaround)}
+                onChange={(value) => setFormData({ ...formData, defaultTestTurnaround: value?.toString() || '24' })}
+                min={1}
+                max={720}
+                placeholder="24"
+                helpText="Specify exact hours if none of the presets match your needs"
+                icon={Timer}
+              />
+            </div>
 
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      checked={formData.enableEmailNotifications}
-                      onChange={(e) => setFormData({ ...formData, enableEmailNotifications: e.target.checked })}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Enable Email Notifications
-                    </span>
-                  </label>
-                </div>
-              </div>
+            {/* Patient Communication Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <Users className="h-5 w-5 mr-2 text-primary-500" />
+                Patient Communication
+              </h4>
+              
+              <CheckboxCardField
+                label="Communication Channels"
+                name="communicationOptions"
+                options={communicationOptions}
+                value={formData.communicationOptions}
+                onChange={(value) => setFormData({ ...formData, communicationOptions: value })}
+                columns={2}
+                cardSize="sm"
+                helpText="Select how you want to communicate with patients"
+              />
+            </div>
 
-              <div>
-                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
-                  Result Management
-                </h4>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      checked={formData.autoReleaseNormalResults}
-                      onChange={(e) => setFormData({ ...formData, autoReleaseNormalResults: e.target.checked })}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Auto-release Normal Results
-                    </span>
-                  </label>
+            {/* Result Management Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <FileCheck className="h-5 w-5 mr-2 text-primary-500" />
+                Result Management
+              </h4>
+              
+              <CheckboxCardField
+                label="Result Processing Rules"
+                name="resultManagementOptions"
+                options={resultManagementOptions}
+                value={formData.resultManagementOptions}
+                onChange={(value) => setFormData({ ...formData, resultManagementOptions: value })}
+                columns={2}
+                cardSize="sm"
+                helpText="Define how test results should be processed and validated"
+              />
+            </div>
 
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      checked={formData.requirePhysicianApproval}
-                      onChange={(e) => setFormData({ ...formData, requirePhysicianApproval: e.target.checked })}
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Require Physician Approval for Critical Results
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-md font-medium text-gray-900 dark:text-white mb-4">
-                  Report Customization
-                </h4>
-                <div className="space-y-4">
-                  <TextareaField
-                    label="Custom Report Header"
-                    name="customReportHeader"
-                    value={formData.customReportHeader}
-                    onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
-                    placeholder="Enter custom text to appear at the top of all reports (optional)"
-                    rows={3}
-                  />
-                  <TextareaField
-                    label="Custom Report Footer"
-                    name="customReportFooter"
-                    value={formData.customReportFooter}
-                    onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
-                    placeholder="Enter custom text to appear at the bottom of all reports (optional)"
-                    rows={3}
-                  />
-                </div>
-              </div>
+            {/* Report Customization Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                <LayoutTemplate className="h-5 w-5 mr-2 text-primary-500" />
+                Report Customization
+              </h4>
+              
+              <TextareaField
+                label="Custom Report Header"
+                name="customReportHeader"
+                value={formData.customReportHeader}
+                onChange={(e) => setFormData({ ...formData, customReportHeader: e.target.value })}
+                placeholder="Enter text to appear at the top of all patient reports (e.g., lab motto, certification info)"
+                rows={3}
+                helpText="This text will appear on all generated reports"
+              />
+              
+              <TextareaField
+                label="Custom Report Footer"
+                name="customReportFooter"
+                value={formData.customReportFooter}
+                onChange={(e) => setFormData({ ...formData, customReportFooter: e.target.value })}
+                placeholder="Enter text for report footer (e.g., disclaimer, contact information)"
+                rows={3}
+                helpText="Footer text for all reports"
+              />
             </div>
           </div>
         );
+      }
 
       default:
         return null;

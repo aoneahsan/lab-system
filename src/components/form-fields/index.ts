@@ -10,8 +10,14 @@ export { NumberField, AgeField, PercentageField, CurrencyField } from './NumberF
 export { PhoneField } from './PhoneField';
 export { CustomPhoneField } from './CustomPhoneField';
 export { TextareaField } from './TextareaField';
+
+// Card-based field components
 export { FeatureToggleField } from './FeatureToggleField';
 export type { FeatureOption } from './FeatureToggleField';
+export { CheckboxCardField } from './CheckboxCardField';
+export type { CheckboxOption } from './CheckboxCardField';
+export { RadioCardField } from './RadioCardField';
+export type { RadioOption } from './RadioCardField';
 
 // Date and time components
 export { DateField, DateTimeField, TimeField } from './DateField';
@@ -41,6 +47,7 @@ export { LexicalEditorField } from './LexicalEditorField';
 import { TextField } from './TextField';
 import { EmailField } from './EmailField';
 import { PhoneField } from './PhoneField';
+import { CustomPhoneField } from './CustomPhoneField';
 import { DateField } from './DateField';
 import { SelectField } from './SelectField';
 import { RelationshipField } from './RelationshipField';
@@ -49,6 +56,10 @@ import { CountryField, StateField, CityField } from './CountryField';
 import { ZipCodeField, UrlField, CreditCardField } from './SpecializedFields';
 import { OccupationField } from './OccupationField';
 import { LexicalEditorField } from './LexicalEditorField';
+import { TextareaField } from './TextareaField';
+import { CheckboxCardField } from './CheckboxCardField';
+import { RadioCardField } from './RadioCardField';
+import { FeatureToggleField } from './FeatureToggleField';
 
 // Commonly used field groups
 export const AddressFields = {
@@ -62,6 +73,7 @@ export const AddressFields = {
 export const ContactFields = {
   EmailField,
   PhoneField,
+  CustomPhoneField,
   UrlField,
 };
 
@@ -69,6 +81,7 @@ export const PersonalInfoFields = {
   TextField,
   EmailField,
   PhoneField,
+  CustomPhoneField,
   DateField,
   SelectField,
   RelationshipField,
@@ -81,6 +94,25 @@ export const PaymentFields = {
   CreditCardField,
   CurrencyField,
   NumberField,
+};
+
+export const FormFields = {
+  TextField,
+  TextareaField,
+  EmailField,
+  PhoneField,
+  CustomPhoneField,
+  SelectField,
+  DateField,
+  NumberField,
+  CountryField,
+  StateField,
+  CityField,
+  ZipCodeField,
+  UrlField,
+  CheckboxCardField,
+  RadioCardField,
+  FeatureToggleField,
 };
 
 // Validation helpers
