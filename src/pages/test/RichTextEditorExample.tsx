@@ -151,7 +151,7 @@ const RichTextEditorExample = () => {
               <ul className="list-disc list-inside space-y-1 text-primary-700 dark:text-primary-300">
                 <li>Type # for headings</li>
                 <li>Type * or - for lists</li>
-                <li>Type > for quotes</li>
+                <li>Type {'>'} for quotes</li>
                 <li>Automatic markdown conversion</li>
               </ul>
             </div>

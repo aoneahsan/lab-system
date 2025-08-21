@@ -93,20 +93,25 @@ class OnboardingService {
       const docRef = doc(firestore, this.COLLECTION_NAME, userId);
       const existingData = await this.getProgress(userId);
       
-      const completedSteps = existingData?.completedSteps || [];
+      // Keep existing completed steps
+      let completedSteps = existingData?.completedSteps || [];
       
-      // Only add to completed steps if markAsComplete is true and validation passes
-      if (markAsComplete && !completedSteps.includes(step)) {
+      // Only add to completed steps if explicitly marking as complete AND validation passes
+      if (markAsComplete) {
         const validation = this.validateStepData(step, stepData);
-        if (validation.isValid) {
+        if (validation.isValid && !completedSteps.includes(step)) {
           completedSteps.push(step);
+          completedSteps = completedSteps.sort((a, b) => a - b);
+        } else if (!validation.isValid) {
+          // If validation fails, remove this step from completed if it was there
+          completedSteps = completedSteps.filter(s => s !== step);
         }
       }
       
       const updatedData: OnboardingData = {
         userId,
         currentStep: Math.max(step, existingData?.currentStep || 0),
-        completedSteps: completedSteps.sort((a, b) => a - b),
+        completedSteps,
         isComplete: false,
         startedAt: existingData?.startedAt || new Date(),
         laboratoryData: {
@@ -236,31 +241,34 @@ class OnboardingService {
     
     switch (step) {
       case 0: // Basic Info
-        if (!data.code) errors.push('Laboratory code is required');
-        if (!data.name) errors.push('Laboratory name is required');
+        if (!data.code || data.code.length < 3) errors.push('Laboratory code must be at least 3 characters');
+        if (!data.name || data.name.trim().length < 3) errors.push('Laboratory name must be at least 3 characters');
         if (!data.type) errors.push('Laboratory type is required');
         break;
         
       case 1: // Address
-        if (!data.street) errors.push('Street address is required');
-        if (!data.city) errors.push('City is required');
-        if (!data.state) errors.push('State is required');
-        if (!data.zipCode) errors.push('ZIP code is required');
-        if (!data.country) errors.push('Country is required');
+        if (!data.street || data.street.trim().length < 5) errors.push('Street address must be at least 5 characters');
+        if (!data.city || !data.cityId) errors.push('City is required');
+        if (!data.state || !data.stateId) errors.push('State is required');
+        if (!data.zipCode || data.zipCode.trim().length < 3) errors.push('ZIP code must be at least 3 characters');
+        if (!data.country || !data.countryId) errors.push('Country is required');
         break;
         
       case 2: // Contact
-        if (!data.email) errors.push('Email is required');
-        if (!data.phone) errors.push('Phone number is required');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!data.email || !emailRegex.test(data.email)) errors.push('Valid email is required');
+        if (!data.phone || data.phone.replace(/\D/g, '').length < 10) errors.push('Valid phone number is required (min 10 digits)');
         break;
         
       case 3: // Settings
         if (!data.timezone) errors.push('Timezone is required');
         if (!data.currency) errors.push('Currency is required');
+        if (!data.resultFormat) errors.push('Result format is required');
+        if (!data.enabledFeatures || data.enabledFeatures.length === 0) errors.push('At least one feature must be enabled');
         break;
         
       case 4: // Custom Configuration
-        // Optional fields, no validation required
+        // All fields are optional in this step
         break;
     }
     
@@ -268,6 +276,84 @@ class OnboardingService {
       isValid: errors.length === 0,
       errors,
     };
+  }
+
+  /**
+   * Re-validate all completed steps (useful after loading saved data)
+   */
+  async revalidateCompletedSteps(
+    userId: string, 
+    laboratoryData: Partial<OnboardingData['laboratoryData']>
+  ): Promise<number[]> {
+    const validatedSteps: number[] = [];
+    
+    for (let step = 0; step < this.TOTAL_STEPS; step++) {
+      const stepData = this.extractStepData(step, laboratoryData);
+      const validation = this.validateStepData(step, stepData);
+      
+      if (validation.isValid) {
+        validatedSteps.push(step);
+      }
+    }
+    
+    return validatedSteps;
+  }
+
+  /**
+   * Extract data for a specific step from laboratory data
+   */
+  private extractStepData(
+    step: number, 
+    laboratoryData: Partial<OnboardingData['laboratoryData']>
+  ): any {
+    switch (step) {
+      case 0:
+        return {
+          code: laboratoryData.code,
+          name: laboratoryData.name,
+          type: laboratoryData.type,
+          licenseNumber: laboratoryData.licenseNumber,
+          accreditationNumber: laboratoryData.accreditationNumber,
+        };
+      case 1:
+        return {
+          street: laboratoryData.street,
+          city: laboratoryData.city,
+          cityId: laboratoryData.cityId,
+          state: laboratoryData.state,
+          stateId: laboratoryData.stateId,
+          zipCode: laboratoryData.zipCode,
+          country: laboratoryData.country,
+          countryId: laboratoryData.countryId,
+        };
+      case 2:
+        return {
+          email: laboratoryData.email,
+          phone: laboratoryData.phone,
+          fax: laboratoryData.fax,
+          website: laboratoryData.website,
+        };
+      case 3:
+        return {
+          timezone: laboratoryData.timezone,
+          currency: laboratoryData.currency,
+          resultFormat: laboratoryData.resultFormat,
+          enabledFeatures: laboratoryData.enabledFeatures,
+        };
+      case 4:
+        return {
+          defaultTestTurnaround: laboratoryData.defaultTestTurnaround,
+          referenceLabName: laboratoryData.referenceLabName,
+          referenceLabContact: laboratoryData.referenceLabContact,
+          customReportHeader: laboratoryData.customReportHeader,
+          customReportFooter: laboratoryData.customReportFooter,
+          communicationOptions: laboratoryData.communicationOptions,
+          resultManagementOptions: laboratoryData.resultManagementOptions,
+          defaultTurnaroundMode: laboratoryData.defaultTurnaroundMode,
+        };
+      default:
+        return {};
+    }
   }
 
   /**

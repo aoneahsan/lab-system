@@ -167,22 +167,32 @@ const SetupLaboratoryPageV2 = () => {
             }));
           }
 
-          // Set completed steps
-          setCompletedSteps(progress.completedSteps || []);
+          // Re-validate completed steps with loaded data
+          const validatedSteps = await onboardingService.revalidateCompletedSteps(
+            currentUser.id,
+            progress.laboratoryData || {}
+          );
+          
+          // Only set steps as completed if they pass validation
+          setCompletedSteps(validatedSteps);
 
           // Check if there's a step in the URL first
           const urlStep = parseInt(searchParams.get('step') || '-1');
           
-          if (urlStep >= 0 && (progress.completedSteps?.includes(urlStep) || urlStep === 0)) {
+          if (urlStep >= 0 && (validatedSteps.includes(urlStep) || urlStep === 0)) {
             // Use the step from URL if it's valid
             setCurrentStep(urlStep);
           } else {
-            // Navigate to next incomplete step
-            const nextStep = await onboardingService.getNextIncompleteStep(currentUser.id);
-            if (nextStep >= 0) {
-              setCurrentStep(nextStep);
-              setSearchParams({ step: nextStep.toString() });
+            // Navigate to next incomplete step based on validated steps
+            let nextStep = 0;
+            for (let i = 0; i < 5; i++) {
+              if (!validatedSteps.includes(i)) {
+                nextStep = i;
+                break;
+              }
             }
+            setCurrentStep(nextStep);
+            setSearchParams({ step: nextStep.toString() });
           }
         }
       } catch (error) {
@@ -285,7 +295,7 @@ const SetupLaboratoryPageV2 = () => {
     }
   };
 
-  const checkCodeAvailability = async (code: string) => {
+  const checkCodeAvailability = async (code: string, currentCompletedSteps: number[] = completedSteps) => {
     if (!code || code.length < 3) {
       setCodeValidation({
         isChecking: false,
@@ -310,6 +320,10 @@ const SetupLaboratoryPageV2 = () => {
           isAvailable: false,
           message: 'This code is already taken',
         });
+        // Remove step 0 from completed if code is not available
+        if (currentCompletedSteps.includes(0)) {
+          setCompletedSteps(prev => prev.filter(s => s !== 0));
+        }
       } else {
         setCodeValidation({
           isChecking: false,
@@ -490,7 +504,9 @@ const SetupLaboratoryPageV2 = () => {
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      setSearchParams({ step: prevStep.toString() });
     } else {
       navigate('/onboarding?option=create');
     }
