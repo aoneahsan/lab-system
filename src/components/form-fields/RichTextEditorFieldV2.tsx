@@ -24,6 +24,8 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { TRANSFORMERS } from '@lexical/markdown';
 import { BaseFormFieldProps, FormFieldWrapper } from './BaseFormField';
 import { EnhancedToolbarPlugin } from './editor/EnhancedToolbarPlugin';
+import { ImageNode } from './editor/ImageNode';
+import { useAuthStore } from '@/stores/auth.store';
 
 interface RichTextEditorFieldV2Props extends BaseFormFieldProps {
   value?: string;
@@ -60,6 +62,8 @@ export const RichTextEditorFieldV2: React.FC<RichTextEditorFieldV2Props> = ({
   showLabel = true,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const { currentUser } = useAuthStore();
+  const tenantId = currentUser?.tenantId;
 
   const theme = {
     ltr: 'text-left',
@@ -117,6 +121,7 @@ export const RichTextEditorFieldV2: React.FC<RichTextEditorFieldV2Props> = ({
       TableCellNode,
       TableRowNode,
       HorizontalRuleNode,
+      ImageNode,
     ],
     editorState: value ? (editor: any) => {
       const parser = new DOMParser();
@@ -165,7 +170,8 @@ export const RichTextEditorFieldV2: React.FC<RichTextEditorFieldV2Props> = ({
           {toolbar && !readOnly && (
             <EnhancedToolbarPlugin 
               disabled={disabled || loading} 
-              toolbarType={toolbar} 
+              toolbarType={toolbar}
+              tenantId={tenantId}
             />
           )}
           

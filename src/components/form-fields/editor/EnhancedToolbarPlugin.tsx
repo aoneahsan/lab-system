@@ -35,6 +35,7 @@ import {
 } from '@lexical/selection';
 import { $getNearestNodeOfType } from '@lexical/utils';
 import { ListNode } from '@lexical/list';
+import { ImageUploadPlugin } from './ImageUploadPlugin';
 import { $isCodeNode } from '@lexical/code';
 import { $isQuoteNode } from '@lexical/rich-text';
 import { mergeRegister } from '@lexical/utils';
@@ -42,7 +43,7 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import {
   Bold, Italic, Underline, Strikethrough, Code, Link2,
   List, ListOrdered, Quote, Heading1, Heading2, Heading3,
-  Undo, Redo, Minus, RemoveFormatting, Table, Image,
+  Undo, Redo, Minus, RemoveFormatting, Table,
   Palette, Highlighter, Type
 } from 'lucide-react';
 import {
@@ -60,11 +61,13 @@ import {
 interface EnhancedToolbarPluginProps {
   disabled?: boolean;
   toolbarType?: boolean | 'minimal' | 'full';
+  tenantId?: string;
 }
 
 export const EnhancedToolbarPlugin: React.FC<EnhancedToolbarPluginProps> = ({
   disabled = false,
   toolbarType = 'full',
+  tenantId,
 }) => {
   const [editor] = useLexicalComposerContext();
   
@@ -493,6 +496,9 @@ export const EnhancedToolbarPlugin: React.FC<EnhancedToolbarPluginProps> = ({
           >
             <Minus className="h-4 w-4" />
           </ToolbarButton>
+          
+          {/* Image upload */}
+          <ImageUploadPlugin disabled={disabled} tenantId={tenantId} />
           
           <ToolbarSeparator />
           
