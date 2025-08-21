@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RichTextEditorField } from '@/components/form-fields/RichTextEditorField';
-import { FileText, Save } from 'lucide-react';
+import { RichTextEditorFieldV2 } from '@/components/form-fields/RichTextEditorFieldV2';
+import { FileText, Save, Sparkles } from 'lucide-react';
 
 const RichTextEditorExample = () => {
   const [content, setContent] = useState('');
@@ -65,12 +66,13 @@ const RichTextEditorExample = () => {
           />
         </div>
 
-        {/* Full Toolbar Example */}
+        {/* Enhanced Full Toolbar Example */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Full Featured Editor
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-yellow-500" />
+            Enhanced Editor with Advanced Features
           </h2>
-          <RichTextEditorField
+          <RichTextEditorFieldV2
             label="Complete Documentation"
             name="documentation"
             value={fullContent}
@@ -78,7 +80,7 @@ const RichTextEditorExample = () => {
             placeholder="Create rich documentation with all formatting options..."
             rows={8}
             toolbar="full"
-            helpText="Full-featured editor with all formatting capabilities including headings, lists, quotes, and links"
+            helpText="Enhanced editor with font controls, text/background colors, alignment, super/subscript, indentation, and more!"
             required
           />
           
@@ -132,6 +134,7 @@ const RichTextEditorExample = () => {
                 <li>Bullet and numbered lists</li>
                 <li>Block quotes</li>
                 <li>Links with URL prompts</li>
+                <li>Horizontal rules</li>
               </ul>
             </div>
             <div>
@@ -150,6 +153,18 @@ const RichTextEditorExample = () => {
                 <li>Type * or - for lists</li>
                 <li>Type > for quotes</li>
                 <li>Automatic markdown conversion</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium mb-1 text-yellow-600 dark:text-yellow-400">✨ Enhanced Features</h4>
+              <ul className="list-disc list-inside space-y-1 text-primary-700 dark:text-primary-300">
+                <li>Font size and family selection</li>
+                <li>Text and background colors</li>
+                <li>Text alignment (left, center, right, justify)</li>
+                <li>Superscript and subscript</li>
+                <li>Indentation controls</li>
+                <li>Clear formatting button</li>
+                <li>Tables support</li>
               </ul>
             </div>
           </div>

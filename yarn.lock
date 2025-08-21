@@ -3398,7 +3398,7 @@
     "@lexical/utils" "0.34.0"
     lexical "0.34.0"
 
-"@lexical/html@0.34.0":
+"@lexical/html@0.34.0", "@lexical/html@^0.34.0":
   version "0.34.0"
   resolved "https://registry.yarnpkg.com/@lexical/html/-/html-0.34.0.tgz#69fb2657e4510bec7734746a26ba6ec14ac90f06"
   integrity sha512-QoFm2P9PSFadInMCFGKJBQI8M2EPUjG6fGf+mUQG9WgX7gIAvTDr21lzUM+dNGtrBwtYxUSQizmUx1NeP6ShyQ==
@@ -3452,7 +3452,7 @@
   dependencies:
     lexical "0.34.0"
 
-"@lexical/overflow@0.34.0":
+"@lexical/overflow@0.34.0", "@lexical/overflow@^0.34.0":
   version "0.34.0"
   resolved "https://registry.yarnpkg.com/@lexical/overflow/-/overflow-0.34.0.tgz#364d7fd29ef18e7d2b9872d1daae08beccd04b74"
   integrity sha512-9f+9E++BxR4jtmcJg4VLnAmjT19IuOS5yyqaMvwEl7612DP5ch9sYG43HusL0w5cjUFbxX6Urkqp8bMPpo0BWA==
@@ -3519,7 +3519,7 @@
     "@lexical/utils" "0.34.0"
     lexical "0.34.0"
 
-"@lexical/text@0.34.0":
+"@lexical/text@0.34.0", "@lexical/text@^0.34.0":
   version "0.34.0"
   resolved "https://registry.yarnpkg.com/@lexical/text/-/text-0.34.0.tgz#9cda6086560798319d5d339405f795781d8f9f49"
   integrity sha512-8T4RwSNP/cVEzg+yf4lMlfzyelnyZjSIsUl2sTiwHHb4RD/r6Zm+VrinCUhtMNq6aasVknV7GEi8Isx60x9XSQ==

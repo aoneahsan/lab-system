@@ -21,6 +21,7 @@ export type { RadioOption } from './RadioCardField';
 
 // Rich Text Editor
 export { RichTextEditorField } from './RichTextEditorField';
+export { RichTextEditorFieldV2 } from './RichTextEditorFieldV2';
 
 // Date and time components
 export { DateField, DateTimeField, TimeField } from './DateField';
@@ -64,6 +65,7 @@ import { CheckboxCardField } from './CheckboxCardField';
 import { RadioCardField } from './RadioCardField';
 import { FeatureToggleField } from './FeatureToggleField';
 import { RichTextEditorField } from './RichTextEditorField';
+import { RichTextEditorFieldV2 } from './RichTextEditorFieldV2';
 
 // Commonly used field groups
 export const AddressFields = {
@@ -104,6 +106,7 @@ export const FormFields = {
   TextField,
   TextareaField,
   RichTextEditorField,
+  RichTextEditorFieldV2,
   EmailField,
   PhoneField,
   CustomPhoneField,
