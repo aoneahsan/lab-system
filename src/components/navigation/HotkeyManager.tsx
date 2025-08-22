@@ -19,14 +19,22 @@ export const HotkeyManager: React.FC = () => {
     }
 
     return () => {
-      // Cleanup is handled by the service
-      keyboardShortcutsService.removeContext('user-navigation');
+      // Cleanup global shortcuts on unmount
+      keyboardShortcutsService.removeGlobalShortcut('d', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('p', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('t', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('s', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('r', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('b', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('i', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('q', 'ctrl');
+      keyboardShortcutsService.removeGlobalShortcut('/', 'ctrl');
     };
   }, [navigate, currentUser?.id]);
 
   const initializeDefaultShortcuts = () => {
     // Register default navigation shortcuts
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'd',
       modifier: 'ctrl',
       description: 'Go to Dashboard',
@@ -35,7 +43,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/dashboard'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'p',
       modifier: 'ctrl',
       description: 'Go to Patients',
@@ -44,7 +52,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/patients'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 't',
       modifier: 'ctrl',
       description: 'Go to Tests',
@@ -53,7 +61,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/tests'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 's',
       modifier: 'ctrl',
       description: 'Go to Samples',
@@ -62,7 +70,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/samples'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'r',
       modifier: 'ctrl',
       description: 'Go to Results',
@@ -71,7 +79,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/results'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'b',
       modifier: 'ctrl',
       description: 'Go to Billing',
@@ -80,7 +88,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/billing'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'i',
       modifier: 'ctrl',
       description: 'Go to Inventory',
@@ -89,7 +97,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/inventory'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: 'q',
       modifier: 'ctrl',
       description: 'Go to Quality Control',
@@ -98,7 +106,7 @@ export const HotkeyManager: React.FC = () => {
       handler: () => navigate('/quality-control'),
     });
 
-    keyboardShortcutsService.addContextShortcut('user-navigation', {
+    keyboardShortcutsService.addGlobalShortcut({
       key: '/',
       modifier: 'ctrl',
       description: 'Global Search',
