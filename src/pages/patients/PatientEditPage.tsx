@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { PatientEditForm } from '@/components/patients/PatientEditForm';
 import type { UpdatePatientData } from '@/types/patient.types';
 import PageHeader from '@/components/common/PageHeader';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 
 const PatientEditPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -74,6 +75,15 @@ const PatientEditPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        showFormShortcuts
+        shortcuts={[
+          { key: 'Tab', description: 'Next field' },
+          { key: 'Tab', modifier: 'shift', description: 'Previous field' },
+        ]}
+      />
+
       {/* Header */}
       <PageHeader
         title="Edit Patient"

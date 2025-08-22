@@ -26,6 +26,7 @@ import CriticalResultsDashboard from '@/components/results/CriticalResultsDashbo
 import ResultAmendmentModal from '@/components/results/ResultAmendmentModal';
 import ResultCorrectionModal from '@/components/results/ResultCorrectionModal';
 import BatchResultApproval from '@/components/results/BatchResultApproval';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 import type { ResultFilter, TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
 import type { Patient } from '@/types/patient.types';
@@ -329,6 +330,19 @@ const ResultsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: 'E', modifier: 'ctrl', description: 'Enter Results' },
+          { key: 'V', modifier: 'ctrl', description: 'Validate Results' },
+          { key: 'A', modifier: 'ctrl', description: 'Approve Selected' },
+          { key: 'P', modifier: 'ctrl', description: 'Print Report' },
+          { key: 'D', modifier: 'ctrl', description: 'Download PDF' },
+        ]}
+        showTableShortcuts
+        showNavigationShortcuts
+      />
+
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>

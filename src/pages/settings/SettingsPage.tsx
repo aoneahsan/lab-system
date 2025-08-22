@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 
 interface SettingCategory {
   title: string;
@@ -98,6 +99,17 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: '1-9', description: 'Quick jump to section' },
+          { key: 'G', modifier: 'ctrl', description: 'General Settings' },
+          { key: 'S', modifier: 'ctrl+shift', description: 'Security Settings' },
+          { key: 'H', modifier: 'ctrl+shift', description: 'Hotkeys Settings' },
+        ]}
+        showNavigationShortcuts
+      />
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">

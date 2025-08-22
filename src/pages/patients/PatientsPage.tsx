@@ -8,6 +8,7 @@ import { PatientRegistrationForm } from '@/components/patients/PatientRegistrati
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
 import { KeyboardHint } from '@/components/common/KeyboardHint';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 import type { PatientSearchFilters as Filters } from '@/types/patient.types';
 
 const PatientsPage = () => {
@@ -37,6 +38,19 @@ const PatientsPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: 'N', modifier: 'ctrl', description: 'New Patient' },
+          { key: 'F', modifier: 'ctrl', description: 'Focus Search' },
+          { key: 'E', description: 'Edit Selected' },
+          { key: 'Delete', description: 'Delete Selected' },
+          { key: 'Space', description: 'Toggle Selection' },
+        ]}
+        showTableShortcuts
+        showNavigationShortcuts
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

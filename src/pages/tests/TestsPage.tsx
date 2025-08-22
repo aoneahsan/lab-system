@@ -19,6 +19,7 @@ import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
 import { ExportFormatter } from '@/utils/import-export/export-formatter';
 import { ExcelParser } from '@/utils/import-export/excel-parser';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 import type { TestDefinition, TestDefinitionFormData, TestFilter } from '@/types/test.types';
 
 const TestsPage: React.FC = () => {
@@ -124,6 +125,18 @@ const TestsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: 'N', modifier: 'ctrl', description: 'New Test' },
+          { key: 'I', modifier: 'ctrl', description: 'Import Tests' },
+          { key: 'E', modifier: 'ctrl', description: 'Export Tests' },
+          { key: 'P', modifier: 'ctrl', description: 'Test Panels' },
+        ]}
+        showTableShortcuts
+        showNavigationShortcuts
+      />
+
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>

@@ -3,6 +3,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { useDashboardSummary, useRecentTests, useCriticalResults } from '@/hooks/useDashboardData';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatters';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 
 const DashboardPage = () => {
   const { currentUser } = useAuthStore();
@@ -46,6 +47,18 @@ const DashboardPage = () => {
 
   return (
     <div>
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: 'P', modifier: 'ctrl', description: 'Go to Patients' },
+          { key: 'T', modifier: 'ctrl', description: 'Go to Tests' },
+          { key: 'R', modifier: 'ctrl', description: 'Go to Results' },
+          { key: 'B', modifier: 'ctrl', description: 'Go to Billing' },
+          { key: 'N', modifier: 'alt', description: 'Quick New (Patient/Test)' },
+        ]}
+        showNavigationShortcuts
+      />
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

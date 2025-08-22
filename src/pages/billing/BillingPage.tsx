@@ -5,6 +5,7 @@ import { useInvoices, useBillingStatistics, useCreateInvoice } from '@/hooks/use
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { PERMISSIONS } from '@/constants/permissions.constants';
 import InvoiceForm from '@/components/billing/InvoiceForm';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 import type { BillingFilter, InvoiceFormData } from '@/types/billing.types';
 
 const BillingPage: React.FC = () => {
@@ -67,6 +68,18 @@ const BillingPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        shortcuts={[
+          { key: 'N', modifier: 'ctrl', description: 'New Invoice' },
+          { key: 'P', modifier: 'ctrl', description: 'Process Payment' },
+          { key: 'C', modifier: 'ctrl', description: 'New Claim' },
+          { key: 'R', modifier: 'ctrl', description: 'View Reports' },
+        ]}
+        showTableShortcuts
+        showNavigationShortcuts
+      />
+
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>

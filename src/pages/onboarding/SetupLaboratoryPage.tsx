@@ -29,6 +29,7 @@ import { KeyboardShortcutsHelper } from '@/components/ui/KeyboardShortcutsHelper
 import { scrollToFirstError } from '@/components/form-fields/FieldError';
 import { useFormKeyboardShortcuts, useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { KeyboardShortcut } from '@/services/KeyboardShortcutsService';
+import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
 
 interface SetupStep {
   id: string;
@@ -1159,11 +1160,15 @@ const SetupLaboratoryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      {/* Keyboard Shortcuts Helper */}
-      <KeyboardShortcutsHelper 
-        type="form" 
-        title="Onboarding Form Shortcuts"
-        position="top-right"
+      {/* Keyboard Shortcuts Indicator */}
+      <KeyboardShortcutsIndicator
+        showFormShortcuts
+        shortcuts={[
+          { key: '→', modifier: 'alt', description: 'Next step' },
+          { key: '←', modifier: 'alt', description: 'Previous step' },
+          { key: 'Enter', description: 'Submit current step' },
+        ]}
+        position="bottom-right"
       />
       
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-6xl 2xl:max-w-7xl">
