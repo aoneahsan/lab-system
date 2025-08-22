@@ -231,7 +231,7 @@ const getFlagEmoji = (countryCode: string): string => {
   return String.fromCodePoint(...codePoints);
 };
 
-export const CustomPhoneField: React.FC<PhoneFieldProps> = ({
+export const PhoneField: React.FC<PhoneFieldProps> = ({
   label = 'Phone Number',
   name,
   value = '',

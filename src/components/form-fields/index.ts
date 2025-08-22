@@ -7,8 +7,7 @@ export { TextField } from './TextField';
 export { EmailField } from './EmailField';
 export { PasswordField, ConfirmPasswordField } from './PasswordField';
 export { NumberField, AgeField, PercentageField, CurrencyField } from './NumberField';
-export { CustomPhoneField } from './CustomPhoneField';
-export { CustomPhoneField as PhoneField } from './CustomPhoneField'; // Alias for backward compatibility
+export { PhoneField } from './PhoneField';
 export { TextareaField } from './TextareaField';
 
 // Card-based field components
@@ -20,8 +19,7 @@ export { RadioCardField } from './RadioCardField';
 export type { RadioOption } from './RadioCardField';
 
 // Rich Text Editor
-export { RichTextEditorFieldV2 } from './RichTextEditorFieldV2';
-export { RichTextEditorFieldV2 as RichTextEditorField } from './RichTextEditorFieldV2'; // Alias for backward compatibility
+export { RichTextEditorField } from './RichTextEditorField';
 
 // Date and time components
 export { DateField, DateTimeField, TimeField } from './DateField';
@@ -50,8 +48,7 @@ export { LexicalEditorField } from './LexicalEditorField';
 // Re-import for field groups
 import { TextField } from './TextField';
 import { EmailField } from './EmailField';
-import { CustomPhoneField } from './CustomPhoneField';
-import { CustomPhoneField as PhoneField } from './CustomPhoneField';
+import { PhoneField } from './PhoneField';
 import { DateField } from './DateField';
 import { SelectField } from './SelectField';
 import { RelationshipField } from './RelationshipField';
@@ -64,8 +61,7 @@ import { TextareaField } from './TextareaField';
 import { CheckboxCardField } from './CheckboxCardField';
 import { RadioCardField } from './RadioCardField';
 import { FeatureToggleField } from './FeatureToggleField';
-import { RichTextEditorFieldV2 } from './RichTextEditorFieldV2';
-import { RichTextEditorFieldV2 as RichTextEditorField } from './RichTextEditorFieldV2';
+import { RichTextEditorField } from './RichTextEditorField';
 
 // Commonly used field groups
 export const AddressFields = {
@@ -78,16 +74,14 @@ export const AddressFields = {
 
 export const ContactFields = {
   EmailField,
-  PhoneField: CustomPhoneField,
-  CustomPhoneField,
+  PhoneField,
   UrlField,
 };
 
 export const PersonalInfoFields = {
   TextField,
   EmailField,
-  PhoneField: CustomPhoneField,
-  CustomPhoneField,
+  PhoneField,
   DateField,
   SelectField,
   RelationshipField,
@@ -105,11 +99,9 @@ export const PaymentFields = {
 export const FormFields = {
   TextField,
   TextareaField,
-  RichTextEditorField: RichTextEditorFieldV2,
-  RichTextEditorFieldV2,
+  RichTextEditorField,
   EmailField,
-  PhoneField: CustomPhoneField,
-  CustomPhoneField,
+  PhoneField,
   SelectField,
   DateField,
   NumberField,

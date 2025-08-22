@@ -27,7 +27,7 @@ import { EnhancedToolbarPlugin } from './editor/EnhancedToolbarPlugin';
 import { ImageNode } from './editor/ImageNode';
 import { useAuthStore } from '@/stores/auth.store';
 
-interface RichTextEditorFieldV2Props extends BaseFormFieldProps {
+interface RichTextEditorFieldProps extends BaseFormFieldProps {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -39,7 +39,7 @@ interface RichTextEditorFieldV2Props extends BaseFormFieldProps {
   rows?: number;
 }
 
-export const RichTextEditorFieldV2: React.FC<RichTextEditorFieldV2Props> = ({
+export const RichTextEditorField: React.FC<RichTextEditorFieldProps> = ({
   label,
   name,
   value = '',

@@ -16,11 +16,11 @@ import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
-import { CustomPhoneField } from '@/components/form-fields/CustomPhoneField';
+import { PhoneField } from '@/components/form-fields/PhoneField';
 import { EmailField } from '@/components/form-fields/EmailField';
 import { ZipCodeField, UrlField } from '@/components/form-fields/SpecializedFields';
 import { TextField } from '@/components/form-fields/TextField';
-import { RichTextEditorFieldV2 } from '@/components/form-fields/RichTextEditorFieldV2';
+import { RichTextEditorField } from '@/components/form-fields/RichTextEditorField';
 import { FeatureToggleField, FeatureOption } from '@/components/form-fields/FeatureToggleField';
 import { CheckboxCardField, CheckboxOption } from '@/components/form-fields/CheckboxCardField';
 import { RadioCardField, RadioOption } from '@/components/form-fields/RadioCardField';
@@ -641,7 +641,7 @@ const SetupLaboratoryPage = () => {
             />
 
             <div className="grid grid-cols-2 gap-4">
-              <CustomPhoneField
+              <PhoneField
                 label="Phone Number *"
                 name="phone"
                 value={formData.phone}
@@ -650,7 +650,7 @@ const SetupLaboratoryPage = () => {
                 country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
                 required
               />
-              <CustomPhoneField
+              <PhoneField
                 label="Fax Number"
                 name="fax"
                 value={formData.fax}
@@ -1023,7 +1023,7 @@ const SetupLaboratoryPage = () => {
                 Report Customization
               </h4>
               
-              <RichTextEditorFieldV2
+              <RichTextEditorField
                 label="Custom Report Header"
                 name="customReportHeader"
                 value={formData.customReportHeader}
@@ -1034,7 +1034,7 @@ const SetupLaboratoryPage = () => {
                 toolbar="full"
               />
               
-              <RichTextEditorFieldV2
+              <RichTextEditorField
                 label="Custom Report Footer"
                 name="customReportFooter"
                 value={formData.customReportFooter}

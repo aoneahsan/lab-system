@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { RichTextEditorField } from '@/components/form-fields/RichTextEditorField';
-import { RichTextEditorFieldV2 } from '@/components/form-fields/RichTextEditorFieldV2';
 import { FileText, Save, Sparkles } from 'lucide-react';
 
 const RichTextEditorExample = () => {
@@ -72,7 +71,7 @@ const RichTextEditorExample = () => {
             <Sparkles className="h-5 w-5 text-yellow-500" />
             Enhanced Editor with Advanced Features
           </h2>
-          <RichTextEditorFieldV2
+          <RichTextEditorField
             label="Complete Documentation"
             name="documentation"
             value={fullContent}

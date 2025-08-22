@@ -272,7 +272,6 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
               { value: 'evening', label: 'Evening (5 PM - 8 PM)' },
             ]}
           />
-          </div>
         </div>
       )}
 
