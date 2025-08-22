@@ -1,44 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Keyboard, FileText, X, Command } from 'lucide-react';
+import { Keyboard, FileText, Command } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
-
-export interface KeyboardShortcut {
-  key: string;
-  description: string;
-  category?: 'navigation' | 'form' | 'action' | 'general';
-  modifier?: 'ctrl' | 'alt' | 'shift' | 'cmd' | 'ctrl+shift' | 'alt+shift';
-}
+import keyboardShortcutsService, { KeyboardShortcut } from '@/services/KeyboardShortcutsService';
 
 interface KeyboardShortcutsHelperProps {
-  shortcuts: KeyboardShortcut[];
   type?: 'form' | 'page';
   title?: string;
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 }
 
 export const KeyboardShortcutsHelper: React.FC<KeyboardShortcutsHelperProps> = ({
-  shortcuts,
   type = 'page',
   title,
   position = 'top-right'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMac, setIsMac] = useState(false);
+  const [groupedShortcuts, setGroupedShortcuts] = useState<Record<string, KeyboardShortcut[]>>({});
 
   useEffect(() => {
-    // Detect if user is on Mac
-    setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+    // Register the help modal callback
+    keyboardShortcutsService.setHelpModalCallback(() => setIsOpen(true));
+    
+    // Get shortcuts from service
+    const updateShortcuts = () => {
+      setGroupedShortcuts(keyboardShortcutsService.getGroupedShortcuts());
+    };
+    
+    updateShortcuts();
+    
+    // Update when shortcuts change (could add event emitter to service for this)
+    const interval = setInterval(updateShortcuts, 1000);
+    
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
-
-  // Group shortcuts by category
-  const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
-    const category = shortcut.category || 'general';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(shortcut);
-    return acc;
-  }, {} as Record<string, KeyboardShortcut[]>);
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
@@ -55,55 +51,6 @@ export const KeyboardShortcutsHelper: React.FC<KeyboardShortcutsHelperProps> = (
     }
   };
 
-  const formatModifier = (modifier?: string) => {
-    if (!modifier) return '';
-    
-    const modifiers = modifier.split('+').map(mod => {
-      switch (mod) {
-        case 'ctrl':
-          return isMac ? '⌘' : 'Ctrl';
-        case 'cmd':
-          return '⌘';
-        case 'alt':
-          return isMac ? '⌥' : 'Alt';
-        case 'shift':
-          return isMac ? '⇧' : 'Shift';
-        default:
-          return mod;
-      }
-    });
-    
-    return modifiers.join(' + ') + ' + ';
-  };
-
-  const formatKey = (key: string) => {
-    // Special key formatting
-    switch (key.toLowerCase()) {
-      case 'enter':
-        return isMac ? '↵' : 'Enter';
-      case 'esc':
-      case 'escape':
-        return 'Esc';
-      case 'tab':
-        return isMac ? '⇥' : 'Tab';
-      case 'space':
-        return 'Space';
-      case 'backspace':
-        return isMac ? '⌫' : 'Backspace';
-      case 'delete':
-        return isMac ? '⌦' : 'Delete';
-      case 'up':
-        return '↑';
-      case 'down':
-        return '↓';
-      case 'left':
-        return '←';
-      case 'right':
-        return '→';
-      default:
-        return key.toUpperCase();
-    }
-  };
 
   const positionClasses = {
     'top-right': 'top-4 right-4',
@@ -146,9 +93,7 @@ export const KeyboardShortcutsHelper: React.FC<KeyboardShortcutsHelperProps> = (
               <div className="text-sm text-blue-700 dark:text-blue-300">
                 <p className="font-medium">Pro Tip</p>
                 <p className="mt-1">
-                  {isMac 
-                    ? 'Use ⌘ (Command) instead of Ctrl on macOS'
-                    : 'Press ? anytime to show this help'}
+                  Press ? anytime to show this help
                 </p>
               </div>
             </div>
@@ -172,8 +117,8 @@ export const KeyboardShortcutsHelper: React.FC<KeyboardShortcutsHelperProps> = (
                       </span>
                       <div className="flex items-center space-x-1">
                         <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 dark:text-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md">
-                          {formatModifier(shortcut.modifier)}
-                          {formatKey(shortcut.key)}
+                          {keyboardShortcutsService.formatModifier(shortcut.modifier)}
+                          {keyboardShortcutsService.formatKey(shortcut.key)}
                         </kbd>
                       </div>
                     </div>
@@ -202,84 +147,3 @@ export const KeyboardShortcutsHelper: React.FC<KeyboardShortcutsHelperProps> = (
     </>
   );
 };
-
-// Hook to register keyboard shortcuts
-export const useKeyboardShortcuts = (
-  shortcuts: KeyboardShortcut[],
-  handlers: Record<string, () => void>,
-  enabled: boolean = true
-) => {
-  useEffect(() => {
-    if (!enabled) return;
-
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Check for help shortcut (?)
-      if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        const helpButton = document.querySelector('[aria-label="Show keyboard shortcuts"]') as HTMLButtonElement;
-        if (helpButton) {
-          helpButton.click();
-          e.preventDefault();
-          return;
-        }
-      }
-
-      // Check for other shortcuts
-      shortcuts.forEach(shortcut => {
-        const handler = handlers[shortcut.key];
-        if (!handler) return;
-
-        let modifierMatch = true;
-        
-        if (shortcut.modifier) {
-          const modifiers = shortcut.modifier.split('+');
-          modifierMatch = modifiers.every(mod => {
-            switch (mod) {
-              case 'ctrl':
-                return e.ctrlKey || e.metaKey;
-              case 'cmd':
-                return e.metaKey;
-              case 'alt':
-                return e.altKey;
-              case 'shift':
-                return e.shiftKey;
-              default:
-                return false;
-            }
-          });
-        } else {
-          // No modifier required - ensure none are pressed
-          modifierMatch = !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey;
-        }
-
-        if (modifierMatch && e.key.toLowerCase() === shortcut.key.toLowerCase()) {
-          e.preventDefault();
-          handler();
-        }
-      });
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [shortcuts, handlers, enabled]);
-};
-
-// Preset shortcuts for common form operations
-export const FORM_SHORTCUTS: KeyboardShortcut[] = [
-  { key: 's', modifier: 'ctrl', description: 'Save current step', category: 'form' },
-  { key: 'enter', modifier: 'ctrl', description: 'Save and continue', category: 'form' },
-  { key: 'tab', description: 'Next field', category: 'navigation' },
-  { key: 'tab', modifier: 'shift', description: 'Previous field', category: 'navigation' },
-  { key: 'escape', description: 'Cancel/Close', category: 'navigation' },
-  { key: 'r', modifier: 'ctrl', description: 'Reset form', category: 'form' },
-  { key: 'up', description: 'Previous step', category: 'navigation' },
-  { key: 'down', description: 'Next step', category: 'navigation' },
-];
-
-// Preset shortcuts for page navigation
-export const PAGE_SHORTCUTS: KeyboardShortcut[] = [
-  { key: 'g', modifier: 'alt', description: 'Go to dashboard', category: 'navigation' },
-  { key: 'n', modifier: 'alt', description: 'Create new', category: 'action' },
-  { key: '/', description: 'Focus search', category: 'navigation' },
-  { key: 'escape', description: 'Close modal/drawer', category: 'navigation' },
-  { key: '?', description: 'Show this help', category: 'general' },
-];

@@ -25,8 +25,10 @@ import { FeatureToggleField, FeatureOption } from '@/components/form-fields/Feat
 import { CheckboxCardField, CheckboxOption } from '@/components/form-fields/CheckboxCardField';
 import { RadioCardField, RadioOption } from '@/components/form-fields/RadioCardField';
 import { NumberField } from '@/components/form-fields/NumberField';
-import { KeyboardShortcutsHelper, useKeyboardShortcuts, KeyboardShortcut } from '@/components/ui/KeyboardShortcutsHelper';
+import { KeyboardShortcutsHelper } from '@/components/ui/KeyboardShortcutsHelper';
 import { scrollToFirstError } from '@/components/form-fields/FieldError';
+import { useFormKeyboardShortcuts, useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { KeyboardShortcut } from '@/services/KeyboardShortcutsService';
 
 interface SetupStep {
   id: string;
@@ -415,54 +417,61 @@ const SetupLaboratoryPage = () => {
     }
   };
 
-  // Define keyboard shortcuts for this form
-  const formShortcuts: KeyboardShortcut[] = [
-    { key: 's', modifier: 'ctrl', description: 'Save current step', category: 'form' },
-    { key: 'enter', modifier: 'ctrl', description: 'Save and continue to next step', category: 'form' },
-    { key: 'ArrowLeft', modifier: 'alt', description: 'Go to previous step', category: 'navigation' },
-    { key: 'ArrowRight', modifier: 'alt', description: 'Go to next step', category: 'navigation' },
-    { key: '1', modifier: 'alt', description: 'Go to Step 1', category: 'navigation' },
-    { key: '2', modifier: 'alt', description: 'Go to Step 2', category: 'navigation' },
-    { key: '3', modifier: 'alt', description: 'Go to Step 3', category: 'navigation' },
-    { key: '4', modifier: 'alt', description: 'Go to Step 4', category: 'navigation' },
-    { key: '5', modifier: 'alt', description: 'Go to Step 5', category: 'navigation' },
-    { key: 'r', modifier: 'ctrl', description: 'Reset current step', category: 'form' },
-    { key: 'escape', description: 'Cancel and go back', category: 'navigation' },
-  ];
-
-  // Setup keyboard shortcut handlers
-  const shortcutHandlers = {
-    's': () => {
-      // Save current step without advancing
-      if (validateCurrentStep()) {
-        const stepData = getStepData(currentStep);
-        saveStepData(currentStep, stepData, currentUser?.id || '', false);
-        toast.success('Saved', 'Progress saved successfully');
-      }
-    },
-    'enter': () => handleNext(),
-    'ArrowLeft': () => handleBack(),
-    'ArrowRight': () => {
-      if (completedSteps.includes(currentStep)) {
-        handleNext();
-      }
-    },
-    '1': () => currentStep !== 0 && completedSteps.includes(0) && setCurrentStep(0),
-    '2': () => currentStep !== 1 && completedSteps.includes(1) && setCurrentStep(1),
-    '3': () => currentStep !== 2 && completedSteps.includes(2) && setCurrentStep(2),
-    '4': () => currentStep !== 3 && completedSteps.includes(3) && setCurrentStep(3),
-    '5': () => currentStep !== 4 && completedSteps.includes(4) && setCurrentStep(4),
-    'r': () => {
-      if (confirm('Are you sure you want to reset this step?')) {
-        // Reset to saved data or defaults
-        window.location.reload();
-      }
-    },
-    'escape': () => handleBack(),
+  // Setup form keyboard shortcuts
+  const handleSave = () => {
+    if (validateCurrentStep()) {
+      const stepData = getStepData(currentStep);
+      saveStepData(currentStep, stepData, currentUser?.id || '', false);
+      toast.success('Saved', 'Progress saved successfully');
+    }
   };
 
-  // Enable keyboard shortcuts
-  useKeyboardShortcuts(formShortcuts, shortcutHandlers, !isCreating && !isSaving);
+  const handleReset = () => {
+    if (confirm('Are you sure you want to reset this step?')) {
+      window.location.reload();
+    }
+  };
+
+  // Use the form keyboard shortcuts hook
+  useFormKeyboardShortcuts(
+    handleSave,
+    handleNext,
+    handleReset,
+    handleBack,
+    { enabled: !isCreating && !isSaving, priority: 10 }
+  );
+
+  // Add step navigation shortcuts
+  const stepShortcuts: KeyboardShortcut[] = [
+    { 
+      key: 'ArrowLeft', 
+      modifier: 'alt', 
+      description: 'Previous step', 
+      category: 'navigation',
+      handler: handleBack 
+    },
+    { 
+      key: 'ArrowRight', 
+      modifier: 'alt', 
+      description: 'Next step', 
+      category: 'navigation',
+      handler: () => completedSteps.includes(currentStep) && handleNext()
+    },
+    ...steps.map((_, index) => ({
+      key: String(index + 1),
+      modifier: 'alt' as const,
+      description: `Go to Step ${index + 1}`,
+      category: 'navigation' as const,
+      handler: () => {
+        if (index === 0 || completedSteps.includes(index - 1)) {
+          setCurrentStep(index);
+        }
+      }
+    }))
+  ];
+
+  // Register step navigation shortcuts
+  useKeyboardShortcuts(stepShortcuts, { enabled: !isCreating && !isSaving, priority: 5 });
 
   const handleSubmit = async () => {
     setIsCreating(true);
@@ -1152,7 +1161,6 @@ const SetupLaboratoryPage = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       {/* Keyboard Shortcuts Helper */}
       <KeyboardShortcutsHelper 
-        shortcuts={formShortcuts} 
         type="form" 
         title="Onboarding Form Shortcuts"
         position="top-right"

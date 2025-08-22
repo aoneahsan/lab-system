@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useModalKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface ModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  onConfirm?: () => void;
 }
 
 export const Modal: React.FC<ModalProps> = ({ 
@@ -14,7 +16,8 @@ export const Modal: React.FC<ModalProps> = ({
   onClose, 
   title, 
   children,
-  size = 'lg' 
+  size = 'lg',
+  onConfirm
 }) => {
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -29,22 +32,12 @@ export const Modal: React.FC<ModalProps> = ({
     };
   }, [isOpen]);
 
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen, onClose]);
+  // Use centralized keyboard shortcuts
+  useModalKeyboardShortcuts(
+    onClose,
+    onConfirm,
+    { enabled: isOpen }
+  );
 
   if (!isOpen) return null;
 

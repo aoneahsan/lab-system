@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { X, AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react';
+import { useModalKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface ModalOptions {
   title?: string;
@@ -53,13 +54,12 @@ const Modal: React.FC<ModalProps> = ({
     }, 200);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      handleCancel();
-    } else if (e.key === 'Enter' && type !== 'prompt') {
-      handleConfirm();
-    }
-  };
+  // Use centralized keyboard shortcuts
+  useModalKeyboardShortcuts(
+    handleCancel,
+    type !== 'prompt' ? handleConfirm : undefined,
+    { enabled: isOpen }
+  );
 
   const getIcon = () => {
     const iconMap = {
@@ -77,7 +77,6 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div
       className="fixed inset-0 z-[9999] overflow-y-auto"
-      onKeyDown={handleKeyDown}
     >
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
@@ -111,6 +110,7 @@ const Modal: React.FC<ModalProps> = ({
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
+                          e.stopPropagation();
                           handleConfirm();
                         }
                       }}
