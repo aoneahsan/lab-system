@@ -182,12 +182,26 @@ const SetupLaboratoryPage = () => {
   // Update formData when savedData changes
   useEffect(() => {
     if (savedData && Object.keys(savedData).length > 0) {
-      setFormData(prev => ({
-        ...prev,
+      const newFormData = {
+        ...formData,
         ...savedData,
-      }));
+      };
+      setFormData(newFormData);
+      
+      // Also validate the saved code if it exists
+      if (savedData.code && savedData.code.length >= 3) {
+        // Reset validation state first
+        setCodeValidation({
+          isChecking: true,
+          isAvailable: null,
+          message: 'Checking availability...',
+        });
+        
+        // Then check the code
+        checkCodeAvailability(savedData.code);
+      }
     }
-  }, [savedData]);
+  }, [savedData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [codeValidation, setCodeValidation] = useState<{
     isChecking: boolean;
@@ -219,11 +233,33 @@ const SetupLaboratoryPage = () => {
       const docRef = await getDoc(doc(firestore, 'tenants', code.toLowerCase()));
 
       if (docRef.exists()) {
-        setCodeValidation({
-          isChecking: false,
-          isAvailable: false,
-          message: 'This code is already taken',
-        });
+        const tenantData = docRef.data();
+        
+        // Check if current user already owns this tenant
+        if (currentUser?.tenantId === code.toLowerCase()) {
+          setCodeValidation({
+            isChecking: false,
+            isAvailable: true,
+            message: 'This is your laboratory code',
+          });
+        } else {
+          // Check if this user is associated with this tenant
+          const tenantUserRef = await getDoc(doc(firestore, 'tenant_users', `${currentUser?.id}_${code.toLowerCase()}`));
+          
+          if (tenantUserRef.exists()) {
+            setCodeValidation({
+              isChecking: false,
+              isAvailable: true,
+              message: 'This is your laboratory code',
+            });
+          } else {
+            setCodeValidation({
+              isChecking: false,
+              isAvailable: false,
+              message: 'This code is already taken',
+            });
+          }
+        }
       } else {
         setCodeValidation({
           isChecking: false,
@@ -258,8 +294,32 @@ const SetupLaboratoryPage = () => {
         if (!formData.code) errors.code = 'Laboratory code is required';
         if (!formData.name) errors.name = 'Laboratory name is required';
         if (!formData.type) errors.type = 'Laboratory type is required';
-        if (formData.code && !codeValidation.isAvailable) {
-          errors.code = 'This code is already taken';
+        
+        // Code validation logic
+        if (formData.code && formData.code.length >= 3) {
+          // Debug logging
+          onboardingLogger.info('Code validation state:', {
+            code: formData.code,
+            isChecking: codeValidation.isChecking,
+            isAvailable: codeValidation.isAvailable,
+            message: codeValidation.message,
+            userTenantId: currentUser?.tenantId
+          });
+          
+          if (codeValidation.isChecking) {
+            errors.code = 'Please wait while we check the code availability';
+          } else {
+            // Check if code is valid for this user
+            const isOwnCode = codeValidation.message === 'This is your laboratory code';
+            const isAvailableCode = codeValidation.isAvailable === true;
+            
+            if (!isOwnCode && !isAvailableCode) {
+              errors.code = codeValidation.message || 'This code is already taken';
+              onboardingLogger.warn('Code validation failed:', { isOwnCode, isAvailableCode, codeValidation });
+            } else {
+              onboardingLogger.info('Code validation passed:', { isOwnCode, isAvailableCode });
+            }
+          }
         }
         break;
         
