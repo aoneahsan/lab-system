@@ -1,6 +1,7 @@
 import React from 'react';
 import { FieldError } from 'react-hook-form';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { FieldError as FieldErrorDisplay, RequiredIndicator } from './FieldError';
 
 export interface BaseFormFieldProps {
   label?: string;
@@ -36,17 +37,15 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   showLabel = true,
   children,
 }) => {
-  const errorMessage = typeof error === 'string' ? error : error?.message;
-
   return (
-    <div className={`form-field-wrapper ${containerClassName}`}>
+    <div className={`form-field-wrapper ${containerClassName}`} data-field-name={name}>
       {showLabel && label && (
         <label
           htmlFor={name}
           className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${labelClassName}`}
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          <RequiredIndicator required={required} />
         </label>
       )}
       
@@ -59,18 +58,14 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
         )}
       </div>
 
-      {helpText && !errorMessage && (
+      {helpText && !error && (
         <div className="mt-1 flex items-start text-sm text-gray-500 dark:text-gray-400">
           <InformationCircleIcon className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
           <span>{helpText}</span>
         </div>
       )}
 
-      {errorMessage && (
-        <p className={`mt-1 text-sm text-red-600 dark:text-red-400 ${errorClassName}`}>
-          {errorMessage}
-        </p>
-      )}
+      <FieldErrorDisplay error={error} className={errorClassName} />
     </div>
   );
 };

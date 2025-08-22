@@ -5,6 +5,7 @@ export interface OnboardingData {
   userId: string;
   currentStep: number;
   completedSteps: number[];
+  stepCompletionDates: Record<number, Date>; // Track when each step was completed
   isComplete: boolean;
   startedAt: Date;
   completedAt?: Date;
@@ -93,8 +94,18 @@ class OnboardingService {
       const docRef = doc(firestore, this.COLLECTION_NAME, userId);
       const existingData = await this.getProgress(userId);
       
-      // Keep existing completed steps
+      // Check if all previous steps are completed before allowing this save
+      if (markAsComplete && step > 0) {
+        for (let i = 0; i < step; i++) {
+          if (!existingData?.completedSteps?.includes(i)) {
+            throw new Error(`Cannot complete step ${step + 1} without completing step ${i + 1} first`);
+          }
+        }
+      }
+      
+      // Keep existing completed steps and timestamps
       let completedSteps = existingData?.completedSteps || [];
+      let stepCompletionDates = existingData?.stepCompletionDates || {};
       
       // Only add to completed steps if explicitly marking as complete AND validation passes
       if (markAsComplete) {
@@ -102,9 +113,12 @@ class OnboardingService {
         if (validation.isValid && !completedSteps.includes(step)) {
           completedSteps.push(step);
           completedSteps = completedSteps.sort((a, b) => a - b);
+          stepCompletionDates[step] = new Date();
         } else if (!validation.isValid) {
           // If validation fails, remove this step from completed if it was there
           completedSteps = completedSteps.filter(s => s !== step);
+          delete stepCompletionDates[step];
+          throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
         }
       }
       
@@ -112,6 +126,7 @@ class OnboardingService {
         userId,
         currentStep: Math.max(step, existingData?.currentStep || 0),
         completedSteps,
+        stepCompletionDates,
         isComplete: false,
         startedAt: existingData?.startedAt || new Date(),
         laboratoryData: {
@@ -130,31 +145,8 @@ class OnboardingService {
       this.saveToLocalStorage(updatedData);
     } catch (error) {
       console.error('Error saving step progress:', error);
-      // Save to localStorage as fallback
-      const existingData = this.getFromLocalStorage(userId);
-      const completedSteps = existingData?.completedSteps || [];
-      
-      // Only add to completed steps if markAsComplete is true and validation passes
-      if (markAsComplete && !completedSteps.includes(step)) {
-        const validation = this.validateStepData(step, stepData);
-        if (validation.isValid) {
-          completedSteps.push(step);
-        }
-      }
-      
-      const updatedData: OnboardingData = {
-        userId,
-        currentStep: Math.max(step, existingData?.currentStep || 0),
-        completedSteps: completedSteps.sort((a, b) => a - b),
-        isComplete: false,
-        startedAt: existingData?.startedAt || new Date(),
-        laboratoryData: {
-          ...existingData?.laboratoryData,
-          ...stepData,
-        },
-      };
-      
-      this.saveToLocalStorage(updatedData);
+      // Re-throw the error so the UI can handle it
+      throw error;
     }
   }
 
@@ -175,6 +167,12 @@ class OnboardingService {
   async completeOnboarding(userId: string): Promise<void> {
     try {
       const docRef = doc(firestore, this.COLLECTION_NAME, userId);
+      const existingData = await this.getProgress(userId);
+      
+      // Ensure all steps are actually completed
+      if (!existingData || existingData.completedSteps.length !== this.TOTAL_STEPS) {
+        throw new Error('Cannot complete onboarding without finishing all steps');
+      }
       
       await updateDoc(docRef, {
         isComplete: true,
@@ -187,15 +185,7 @@ class OnboardingService {
       this.clearLocalStorage();
     } catch (error) {
       console.error('Error completing onboarding:', error);
-      // Update localStorage
-      const existingData = this.getFromLocalStorage(userId);
-      if (existingData) {
-        existingData.isComplete = true;
-        existingData.completedAt = new Date();
-        existingData.completedSteps = [0, 1, 2, 3, 4];
-        existingData.currentStep = 4;
-        this.saveToLocalStorage(existingData);
-      }
+      throw error;
     }
   }
 
@@ -296,12 +286,18 @@ class OnboardingService {
    */
   async revalidateCompletedSteps(
     userId: string, 
-    laboratoryData: Partial<OnboardingData['laboratoryData']>
+    laboratoryData: Partial<OnboardingData['laboratoryData']>,
+    stepCompletionDates?: Record<number, Date>
   ): Promise<number[]> {
     const validatedSteps: number[] = [];
     
-    // Only validate steps that have meaningful data, not just defaults
+    // Only validate steps that have timestamps AND valid data
     for (let step = 0; step < this.TOTAL_STEPS; step++) {
+      // Skip if no timestamp exists for this step
+      if (stepCompletionDates && !stepCompletionDates[step]) {
+        continue;
+      }
+      
       const stepData = this.extractStepData(step, laboratoryData);
       
       // Check if step has actual data (not just empty/default values)
@@ -311,7 +307,18 @@ class OnboardingService {
       const validation = this.validateStepData(step, stepData);
       
       if (validation.isValid) {
-        validatedSteps.push(step);
+        // Ensure all previous steps are also validated
+        let canInclude = true;
+        for (let i = 0; i < step; i++) {
+          if (!validatedSteps.includes(i)) {
+            canInclude = false;
+            break;
+          }
+        }
+        
+        if (canInclude) {
+          validatedSteps.push(step);
+        }
       }
     }
     
@@ -415,6 +422,33 @@ class OnboardingService {
     } catch (error) {
       console.error('Error clearing onboarding data:', error);
       this.clearLocalStorage();
+    }
+  }
+
+  /**
+   * Clean invalid onboarding data (remove improperly saved steps)
+   */
+  async cleanInvalidData(userId: string): Promise<void> {
+    try {
+      const progress = await this.getProgress(userId);
+      if (!progress) return;
+
+      // Revalidate and clean up
+      const validSteps = await this.revalidateCompletedSteps(
+        userId,
+        progress.laboratoryData,
+        progress.stepCompletionDates
+      );
+
+      // Update with only valid steps
+      const docRef = doc(firestore, this.COLLECTION_NAME, userId);
+      await updateDoc(docRef, {
+        completedSteps: validSteps,
+        currentStep: validSteps.length > 0 ? Math.max(...validSteps) : 0,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error('Error cleaning invalid data:', error);
     }
   }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ChevronLeft, ChevronRight, Building2, MapPin, Phone, Globe, Settings, Check, FileText,
@@ -25,6 +25,8 @@ import { FeatureToggleField, FeatureOption } from '@/components/form-fields/Feat
 import { CheckboxCardField, CheckboxOption } from '@/components/form-fields/CheckboxCardField';
 import { RadioCardField, RadioOption } from '@/components/form-fields/RadioCardField';
 import { NumberField } from '@/components/form-fields/NumberField';
+import { KeyboardShortcutsHelper, useKeyboardShortcuts, KeyboardShortcut } from '@/components/ui/KeyboardShortcutsHelper';
+import { scrollToFirstError } from '@/components/form-fields/FieldError';
 
 interface SetupStep {
   id: string;
@@ -86,18 +88,16 @@ const SetupLaboratoryPage = () => {
   const [currentStep, setCurrentStep] = useState(stepFromUrl);
   const [isCreating, setIsCreating] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Initialize onboarding data on component mount
   useEffect(() => {
     if (currentUser?.id && !isInitialized) {
       const initOnboarding = async () => {
-        // Clear any stale local storage data first
+        // Clear local storage to start fresh
         useOnboardingStore.getState().clearOnboarding();
         
-        // Small delay to ensure state is cleared
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Now initialize with fresh data from Firebase
+        // Clean any invalid data and initialize
         await initializeOnboarding(currentUser.id);
         setIsInitialized(true);
       };
@@ -247,39 +247,45 @@ const SetupLaboratoryPage = () => {
   };
 
   const validateCurrentStep = () => {
+    const errors: Record<string, string> = {};
+    
     switch (currentStep) {
       case 0: // Basic Info
-        if (!formData.code || !formData.name) {
-          toast.error('Missing information', 'Please fill in all required fields');
-          return false;
-        }
-        if (!codeValidation.isAvailable) {
-          toast.error('Invalid code', 'Please choose an available laboratory code');
-          return false;
+        if (!formData.code) errors.code = 'Laboratory code is required';
+        if (!formData.name) errors.name = 'Laboratory name is required';
+        if (!formData.type) errors.type = 'Laboratory type is required';
+        if (formData.code && !codeValidation.isAvailable) {
+          errors.code = 'This code is already taken';
         }
         break;
+        
       case 1: // Address
-        if (!formData.street || !formData.city || !formData.state || !formData.zipCode) {
-          toast.error('Missing information', 'Please fill in all address fields');
-          return false;
-        }
+        if (!formData.street) errors.street = 'Street address is required';
+        if (!formData.city) errors.city = 'City is required';
+        if (!formData.state) errors.state = 'State is required';
+        if (!formData.zipCode) errors.zipCode = 'ZIP code is required';
+        if (!formData.country) errors.country = 'Country is required';
         break;
+        
       case 2: // Contact
-        if (!formData.email || !formData.phone) {
-          toast.error('Missing information', 'Email and phone are required');
-          return false;
+        if (!formData.email) errors.email = 'Email is required';
+        if (!formData.phone) errors.phone = 'Phone number is required';
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (formData.email && !emailRegex.test(formData.email)) {
+          errors.email = 'Please enter a valid email address';
         }
         break;
+        
       case 3: // Settings
-        if (!formData.timezone || !formData.currency || !formData.resultFormat) {
-          toast.error('Missing information', 'Please select timezone, currency, and result format');
-          return false;
-        }
+        if (!formData.timezone) errors.timezone = 'Timezone is required';
+        if (!formData.currency) errors.currency = 'Currency is required';
+        if (!formData.resultFormat) errors.resultFormat = 'Result format is required';
         if (!formData.enabledFeatures || formData.enabledFeatures.length === 0) {
-          toast.error('Missing features', 'Please select at least one feature to enable');
-          return false;
+          errors.features = 'Please select at least one feature to enable';
         }
         break;
+        
       case 4: // Custom Configuration
         // At least some configuration should be provided
         const hasConfig = 
@@ -291,11 +297,27 @@ const SetupLaboratoryPage = () => {
           (formData.resultManagementOptions && formData.resultManagementOptions.length > 0);
         
         if (!hasConfig) {
-          toast.error('Missing configuration', 'Please configure at least one custom setting');
-          return false;
+          errors.configuration = 'Please configure at least one custom setting';
         }
         break;
     }
+    
+    setFieldErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      // Show toast with summary
+      const errorCount = Object.keys(errors).length;
+      toast.error(
+        'Validation failed', 
+        `Please fix ${errorCount} error${errorCount > 1 ? 's' : ''} in the form`
+      );
+      
+      // Scroll to first error
+      setTimeout(() => scrollToFirstError(errors), 100);
+      
+      return false;
+    }
+    
     return true;
   };
 
@@ -306,18 +328,24 @@ const SetupLaboratoryPage = () => {
     }
 
     if (validateCurrentStep()) {
-      // Save current step data and mark as complete
-      const stepData = getStepData(currentStep);
-      await saveStepData(currentStep, stepData, currentUser.id, true);
-      
-      if (currentStep < steps.length - 1) {
-        const nextStep = currentStep + 1;
-        const canAccess = await navigateToStep(nextStep, currentUser.id);
-        if (canAccess) {
+      try {
+        // Get all form data for the current step
+        const stepData = getStepData(currentStep);
+        
+        // Save and mark as complete
+        await saveStepData(currentStep, stepData, currentUser.id, true);
+        
+        // Only navigate if save was successful
+        if (currentStep < steps.length - 1) {
+          const nextStep = currentStep + 1;
           setCurrentStep(nextStep);
+        } else {
+          // Last step - create the laboratory
+          await handleSubmit();
         }
-      } else {
-        handleSubmit();
+      } catch (error: any) {
+        console.error('Error saving step:', error);
+        toast.error('Save failed', error.message || 'Could not save your progress');
       }
     }
   };
@@ -386,6 +414,55 @@ const SetupLaboratoryPage = () => {
       navigate('/onboarding?option=create');
     }
   };
+
+  // Define keyboard shortcuts for this form
+  const formShortcuts: KeyboardShortcut[] = [
+    { key: 's', modifier: 'ctrl', description: 'Save current step', category: 'form' },
+    { key: 'enter', modifier: 'ctrl', description: 'Save and continue to next step', category: 'form' },
+    { key: 'ArrowLeft', modifier: 'alt', description: 'Go to previous step', category: 'navigation' },
+    { key: 'ArrowRight', modifier: 'alt', description: 'Go to next step', category: 'navigation' },
+    { key: '1', modifier: 'alt', description: 'Go to Step 1', category: 'navigation' },
+    { key: '2', modifier: 'alt', description: 'Go to Step 2', category: 'navigation' },
+    { key: '3', modifier: 'alt', description: 'Go to Step 3', category: 'navigation' },
+    { key: '4', modifier: 'alt', description: 'Go to Step 4', category: 'navigation' },
+    { key: '5', modifier: 'alt', description: 'Go to Step 5', category: 'navigation' },
+    { key: 'r', modifier: 'ctrl', description: 'Reset current step', category: 'form' },
+    { key: 'escape', description: 'Cancel and go back', category: 'navigation' },
+  ];
+
+  // Setup keyboard shortcut handlers
+  const shortcutHandlers = {
+    's': () => {
+      // Save current step without advancing
+      if (validateCurrentStep()) {
+        const stepData = getStepData(currentStep);
+        saveStepData(currentStep, stepData, currentUser?.id || '', false);
+        toast.success('Saved', 'Progress saved successfully');
+      }
+    },
+    'enter': () => handleNext(),
+    'ArrowLeft': () => handleBack(),
+    'ArrowRight': () => {
+      if (completedSteps.includes(currentStep)) {
+        handleNext();
+      }
+    },
+    '1': () => currentStep !== 0 && completedSteps.includes(0) && setCurrentStep(0),
+    '2': () => currentStep !== 1 && completedSteps.includes(1) && setCurrentStep(1),
+    '3': () => currentStep !== 2 && completedSteps.includes(2) && setCurrentStep(2),
+    '4': () => currentStep !== 3 && completedSteps.includes(3) && setCurrentStep(3),
+    '5': () => currentStep !== 4 && completedSteps.includes(4) && setCurrentStep(4),
+    'r': () => {
+      if (confirm('Are you sure you want to reset this step?')) {
+        // Reset to saved data or defaults
+        window.location.reload();
+      }
+    },
+    'escape': () => handleBack(),
+  };
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts(formShortcuts, shortcutHandlers, !isCreating && !isSaving);
 
   const handleSubmit = async () => {
     setIsCreating(true);
@@ -491,62 +568,42 @@ const SetupLaboratoryPage = () => {
       case 0:
         return (
           <div className="space-y-6">
-            <div>
-              <label className="label">Laboratory Code *</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  minLength={3}
-                  maxLength={10}
-                  className={`input ${
-                    formData.code && !codeValidation.isChecking
-                      ? codeValidation.isAvailable
-                        ? 'border-green-500 focus:border-green-500'
-                        : 'border-red-500 focus:border-red-500'
-                      : ''
-                  }`}
-                  value={formData.code}
-                  onChange={handleCodeChange}
-                  placeholder="e.g., LAB001"
-                />
-                {formData.code && (
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    {codeValidation.isChecking ? (
-                      <LoadingSpinner size="sm" />
-                    ) : codeValidation.isAvailable ? (
-                      <Check className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <span className="text-red-500">✗</span>
-                    )}
-                  </div>
-                )}
-              </div>
-              {codeValidation.message && (
-                <p
-                  className={`mt-1 text-sm ${
-                    codeValidation.isAvailable ? 'text-green-600' : 'text-red-600'
-                  }`}
-                >
-                  {codeValidation.message}
-                </p>
+            <div className="relative">
+              <TextField
+                label="Laboratory Code"
+                name="code"
+                value={formData.code}
+                onChange={handleCodeChange}
+                placeholder="e.g., LAB001"
+                required
+                minLength={3}
+                maxLength={10}
+                error={fieldErrors.code || (!codeValidation.isAvailable && formData.code ? codeValidation.message : undefined)}
+                helpText="A unique 3-10 character code for your laboratory"
+              />
+              {formData.code && (
+                <div className="absolute top-8 right-3">
+                  {codeValidation.isChecking ? (
+                    <LoadingSpinner size="sm" />
+                  ) : codeValidation.isAvailable ? (
+                    <Check className="h-5 w-5 text-green-500" />
+                  ) : null}
+                </div>
               )}
-              <p className="mt-1 text-sm text-gray-500">
-                A unique 3-10 character code for your laboratory
-              </p>
             </div>
 
             <TextField
-              label="Laboratory Name *"
+              label="Laboratory Name"
               name="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Central Medical Laboratory"
               required
+              error={fieldErrors.name}
             />
 
             <SelectField
-              label="Laboratory Type *"
+              label="Laboratory Type"
               name="type"
               value={formData.type}
               onChange={(value) => setFormData({ ...formData, type: value as string })}
@@ -558,6 +615,7 @@ const SetupLaboratoryPage = () => {
               ]}
               required
               isClearable={false}
+              error={fieldErrors.type}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -583,16 +641,17 @@ const SetupLaboratoryPage = () => {
         return (
           <div className="space-y-6">
             <TextField
-              label="Street Address *"
+              label="Street Address"
               name="street"
               value={formData.street}
               onChange={(e) => setFormData({ ...formData, street: e.target.value })}
               placeholder="123 Medical Center Drive"
               required
+              error={fieldErrors.street}
             />
 
             <CountryField
-              label="Country *"
+              label="Country"
               name="country"
               value={formData.countryId}
               onChange={(value) => {
@@ -608,11 +667,12 @@ const SetupLaboratoryPage = () => {
                 });
               }}
               required
+              error={fieldErrors.country}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StateField
-                label="State/Province *"
+                label="State/Province"
                 name="state"
                 countryId={formData.countryId}
                 value={formData.stateId}
@@ -627,10 +687,11 @@ const SetupLaboratoryPage = () => {
                   });
                 }}
                 required
+                error={fieldErrors.state}
               />
               
               <CityField
-                label="City *"
+                label="City"
                 name="city"
                 countryId={formData.countryId}
                 stateId={formData.stateId}
@@ -643,16 +704,18 @@ const SetupLaboratoryPage = () => {
                   });
                 }}
                 required
+                error={fieldErrors.city}
               />
             </div>
 
             <ZipCodeField
-              label="ZIP/Postal Code *"
+              label="ZIP/Postal Code"
               name="zipCode"
               value={formData.zipCode}
               onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
               country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'UK' : 'US'}
               required
+              error={fieldErrors.zipCode}
             />
           </div>
         );
@@ -661,23 +724,25 @@ const SetupLaboratoryPage = () => {
         return (
           <div className="space-y-6">
             <EmailField
-              label="Contact Email *"
+              label="Contact Email"
               name="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="admin@laboratory.com"
               required
+              error={fieldErrors.email}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <PhoneField
-                label="Phone Number *"
+                label="Phone Number"
                 name="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="(555) 123-4567"
                 country={formData.country === 'United States' ? 'US' : formData.country === 'Canada' ? 'CA' : formData.country === 'United Kingdom' ? 'GB' : 'US'}
                 required
+                error={fieldErrors.phone}
               />
               <PhoneField
                 label="Fax Number"
@@ -1085,6 +1150,14 @@ const SetupLaboratoryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      {/* Keyboard Shortcuts Helper */}
+      <KeyboardShortcutsHelper 
+        shortcuts={formShortcuts} 
+        type="form" 
+        title="Onboarding Form Shortcuts"
+        position="top-right"
+      />
+      
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-6xl 2xl:max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -1110,15 +1183,23 @@ const SetupLaboratoryPage = () => {
                 <div key={step.id} className="flex items-center flex-1">
                   <div 
                     className={`flex flex-col items-center min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] ${
-                      isAccessible || isCompleted ? 'cursor-pointer' : 'cursor-not-allowed'
+                      isCompleted || (index === 0) || (index === completedSteps.length && completedSteps.includes(index - 1)) 
+                        ? 'cursor-pointer' 
+                        : 'cursor-not-allowed opacity-60'
                     }`}
                     onClick={() => {
-                      if (isAccessible || isCompleted) {
+                      // Only allow clicking on completed steps or the next available step
+                      if (isCompleted) {
+                        setCurrentStep(index);
+                      } else if (index === 0) {
+                        setCurrentStep(0);
+                      } else if (index === completedSteps.length && completedSteps.includes(index - 1)) {
                         setCurrentStep(index);
                       } else {
+                        const nextStep = completedSteps.length;
                         toast.error(
                           'Complete previous steps',
-                          `Please complete step ${index} before proceeding`
+                          `Please complete step ${nextStep + 1} first`
                         );
                       }
                     }}

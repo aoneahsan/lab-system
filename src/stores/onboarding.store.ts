@@ -43,17 +43,21 @@ export const useOnboardingStore = create<OnboardingStore>()(
           set({ isLoading: true });
           
           try {
+            // First clean any invalid data
+            await onboardingService.cleanInvalidData(userId);
+            
             const progress = await onboardingService.getProgress(userId);
             
             if (progress && progress.laboratoryData && Object.keys(progress.laboratoryData).length > 0) {
-              // Re-validate all completed steps with current data
+              // Re-validate all completed steps with current data and timestamps
               const revalidatedSteps = await onboardingService.revalidateCompletedSteps(
                 userId,
-                progress.laboratoryData
+                progress.laboratoryData,
+                progress.stepCompletionDates
               );
               
               set({
-                currentStep: progress.currentStep,
+                currentStep: revalidatedSteps.length > 0 ? Math.max(...revalidatedSteps) : 0,
                 completedSteps: revalidatedSteps,
                 laboratoryData: progress.laboratoryData,
                 isLoading: false,
@@ -117,7 +121,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
             
             // Validate the step data if marking as complete
             if (markComplete) {
-              const validation = state.validateStep(step, data);
+              const validation = state.validateStep(step, mergedData);
               
               if (!validation.isValid) {
                 set({ 
@@ -127,14 +131,29 @@ export const useOnboardingStore = create<OnboardingStore>()(
                   },
                   isSaving: false 
                 });
+                toast.error('Validation failed', validation.errors.join(', '));
                 return;
+              }
+              
+              // Check if all previous steps are completed
+              if (step > 0) {
+                for (let i = 0; i < step; i++) {
+                  if (!state.completedSteps.includes(i)) {
+                    toast.error(
+                      'Complete previous steps', 
+                      `Please complete step ${i + 1} before proceeding`
+                    );
+                    set({ isSaving: false });
+                    return;
+                  }
+                }
               }
             }
             
-            // Save to service
-            await onboardingService.saveStepProgress(userId, step, data, markComplete);
+            // Save to service - this will throw if validation fails
+            await onboardingService.saveStepProgress(userId, step, mergedData, markComplete);
             
-            // Update local state
+            // Update local state only if save succeeds
             const updatedCompletedSteps = markComplete && !state.completedSteps.includes(step)
               ? [...state.completedSteps, step].sort((a, b) => a - b)
               : state.completedSteps;
@@ -149,9 +168,9 @@ export const useOnboardingStore = create<OnboardingStore>()(
             if (markComplete) {
               toast.success('Step completed', 'Your progress has been saved');
             }
-          } catch (error) {
+          } catch (error: any) {
             console.error('Error saving step data:', error);
-            toast.error('Save failed', 'Could not save your progress');
+            toast.error('Save failed', error.message || 'Could not save your progress');
             set({ isSaving: false });
           }
         },
