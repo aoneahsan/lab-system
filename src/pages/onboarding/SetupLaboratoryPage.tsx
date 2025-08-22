@@ -560,7 +560,7 @@ const SetupLaboratoryPage = () => {
               isClearable={false}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextField
                 label="License Number"
                 name="licenseNumber"
@@ -610,7 +610,7 @@ const SetupLaboratoryPage = () => {
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StateField
                 label="State/Province *"
                 name="state"
@@ -669,7 +669,7 @@ const SetupLaboratoryPage = () => {
               required
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <PhoneField
                 label="Phone Number *"
                 name="phone"
@@ -795,7 +795,7 @@ const SetupLaboratoryPage = () => {
 
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SelectField
                 label="Timezone"
                 name="timezone"
@@ -989,7 +989,7 @@ const SetupLaboratoryPage = () => {
                 options={turnaroundOptions}
                 value={formData.defaultTurnaroundMode}
                 onChange={(value) => setFormData({ ...formData, defaultTurnaroundMode: value })}
-                columns={3}
+                columns={1}
                 cardSize="sm"
                 helpText="Sets the expected processing time for standard tests"
               />
@@ -1085,7 +1085,7 @@ const SetupLaboratoryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:max-w-6xl 2xl:max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -1097,7 +1097,7 @@ const SetupLaboratoryPage = () => {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8 overflow-x-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 mb-8 overflow-x-auto">
           <div className="flex items-center justify-between min-w-fit">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -1109,7 +1109,7 @@ const SetupLaboratoryPage = () => {
               return (
                 <div key={step.id} className="flex items-center flex-1">
                   <div 
-                    className={`flex flex-col items-center min-w-[100px] ${
+                    className={`flex flex-col items-center min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] ${
                       isAccessible || isCompleted ? 'cursor-pointer' : 'cursor-not-allowed'
                     }`}
                     onClick={() => {
@@ -1124,7 +1124,7 @@ const SetupLaboratoryPage = () => {
                     }}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                         isActive
                           ? 'bg-primary-600 text-white ring-4 ring-primary-100 dark:ring-primary-900'
                           : isCompleted
@@ -1135,14 +1135,14 @@ const SetupLaboratoryPage = () => {
                       }`}
                     >
                       {isCompleted ? (
-                        <Check className="h-5 w-5" />
+                        <Check className="h-5 w-5 sm:h-6 sm:w-6" />
                       ) : (
-                        <Icon className="h-5 w-5" />
+                        <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                       )}
                     </div>
-                    <div className="mt-2 text-center px-2">
+                    <div className="mt-2 text-center px-1 sm:px-2">
                       <p
-                        className={`text-xs font-medium ${
+                        className={`text-xs sm:text-sm font-medium ${
                           isActive
                             ? 'text-primary-600 dark:text-primary-400'
                             : isCompleted
@@ -1152,7 +1152,7 @@ const SetupLaboratoryPage = () => {
                       >
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 hidden lg:block">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 hidden md:block">
                         {step.description}
                       </p>
                     </div>
@@ -1173,7 +1173,7 @@ const SetupLaboratoryPage = () => {
         </div>
 
         {/* Form Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 sm:p-8 lg:p-10 mb-8">
           {isLoadingOnboarding ? (
             <div className="flex flex-col items-center justify-center py-12">
               <LoadingSpinner size="lg" />
@@ -1190,19 +1190,19 @@ const SetupLaboratoryPage = () => {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
           <button
             onClick={handleBack}
             disabled={isLoadingOnboarding || isSaving}
-            className="btn btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-4 w-4" />
             {currentStep === 0 ? 'Back to Options' : 'Previous'}
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             {/* Progress indicator */}
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
               Step {currentStep + 1} of {steps.length}
               {completedSteps.includes(currentStep) && (
                 <span className="ml-2 text-green-600 dark:text-green-400">✓ Completed</span>
@@ -1212,7 +1212,7 @@ const SetupLaboratoryPage = () => {
             <button
               onClick={handleNext}
               disabled={isCreating || isSaving || isLoadingOnboarding}
-              className="btn btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               {isCreating || isSaving ? (
                 <>
