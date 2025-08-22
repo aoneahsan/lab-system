@@ -565,7 +565,8 @@
       "Bash(wc:*)",
       "Bash(cloc:*)",
       "Bash(./scripts/deploy.sh:*)",
-      "Bash(firebase hosting:sites:list:*)"
+      "Bash(firebase hosting:sites:list:*)",
+      "Bash(firebase firestore:rules:get:*)"
     ],
     "deny": []
   }
