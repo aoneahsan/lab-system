@@ -90,40 +90,37 @@ const SetupLaboratoryPage = () => {
   // Initialize onboarding data on component mount
   useEffect(() => {
     if (currentUser?.id && !isInitialized) {
+      // Clear any stale data first
+      useOnboardingStore.getState().clearOnboarding();
+      
       initializeOnboarding(currentUser.id).then(() => {
         setIsInitialized(true);
       });
     }
   }, [currentUser?.id, initializeOnboarding, isInitialized]);
 
-  // Check step access and redirect if needed
+  // Check step access and set current step
   useEffect(() => {
-    if (isInitialized && currentUser?.id) {
-      // Check if user can access the requested step
-      if (!canAccessStep(stepFromUrl)) {
-        // Find the first incomplete step
-        let firstIncompleteStep = 0;
-        for (let i = 0; i < steps.length; i++) {
-          if (!completedSteps.includes(i)) {
-            firstIncompleteStep = i;
-            break;
-          }
-        }
-        
-        // Redirect to the first incomplete step
-        if (firstIncompleteStep !== stepFromUrl) {
-          toast.error(
-            'Complete previous steps',
-            `Please complete step ${firstIncompleteStep + 1} before proceeding`
-          );
-          setCurrentStep(firstIncompleteStep);
-          setSearchParams({ step: firstIncompleteStep.toString() });
-        }
-      } else {
+    if (isInitialized) {
+      // Allow navigation to completed steps or the next step
+      const isStepAccessible = stepFromUrl === 0 || 
+                               completedSteps.includes(stepFromUrl) || 
+                               (stepFromUrl > 0 && completedSteps.includes(stepFromUrl - 1));
+      
+      if (isStepAccessible) {
         setCurrentStep(stepFromUrl);
+      } else if (stepFromUrl > 0 && !completedSteps.includes(stepFromUrl - 1)) {
+        // Only show error if trying to skip ahead
+        const nextAvailableStep = completedSteps.length;
+        toast.error(
+          'Complete previous steps',
+          `Please complete step ${nextAvailableStep + 1} first`
+        );
+        setCurrentStep(nextAvailableStep);
+        setSearchParams({ step: nextAvailableStep.toString() });
       }
     }
-  }, [stepFromUrl, canAccessStep, completedSteps, isInitialized, currentUser?.id, setSearchParams]);
+  }, [stepFromUrl, completedSteps, isInitialized, setSearchParams]);
 
   // Update URL when step changes
   useEffect(() => {
@@ -1074,20 +1071,22 @@ const SetupLaboratoryPage = () => {
               const Icon = step.icon;
               const isActive = index === currentStep;
               const isCompleted = completedSteps.includes(index);
-              const isAccessible = canAccessStep(index);
-              const isLocked = !isAccessible && index !== currentStep;
+              const isAccessible = index === 0 || completedSteps.includes(index - 1);
+              const isNext = !isCompleted && isAccessible;
 
               return (
                 <div key={step.id} className="flex items-center">
                   <div 
-                    className="flex flex-col items-center cursor-pointer relative"
+                    className={`flex flex-col items-center ${
+                      isAccessible || isCompleted ? 'cursor-pointer' : 'cursor-not-allowed'
+                    }`}
                     onClick={() => {
-                      if (isAccessible && index !== currentStep) {
+                      if (isAccessible || isCompleted) {
                         setCurrentStep(index);
-                      } else if (isLocked) {
+                      } else {
                         toast.error(
-                          'Step locked',
-                          `Complete step ${completedSteps.length + 1} first`
+                          'Complete previous steps',
+                          `Please complete step ${index} before proceeding`
                         );
                       }
                     }}
@@ -1097,28 +1096,18 @@ const SetupLaboratoryPage = () => {
                         isActive
                           ? 'bg-primary-600 text-white ring-4 ring-primary-100 dark:ring-primary-900'
                           : isCompleted
-                          ? 'bg-green-500 text-white hover:bg-green-600'
-                          : isLocked
-                          ? 'bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          ? 'bg-green-500 text-white'
+                          : isNext
+                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
                       }`}
                     >
                       {isCompleted ? (
                         <Check className="h-6 w-6" />
-                      ) : isLocked ? (
-                        <Lock className="h-5 w-5" />
                       ) : (
                         <Icon className="h-6 w-6" />
                       )}
                     </div>
-                    {isLocked && (
-                      <div className="absolute -top-1 -right-1">
-                        <span className="flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                        </span>
-                      </div>
-                    )}
                     <div className="mt-2 text-center">
                       <p
                         className={`text-sm font-medium ${
@@ -1126,8 +1115,6 @@ const SetupLaboratoryPage = () => {
                             ? 'text-primary-600 dark:text-primary-400'
                             : isCompleted
                             ? 'text-green-600 dark:text-green-400'
-                            : isLocked
-                            ? 'text-gray-400 dark:text-gray-500'
                             : 'text-gray-500 dark:text-gray-400'
                         }`}
                       >
@@ -1136,22 +1123,12 @@ const SetupLaboratoryPage = () => {
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                         {step.description}
                       </p>
-                      {isCompleted && (
-                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                          ✓ Completed
-                        </span>
-                      )}
-                      {isLocked && (
-                        <span className="text-xs text-red-500 dark:text-red-400 font-medium">
-                          Locked
-                        </span>
-                      )}
                     </div>
                   </div>
                   {index < steps.length - 1 && (
                     <div
                       className={`h-0.5 w-24 mx-4 transition-colors ${
-                        completedSteps.includes(index) ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
+                        isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
                       }`}
                     />
                   )}
@@ -1173,32 +1150,7 @@ const SetupLaboratoryPage = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 {steps[currentStep].title}
               </h2>
-              {!canAccessStep(currentStep) && currentStep !== 0 ? (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-                  <div className="flex items-start space-x-3">
-                    <Lock className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
-                    <div>
-                      <h3 className="text-sm font-medium text-red-900 dark:text-red-300">
-                        Step Locked
-                      </h3>
-                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
-                        Please complete all previous steps before accessing this step.
-                      </p>
-                      <button
-                        onClick={() => {
-                          const nextIncomplete = completedSteps.length;
-                          setCurrentStep(Math.min(nextIncomplete, steps.length - 1));
-                        }}
-                        className="mt-3 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-500"
-                      >
-                        Go to step {completedSteps.length + 1} →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                renderStepContent()
-              )}
+              {renderStepContent()}
             </>
           )}
         </div>
@@ -1225,7 +1177,7 @@ const SetupLaboratoryPage = () => {
 
             <button
               onClick={handleNext}
-              disabled={isCreating || isSaving || isLoadingOnboarding || (!canAccessStep(currentStep) && currentStep !== 0)}
+              disabled={isCreating || isSaving || isLoadingOnboarding}
               className="btn btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isCreating || isSaving ? (
