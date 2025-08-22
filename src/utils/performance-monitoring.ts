@@ -125,7 +125,10 @@ class PerformanceMonitor {
   stopTrace(name: string, metrics?: Record<string, number>): void {
     const customTrace = this.traces.get(name);
     if (!customTrace) {
-      logger.warn(`Trace ${name} not found`);
+      // Don't log warning for common traces that might not exist
+      if (!['app_initialization', 'route_change'].includes(name)) {
+        logger.warn(`Trace ${name} not found`);
+      }
       return;
     }
 

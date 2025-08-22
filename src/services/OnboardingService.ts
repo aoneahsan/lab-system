@@ -175,12 +175,15 @@ class OnboardingService {
         throw new Error('Cannot complete onboarding without finishing all steps');
       }
       
-      await updateDoc(docRef, {
+      // Use setDoc with merge to handle both existing and non-existing documents
+      await setDoc(docRef, {
+        ...existingData,
         isComplete: true,
         completedAt: serverTimestamp(),
         completedSteps: [0, 1, 2, 3, 4],
         currentStep: 4,
-      });
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
       
       // Clear from localStorage after completion
       this.clearLocalStorage();
@@ -441,13 +444,14 @@ class OnboardingService {
         progress.stepCompletionDates
       );
 
-      // Update with only valid steps
+      // Update with only valid steps using setDoc with merge
       const docRef = doc(firestore, this.COLLECTION_NAME, userId);
-      await updateDoc(docRef, {
+      await setDoc(docRef, {
+        ...progress,
         completedSteps: validSteps,
         currentStep: validSteps.length > 0 ? Math.max(...validSteps) : 0,
         updatedAt: serverTimestamp(),
-      });
+      }, { merge: true });
     } catch (error) {
       onboardingLogger.error('Error cleaning invalid data:', error);
     }
