@@ -229,7 +229,7 @@ class LoggerService {
   /**
    * Core logging method
    */
-  private log(level: LogLevel, message: string, ...data: any[]): void {
+  private writeLog(level: LogLevel, message: string, ...data: any[]): void {
     if (!this.shouldLog(level)) return;
 
     const context = this.config.prefix;
@@ -285,42 +285,42 @@ class LoggerService {
    * Verbose logging (most detailed)
    */
   verbose(message: string, ...data: any[]): void {
-    this.log(LogLevel.VERBOSE, message, ...data);
+    this.writeLog(LogLevel.VERBOSE, message, ...data);
   }
 
   /**
    * Debug logging
    */
   debug(message: string, ...data: any[]): void {
-    this.log(LogLevel.DEBUG, message, ...data);
+    this.writeLog(LogLevel.DEBUG, message, ...data);
   }
 
   /**
    * Info logging
    */
   info(message: string, ...data: any[]): void {
-    this.log(LogLevel.INFO, message, ...data);
+    this.writeLog(LogLevel.INFO, message, ...data);
   }
 
   /**
    * General logging
    */
   log(message: string, ...data: any[]): void {
-    this.log(LogLevel.LOG, message, ...data);
+    this.writeLog(LogLevel.LOG, message, ...data);
   }
 
   /**
    * Warning logging
    */
   warn(message: string, ...data: any[]): void {
-    this.log(LogLevel.WARN, message, ...data);
+    this.writeLog(LogLevel.WARN, message, ...data);
   }
 
   /**
    * Error logging
    */
   error(message: string, ...data: any[]): void {
-    this.log(LogLevel.ERROR, message, ...data);
+    this.writeLog(LogLevel.ERROR, message, ...data);
   }
 
   /**
@@ -469,8 +469,7 @@ export const reportLogger = logger.createContext('REPORTS');
 export const validationLogger = logger.createContext('VALIDATION');
 export const onboardingLogger = logger.createContext('ONBOARDING');
 
-// Export LogLevel enum for external use
-export { LogLevel };
+// Export default logger instance
 export default logger;
 
 // Add global debug helpers (only in development)
