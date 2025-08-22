@@ -12,7 +12,7 @@ const UnifiedTracking = {
   track: async (_eventName: string, _properties?: any) => {},
   identify: async (_userId: string, _traits?: any) => {},
   logError: async (_error: Error, _context?: any) => {},
-  setConsent: async (_consent: any) => {}
+  setConsent: async (_consent: any) => {},
 };
 const _useTrackEvent = () => ({ trackEvent: async (_eventName: string, _properties?: any) => {} });
 import { useAuthStore } from '@/stores/auth.store';
@@ -22,26 +22,25 @@ import { firebaseKit } from '@/services/firebase-kit.service';
 // Initialize unified tracking on app start
 let initialized = false;
 
-
 const initializeTracking = async () => {
   if (initialized) return;
-  
+
   await UnifiedTracking.initialize({
     analytics: {
-      providers: import.meta.env.VITE_GA_MEASUREMENT_ID ? ['google-analytics'] : [],
+      providers: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ? ['google-analytics'] : [],
       googleAnalytics: {
-        measurementId: import.meta.env.VITE_GA_MEASUREMENT_ID
-      }
+        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+      },
     },
     errorTracking: {
       providers: import.meta.env.VITE_SENTRY_DSN ? ['sentry'] : [],
       sentry: {
         dsn: import.meta.env.VITE_SENTRY_DSN,
-        environment: import.meta.env.MODE
-      }
-    }
+        environment: import.meta.env.MODE,
+      },
+    },
   });
-  
+
   initialized = true;
 };
 
@@ -65,17 +64,17 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
   useEffect(() => {
     const trackPageView = async () => {
       if (!initialized) await initializeTracking();
-      
+
       await UnifiedTracking.track('page_view', {
         path: location.pathname,
         title: document.title,
         referrer: document.referrer,
       });
-      
+
       // Also track in Firebase Analytics
       await firebaseKit.analytics.setCurrentScreen(document.title, location.pathname);
     };
-    
+
     trackPageView();
   }, [location]);
 
@@ -83,23 +82,23 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
   useEffect(() => {
     const updateUser = async () => {
       if (!initialized) await initializeTracking();
-      
+
       if (currentUser) {
         await UnifiedTracking.identify(currentUser.id, {
           email: currentUser.email || undefined,
           name: currentUser.displayName,
           role: currentUser.role,
           tenantId: currentUser.tenantId,
-          department: currentUser.metadata?.department
+          department: currentUser.metadata?.department,
         });
-        
+
         // Also set user in Firebase Analytics
         await firebaseKit.analytics.setUserId(currentUser.id);
         await firebaseKit.analytics.setUserProperty('role', currentUser.role);
         await firebaseKit.analytics.setUserProperty('tenant_id', currentUser.tenantId);
       }
     };
-    
+
     updateUser();
   }, [currentUser]);
 
@@ -107,13 +106,13 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
   useEffect(() => {
     const trackAppStart = async () => {
       if (!initialized) await initializeTracking();
-      
+
       await UnifiedTracking.track('app_started', {
         timestamp: new Date().toISOString(),
         platform: 'web',
       });
     };
-    
+
     trackAppStart();
 
     // Track app visibility changes
@@ -146,4 +145,3 @@ export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) 
 
 // Re-export the hook from unified-tracking for convenience
 // export { useTrackEvent } from 'unified-tracking/react';
-
