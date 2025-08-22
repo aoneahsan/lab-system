@@ -1,5 +1,6 @@
 import { QRCodeStudio, QRType, BarcodeFormat } from 'qrcode-studio';
 import type { SampleLabel, QRCodeConfig } from '@/types/sample.types';
+import { logger } from '@/services/logger.service';
 
 export const qrcodeService = {
   // Generate QR code for sample
@@ -64,12 +65,12 @@ export const qrcodeService = {
     // For web-based scanning, we'll need to handle this differently
     // code-craft-studio provides React components for scanning
     // This method will need to be refactored to use the component-based approach
-    console.warn('Scanner initialization needs to be refactored to use code-craft-studio React components');
+    logger.warn('Scanner initialization needs to be refactored to use code-craft-studio React components');
     
     // Return a mock scanner object for now
     return {
       stop: async () => {
-        console.log('Scanner stopped');
+        logger.log('Scanner stopped');
       }
     };
   },

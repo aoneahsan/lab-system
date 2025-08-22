@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Play, Download, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import type { GeneratedReport, ReportFormat } from '@/types/report.types';
 import { format } from 'date-fns';
+import { uiLogger } from '@/services/logger.service';
 
 const mockGeneratedReports: GeneratedReport[] = [
   {
@@ -43,7 +44,7 @@ export default function ReportGeneration() {
   };
 
   const handleGenerateReport = () => {
-    console.log('Generating report:', { selectedTemplate, parameters, format: reportFormat });
+    uiLogger.log('Generating report:', { selectedTemplate, parameters, format: reportFormat });
   };
 
   return (

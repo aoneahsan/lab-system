@@ -4,6 +4,7 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
 import { Timestamp } from 'firebase/firestore';
+import { logger } from '@/services/logger.service';
 import type {
   TestResult,
   ResultFilter,
@@ -92,7 +93,7 @@ export const useCreateResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to create result');
-      console.error('Error creating result:', error);
+      logger.error('Error creating result:', error);
     },
   });
 };
@@ -115,7 +116,7 @@ export const useCreateBatchResults = () => {
     },
     onError: (error) => {
       toast.error('Failed to create results');
-      console.error('Error creating results:', error);
+      logger.error('Error creating results:', error);
     },
   });
 };
@@ -138,7 +139,7 @@ export const useUpdateResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to update result');
-      console.error('Error updating result:', error);
+      logger.error('Error updating result:', error);
     },
   });
 };
@@ -161,7 +162,7 @@ export const useVerifyResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to verify result');
-      console.error('Error verifying result:', error);
+      logger.error('Error verifying result:', error);
     },
   });
 };
@@ -184,7 +185,7 @@ export const useApproveResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to approve result');
-      console.error('Error approving result:', error);
+      logger.error('Error approving result:', error);
     },
   });
 };
@@ -207,7 +208,7 @@ export const useRejectResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to reject result');
-      console.error('Error rejecting result:', error);
+      logger.error('Error rejecting result:', error);
     },
   });
 };
@@ -229,7 +230,7 @@ export const useDeleteResult = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete result');
-      console.error('Error deleting result:', error);
+      logger.error('Error deleting result:', error);
     },
   });
 };
@@ -265,7 +266,7 @@ export const useCreateResultReport = () => {
     },
     onError: (error) => {
       toast.error('Failed to create report');
-      console.error('Error creating report:', error);
+      logger.error('Error creating report:', error);
     },
   });
 };

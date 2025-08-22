@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { uiLogger } from '@/services/logger.service';
 
 interface TenantCheckerProps {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export const TenantChecker = ({ children }: TenantCheckerProps) => {
       try {
         await fetchTenant(currentUser.tenantId);
       } catch (err) {
-        console.error('Error loading tenant:', err);
+        uiLogger.error('Error loading tenant:', err);
         setError('Unable to load tenant information. Please contact support.');
       }
     };

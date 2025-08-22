@@ -5,6 +5,7 @@ import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
+import { uiLogger } from '@/services/logger.service';
 
 interface CreateLaboratoryModalProps {
   isOpen: boolean;
@@ -167,7 +168,7 @@ const CreateLaboratoryModal = ({ isOpen, onClose, onSuccess }: CreateLaboratoryM
 
       onSuccess(formData.code);
     } catch (_error) {
-      console.error('Error creating laboratory:', error);
+      uiLogger.error('Error creating laboratory:', error);
       toast.error('Creation failed', 'Failed to create laboratory. Please try again.');
     } finally {
       setIsCreating(false);

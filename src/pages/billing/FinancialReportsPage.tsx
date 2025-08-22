@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useBillingStatistics } from '@/hooks/useBilling';
+import { uiLogger } from '@/services/logger.service';
 
 const FinancialReportsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const FinancialReportsPage: React.FC = () => {
 
   const generateReport = () => {
     // In a real implementation, this would generate and download the report
-    console.log('Generating report:', reportType, dateRange);
+    uiLogger.log('Generating report:', reportType, dateRange);
   };
 
   return (

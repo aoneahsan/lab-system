@@ -1,3 +1,5 @@
+import { logger } from '@/services/logger.service';
+
 /**
  * SMS Service for sending text messages
  * In production, integrate with Twilio, AWS SNS, or other SMS providers
@@ -16,13 +18,13 @@ class SMSService {
       //   to: phoneNumber
       // });
       
-      console.log('SMS would be sent in production:', { phoneNumber, message });
+      logger.log('SMS would be sent in production:', { phoneNumber, message });
     } else {
       // Development mode - log to console
-      console.log('📱 SMS Service (Dev Mode)');
-      console.log('To:', phoneNumber);
-      console.log('Message:', message);
-      console.log('---');
+      logger.log('📱 SMS Service (Dev Mode)');
+      logger.log('To:', phoneNumber);
+      logger.log('Message:', message);
+      logger.log('---');
       
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));

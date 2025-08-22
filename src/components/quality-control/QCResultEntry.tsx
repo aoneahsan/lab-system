@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 import { Timestamp } from 'firebase/firestore';
+import { uiLogger } from '@/services/logger.service';
 
 export default function QCResultEntry() {
   const [selectedTest, setSelectedTest] = useState('');
@@ -53,7 +54,7 @@ export default function QCResultEntry() {
       setValue('');
       setComments('');
     } catch (error) {
-      console.error('Error recording QC result:', error);
+      uiLogger.error('Error recording QC result:', error);
     }
   };
 

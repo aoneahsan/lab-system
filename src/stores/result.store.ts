@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { resultService } from '@/services/result.service';
 import type { TestResult, ResultEntry } from '@/types/result.types';
 import type { Timestamp } from 'firebase/firestore';
+import { logger } from '@/services/logger.service';
 
 interface ResultStore {
   results: TestResult[];
@@ -111,7 +112,7 @@ export const useResultStore = create<ResultStore>((set, get) => ({
         validationErrors: validation.errors,
       });
     } catch (error) {
-      console.error('Validation error:', error);
+      logger.error('Validation error:', error);
     }
   },
 

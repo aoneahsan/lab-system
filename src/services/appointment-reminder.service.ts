@@ -16,6 +16,7 @@ import { appointmentService } from './appointment.service';
 import { messageService, templateService } from './communication.service';
 import type { Appointment } from '@/types/appointment.types';
 import type { MessageTemplate } from '@/types/communication.types';
+import { logger } from '@/services/logger.service';
 
 const getCollectionName = (collectionName: string) => {
   const tenantPrefix = useTenantStore.getState().currentTenant?.firebasePrefix || 'labflow_';
@@ -126,7 +127,7 @@ export const appointmentReminderService = {
         await this.sendReminder(appointment.id, channel, templateId);
         sent++;
       } catch (error) {
-        console.error(`Failed to send reminder for appointment ${appointment.id}:`, error);
+        logger.error(`Failed to send reminder for appointment ${appointment.id}:`, error);
         failed++;
       }
     }
@@ -238,7 +239,7 @@ export const appointmentReminderService = {
     );
     
     if (!reminderTemplate) {
-      console.warn('No active appointment reminder template found');
+      logger.warn('No active appointment reminder template found');
       return;
     }
 

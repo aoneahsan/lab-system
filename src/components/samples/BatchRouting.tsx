@@ -19,6 +19,7 @@ import { useTests } from '@/hooks/useTests';
 import { toast } from 'sonner';
 import type { Sample } from '@/types/sample.types';
 import type { TestDefinition } from '@/types/test.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface RoutingRule {
   testId: string;
@@ -169,7 +170,7 @@ export const BatchRouting: React.FC = () => {
       setManualRouting([]);
     } catch (error) {
       toast.error('Failed to route samples');
-      console.error('Batch routing error:', error);
+      uiLogger.error('Batch routing error:', error);
     } finally {
       setIsProcessing(false);
     }

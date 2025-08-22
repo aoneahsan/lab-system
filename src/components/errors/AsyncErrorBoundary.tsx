@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { RefreshCw, WifiOff, AlertCircle } from 'lucide-react';
+import { uiLogger } from '@/services/logger.service';
 
 interface AsyncErrorBoundaryProps {
   children: ReactNode;
@@ -15,7 +16,7 @@ export const AsyncErrorBoundary: React.FC<AsyncErrorBoundaryProps> = ({
 
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection:', event.reason);
+      uiLogger.error('Unhandled promise rejection:', event.reason);
       setError(new Error(event.reason?.message || 'An async error occurred'));
     };
 

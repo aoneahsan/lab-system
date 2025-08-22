@@ -1,13 +1,14 @@
 import { notifications } from 'notification-kit';
 import app, { firebaseConfig } from '@/config/firebase.config';
+import { logger } from '@/services/logger.service';
 
 // Initialize notification kit with v2.0.3 API
 export const initializeNotifications = async () => {
   try {
     // Check if Firebase config is properly loaded
     if (!firebaseConfig.apiKey) {
-      console.warn('Firebase configuration is missing. Notifications will be disabled.');
-      console.warn('Please ensure VITE_FIREBASE_API_KEY is set in your .env file');
+      logger.warn('Firebase configuration is missing. Notifications will be disabled.');
+      logger.warn('Please ensure VITE_FIREBASE_API_KEY is set in your .env file');
       return;
     }
 
@@ -26,7 +27,7 @@ export const initializeNotifications = async () => {
       });
     } catch (appError) {
       // Method 2: If app instance fails, try with config directly
-      console.warn('App instance initialization failed, trying with config:', appError);
+      logger.warn('App instance initialization failed, trying with config:', appError);
       await notifications.init({
         provider: 'firebase',
         config: {
@@ -41,9 +42,9 @@ export const initializeNotifications = async () => {
     }
 
     isInitialized = true;
-    console.log('✅ Notifications initialized successfully');
+    logger.log('✅ Notifications initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize notifications:', error);
+    logger.error('Failed to initialize notifications:', error);
     // Don't throw - allow app to continue without notifications
   }
 };
@@ -55,7 +56,7 @@ let isInitialized = false;
 export const toast = {
   success: (title: string, message?: string) => {
     if (!isInitialized) {
-      console.log(`✅ ${title}`, message || '');
+      logger.log(`✅ ${title}`, message || '');
       return;
     }
     notifications.showInApp({
@@ -67,7 +68,7 @@ export const toast = {
   },
   error: (title: string, message?: string) => {
     if (!isInitialized) {
-      console.error(`❌ ${title}`, message || '');
+      logger.error(`❌ ${title}`, message || '');
       return;
     }
     notifications.showInApp({
@@ -79,7 +80,7 @@ export const toast = {
   },
   warning: (title: string, message?: string) => {
     if (!isInitialized) {
-      console.warn(`⚠️ ${title}`, message || '');
+      logger.warn(`⚠️ ${title}`, message || '');
       return;
     }
     notifications.showInApp({
@@ -91,7 +92,7 @@ export const toast = {
   },
   info: (title: string, message?: string) => {
     if (!isInitialized) {
-      console.info(`ℹ️ ${title}`, message || '');
+      logger.info(`ℹ️ ${title}`, message || '');
       return;
     }
     notifications.showInApp({

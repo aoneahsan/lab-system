@@ -11,6 +11,7 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { InventoryItem } from '@/types';
 import { toast } from 'sonner';
 import { Timestamp } from 'firebase/firestore';
+import { uiLogger } from '@/services/logger.service';
 
 interface ImportProgress {
   total: number;
@@ -69,7 +70,7 @@ export const InventoryImport: React.FC = () => {
         toast.error(`Validation failed: ${validation.errors.length} errors found`);
       }
     } catch (error) {
-      console.error('Import error:', error);
+      uiLogger.error('Import error:', error);
       setProgress({ ...progress, status: 'error' });
       toast.error('Failed to parse file');
     }
@@ -140,7 +141,7 @@ export const InventoryImport: React.FC = () => {
           successful: prev.successful + 1,
         }));
       } catch (error) {
-        console.error('Failed to import item:', error);
+        uiLogger.error('Failed to import item:', error);
         setProgress(prev => ({
           ...prev,
           processed: prev.processed + 1,

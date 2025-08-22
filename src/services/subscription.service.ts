@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import type { SubscriptionPlanFeatures, TwoFactorMethod } from '@/types/two-factor.types';
+import { logger } from '@/services/logger.service';
 
 export interface SubscriptionPlan {
   id: string;
@@ -169,7 +170,7 @@ class SubscriptionService {
     } catch (error) {
       // Silent fail - we'll use in-memory defaults
       if ((error as any)?.code !== 'permission-denied') {
-        console.error('Error initializing subscription plans:', error);
+        logger.error('Error initializing subscription plans:', error);
       }
     }
   }
@@ -185,7 +186,7 @@ class SubscriptionService {
         ...doc.data(),
       })) as SubscriptionPlan[];
     } catch (error) {
-      console.error('Error fetching subscription plans:', error);
+      logger.error('Error fetching subscription plans:', error);
       return [];
     }
   }
@@ -223,7 +224,7 @@ class SubscriptionService {
           autoRenew: false,
         };
       }
-      console.error('Error fetching user subscription:', error);
+      logger.error('Error fetching user subscription:', error);
       return {
         userId,
         planId: 'default-free',
@@ -280,7 +281,7 @@ class SubscriptionService {
         updatedAt: new Date(),
       });
     } catch (error) {
-      console.error('Error updating user subscription:', error);
+      logger.error('Error updating user subscription:', error);
       throw error;
     }
   }
@@ -297,7 +298,7 @@ class SubscriptionService {
         customOverrides: overrides,
       });
     } catch (error) {
-      console.error('Error applying feature overrides:', error);
+      logger.error('Error applying feature overrides:', error);
       throw error;
     }
   }
@@ -357,7 +358,7 @@ class SubscriptionService {
     } catch (error) {
       // Silent fail for permission errors
       if ((error as any)?.code !== 'permission-denied') {
-        console.error('Error fetching subscription plan:', error);
+        logger.error('Error fetching subscription plan:', error);
       }
       return null;
     }
@@ -381,7 +382,7 @@ class SubscriptionService {
 
       return null;
     } catch (error) {
-      console.error('Error fetching free plan:', error);
+      logger.error('Error fetching free plan:', error);
       return null;
     }
   }

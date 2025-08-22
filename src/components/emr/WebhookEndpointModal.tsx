@@ -6,6 +6,7 @@ import {
   useWebhookEndpoint,
 } from '@/hooks/useWebhooks';
 import type { WebhookEventType, WebhookEndpointFormData } from '@/types/webhook.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface WebhookEndpointModalProps {
   connectionId: string;
@@ -145,7 +146,7 @@ export const WebhookEndpointModal: React.FC<WebhookEndpointModalProps> = ({
       }
       onClose();
     } catch (error) {
-      console.error('Error saving webhook endpoint:', error);
+      uiLogger.error('Error saving webhook endpoint:', error);
     }
   };
 

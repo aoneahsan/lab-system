@@ -11,6 +11,7 @@ import { firestore, functions } from '@/config/firebase.config';
 import { httpsCallable } from 'firebase/functions';
 import { getTenantSpecificCollectionName } from '@/utils/tenant.utils';
 import { trackingInstance } from '@/providers/TrackingProvider';
+import { logger } from '@/services/logger.service';
 
 interface TestVolumeData {
   date: string;
@@ -112,7 +113,7 @@ class PredictiveAnalyticsService {
 
       return forecasts;
     } catch (error) {
-      console.error('Error forecasting test volumes:', error);
+      logger.error('Error forecasting test volumes:', error);
       throw error;
     }
   }
@@ -150,7 +151,7 @@ class PredictiveAnalyticsService {
 
       return forecasts;
     } catch (error) {
-      console.error('Error forecasting resource needs:', error);
+      logger.error('Error forecasting resource needs:', error);
       throw error;
     }
   }
@@ -226,7 +227,7 @@ class PredictiveAnalyticsService {
 
       return metrics;
     } catch (error) {
-      console.error('Error getting lab metrics:', error);
+      logger.error('Error getting lab metrics:', error);
       throw error;
     }
   }
@@ -248,7 +249,7 @@ class PredictiveAnalyticsService {
 
       return result.data.anomalies;
     } catch (error) {
-      console.error('Error detecting anomalies:', error);
+      logger.error('Error detecting anomalies:', error);
       throw error;
     }
   }

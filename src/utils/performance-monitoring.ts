@@ -5,6 +5,7 @@
 
 import { type PerformanceTrace, trace } from 'firebase/performance';
 import { performance } from '@/config/firebase.config';
+import { logger } from '@/services/logger.service';
 
 // Web Vitals thresholds
 const WEB_VITALS_THRESHOLDS = {
@@ -74,7 +75,7 @@ class PerformanceMonitor {
       });
       clsObserver.observe({ entryTypes: ['layout-shift'] });
     } catch (error) {
-      console.warn('Failed to setup web vitals monitoring:', error);
+      logger.warn('Failed to setup web vitals monitoring:', error);
     }
   }
 
@@ -114,7 +115,7 @@ class PerformanceMonitor {
       customTrace.start();
       this.traces.set(name, customTrace);
     } catch (error) {
-      console.warn(`Failed to start trace ${name}:`, error);
+      logger.warn(`Failed to start trace ${name}:`, error);
     }
   }
 
@@ -124,7 +125,7 @@ class PerformanceMonitor {
   stopTrace(name: string, metrics?: Record<string, number>): void {
     const customTrace = this.traces.get(name);
     if (!customTrace) {
-      console.warn(`Trace ${name} not found`);
+      logger.warn(`Trace ${name} not found`);
       return;
     }
 
@@ -138,7 +139,7 @@ class PerformanceMonitor {
       customTrace.stop();
       this.traces.delete(name);
     } catch (error) {
-      console.warn(`Failed to stop trace ${name}:`, error);
+      logger.warn(`Failed to stop trace ${name}:`, error);
     }
   }
 
@@ -154,9 +155,9 @@ class PerformanceMonitor {
       if (threshold) {
         const rating =
           value <= threshold.good ? '🟢' : value <= threshold.needs_improvement ? '🟡' : '🔴';
-        console.log(`${rating} ${name}: ${value.toFixed(2)}ms`);
+        logger.log(`${rating} ${name}: ${value.toFixed(2)}ms`);
       } else {
-        console.log(`📊 ${name}: ${value}`);
+        logger.log(`📊 ${name}: ${value}`);
       }
     }
   }

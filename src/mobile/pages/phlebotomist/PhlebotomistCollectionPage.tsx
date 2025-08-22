@@ -7,6 +7,7 @@ import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
 import { toast } from '@/hooks/useToast';
+import { uiLogger } from '@/services/logger.service';
 
 interface CollectionData {
   patientId: string;
@@ -67,7 +68,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
         toast.success('Photo captured');
       }
     } catch (error) {
-      console.error('Failed to capture photo:', error);
+      uiLogger.error('Failed to capture photo:', error);
       toast.error('Failed to capture photo');
     }
   };
@@ -91,7 +92,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
       toast.success('Collection saved successfully');
       navigate('/home');
     } catch (error) {
-      console.error('Failed to save collection:', error);
+      uiLogger.error('Failed to save collection:', error);
       toast.error('Failed to save collection');
     }
   };
@@ -364,7 +365,7 @@ const PhlebotomistCollectionPage: React.FC = () => {
           <QRScanner
             onScan={(result) => handleScanResult((result as any).text || (result as any).data || '')}
             onError={(error) => {
-              console.error('Scan error:', error);
+              uiLogger.error('Scan error:', error);
               toast.error('Failed to scan barcode');
               setIsScanning(false);
             }}

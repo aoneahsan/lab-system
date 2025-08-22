@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartBarIcon, ClockIcon, ExclamationTriangleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useTracking } from '@/providers/TrackingProvider';
+import { uiLogger } from '@/services/logger.service';
 
 interface PerformanceMetric {
   name: string;
@@ -137,7 +138,7 @@ export const PerformanceDashboard: React.FC = () => {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching performance metrics:', error);
+      uiLogger.error('Error fetching performance metrics:', error);
       setError('Failed to fetch performance metrics');
       setLoading(false);
     }

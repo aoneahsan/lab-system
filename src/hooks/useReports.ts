@@ -3,6 +3,7 @@ import { reportService } from '@/services/report.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 import type {
   Report,
   ReportQueryFilter,
@@ -69,7 +70,7 @@ export const useCreateReportTemplate = () => {
     },
     onError: (error) => {
       toast.error('Failed to create report template');
-      console.error('Error creating report template:', error);
+      logger.error('Error creating report template:', error);
     },
   });
 };
@@ -97,7 +98,7 @@ export const useUpdateReportTemplate = () => {
     },
     onError: (error) => {
       toast.error('Failed to update report template');
-      console.error('Error updating report template:', error);
+      logger.error('Error updating report template:', error);
     },
   });
 };
@@ -117,7 +118,7 @@ export const useDeleteReportTemplate = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete report template');
-      console.error('Error deleting report template:', error);
+      logger.error('Error deleting report template:', error);
     },
   });
 };
@@ -165,7 +166,7 @@ export const useCreateReport = () => {
     },
     onError: (error) => {
       toast.error('Failed to create report');
-      console.error('Error creating report:', error);
+      logger.error('Error creating report:', error);
     },
   });
 };
@@ -187,7 +188,7 @@ export const useUpdateReport = () => {
     },
     onError: (error) => {
       toast.error('Failed to update report');
-      console.error('Error updating report:', error);
+      logger.error('Error updating report:', error);
     },
   });
 };
@@ -207,7 +208,7 @@ export const useDeleteReport = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete report');
-      console.error('Error deleting report:', error);
+      logger.error('Error deleting report:', error);
     },
   });
 };
@@ -229,7 +230,7 @@ export const useGenerateReport = () => {
     },
     onError: (error) => {
       toast.error('Failed to generate report');
-      console.error('Error generating report:', error);
+      logger.error('Error generating report:', error);
     },
   });
 };
@@ -277,7 +278,7 @@ export const useCreateDashboard = () => {
     },
     onError: (error) => {
       toast.error('Failed to create dashboard');
-      console.error('Error creating dashboard:', error);
+      logger.error('Error creating dashboard:', error);
     },
   });
 };
@@ -305,7 +306,7 @@ export const useUpdateDashboard = () => {
     },
     onError: (error) => {
       toast.error('Failed to update dashboard');
-      console.error('Error updating dashboard:', error);
+      logger.error('Error updating dashboard:', error);
     },
   });
 };
@@ -325,7 +326,7 @@ export const useDeleteDashboard = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete dashboard');
-      console.error('Error deleting dashboard:', error);
+      logger.error('Error deleting dashboard:', error);
     },
   });
 };

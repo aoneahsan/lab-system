@@ -8,6 +8,7 @@ import { getPerformance } from 'firebase/performance';
 import { getRemoteConfig } from 'firebase/remote-config';
 import { getMessaging } from 'firebase/messaging';
 import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
+import { logger } from '@/services/logger.service';
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -51,7 +52,7 @@ if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
   // Database emulator
   connectDatabaseEmulator(database, 'localhost', 9000);
 
-  console.log('🔧 Firebase Emulators connected');
+  logger.log('🔧 Firebase Emulators connected');
 }
 
 export default app;

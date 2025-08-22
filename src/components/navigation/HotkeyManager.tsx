@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { hotkeysService } from '@/services/hotkeys.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { userPreferencesService } from '@/services/user-preferences.service';
+import { uiLogger } from '@/services/logger.service';
 
 export const HotkeyManager: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export const HotkeyManager: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load user hotkeys:', error);
+      uiLogger.error('Failed to load user hotkeys:', error);
     }
   };
 

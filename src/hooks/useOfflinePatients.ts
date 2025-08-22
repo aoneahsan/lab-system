@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import type { Patient } from '@/types/patient.types';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/services/logger.service';
 
 interface OfflinePatientData {
   patients: Patient[];
@@ -39,7 +40,7 @@ export function useOfflinePatients() {
           pendingChanges: unsynced.length
         };
       } catch (error) {
-        console.error('Failed to load offline patients:', error);
+        logger.error('Failed to load offline patients:', error);
         return {
           patients: [],
           lastSyncTime: null,
@@ -81,7 +82,7 @@ export function useOfflinePatients() {
     },
     onError: (error: any) => {
       toast.error('Failed to sync patient data');
-      console.error('Sync error:', error);
+      logger.error('Sync error:', error);
     }
   });
 
@@ -104,7 +105,7 @@ export function useOfflinePatients() {
       const patients = await offlineDatabase.getCachedData('patients') as Patient[];
       return patients.find(p => p.id === patientId) || null;
     } catch (error) {
-      console.error('Failed to get patient by ID:', error);
+      logger.error('Failed to get patient by ID:', error);
       return null;
     }
   };
@@ -150,7 +151,7 @@ export function useOfflinePatients() {
           await offlineDatabase.markSynced(change.id);
           syncedCount++;
         } catch (error) {
-          console.error(`Failed to sync patient change ${change.id}:`, error);
+          logger.error(`Failed to sync patient change ${change.id}:`, error);
           await offlineDatabase.markSyncError(change.id, error);
         }
       }
@@ -165,7 +166,7 @@ export function useOfflinePatients() {
     },
     onError: (error: any) => {
       toast.error('Failed to sync pending changes');
-      console.error('Sync error:', error);
+      logger.error('Sync error:', error);
     }
   });
 
@@ -216,7 +217,7 @@ export function useOfflinePatientResults(patientId: string) {
         
         return [];
       } catch (error) {
-        console.error('Failed to load patient results:', error);
+        logger.error('Failed to load patient results:', error);
         return [];
       }
     },

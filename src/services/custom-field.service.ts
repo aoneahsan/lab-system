@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
+import { logger } from '@/services/logger.service';
 import type {
   CustomFieldDefinition,
   CreateCustomFieldData,
@@ -82,7 +83,7 @@ class CustomFieldService {
         ...newDoc.data(),
       });
     } catch (error) {
-      console.error('Error creating custom field:', error);
+      logger.error('Error creating custom field:', error);
       throw error;
     }
   }
@@ -109,7 +110,7 @@ class CustomFieldService {
         ...updatedDoc.data(),
       });
     } catch (error) {
-      console.error('Error updating custom field:', error);
+      logger.error('Error updating custom field:', error);
       throw error;
     }
   }
@@ -129,7 +130,7 @@ class CustomFieldService {
         ...docSnap.data(),
       });
     } catch (error) {
-      console.error('Error fetching custom field:', error);
+      logger.error('Error fetching custom field:', error);
       throw error;
     }
   }
@@ -163,7 +164,7 @@ class CustomFieldService {
 
       return fields;
     } catch (error) {
-      console.error('Error fetching custom fields:', error);
+      logger.error('Error fetching custom fields:', error);
       throw error;
     }
   }
@@ -197,7 +198,7 @@ class CustomFieldService {
 
       return sections.sort((a, b) => a.displayOrder - b.displayOrder);
     } catch (error) {
-      console.error('Error fetching custom field sections:', error);
+      logger.error('Error fetching custom field sections:', error);
       throw error;
     }
   }
@@ -208,7 +209,7 @@ class CustomFieldService {
       const docRef = doc(firestore, collectionName, fieldId);
       await deleteDoc(docRef);
     } catch (error) {
-      console.error('Error deleting custom field:', error);
+      logger.error('Error deleting custom field:', error);
       throw error;
     }
   }
@@ -233,7 +234,7 @@ class CustomFieldService {
 
       await Promise.all(updatePromises);
     } catch (error) {
-      console.error('Error reordering custom fields:', error);
+      logger.error('Error reordering custom fields:', error);
       throw error;
     }
   }

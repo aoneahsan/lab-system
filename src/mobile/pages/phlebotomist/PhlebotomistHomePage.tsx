@@ -15,6 +15,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useOfflineStore } from '@/mobile/stores/offline.store';
 import { Device } from '@capacitor/device';
 import { Geolocation } from '@capacitor/geolocation';
+import { uiLogger } from '@/services/logger.service';
 
 interface CollectionStats {
   scheduled: number;
@@ -60,7 +61,7 @@ const PhlebotomistHomePage: React.FC = () => {
         setBatteryLevel(Math.round(info.batteryLevel * 100));
       }
     } catch (error) {
-      console.error('Failed to get battery info:', error);
+      uiLogger.error('Failed to get battery info:', error);
     }
   };
 
@@ -72,7 +73,7 @@ const PhlebotomistHomePage: React.FC = () => {
         lng: position.coords.longitude,
       });
     } catch (error) {
-      console.error('Failed to get location:', error);
+      uiLogger.error('Failed to get location:', error);
     }
   };
 

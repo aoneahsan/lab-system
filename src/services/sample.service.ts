@@ -16,6 +16,7 @@ import {
 import { db } from '@/config/firebase';
 import { useAuthStore } from '@/stores/auth.store';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { logger } from '@/services/logger.service';
 import type {
   Sample,
   SampleCollection,
@@ -418,7 +419,7 @@ export const sampleService = {
       // Get current sample to update chain of custody
       const currentSample = await this.getSample(tenantId, update.sampleId);
       if (!currentSample) {
-        console.error(`Sample ${update.sampleId} not found`);
+        logger.error(`Sample ${update.sampleId} not found`);
         continue;
       }
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { unifiedStorage, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { ThemeProviderContext, type Theme } from '@/contexts/theme-context';
+import { uiLogger } from '@/services/logger.service';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -26,7 +27,7 @@ export function ThemeProvider({
           setTheme(savedTheme);
         }
       } catch (error) {
-        console.error('Failed to load theme:', error);
+        uiLogger.error('Failed to load theme:', error);
       } finally {
         setIsLoaded(true);
       }
@@ -61,7 +62,7 @@ export function ThemeProvider({
         });
         setTheme(newTheme);
       } catch (error) {
-        console.error('Failed to save theme:', error);
+        uiLogger.error('Failed to save theme:', error);
       }
     },
   };

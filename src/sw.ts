@@ -4,6 +4,7 @@ import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from 'workbox-strategi
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
+import { logger } from '@/services/logger.service';
 
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
@@ -118,11 +119,11 @@ async function syncResults() {
           await cache.delete(request);
         }
       } catch (error) {
-        console.error('Failed to sync result:', error);
+        logger.error('Failed to sync result:', error);
       }
     }
   } catch (error) {
-    console.error('Sync failed:', error);
+    logger.error('Sync failed:', error);
   }
 }
 
@@ -192,6 +193,6 @@ async function checkCriticalResults() {
       }
     }
   } catch (error) {
-    console.error('Failed to check critical results:', error);
+    logger.error('Failed to check critical results:', error);
   }
 }

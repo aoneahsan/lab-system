@@ -1,6 +1,7 @@
 import { db } from '@/config/firebase.config';
 import { collection, addDoc } from 'firebase/firestore';
 import { SHARED_COLLECTIONS } from '@/config/firebase-collections-helper';
+import { logger } from '@/services/logger.service';
 
 // Sample test definitions for seeding
 const sampleTests = [
@@ -50,7 +51,7 @@ const sampleTests = [
 export async function seedTests(tenantId: string) {
   const testsCollection = collection(db, SHARED_COLLECTIONS.LABFLOW_TESTS);
   
-  console.log(`Seeding ${sampleTests.length} test definitions for tenant ${tenantId}...`);
+  logger.log(`Seeding ${sampleTests.length} test definitions for tenant ${tenantId}...`);
   
   for (const test of sampleTests) {
     try {
@@ -66,20 +67,20 @@ export async function seedTests(tenantId: string) {
         resultType: 'numeric',
         units: test.code === 'GLUCOSE' ? 'mg/dL' : '',
       });
-      console.log(`✓ Added test: ${test.name} (${test.code})`);
+      logger.log(`✓ Added test: ${test.name} (${test.code})`);
     } catch (error) {
-      console.error(`✗ Failed to add test ${test.name}:`, error);
+      logger.error(`✗ Failed to add test ${test.name}:`, error);
     }
   }
   
-  console.log('Test seeding complete!');
+  logger.log('Test seeding complete!');
 }
 
 // If running directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const tenantId = process.argv[2] || 'default-tenant';
   seedTests(tenantId).then(() => process.exit(0)).catch((error) => {
-    console.error('Seeding failed:', error);
+    logger.error('Seeding failed:', error);
     process.exit(1);
   });
 }

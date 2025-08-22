@@ -7,6 +7,7 @@ import { ExcelParser } from '@/utils/import-export/excel-parser';
 import { CSVParser } from '@/utils/import-export/csv-parser';
 import { ExportFormatter } from '@/utils/import-export/export-formatter';
 import { toast } from 'sonner';
+import { uiLogger } from '@/services/logger.service';
 
 interface ExportFilters {
   categories: string[];
@@ -115,7 +116,7 @@ export const InventoryExport: React.FC = () => {
       
       toast.success(`Exported ${filteredItems.length} inventory items successfully`);
     } catch (error) {
-      console.error('Export error:', error);
+      uiLogger.error('Export error:', error);
       toast.error('Failed to export inventory');
     } finally {
       setIsExporting(false);

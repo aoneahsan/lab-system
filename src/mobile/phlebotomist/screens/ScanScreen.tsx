@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { QrCode, Camera, Package, User, AlertCircle, CheckCircle } from 'lucide-react';
 import { barcodeScanner } from '@/services/barcode-scanner.service';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/services/logger.service';
 
 export const ScanScreen: React.FC = () => {
   const [scanMode, setScanMode] = useState<'patient' | 'sample' | 'tube'>('patient');
@@ -41,7 +42,7 @@ export const ScanScreen: React.FC = () => {
     } catch (error: any) {
       setIsScanning(false);
       toast.error(error.message || 'Scan failed');
-      console.error('Scan error:', error);
+      logger.error('Scan error:', error);
     }
   };
 

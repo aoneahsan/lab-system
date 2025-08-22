@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { useQualityControlStore } from '@/stores/quality-control.store';
 import { toast } from 'react-hot-toast';
+import { uiLogger } from '@/services/logger.service';
 
 const qcLevelSchema = z.object({
   level: z.string().min(1, 'Level name is required'),
@@ -84,7 +85,7 @@ export function AddQCTestModal({ isOpen, onClose }: Props) {
       onClose();
     } catch (error) {
       toast.error('Failed to add QC test');
-      console.error('Error adding QC test:', error);
+      uiLogger.error('Error adding QC test:', error);
     } finally {
       setIsSubmitting(false);
     }

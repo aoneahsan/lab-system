@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner';
 import type { TestDefinition } from '@/types/test.types';
 import type { TestResult } from '@/types/result.types';
+import { uiLogger } from '@/services/logger.service';
 
 // Sample test definitions for demo
 const sampleTestDefinitions: TestDefinition[] = [
@@ -98,7 +99,7 @@ export const VoiceDictationDemo: React.FC = () => {
   const [testValue, setTestValue] = useState('');
 
   const handleResultSubmit = (results: Partial<TestResult>[]) => {
-    console.log('Submitted results:', results);
+    uiLogger.log('Submitted results:', results);
     toast.success(
       <div>
         <p className="font-medium">Results submitted successfully!</p>

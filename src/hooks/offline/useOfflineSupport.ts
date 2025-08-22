@@ -3,6 +3,7 @@ import { Network } from '@capacitor/network';
 import { syncService } from '@/services/offline/sync.service';
 import type { SyncStatus } from '@/services/offline/sync.service';
 import { offlineDatabase } from '@/services/offline/database.service';
+import { logger } from '@/services/logger.service';
 
 export interface OfflineState {
   isOnline: boolean;
@@ -58,7 +59,7 @@ export const useOfflineSupport = () => {
           }));
         });
       } catch (error) {
-        console.error('Error initializing offline support:', error);
+        logger.error('Error initializing offline support:', error);
       }
     };
 

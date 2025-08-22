@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Download, Eye, Calendar, Search } from 'lucide-react';
 import { format } from 'date-fns';
+import { uiLogger } from '@/services/logger.service';
 
 interface Report {
   id: string;
@@ -85,12 +86,12 @@ const MobileReportsPage: React.FC = () => {
 
   const handleView = (report: Report) => {
     // In production, this would open the report viewer
-    console.log('View report:', report.id);
+    uiLogger.log('View report:', report.id);
   };
 
   const handleDownload = (report: Report) => {
     // In production, this would download the report
-    console.log('Download report:', report.id);
+    uiLogger.log('Download report:', report.id);
   };
 
   return (

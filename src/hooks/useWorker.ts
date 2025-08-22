@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { WorkerManager } from '@/utils/performance';
+import { logger } from '@/services/logger.service';
 
 interface UseWorkerOptions {
   workerUrl: string;
@@ -63,7 +64,7 @@ export function useWorker(options: UseWorkerOptions) {
 
   const postMessage = useCallback((message: any) => {
     if (!workerRef.current) {
-      console.error('Worker not initialized');
+      logger.error('Worker not initialized');
       return;
     }
     

@@ -6,6 +6,7 @@ import { X, Plus, Trash2 } from 'lucide-react';
 import { useInventoryStore } from '@/stores/inventory.store';
 import type { Vendor, InventoryItem } from '@/types/inventory.types';
 import { toast } from 'react-hot-toast';
+import { uiLogger } from '@/services/logger.service';
 
 const purchaseOrderSchema = z.object({
   vendorId: z.string().min(1, 'Vendor is required'),
@@ -123,7 +124,7 @@ export function CreatePurchaseOrderModal({ isOpen, onClose }: Props) {
       onClose();
     } catch (error) {
       toast.error('Failed to create purchase order');
-      console.error('Error creating purchase order:', error);
+      uiLogger.error('Error creating purchase order:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -9,6 +9,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getStoragePath } from '@/constants/tenant.constants';
 import { SelectField, LexicalEditorField } from '@/components/form-fields';
 import type { PatientDocument } from '@/types/patient.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface DocumentUploadProps {
   patientId: string;
@@ -82,7 +83,7 @@ export const DocumentUpload = ({ patientId, onUploadComplete, onCancel }: Docume
 
         onUploadComplete?.();
       } catch (error) {
-        console.error('Document upload error:', error);
+        uiLogger.error('Document upload error:', error);
         showToast({
           type: 'error',
           title: 'Upload Failed',

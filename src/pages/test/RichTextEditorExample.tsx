@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RichTextEditorField } from '@/components/form-fields/RichTextEditorField';
 import { FileText, Save, Sparkles } from 'lucide-react';
+import { uiLogger } from '@/services/logger.service';
 
 const RichTextEditorExample = () => {
   const [content, setContent] = useState('');
@@ -10,7 +11,7 @@ const RichTextEditorExample = () => {
 
   const handleSave = () => {
     setSavedContent(fullContent);
-    console.log('Saved content:', fullContent);
+    uiLogger.log('Saved content:', fullContent);
   };
 
   return (

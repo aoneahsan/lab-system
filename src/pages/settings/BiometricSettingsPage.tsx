@@ -3,6 +3,7 @@ import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useToast } from '@/hooks/useToast';
 import PageHeader from '@/components/common/PageHeader';
+import { uiLogger } from '@/services/logger.service';
 
 const BiometricSettingsPage = () => {
   const { isLoading, biometricStatus, preferences, updatePreferences, authenticate, checkStatus } =
@@ -61,7 +62,7 @@ const BiometricSettingsPage = () => {
         await updatePreferences({ enabled: false });
       }
     } catch (error) {
-      console.error('Error toggling biometric:', error);
+      uiLogger.error('Error toggling biometric:', error);
       showToast({
         type: 'error',
         title: 'Error',
@@ -82,7 +83,7 @@ const BiometricSettingsPage = () => {
         message: 'Biometric status has been refreshed',
       });
     } catch (error) {
-      console.error('Error refreshing status:', error);
+      uiLogger.error('Error refreshing status:', error);
       showToast({
         type: 'error',
         title: 'Error',

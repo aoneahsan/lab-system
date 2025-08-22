@@ -12,6 +12,7 @@ import { firestore } from '@/config/firebase.config';
 import { smsService } from '@/services/sms.service';
 import { emailService } from '@/services/email.service';
 import { subscriptionService } from '@/services/subscription.service';
+import { logger } from '@/services/logger.service';
 import type {
   TwoFactorMethod,
   TwoFactorSettings,
@@ -180,7 +181,7 @@ class TwoFactorAuthService {
       // delta is null if invalid, or the time step difference if valid
       return delta !== null;
     } catch (error) {
-      console.error('Error verifying TOTP code:', error);
+      logger.error('Error verifying TOTP code:', error);
       return false;
     }
   }
@@ -260,7 +261,7 @@ class TwoFactorAuthService {
         backupCodes,
       };
     } catch (error) {
-      console.error('Error enabling 2FA:', error);
+      logger.error('Error enabling 2FA:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to enable 2FA',
@@ -322,7 +323,7 @@ class TwoFactorAuthService {
       // Also clear localStorage
       localStorage.removeItem(`2fa_settings_${userId}`);
     } catch (error) {
-      console.error('Error disabling 2FA:', error);
+      logger.error('Error disabling 2FA:', error);
       // Clear from localStorage as fallback
       localStorage.removeItem(`2fa_settings_${userId}`);
     }
@@ -370,7 +371,7 @@ class TwoFactorAuthService {
       // Check if it's a backup code
       return await this.verifyBackupCode(userId, code);
     } catch (error) {
-      console.error('Error verifying 2FA code:', error);
+      logger.error('Error verifying 2FA code:', error);
       return false;
     }
   }
@@ -393,7 +394,7 @@ class TwoFactorAuthService {
         totpSecret: userData.totpSecret || userData.twoFactorSettings.totpSecret,
       };
     } catch (error) {
-      console.error('Error getting 2FA settings from Firestore:', error);
+      logger.error('Error getting 2FA settings from Firestore:', error);
       // Return null on permission errors
       return null;
     }
@@ -419,7 +420,7 @@ class TwoFactorAuthService {
         ...(settings.totpSecret ? { totpSecret: settings.totpSecret } : {}),
       });
     } catch (error) {
-      console.error('Error saving 2FA settings to Firestore:', error);
+      logger.error('Error saving 2FA settings to Firestore:', error);
       // Already saved to localStorage, so the feature still works
     }
   }

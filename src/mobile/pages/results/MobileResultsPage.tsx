@@ -16,6 +16,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { toast } from '@/hooks/useToast';
 import type { TestResult } from '@/types/result.types';
+import { uiLogger } from '@/services/logger.service';
 
 const MobileTestResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const MobileTestResultsPage: React.FC = () => {
 
       toast.success('Report downloaded successfully');
     } catch (error) {
-      console.error('Download failed:', error);
+      uiLogger.error('Download failed:', error);
       toast.error('Failed to download report');
     }
   };
@@ -82,7 +83,7 @@ const MobileTestResultsPage: React.FC = () => {
         dialogTitle: 'Share your lab report',
       });
     } catch (error) {
-      console.error('Share failed:', error);
+      uiLogger.error('Share failed:', error);
     }
   };
 

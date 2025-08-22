@@ -16,6 +16,7 @@ import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { fhirService } from './fhir.service';
 import { hl7Parser } from './hl7-parser.service';
+import { logger } from '@/services/logger.service';
 import type {
   EMRConnection,
   EMRConnectionFormData,
@@ -286,8 +287,8 @@ class EMRConnectionService {
     tenantId: string
   ): Promise<void> {
     // Implementation would process FHIR resources
-    console.log('Processing FHIR message', message);
-    console.log('Connection:', connection.id, 'Tenant:', tenantId);
+    logger.log('Processing FHIR message', message);
+    logger.log('Connection:', connection.id, 'Tenant:', tenantId);
   }
 
   private async processHL7Message(
@@ -312,8 +313,8 @@ class EMRConnectionService {
     tenantId: string
   ): Promise<void> {
     // Implementation would process API messages
-    console.log('Processing API message', message);
-    console.log('Connection:', connection.id, 'Tenant:', tenantId);
+    logger.log('Processing API message', message);
+    logger.log('Connection:', connection.id, 'Tenant:', tenantId);
   }
 
   // Helper methods

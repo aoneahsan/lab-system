@@ -20,6 +20,7 @@ import { COLLECTIONS } from '@/config/firebase-collections';
 import { settingsService } from '@/services/settings';
 import { notificationService } from '@/services/notification.service';
 import { patientService } from '@/services/patient.service';
+import { logger } from '@/services/logger.service';
 import type {
   Invoice,
   Payment,
@@ -335,7 +336,7 @@ export const billingService = {
     if (settings.notifications.emailEnabled) {
       // In production, would send to insurance provider's claim endpoint
       // For now, log the submission
-      console.log(`Claim ${claim.claimNumber} submitted to insurance provider ${claim.insuranceId}`);
+      logger.log(`Claim ${claim.claimNumber} submitted to insurance provider ${claim.insuranceId}`);
     }
     
     // Create audit log for claim submission

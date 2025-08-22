@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCreateCampaign, useUpdateCampaign, useMessageTemplates } from '@/hooks/useCommunication';
 import { Campaign, CampaignFormData } from '@/types/communication.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface CampaignModalProps {
   campaign?: Campaign | null;
@@ -50,7 +51,7 @@ export default function CampaignModal({ campaign, onClose }: CampaignModalProps)
       }
       onClose();
     } catch (error) {
-      console.error('Failed to save campaign:', error);
+      uiLogger.error('Failed to save campaign:', error);
     }
   };
 

@@ -30,6 +30,7 @@ import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsInd
 import type { ResultFilter, TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
 import type { Patient } from '@/types/patient.types';
+import { uiLogger } from '@/services/logger.service';
 
 const ResultsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -294,7 +295,7 @@ const ResultsPage: React.FC = () => {
     } catch (error) {
       toast.dismiss(loadingToast);
       toast.error('PDF Generation Failed', 'An error occurred while generating PDFs');
-      console.error('Batch PDF generation error:', error);
+      uiLogger.error('Batch PDF generation error:', error);
     }
   };
 

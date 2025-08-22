@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { useRecordPayment } from '@/hooks/useBilling';
 import type { Invoice } from '@/types/billing.types';
+import { uiLogger } from '@/services/logger.service';
 import { 
   DateField, 
   NumberField, 
@@ -64,7 +65,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, invoice })
       });
       onClose();
     } catch (error) {
-      console.error('Error recording payment:', error);
+      uiLogger.error('Error recording payment:', error);
     }
   };
 

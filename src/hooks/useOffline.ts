@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { offlineSyncService } from '@/services/offline-sync.service';
 import { offlineDbService } from '@/services/offline-db.service';
 import type { SyncProgress } from '@/services/offline-sync.service';
+import { logger } from '@/services/logger.service';
 
 export interface OfflineState {
   isOffline: boolean;
@@ -32,7 +33,7 @@ export function useOffline() {
           lastSyncTime: status.lastSyncTime,
         }));
       } catch (error) {
-        console.error('Failed to initialize offline services:', error);
+        logger.error('Failed to initialize offline services:', error);
       }
     };
 
@@ -69,7 +70,7 @@ export function useOffline() {
     try {
       await offlineSyncService.syncNow();
     } catch (error) {
-      console.error('Manual sync failed:', error);
+      logger.error('Manual sync failed:', error);
       throw error;
     }
   }, []);
@@ -87,7 +88,7 @@ export function useOffline() {
           pendingChanges: status.pendingChanges,
         }));
       } catch (error) {
-        console.error('Failed to queue operation:', error);
+        logger.error('Failed to queue operation:', error);
         throw error;
       }
     },
@@ -99,7 +100,7 @@ export function useOffline() {
     try {
       return await offlineDbService.getCachedData(collection, tenantId, filters);
     } catch (error) {
-      console.error('Failed to get cached data:', error);
+      logger.error('Failed to get cached data:', error);
       return [];
     }
   }, []);
@@ -109,7 +110,7 @@ export function useOffline() {
     try {
       return await offlineDbService.getCachedRecord(collection, id);
     } catch (error) {
-      console.error('Failed to get cached record:', error);
+      logger.error('Failed to get cached record:', error);
       return null;
     }
   }, []);
@@ -119,7 +120,7 @@ export function useOffline() {
     try {
       await offlineDbService.updateCachedRecord(collection, id, updates);
     } catch (error) {
-      console.error('Failed to update cached record:', error);
+      logger.error('Failed to update cached record:', error);
       throw error;
     }
   }, []);
@@ -134,7 +135,7 @@ export function useOffline() {
         lastSyncTime: 0,
       }));
     } catch (error) {
-      console.error('Failed to clear offline data:', error);
+      logger.error('Failed to clear offline data:', error);
       throw error;
     }
   }, []);

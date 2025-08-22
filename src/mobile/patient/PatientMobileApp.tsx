@@ -8,6 +8,7 @@ import { AppointmentsScreen } from './screens/AppointmentsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { NotificationsScreen } from './screens/NotificationsScreen';
 import { LoginScreen } from './screens/LoginScreen';
+import { logger } from '@/services/logger.service';
 
 interface TabItem {
   id: string;
@@ -40,12 +41,12 @@ export const PatientMobileApp: React.FC = () => {
 
   const setupPushNotifications = async () => {
     // Implementation for push notifications
-    console.log('Setting up push notifications');
+    logger.log('Setting up push notifications');
   };
 
   const checkForUpdates = async () => {
     // Implementation for checking app updates
-    console.log('Checking for app updates');
+    logger.log('Checking for app updates');
   };
 
   const renderContent = () => {

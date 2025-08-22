@@ -1,5 +1,6 @@
 import Dexie, { Table } from 'dexie';
 import type { OfflineQueueItem, OfflineMetadata } from './offline-db.service';
+import { logger } from '@/services/logger.service';
 
 // Define interfaces for our IndexedDB tables
 interface QueueRecord {
@@ -66,9 +67,9 @@ export class OfflineDbWebService {
     try {
       await this.db.open();
       this.isInitialized = true;
-      console.log('IndexedDB offline database initialized');
+      logger.log('IndexedDB offline database initialized');
     } catch (error) {
-      console.error('Failed to initialize IndexedDB:', error);
+      logger.error('Failed to initialize IndexedDB:', error);
       throw error;
     }
   }

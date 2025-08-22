@@ -13,6 +13,7 @@ import {
   Search
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { uiLogger } from '@/services/logger.service';
 
 interface PaymentMethod {
   id: string;
@@ -168,11 +169,11 @@ const MobilePaymentsPage: React.FC = () => {
   };
 
   const handleAddPaymentMethod = () => {
-    console.log('Add payment method');
+    uiLogger.log('Add payment method');
   };
 
   const handleDownloadReceipt = (transactionId: string) => {
-    console.log('Download receipt for:', transactionId);
+    uiLogger.log('Download receipt for:', transactionId);
   };
 
   return (

@@ -13,6 +13,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/services/logger.service';
 
 interface Sample {
   id: string;
@@ -159,7 +160,7 @@ export const ProcessingScreen: React.FC = () => {
 
   const handleStartProcessing = (sampleId: string) => {
     // Start processing logic
-    console.log('Starting processing for:', sampleId);
+    logger.log('Starting processing for:', sampleId);
   };
 
   const handleScanSample = () => {

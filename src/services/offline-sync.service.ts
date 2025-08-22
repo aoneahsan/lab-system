@@ -15,6 +15,7 @@ import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { offlineDbService, OfflineQueueItem } from './offline-db.service';
 import { Network } from '@capacitor/network';
+import { logger } from '@/services/logger.service';
 
 export interface SyncResult {
   success: boolean;
@@ -44,7 +45,7 @@ class OfflineSyncService {
       // Set up network listener
       this.networkListener = await Network.addListener('networkStatusChange', async (status) => {
         if (status.connected) {
-          console.log('Network connection restored, initiating sync...');
+          logger.log('Network connection restored, initiating sync...');
           await this.performSync();
         }
       });
@@ -59,7 +60,7 @@ class OfflineSyncService {
       // Set up periodic sync (every 5 minutes when online)
       this.startPeriodicSync();
     } catch (error) {
-      console.error('Failed to initialize offline sync service:', error);
+      logger.error('Failed to initialize offline sync service:', error);
       // Don't throw error to prevent app from crashing
     }
   }
@@ -106,13 +107,13 @@ class OfflineSyncService {
   // Perform sync
   async performSync(): Promise<SyncResult> {
     if (this.syncInProgress) {
-      console.log('Sync already in progress, skipping...');
+      logger.log('Sync already in progress, skipping...');
       return { success: false, synced: 0, failed: 0, errors: [] };
     }
 
     const status = await Network.getStatus();
     if (!status.connected) {
-      console.log('No network connection, skipping sync...');
+      logger.log('No network connection, skipping sync...');
       return { success: false, synced: 0, failed: 0, errors: [] };
     }
 
@@ -144,7 +145,7 @@ class OfflineSyncService {
           await offlineDbService.markAsSynced(op.id);
           result.synced++;
         } catch (error: any) {
-          console.error('Sync operation failed:', error);
+          logger.error('Sync operation failed:', error);
           await offlineDbService.updateRetryInfo(op.id, error.message);
           result.failed++;
           result.errors.push({ operation: op, error: error.message });
@@ -167,7 +168,7 @@ class OfflineSyncService {
       // Fetch latest data from server
       await this.fetchLatestData();
     } catch (error: any) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed:', error);
       result.success = false;
       result.errors.push({
         operation: {} as OfflineQueueItem,
@@ -276,7 +277,7 @@ class OfflineSyncService {
 
         await offlineDbService.cacheData(name, tenantId, data);
       } catch (error) {
-        console.error(`Failed to fetch ${name}:`, error);
+        logger.error(`Failed to fetch ${name}:`, error);
       }
     }
   }

@@ -9,6 +9,7 @@ import { useTests } from '@/hooks/useTests';
 import { useAvailableSlots, useCreateAppointment } from '@/hooks/useAppointments';
 import { Button } from '@/components/ui/Button';
 import { SelectField, DateField, TimeField, TextField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 const schema = yup.object({
   patientId: yup.string().required('Patient is required'),
@@ -100,7 +101,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
 
       onSuccess?.();
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      uiLogger.error('Error creating appointment:', error);
     }
   };
 

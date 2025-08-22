@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { auth } from '@/config/firebase';
 import { notificationService } from './notification.service';
 import type { User } from 'firebase/auth';
+import { logger } from '@/services/logger.service';
 
 export interface UnifiedNotificationOptions {
   title: string;
@@ -46,14 +47,14 @@ class UnifiedNotificationService {
 
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize unified notifications:', error);
+      logger.error('Failed to initialize unified notifications:', error);
     }
   }
 
   private setupPushListeners() {
     // Handle push notification received
     notifications.onPush((notification) => {
-      console.log('Push notification received:', notification);
+      logger.log('Push notification received:', notification);
       
       // Show as in-app notification if app is in foreground
       if (notification.data?.showInApp !== false) {
@@ -68,7 +69,7 @@ class UnifiedNotificationService {
 
     // Handle push notification opened
     notifications.onPushOpened((notification) => {
-      console.log('Push notification opened:', notification);
+      logger.log('Push notification opened:', notification);
       
       // Handle deep linking based on notification data
       if (notification.data?.route) {
@@ -80,7 +81,7 @@ class UnifiedNotificationService {
   private setupLocalListeners() {
     // Handle local notification actions
     notifications.on('notificationActionPerformed', (event) => {
-      console.log('Notification action performed:', event);
+      logger.log('Notification action performed:', event);
       
       // Handle specific actions for local notifications
       if (event.type === 'local.action' && event.actionId === 'view') {
@@ -108,7 +109,7 @@ class UnifiedNotificationService {
       
       return false;
     } catch (error) {
-      console.error('Failed to request push permission:', error);
+      logger.error('Failed to request push permission:', error);
       return false;
     }
   }
@@ -118,7 +119,7 @@ class UnifiedNotificationService {
       try {
         this.pushToken = await notifications.getToken();
       } catch (error) {
-        console.error('Failed to get push token:', error);
+        logger.error('Failed to get push token:', error);
       }
     }
     return this.pushToken;
@@ -143,7 +144,7 @@ class UnifiedNotificationService {
       // Subscribe to user-specific topic
       await notifications.subscribe(`user_${this.currentUser.uid}`);
     } catch (error) {
-      console.error('Failed to subscribe to topics:', error);
+      logger.error('Failed to subscribe to topics:', error);
     }
   }
 
@@ -352,7 +353,7 @@ class UnifiedNotificationService {
     if (platform !== 'web') {
       // This would open device settings on mobile
       // Implementation depends on additional Capacitor plugins
-      console.log('Opening notification settings...');
+      logger.log('Opening notification settings...');
     }
   }
 }

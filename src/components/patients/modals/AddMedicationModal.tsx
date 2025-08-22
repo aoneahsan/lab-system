@@ -5,6 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { TextField } from '@/components/form-fields/TextField';
 import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField';
 import { DateField } from '@/components/form-fields/DateField';
+import { uiLogger } from '@/services/logger.service';
 
 interface AddMedicationModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export const AddMedicationModal = ({ isOpen, onClose, onSubmit, medication }: Ad
       reset();
       onClose();
     } catch (error) {
-      console.error('Error adding medication:', error);
+      uiLogger.error('Error adding medication:', error);
     } finally {
       setIsSubmitting(false);
     }

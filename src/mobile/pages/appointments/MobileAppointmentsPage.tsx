@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Plus, ChevronRight, X } from 'lucide-react';
 import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { toast } from '@/hooks/useToast';
+import { uiLogger } from '@/services/logger.service';
 
 interface Appointment {
   id: string;
@@ -89,7 +90,7 @@ const MobileAppointmentsPage: React.FC = () => {
 
       toast.success('Reminder scheduled');
     } catch (_error) {
-      console.error('Failed to schedule notification:', _error);
+      uiLogger.error('Failed to schedule notification:', _error);
       toast.error('Failed to schedule reminder');
     }
   };

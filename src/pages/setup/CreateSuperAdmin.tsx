@@ -7,6 +7,7 @@ import { Shield, Loader2 } from 'lucide-react';
 import { toast } from '@/stores/toast.store';
 import { useNavigate, Link } from 'react-router-dom';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
+import { uiLogger } from '@/services/logger.service';
 
 // This is a setup page to create the initial super admin
 // Should be removed or protected after initial setup
@@ -102,7 +103,7 @@ const CreateSuperAdmin = () => {
         // Navigate to login after email sent
         setTimeout(() => navigate('/login'), 3000);
       } catch (emailError) {
-        console.error('Failed to send email:', emailError);
+        uiLogger.error('Failed to send email:', emailError);
         
         // If email fails, store password temporarily to show to user
         setCreatedPassword(password);
@@ -113,7 +114,7 @@ const CreateSuperAdmin = () => {
         );
       }
     } catch (error: any) {
-      console.error('Error creating super admin:', error);
+      uiLogger.error('Error creating super admin:', error);
       
       if (error.code === 'auth/email-already-in-use') {
         toast.error('Account exists', 'This email is already registered');

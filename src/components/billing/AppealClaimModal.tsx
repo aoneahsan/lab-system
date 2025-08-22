@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useAppealClaim } from '@/hooks/useBilling';
 import type { InsuranceClaim } from '@/types/billing.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface AppealClaimModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ const AppealClaimModal: React.FC<AppealClaimModalProps> = ({ isOpen, onClose, cl
       });
       onClose();
     } catch (error) {
-      console.error('Error appealing claim:', error);
+      uiLogger.error('Error appealing claim:', error);
     } finally {
       setIsSubmitting(false);
     }

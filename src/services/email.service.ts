@@ -1,3 +1,5 @@
+import { logger } from '@/services/logger.service';
+
 /**
  * Email Service for sending emails
  * In production, integrate with SendGrid, AWS SES, or other email providers
@@ -36,20 +38,20 @@ class EmailService {
       // };
       // await sgMail.send(msg);
       
-      console.log('Email would be sent in production:', options);
+      logger.log('Email would be sent in production:', options);
     } else {
       // Development mode - log to console
-      console.log('📧 Email Service (Dev Mode)');
-      console.log('To:', recipients.join(', '));
-      console.log('Subject:', options.subject);
-      console.log('From:', options.from || this.defaultFrom);
+      logger.log('📧 Email Service (Dev Mode)');
+      logger.log('To:', recipients.join(', '));
+      logger.log('Subject:', options.subject);
+      logger.log('From:', options.from || this.defaultFrom);
       if (options.html) {
-        console.log('HTML Content:', options.html.substring(0, 200) + '...');
+        logger.log('HTML Content:', options.html.substring(0, 200) + '...');
       }
       if (options.text) {
-        console.log('Text Content:', options.text.substring(0, 200) + '...');
+        logger.log('Text Content:', options.text.substring(0, 200) + '...');
       }
-      console.log('---');
+      logger.log('---');
       
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));

@@ -5,6 +5,7 @@
 
 import keyboardShortcutsService, { KeyboardShortcut } from './KeyboardShortcutsService';
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 export interface HotkeyBinding {
   id: string;
@@ -40,7 +41,7 @@ class HotkeysService {
   private gestures: GestureBinding[] = [];
 
   constructor() {
-    console.warn('HotkeysService is deprecated. Use KeyboardShortcutsService directly.');
+    logger.warn('HotkeysService is deprecated. Use KeyboardShortcutsService directly.');
   }
 
   /**
@@ -87,7 +88,7 @@ class HotkeysService {
   unregisterHotkey(id: string): void {
     // Find the hotkey by id and remove it
     // Note: This is a simplified implementation
-    console.warn('unregisterHotkey is deprecated');
+    logger.warn('unregisterHotkey is deprecated');
   }
 
   /**
@@ -146,7 +147,7 @@ class HotkeysService {
    * Get all registered hotkeys (legacy method)
    */
   getHotkeys(): HotkeyBinding[] {
-    console.warn('getHotkeys is deprecated. Use keyboardShortcutsService.getAllShortcuts()');
+    logger.warn('getHotkeys is deprecated. Use keyboardShortcutsService.getAllShortcuts()');
     return [];
   }
 
@@ -154,7 +155,7 @@ class HotkeysService {
    * Update a hotkey binding
    */
   updateHotkey(id: string, updates: Partial<HotkeyBinding>): void {
-    console.warn('updateHotkey is deprecated. Use keyboardShortcutsService methods directly');
+    logger.warn('updateHotkey is deprecated. Use keyboardShortcutsService methods directly');
   }
 
   /**
@@ -184,11 +185,11 @@ class HotkeysService {
    * Gesture support (not implemented in new service yet)
    */
   registerGesture(gesture: GestureBinding): void {
-    console.warn('Gesture support not yet implemented in new KeyboardShortcutsService');
+    logger.warn('Gesture support not yet implemented in new KeyboardShortcutsService');
   }
 
   unregisterGesture(id: string): void {
-    console.warn('Gesture support not yet implemented in new KeyboardShortcutsService');
+    logger.warn('Gesture support not yet implemented in new KeyboardShortcutsService');
   }
 
   /**
@@ -196,7 +197,7 @@ class HotkeysService {
    */
   initialize(navigateFn?: any): void {
     this.navigateFn = navigateFn;
-    console.warn('initialize is deprecated. KeyboardShortcutsService auto-initializes.');
+    logger.warn('initialize is deprecated. KeyboardShortcutsService auto-initializes.');
   }
 
   /**

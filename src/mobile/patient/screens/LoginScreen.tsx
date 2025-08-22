@@ -3,6 +3,7 @@ import { Eye, EyeOff, Fingerprint, Lock, Mail, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth.store';
 import { biometricAuth } from '@/services/biometric-auth.service';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/services/logger.service';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -25,7 +26,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       const available = await biometricAuth.isAvailable();
       setBiometricAvailable(available);
     } catch (error) {
-      console.log('Biometric not available:', error);
+      logger.log('Biometric not available:', error);
     }
   };
 

@@ -9,6 +9,7 @@ import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { toast } from 'sonner';
 import { EmailField, PasswordField, CheckboxField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -43,7 +44,7 @@ const MobileLoginPage: React.FC = () => {
       const result = await BiometricAuth.isAvailable();
       setBiometricAvailable(result || false);
     } catch (_error) {
-      console.error('Biometric check failed:', _error);
+      uiLogger.error('Biometric check failed:', _error);
     }
   };
 
@@ -57,7 +58,7 @@ const MobileLoginPage: React.FC = () => {
           handleBiometricLogin();
         }
       } catch (_error) {
-        console.error('Failed to check saved credentials:', _error);
+        uiLogger.error('Failed to check saved credentials:', _error);
       }
     };
     
@@ -84,7 +85,7 @@ const MobileLoginPage: React.FC = () => {
         }
       }
     } catch (_error) {
-      console.error('Biometric authentication failed:', _error);
+      uiLogger.error('Biometric authentication failed:', _error);
       toast.error('Biometric authentication failed');
     }
   }, [login, navigate]);

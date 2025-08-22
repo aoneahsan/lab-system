@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import fileUploadService, { UploadOptions, UploadResult, FileData } from '@/services/FileUploadService';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 export interface UseFileUploadOptions extends Omit<UploadOptions, 'onProgress' | 'onError' | 'onComplete'> {
   multiple?: boolean;
@@ -94,7 +95,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUpload
               setProgress(overallProgress);
             },
             onError: (err) => {
-              console.error('Upload error:', err);
+              logger.error('Upload error:', err);
               setError(err);
               if (options.showToast) {
                 toast.error('Upload failed', err.message);
@@ -111,7 +112,7 @@ export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUpload
           results.push(result);
           completedFiles++;
         } catch (err) {
-          console.error(`Failed to upload ${file.name}:`, err);
+          logger.error(`Failed to upload ${file.name}:`, err);
           if (options.showToast) {
             toast.error('Upload failed', `Failed to upload ${file.name}`);
           }

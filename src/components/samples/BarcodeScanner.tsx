@@ -3,6 +3,7 @@ import { X, Camera } from 'lucide-react';
 import { BarcodeScanner as CraftBarcodeScanner } from 'code-craft-studio';
 import { Capacitor } from '@capacitor/core';
 import { toast } from '@/stores/toast.store';
+import { uiLogger } from '@/services/logger.service';
 
 interface BarcodeScannerProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
   };
 
   const handleScanError = (error: any) => {
-    console.error('Scan error:', error);
+    uiLogger.error('Scan error:', error);
     const errorMessage = error?.message || error?.toString() || 'Failed to scan barcode';
     setError(errorMessage);
     toast.error('Scan Failed', errorMessage);

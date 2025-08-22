@@ -3,6 +3,7 @@ import { appointmentService } from '@/services/appointment.service';
 import { Appointment } from '@/types/appointment.types';
 import { toast } from '@/stores/toast.store';
 import { useTenantStore } from '@/stores/tenant.store';
+import { logger } from '@/services/logger.service';
 
 export const useAppointments = (filters?: any) => {
   const { currentTenant } = useTenantStore();
@@ -37,7 +38,7 @@ export const useCreateAppointment = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to create appointment. Please try again.');
-      console.error('Error creating appointment:', error);
+      logger.error('Error creating appointment:', error);
     },
   });
 };
@@ -56,7 +57,7 @@ export const useUpdateAppointment = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to update appointment. Please try again.');
-      console.error('Error updating appointment:', error);
+      logger.error('Error updating appointment:', error);
     },
   });
 };
@@ -74,7 +75,7 @@ export const useCancelAppointment = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to cancel appointment. Please try again.');
-      console.error('Error cancelling appointment:', error);
+      logger.error('Error cancelling appointment:', error);
     },
   });
 };
@@ -92,7 +93,7 @@ export const useCheckInPatient = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to check in patient. Please try again.');
-      console.error('Error checking in patient:', error);
+      logger.error('Error checking in patient:', error);
     },
   });
 };
@@ -110,7 +111,7 @@ export const useCompleteAppointment = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to complete appointment. Please try again.');
-      console.error('Error completing appointment:', error);
+      logger.error('Error completing appointment:', error);
     },
   });
 };
@@ -148,7 +149,7 @@ export const useUpdateAppointmentSettings = () => {
     },
     onError: (error) => {
       toast.error('Error', 'Failed to update settings. Please try again.');
-      console.error('Error updating appointment settings:', error);
+      logger.error('Error updating appointment settings:', error);
     },
   });
 };

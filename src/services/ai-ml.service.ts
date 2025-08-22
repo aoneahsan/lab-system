@@ -4,6 +4,7 @@ import { trackingInstance } from '@/providers/TrackingProvider';
 import type { TestResult } from '@/types/result.types';
 import type { TestDefinition } from '@/types/test.types';
 import type { Patient } from '@/types/patient.types';
+import { logger } from '@/services/logger.service';
 
 // Types for AI/ML predictions and analysis
 export interface ResultInterpretation {
@@ -173,7 +174,7 @@ class AIMLService {
         error: (error as Error).message,
         duration: Date.now() - startTime,
       });
-      console.error('AI interpretation error:', error, { 
+      logger.error('AI interpretation error:', error, { 
         context: 'ai_interpretation',
         testCode: testDefinition.code,
       });

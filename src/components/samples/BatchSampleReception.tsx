@@ -17,6 +17,7 @@ import { useAnalyzerStore } from '@/stores/analyzer.store';
 import { useDepartmentStore } from '@/stores/department.store';
 import { toast } from 'sonner';
 import type { Sample, SampleStatus } from '@/types/sample.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface ScannedSample {
   barcode: string;
@@ -165,7 +166,7 @@ export const BatchSampleReception: React.FC = () => {
       lastScanRef.current = '';
     } catch (error) {
       toast.error('Failed to receive samples');
-      console.error('Batch receive error:', error);
+      uiLogger.error('Batch receive error:', error);
     } finally {
       setIsProcessing(false);
     }

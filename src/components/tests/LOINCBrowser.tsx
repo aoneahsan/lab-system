@@ -5,6 +5,7 @@ import { useUrlState } from '@/hooks/useUrlState';
 import { useModalState } from '@/hooks/useModalState';
 import { loincService } from '@/services/loinc.service';
 import type { LOINCCode } from '@/types/test.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface LOINCBrowserProps {
   onSelect: (loinc: LOINCCode) => void;
@@ -58,7 +59,7 @@ const LOINCBrowser: React.FC<LOINCBrowserProps> = ({ onSelect, onClose, selected
       const results = await loincService.searchByCategory(selectedCategory);
       setCategoryResults(results);
     } catch (error) {
-      console.error('Error loading category results:', error);
+      uiLogger.error('Error loading category results:', error);
       setCategoryResults([]);
     } finally {
       setIsLoadingCategory(false);

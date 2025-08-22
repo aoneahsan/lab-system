@@ -1,4 +1,5 @@
 import { unifiedStorage, STORAGE_KEYS } from '@/services/unified-storage.service';
+import { logger } from '@/services/logger.service';
 
 /**
  * Storage Migration Utility
@@ -19,11 +20,11 @@ export class StorageMigration {
    */
   async runMigration(): Promise<void> {
     if (await this.isMigrationCompleted()) {
-      console.log('Storage migration already completed');
+      logger.log('Storage migration already completed');
       return;
     }
 
-    console.log('Starting storage migration...');
+    logger.log('Starting storage migration...');
 
     try {
       // Migrate localStorage data
@@ -40,9 +41,9 @@ export class StorageMigration {
         tags: ['system-metadata']
       });
 
-      console.log('Storage migration completed successfully');
+      logger.log('Storage migration completed successfully');
     } catch (error) {
-      console.error('Storage migration failed:', error);
+      logger.error('Storage migration failed:', error);
       throw error;
     }
   }
@@ -51,7 +52,7 @@ export class StorageMigration {
    * Migrate data from localStorage
    */
   private async migrateLocalStorage(): Promise<void> {
-    console.log('Migrating localStorage data...');
+    logger.log('Migrating localStorage data...');
 
     const keysToMigrate = [
       { old: 'vite-ui-theme', new: STORAGE_KEYS.THEME },
@@ -76,10 +77,10 @@ export class StorageMigration {
 
           // Remove from localStorage after successful migration
           localStorage.removeItem(old);
-          console.log(`Migrated localStorage key: ${old} -> ${newKey}`);
+          logger.log(`Migrated localStorage key: ${old} -> ${newKey}`);
         }
       } catch (error) {
-        console.error(`Failed to migrate localStorage key ${old}:`, error);
+        logger.error(`Failed to migrate localStorage key ${old}:`, error);
       }
     }
   }
@@ -89,14 +90,14 @@ export class StorageMigration {
    */
   private async migrateCapacitorPreferences(): Promise<void> {
     // Migration skipped - Capacitor Preferences package has been removed
-    console.log('Skipping Capacitor Preferences migration - package removed');
+    logger.log('Skipping Capacitor Preferences migration - package removed');
   }
 
   /**
    * Migrate data from Dexie/IndexedDB
    */
   private async migrateDexieData(): Promise<void> {
-    console.log('Migrating Dexie/IndexedDB data...');
+    logger.log('Migrating Dexie/IndexedDB data...');
 
     try {
       // Check if IndexedDB database exists
@@ -132,11 +133,11 @@ export class StorageMigration {
                     tags: ['migrated-data', 'indexeddb', storeName],
                     compression: true
                   });
-                  console.log(`Migrated ${records.length} records from IndexedDB table: ${storeName}`);
+                  logger.log(`Migrated ${records.length} records from IndexedDB table: ${storeName}`);
                 }
               };
             } catch (error) {
-              console.error(`Failed to migrate IndexedDB table ${storeName}:`, error);
+              logger.error(`Failed to migrate IndexedDB table ${storeName}:`, error);
             }
           }
         }
@@ -144,14 +145,14 @@ export class StorageMigration {
         // Close and delete the old database
         db.close();
         indexedDB.deleteDatabase(dbName);
-        console.log('Deleted old IndexedDB database');
+        logger.log('Deleted old IndexedDB database');
       };
       
       request.onerror = () => {
-        console.log('No existing IndexedDB database to migrate');
+        logger.log('No existing IndexedDB database to migrate');
       };
     } catch (error) {
-      console.error('Failed to migrate Dexie data:', error);
+      logger.error('Failed to migrate Dexie data:', error);
     }
   }
 
@@ -160,7 +161,7 @@ export class StorageMigration {
    */
   async rollbackMigration(): Promise<void> {
     await unifiedStorage.remove(this.migrationKey);
-    console.log('Migration rollback completed');
+    logger.log('Migration rollback completed');
   }
 }
 
@@ -174,6 +175,6 @@ export async function runStorageMigration(): Promise<void> {
   try {
     await storageMigration.runMigration();
   } catch (error) {
-    console.error('Failed to run storage migration:', error);
+    logger.error('Failed to run storage migration:', error);
   }
 }

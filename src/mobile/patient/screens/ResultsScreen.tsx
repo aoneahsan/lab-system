@@ -18,6 +18,7 @@ import { toast } from '@/stores/toast.store';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { logger } from '@/services/logger.service';
 
 interface TestResult {
   id: string;
@@ -158,7 +159,7 @@ export const ResultsScreen: React.FC = () => {
         window.open(pdfUrl, '_blank');
       }
     } catch (error) {
-      console.error('Error downloading result:', error);
+      logger.error('Error downloading result:', error);
       toast.error('Download failed', 'Unable to download the result PDF');
     }
   };
@@ -203,7 +204,7 @@ export const ResultsScreen: React.FC = () => {
         toast.success('Copied to clipboard', 'Results summary copied to clipboard');
       }
     } catch (error) {
-      console.error('Error sharing result:', error);
+      logger.error('Error sharing result:', error);
       toast.error('Share failed', 'Unable to share the result');
     }
   };

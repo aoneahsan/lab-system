@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { X, Printer } from 'lucide-react';
 import { QRCodeStudio, QRType } from 'qrcode-studio';
 import type { Sample } from '@/types/sample.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface BatchBarcodesPrintProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ const BatchBarcodesPrint: React.FC<BatchBarcodesPrintProps> = ({ isOpen, onClose
         
         codes[sample.id] = result.dataUrl;
       } catch (error) {
-        console.error(`Error generating QR code for sample ${sample.id}:`, error);
+        uiLogger.error(`Error generating QR code for sample ${sample.id}:`, error);
       }
     }
     

@@ -1,5 +1,6 @@
 import { api } from './api';
 import { useAuthStore } from '@/stores/auth.store';
+import { logger } from '@/services/logger.service';
 
 export interface AuditLog {
   id: string;
@@ -79,7 +80,7 @@ class AuditService {
       await api.post('/api/audit', auditLog);
     } catch (error) {
       // Don't throw errors from audit logging
-      console.error('Failed to log audit event:', error);
+      logger.error('Failed to log audit event:', error);
     }
   }
 

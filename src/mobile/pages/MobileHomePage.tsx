@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from '@/stores/auth.store';
 import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { App } from '@capacitor/app';
+import { uiLogger } from '@/services/logger.service';
 
 const MobileHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const MobileHomePage: React.FC = () => {
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
         // App became active, refresh data
-        console.log('App became active');
+        uiLogger.log('App became active');
       }
     });
   }, []);
@@ -43,19 +44,19 @@ const MobileHomePage: React.FC = () => {
       const granted = await unifiedNotificationService.requestPushPermission();
 
       if (granted) {
-        console.log('Push notifications enabled');
+        uiLogger.log('Push notifications enabled');
         
         // Get push token if needed
         const token = await unifiedNotificationService.getPushToken();
         if (token) {
-          console.log('Push registration success, token:', token);
+          uiLogger.log('Push registration success, token:', token);
         }
         
         // Notification count will be handled by NotificationCenter component
         // which subscribes to notification service
       }
     } catch (error) {
-      console.error('Push notification setup failed:', error);
+      uiLogger.error('Push notification setup failed:', error);
     }
   };
 

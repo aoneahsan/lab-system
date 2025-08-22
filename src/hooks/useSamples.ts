@@ -3,6 +3,7 @@ import { sampleService } from '@/services/sample.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 import type {
   Sample,
   SampleCollection,
@@ -86,7 +87,7 @@ export const useCreateSample = () => {
     },
     onError: (error) => {
       toast.error('Failed to create sample');
-      console.error('Error creating sample:', error);
+      logger.error('Error creating sample:', error);
     },
   });
 };
@@ -109,7 +110,7 @@ export const useUpdateSample = () => {
     },
     onError: (error) => {
       toast.error('Failed to update sample');
-      console.error('Error updating sample:', error);
+      logger.error('Error updating sample:', error);
     },
   });
 };
@@ -150,7 +151,7 @@ export const useUpdateSampleStatus = () => {
     },
     onError: (error) => {
       toast.error('Failed to update sample status');
-      console.error('Error updating sample status:', error);
+      logger.error('Error updating sample status:', error);
     },
   });
 };
@@ -172,7 +173,7 @@ export const useDeleteSample = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete sample');
-      console.error('Error deleting sample:', error);
+      logger.error('Error deleting sample:', error);
     },
   });
 };
@@ -213,7 +214,7 @@ export const useCreateSampleCollection = () => {
     },
     onError: (error) => {
       toast.error('Failed to create sample collection');
-      console.error('Error creating sample collection:', error);
+      logger.error('Error creating sample collection:', error);
     },
   });
 };
@@ -246,7 +247,7 @@ export const useCompleteSampleCollection = () => {
     },
     onError: (error) => {
       toast.error('Failed to complete sample collection');
-      console.error('Error completing sample collection:', error);
+      logger.error('Error completing sample collection:', error);
     },
   });
 };
@@ -269,7 +270,7 @@ export const useBatchUpdateSamples = () => {
     },
     onError: (error) => {
       toast.error('Failed to update samples');
-      console.error('Error updating samples:', error);
+      logger.error('Error updating samples:', error);
     },
   });
 };

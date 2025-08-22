@@ -3,6 +3,7 @@ import { qcService } from '@/services/qc.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 import type {
   QCMaterial,
   // QCRun,
@@ -72,7 +73,7 @@ export const useCreateQCMaterial = () => {
     },
     onError: (error) => {
       toast.error('Failed to create QC material');
-      console.error('Error creating QC material:', error);
+      logger.error('Error creating QC material:', error);
     },
   });
 };
@@ -94,7 +95,7 @@ export const useUpdateQCMaterial = () => {
     },
     onError: (error) => {
       toast.error('Failed to update QC material');
-      console.error('Error updating QC material:', error);
+      logger.error('Error updating QC material:', error);
     },
   });
 };
@@ -144,7 +145,7 @@ export const useCreateQCRun = () => {
     },
     onError: (error) => {
       toast.error('Failed to create QC run');
-      console.error('Error creating QC run:', error);
+      logger.error('Error creating QC run:', error);
     },
   });
 };
@@ -175,7 +176,7 @@ export const useReviewQCRun = () => {
     },
     onError: (error) => {
       toast.error('Failed to review QC run');
-      console.error('Error reviewing QC run:', error);
+      logger.error('Error reviewing QC run:', error);
     },
   });
 };

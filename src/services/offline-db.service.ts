@@ -1,4 +1,5 @@
 import { unifiedStorage } from './unified-storage.service';
+import { logger } from '@/services/logger.service';
 
 export interface OfflineQueueItem {
   id: string;
@@ -73,9 +74,9 @@ class UnifiedOfflineDbService implements IOfflineDbService {
       }
       
       this.initialized = true;
-      console.log('Unified offline database service initialized');
+      logger.log('Unified offline database service initialized');
     } catch (error) {
-      console.error('Failed to initialize unified offline database:', error);
+      logger.error('Failed to initialize unified offline database:', error);
       throw error;
     }
   }

@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { useTracking } from '@/providers/TrackingProvider';
 import { errorMonitor } from '@/services/error-monitoring';
+import { logger } from '@/services/logger.service';
 
 const captureError = (error: Error, context?: any) => errorMonitor.captureException(error, context);
 const captureMessage = (message: string, level?: string) => errorMonitor.logError(message);
-const addBreadcrumb = (data: any) => console.log('Breadcrumb:', data);
+const addBreadcrumb = (data: any) => logger.log('Breadcrumb:', data);
 const useUnifiedErrorHandler = () => (error: Error) => errorMonitor.trackError(error);
 
 // Custom hooks for error handling

@@ -13,6 +13,7 @@ import {
 import { useClaim, useSubmitClaim } from '@/hooks/useBilling';
 import { useModalState } from '@/hooks/useModalState';
 import AppealClaimModal from '@/components/billing/AppealClaimModal';
+import { uiLogger } from '@/services/logger.service';
 
 const ClaimDetailPage: React.FC = () => {
   const { claimId } = useParams<{ claimId: string }>();
@@ -77,7 +78,7 @@ const ClaimDetailPage: React.FC = () => {
     try {
       await submitClaimMutation.mutateAsync(claimId!);
     } catch (error) {
-      console.error('Error submitting claim:', error);
+      uiLogger.error('Error submitting claim:', error);
     }
   };
 

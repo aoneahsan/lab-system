@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useUrlState, useUrlFilters, useUrlPagination } from '@/hooks/useUrlState';
 import { Modal } from '@/components/ui/Modal';
+import { uiLogger } from '@/services/logger.service';
 
 interface PatientTestResultsTabProps {
   patientId: string;
@@ -90,7 +91,7 @@ export const PatientTestResultsTab = ({ patientId }: PatientTestResultsTabProps)
 
   const handleDownloadReport = (test: any) => {
     // Implementation for downloading report
-    console.log('Downloading report for:', test.testName);
+    uiLogger.log('Downloading report for:', test.testName);
   };
 
   const handlePrintReport = (test: any) => {
@@ -100,7 +101,7 @@ export const PatientTestResultsTab = ({ patientId }: PatientTestResultsTabProps)
 
   const handleShareReport = (test: any) => {
     // Implementation for sharing report
-    console.log('Sharing report for:', test.testName);
+    uiLogger.log('Sharing report for:', test.testName);
   };
 
   const getStatusColor = (status: string) => {

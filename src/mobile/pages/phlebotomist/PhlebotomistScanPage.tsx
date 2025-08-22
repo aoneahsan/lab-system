@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { QRScanner } from 'code-craft-studio';
 import { toast } from '@/hooks/useToast';
+import { uiLogger } from '@/services/logger.service';
 
 interface ScanResult {
   type: 'patient' | 'sample' | 'order';
@@ -267,7 +268,7 @@ const PhlebotomistScanPage: React.FC = () => {
               setIsScanning(false);
             }}
             onError={(error) => {
-              console.error('Scan error:', error);
+              uiLogger.error('Scan error:', error);
               toast.error('Failed to scan barcode');
               setIsScanning(false);
             }}

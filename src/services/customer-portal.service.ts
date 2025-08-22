@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth } from '@/config/firebase.config';
+import { logger } from '@/services/logger.service';
 import type {
   CustomerPortalAccess,
   SharedResult,
@@ -290,6 +291,6 @@ export const customerPortalService = {
   // Helper functions
   async sendShareNotification(shareId: string, data: ShareResultData): Promise<void> {
     // Implementation would send actual notifications via email/SMS/WhatsApp
-    console.log('Sending share notification:', shareId, data);
+    logger.log('Sending share notification:', shareId, data);
   }
 };

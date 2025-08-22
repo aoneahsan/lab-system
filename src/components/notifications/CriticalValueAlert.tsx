@@ -3,6 +3,7 @@ import { notificationService } from '../../services/notifications';
 import type { CriticalValueNotification } from '../../services/notifications';
 import { unifiedNotificationService } from '@/services/unified-notification.service';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { uiLogger } from '@/services/logger.service';
 
 interface CriticalValueAlertProps {
   notification: CriticalValueNotification;
@@ -44,7 +45,7 @@ const CriticalValueAlert: React.FC<CriticalValueAlertProps> = ({
       
       onAcknowledge();
     } catch (error) {
-      console.error('Error acknowledging critical value:', error);
+      uiLogger.error('Error acknowledging critical value:', error);
       unifiedNotificationService.showError(
         'Failed to acknowledge',
         'Please try again or contact support'

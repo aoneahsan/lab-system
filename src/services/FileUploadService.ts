@@ -2,6 +2,7 @@ import { storage, firestore } from '@/config/firebase.config';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject, UploadTask } from 'firebase/storage';
 import { doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/services/logger.service';
 
 export interface UploadOptions {
   folder?: string;
@@ -167,7 +168,7 @@ class FileUploadService {
         await deleteDoc(doc(firestore, firestoreCollection, firestoreId));
       }
     } catch (error) {
-      console.error('Error deleting file:', error);
+      logger.error('Error deleting file:', error);
       throw error;
     }
   }

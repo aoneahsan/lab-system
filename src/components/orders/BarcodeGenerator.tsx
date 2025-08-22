@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Printer, Download } from 'lucide-react';
 import { QRCodeStudio, BarcodeFormat } from 'qrcode-studio';
+import { uiLogger } from '@/services/logger.service';
 
 interface BarcodeGeneratorProps {
   value: string;
@@ -51,7 +52,7 @@ export default function BarcodeGenerator({
         });
         setBarcodeDataUrl(result.dataUrl);
       } catch (err) {
-        console.error('Error generating barcode:', err);
+        uiLogger.error('Error generating barcode:', err);
         setError('Failed to generate barcode');
       }
     };

@@ -7,6 +7,7 @@ import { Capacitor } from '@capacitor/core';
 import BarcodeScanner from '@/components/samples/BarcodeScanner';
 import { sampleService } from '@/services/sample.service';
 import { useTenantStore } from '@/stores/tenant.store';
+import { uiLogger } from '@/services/logger.service';
 
 const SampleScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ const SampleScanPage: React.FC = () => {
       }
     } catch (error) {
       toast.error('Search Error', 'Failed to search for sample');
-      console.error('Sample search error:', error);
+      uiLogger.error('Sample search error:', error);
     } finally {
       setIsSearching(false);
     }

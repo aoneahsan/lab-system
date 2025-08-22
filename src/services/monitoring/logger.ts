@@ -1,4 +1,5 @@
 import { captureException, captureMessage, setContext } from '@sentry/react';
+import { logger } from '@/services/logger.service';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -37,7 +38,7 @@ class Logger {
     // Console output in development
     if (this.isDevelopment) {
       const style = this.getConsoleStyle(level);
-      console.log(
+      logger.log(
         `%c[${level.toUpperCase()}] ${message}`,
         style,
         data || ''

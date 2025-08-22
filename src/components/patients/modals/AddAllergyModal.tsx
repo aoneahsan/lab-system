@@ -7,6 +7,7 @@ import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField'
 import { SelectField } from '@/components/form-fields/SelectField';
 import { DateField } from '@/components/form-fields/DateField';
 import { Controller } from 'react-hook-form';
+import { uiLogger } from '@/services/logger.service';
 
 interface AddAllergyModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export const AddAllergyModal = ({ isOpen, onClose, onSubmit, allergy }: AddAller
       reset();
       onClose();
     } catch (error) {
-      console.error('Error adding allergy:', error);
+      uiLogger.error('Error adding allergy:', error);
     } finally {
       setIsSubmitting(false);
     }

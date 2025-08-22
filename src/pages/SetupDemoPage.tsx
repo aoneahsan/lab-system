@@ -3,6 +3,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/stores/toast.store';
+import { uiLogger } from '@/services/logger.service';
 
 const SetupDemoPage = () => {
   const [isCreating, setIsCreating] = useState(false);
@@ -12,7 +13,7 @@ const SetupDemoPage = () => {
     setIsCreating(true);
 
     try {
-      console.log('🚀 Creating demo tenant...');
+      uiLogger.log('🚀 Creating demo tenant...');
 
       // Create demo tenant
       const tenantId = 'demo';
@@ -63,7 +64,7 @@ const SetupDemoPage = () => {
       toast.success('Demo tenant created!', 'Now you can register with tenant code: DEMO');
       navigate('/register');
     } catch (error) {
-      console.error('❌ Error creating demo tenant:', error);
+      uiLogger.error('❌ Error creating demo tenant:', error);
       toast.error('Setup failed', 'Could not create demo tenant');
     } finally {
       setIsCreating(false);

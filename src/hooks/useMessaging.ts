@@ -3,6 +3,7 @@ import { messagingService } from '@/services/messaging/messagingService';
 import { smsService } from '@/services/messaging/smsService';
 import { emailService } from '@/services/messaging/emailService';
 import { NotificationPreferences } from '@/config/messaging';
+import { logger } from '@/services/logger.service';
 
 export function useMessaging() {
   // Send templated message
@@ -92,7 +93,7 @@ export function useNotificationPreferences(_userId: string) {
     },
     updatePreferences: async (newPreferences: NotificationPreferences) => {
       // Update preferences in database
-      console.log('Updating preferences:', newPreferences);
+      logger.log('Updating preferences:', newPreferences);
     },
   };
 }

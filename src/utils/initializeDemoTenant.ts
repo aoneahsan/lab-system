@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
+import { logger } from '@/services/logger.service';
 
 export const initializeDemoTenant = async () => {
   try {
@@ -7,7 +8,7 @@ export const initializeDemoTenant = async () => {
     const demoDoc = await getDoc(doc(firestore, 'tenants', 'demo'));
 
     if (!demoDoc.exists()) {
-      console.log('Creating DEMO tenant...');
+      logger.log('Creating DEMO tenant...');
 
       // Create DEMO tenant
       await setDoc(doc(firestore, 'tenants', 'demo'), {
@@ -49,10 +50,10 @@ export const initializeDemoTenant = async () => {
         updatedAt: serverTimestamp(),
       });
 
-      console.log('✅ DEMO tenant created successfully');
+      logger.log('✅ DEMO tenant created successfully');
     }
   } catch {
     // Silently fail if no permissions - this is expected for regular users
-    console.log('Could not initialize DEMO tenant - this is normal for non-admin users');
+    logger.log('Could not initialize DEMO tenant - this is normal for non-admin users');
   }
 };

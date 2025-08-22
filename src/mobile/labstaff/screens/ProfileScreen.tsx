@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ export const ProfileScreen: React.FC = () => {
       navigate('/login');
       toast.success('Logged Out', 'You have been logged out successfully');
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
       toast.error('Logout Failed', 'Unable to log out. Please try again.');
     } finally {
       setIsLoggingOut(false);

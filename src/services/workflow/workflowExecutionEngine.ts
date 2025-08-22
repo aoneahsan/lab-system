@@ -1,4 +1,5 @@
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 interface WorkflowStep {
   id: string;
@@ -41,7 +42,7 @@ export class WorkflowExecutionEngine {
       const step = this.steps.get(currentStepId);
 
       if (!step) {
-        console.error(`Step ${currentStepId} not found`);
+        logger.error(`Step ${currentStepId} not found`);
         continue;
       }
 
@@ -58,7 +59,7 @@ export class WorkflowExecutionEngine {
           this.executionStack.push(...step.nextSteps);
         }
       } catch (error) {
-        console.error(`Error executing step ${step.id}:`, error);
+        logger.error(`Error executing step ${step.id}:`, error);
         toast.error('Workflow Error', `Failed to execute step: ${step.name}`);
         throw error;
       }
@@ -89,7 +90,7 @@ export class WorkflowExecutionEngine {
       const func = new Function('data', 'variables', `return ${condition}`);
       return func(this.context.data, this.context.variables);
     } catch (error) {
-      console.error('Error evaluating condition:', error);
+      logger.error('Error evaluating condition:', error);
       return false;
     }
   }
@@ -105,7 +106,7 @@ export class WorkflowExecutionEngine {
       case 'escalate':
         return this.escalate(params);
       default:
-        console.warn(`Unknown action type: ${actionType}`);
+        logger.warn(`Unknown action type: ${actionType}`);
         return null;
     }
   }

@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/services/logger.service';
 
 interface ScanResult {
   cancelled: boolean;
@@ -17,7 +18,7 @@ class BarcodeScannerService {
       const { BarcodeScanner } = await import('@capacitor-community/barcode-scanner');
       return !!(BarcodeScanner);
     } catch (error) {
-      console.log('Barcode scanner plugin not available:', error);
+      logger.log('Barcode scanner plugin not available:', error);
       return false;
     }
   }
@@ -32,7 +33,7 @@ class BarcodeScannerService {
       const status = await BarcodeScanner.checkPermission({ force: true });
       return status.granted;
     } catch (error) {
-      console.error('Failed to request camera permissions:', error);
+      logger.error('Failed to request camera permissions:', error);
       return false;
     }
   }
@@ -68,7 +69,7 @@ class BarcodeScannerService {
         format: result.format
       };
     } catch (error) {
-      console.error('Scan failed:', error);
+      logger.error('Scan failed:', error);
       return { cancelled: true };
     }
   }
@@ -84,7 +85,7 @@ class BarcodeScannerService {
       await BarcodeScanner.showBackground();
       document.body.classList.remove('scanner-active');
     } catch (error) {
-      console.error('Failed to stop scan:', error);
+      logger.error('Failed to stop scan:', error);
     }
   }
 

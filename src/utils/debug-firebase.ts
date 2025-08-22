@@ -1,6 +1,7 @@
 import { collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
+import { logger } from '@/services/logger.service';
 
 // Debug utility to log all Firestore queries
 export const enableFirestoreDebug = () => {
@@ -8,7 +9,7 @@ export const enableFirestoreDebug = () => {
   const originalCollection = collection;
   (window as any).__firestoreCollection = originalCollection;
   (window as any).collection = (...args: any[]) => {
-    console.log('🔥 Firestore Collection:', args[1]);
+    logger.log('🔥 Firestore Collection:', args[1]);
     return originalCollection(...(args as [any, any, ...any[]]));
   };
 
@@ -16,7 +17,7 @@ export const enableFirestoreDebug = () => {
   const originalQuery = query;
   (window as any).__firestoreQuery = originalQuery;
   (window as any).query = (...args: any[]) => {
-    console.log('🔍 Firestore Query:', {
+    logger.log('🔍 Firestore Query:', {
       collection: args[0]?.path || args[0],
       constraints: args.slice(1).map((c: any) => ({
         type: c?.type,
@@ -34,10 +35,10 @@ export const enableFirestoreDebug = () => {
   (window as any).getDocs = async (query: any) => {
     try {
       const result = await originalGetDocs(query);
-      console.log('✅ Query Success:', query?.path || query);
+      logger.log('✅ Query Success:', query?.path || query);
       return result;
     } catch (error: any) {
-      console.error('❌ Query Failed:', {
+      logger.error('❌ Query Failed:', {
         path: query?.path || query,
         error: error.message,
         code: error.code,
@@ -49,19 +50,19 @@ export const enableFirestoreDebug = () => {
 
 // Test all collection permissions for current user
 export const testAllPermissions = async () => {
-  console.log('🧪 Testing Firebase Permissions...');
+  logger.log('🧪 Testing Firebase Permissions...');
 
   const user = auth.currentUser;
   const tenant = useTenantStore.getState().currentTenant;
 
-  console.log('Current User:', {
+  logger.log('Current User:', {
     uid: user?.uid,
     email: user?.email,
     tenantId: tenant?.id,
   });
 
   if (!user || !tenant) {
-    console.error('❌ No user or tenant found');
+    logger.error('❌ No user or tenant found');
     return;
   }
 
@@ -76,17 +77,17 @@ export const testAllPermissions = async () => {
     const tenantUserSnap = await getDocs(tenantUserQuery);
 
     if (tenantUserSnap.empty) {
-      console.error('❌ No tenant_users document found for:', tenantUserDocId);
+      logger.error('❌ No tenant_users document found for:', tenantUserDocId);
     } else {
       const userData = tenantUserSnap.docs[0].data();
-      console.log('✅ Tenant User Found:', {
+      logger.log('✅ Tenant User Found:', {
         docId: tenantUserSnap.docs[0].id,
         role: userData.role,
         isActive: userData.isActive,
       });
     }
   } catch (error: any) {
-    console.error('❌ Failed to check tenant_users:', error.message);
+    logger.error('❌ Failed to check tenant_users:', error.message);
   }
 
   // Test collections
@@ -113,19 +114,19 @@ export const testAllPermissions = async () => {
       const { getCollectionName } = await import('@/config/firebase-collections');
       const fullCollectionName = getCollectionName(collName);
 
-      console.log(`\n📁 Testing: ${fullCollectionName}`);
+      logger.log(`\n📁 Testing: ${fullCollectionName}`);
 
       // Try a simple query
       const testQuery = query(collection(db, fullCollectionName), limit(1));
 
       const snapshot = await getDocs(testQuery);
-      console.log(`✅ ${fullCollectionName}: Access GRANTED (${snapshot.size} docs)`);
+      logger.log(`✅ ${fullCollectionName}: Access GRANTED (${snapshot.size} docs)`);
     } catch (error: any) {
-      console.error(`❌ ${collName}: Access DENIED - ${error.message}`);
+      logger.error(`❌ ${collName}: Access DENIED - ${error.message}`);
     }
   }
 
-  console.log('\n🏁 Permission test complete');
+  logger.log('\n🏁 Permission test complete');
 };
 
 // Log current auth and tenant state
@@ -133,7 +134,7 @@ export const logAuthState = () => {
   const user = auth.currentUser;
   const tenant = useTenantStore.getState().currentTenant;
 
-  console.log('🔐 Auth State:', {
+  logger.log('🔐 Auth State:', {
     user: user
       ? {
           uid: user.uid,
@@ -157,13 +158,13 @@ export const testQuery = async (collectionName: string, constraints: any[] = [])
   try {
     const q = query(collection(db, collectionName), ...constraints);
     const snapshot = await getDocs(q);
-    console.log(`✅ Query successful: ${collectionName}`, {
+    logger.log(`✅ Query successful: ${collectionName}`, {
       docs: snapshot.size,
       empty: snapshot.empty,
     });
     return snapshot;
   } catch (error: any) {
-    console.error(`❌ Query failed: ${collectionName}`, {
+    logger.error(`❌ Query failed: ${collectionName}`, {
       error: error.message,
       code: error.code,
     });
@@ -180,9 +181,9 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     testQuery,
   };
 
-  console.log('🐛 Firebase Debug Mode Available. Use:');
-  console.log('- firebaseDebug.enableDebug() to log all queries');
-  console.log('- firebaseDebug.testPermissions() to test all collections');
-  console.log('- firebaseDebug.logAuthState() to check auth state');
-  console.log('- firebaseDebug.testQuery(collection, [constraints]) to test specific query');
+  logger.log('🐛 Firebase Debug Mode Available. Use:');
+  logger.log('- firebaseDebug.enableDebug() to log all queries');
+  logger.log('- firebaseDebug.testPermissions() to test all collections');
+  logger.log('- firebaseDebug.logAuthState() to check auth state');
+  logger.log('- firebaseDebug.testQuery(collection, [constraints]) to test specific query');
 }

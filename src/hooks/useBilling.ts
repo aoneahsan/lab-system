@@ -3,6 +3,7 @@ import { billingService } from '@/services/billing.service';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 import type {
   Invoice,
   BillingFilter,
@@ -73,7 +74,7 @@ export const useCreateInvoice = () => {
     },
     onError: (error) => {
       toast.error('Failed to create invoice');
-      console.error('Error creating invoice:', error);
+      logger.error('Error creating invoice:', error);
     },
   });
 };
@@ -96,7 +97,7 @@ export const useUpdateInvoice = () => {
     },
     onError: (error) => {
       toast.error('Failed to update invoice');
-      console.error('Error updating invoice:', error);
+      logger.error('Error updating invoice:', error);
     },
   });
 };
@@ -119,7 +120,7 @@ export const useSendInvoice = () => {
     },
     onError: (error) => {
       toast.error('Failed to send invoice');
-      console.error('Error sending invoice:', error);
+      logger.error('Error sending invoice:', error);
     },
   });
 };
@@ -144,7 +145,7 @@ export const useRecordPayment = () => {
     },
     onError: (error) => {
       toast.error('Failed to record payment');
-      console.error('Error recording payment:', error);
+      logger.error('Error recording payment:', error);
     },
   });
 };
@@ -181,7 +182,7 @@ export const useCreateInsuranceClaim = () => {
     },
     onError: (error) => {
       toast.error('Failed to create insurance claim');
-      console.error('Error creating claim:', error);
+      logger.error('Error creating claim:', error);
     },
   });
 };
@@ -204,7 +205,7 @@ export const useSubmitClaim = () => {
     },
     onError: (error) => {
       toast.error('Failed to submit claim');
-      console.error('Error submitting claim:', error);
+      logger.error('Error submitting claim:', error);
     },
   });
 };
@@ -311,7 +312,7 @@ export const useAppealClaim = () => {
     },
     onError: (error) => {
       toast.error('Failed to submit appeal');
-      console.error('Error submitting appeal:', error);
+      logger.error('Error submitting appeal:', error);
     },
   });
 };
@@ -349,7 +350,7 @@ export const useCheckEligibility = () => {
     },
     onError: (error) => {
       toast.error('Failed to check eligibility');
-      console.error('Error checking eligibility:', error);
+      logger.error('Error checking eligibility:', error);
     },
   });
 };

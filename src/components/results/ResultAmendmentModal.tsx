@@ -8,6 +8,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface ResultAmendmentModalProps {
   isOpen: boolean;
@@ -77,7 +78,7 @@ const ResultAmendmentModal: React.FC<ResultAmendmentModalProps> = ({ isOpen, onC
     },
     onError: (error) => {
       toast.error('Amendment Failed', 'Failed to amend the result');
-      console.error('Amendment error:', error);
+      uiLogger.error('Amendment error:', error);
     },
   });
 

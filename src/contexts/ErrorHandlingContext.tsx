@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { captureError } from 'unified-error-handling';
 import { useTracking } from '@/providers/TrackingProvider';
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 export const useErrorHandler = () => {
   const { trackError } = useTracking();
@@ -10,7 +11,7 @@ export const useErrorHandler = () => {
     (error: Error, context?: any) => {
       // Log to console in development
       if (import.meta.env.DEV) {
-        console.error('Error:', error, context);
+        logger.error('Error:', error, context);
       }
 
       // Capture with unified-error-handling
@@ -39,13 +40,13 @@ export const useErrorHandler = () => {
 
   const logWarning = useCallback((message: string, context?: any) => {
     if (import.meta.env.DEV) {
-      console.warn('Warning:', message, context);
+      logger.warn('Warning:', message, context);
     }
   }, []);
 
   const logInfo = useCallback((message: string, context?: any) => {
     if (import.meta.env.DEV) {
-      console.info('Info:', message, context);
+      logger.info('Info:', message, context);
     }
   }, []);
 

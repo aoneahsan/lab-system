@@ -6,6 +6,7 @@
 import { collection, query, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/config/firebase';
 import { useTenantStore } from '@/stores/tenant.store';
+import { logger } from '@/services/logger.service';
 import {
   getFirestoreCollectionName,
   COLLECTION_NAMES,
@@ -14,16 +15,16 @@ import {
 } from '@/config/firebase-collections-helper';
 
 export const runPermissionTests = async () => {
-  console.log('🔍 Starting Firebase Permission Tests...\n');
+  logger.log('🔍 Starting Firebase Permission Tests...\n');
 
   // Check auth state
   const user = auth.currentUser;
   if (!user) {
-    console.error('❌ No user authenticated. Please login first.');
+    logger.error('❌ No user authenticated. Please login first.');
     return;
   }
 
-  console.log('✅ User authenticated:', {
+  logger.log('✅ User authenticated:', {
     uid: user.uid,
     email: user.email,
   });
@@ -31,27 +32,27 @@ export const runPermissionTests = async () => {
   // Check tenant
   const tenant = useTenantStore.getState().currentTenant;
   if (!tenant) {
-    console.error('❌ No tenant selected. Please select a tenant.');
+    logger.error('❌ No tenant selected. Please select a tenant.');
     return;
   }
 
-  console.log('✅ Tenant selected:', {
+  logger.log('✅ Tenant selected:', {
     id: tenant.id,
     name: tenant.name,
   });
 
   // Check tenant_user document
-  console.log('\n📋 Checking tenant_user document...');
+  logger.log('\n📋 Checking tenant_user document...');
   try {
     const tenantUserDocId = `${user.uid}_${tenant.id}`;
     const tenantUserDoc = await getDoc(doc(db, ROOT_COLLECTIONS.TENANT_USERS, tenantUserDocId));
 
     if (!tenantUserDoc.exists()) {
-      console.error(`❌ Tenant user document not found: ${tenantUserDocId}`);
-      console.error('   This is required for accessing tenant-specific collections.');
+      logger.error(`❌ Tenant user document not found: ${tenantUserDocId}`);
+      logger.error('   This is required for accessing tenant-specific collections.');
     } else {
       const data = tenantUserDoc.data();
-      console.log('✅ Tenant user found:', {
+      logger.log('✅ Tenant user found:', {
         docId: tenantUserDocId,
         role: data.role,
         isActive: data.isActive,
@@ -60,35 +61,35 @@ export const runPermissionTests = async () => {
       });
     }
   } catch (error: any) {
-    console.error('❌ Error checking tenant_user:', error.message);
+    logger.error('❌ Error checking tenant_user:', error.message);
   }
 
   // Test root collections
-  console.log('\n📁 Testing ROOT collections...');
+  logger.log('\n📁 Testing ROOT collections...');
   for (const [name, collectionName] of Object.entries(ROOT_COLLECTIONS)) {
     try {
       const q = query(collection(db, collectionName), limit(1));
       await getDocs(q);
-      console.log(`✅ ${name} (${collectionName}): Accessible`);
+      logger.log(`✅ ${name} (${collectionName}): Accessible`);
     } catch (error: any) {
-      console.error(`❌ ${name} (${collectionName}): ${error.message}`);
+      logger.error(`❌ ${name} (${collectionName}): ${error.message}`);
     }
   }
 
   // Test shared collections
-  console.log('\n📁 Testing SHARED collections...');
+  logger.log('\n📁 Testing SHARED collections...');
   for (const [name, collectionName] of Object.entries(SHARED_COLLECTIONS)) {
     try {
       const q = query(collection(db, collectionName), limit(1));
       await getDocs(q);
-      console.log(`✅ ${name} (${collectionName}): Accessible`);
+      logger.log(`✅ ${name} (${collectionName}): Accessible`);
     } catch (error: any) {
-      console.error(`❌ ${name} (${collectionName}): ${error.message}`);
+      logger.error(`❌ ${name} (${collectionName}): ${error.message}`);
     }
   }
 
   // Test tenant-specific collections
-  console.log('\n📁 Testing TENANT-SPECIFIC collections...');
+  logger.log('\n📁 Testing TENANT-SPECIFIC collections...');
   const criticalCollections = [
     'PATIENTS',
     'TESTS',
@@ -105,30 +106,30 @@ export const runPermissionTests = async () => {
 
     try {
       const fullCollectionName = getFirestoreCollectionName(collectionName, tenant.id);
-      console.log(`\n   Testing ${collectionKey}...`);
-      console.log(`   Collection name: ${fullCollectionName}`);
+      logger.log(`\n   Testing ${collectionKey}...`);
+      logger.log(`   Collection name: ${fullCollectionName}`);
 
       const q = query(collection(db, fullCollectionName), limit(1));
       const snapshot = await getDocs(q);
 
-      console.log(`   ✅ ${collectionKey}: Access GRANTED (${snapshot.size} docs found)`);
+      logger.log(`   ✅ ${collectionKey}: Access GRANTED (${snapshot.size} docs found)`);
     } catch (error: any) {
-      console.error(`   ❌ ${collectionKey}: Access DENIED`);
-      console.error(`      Error: ${error.message}`);
-      console.error(`      Code: ${error.code}`);
+      logger.error(`   ❌ ${collectionKey}: Access DENIED`);
+      logger.error(`      Error: ${error.message}`);
+      logger.error(`      Code: ${error.code}`);
     }
   }
 
-  console.log('\n✅ Permission test complete!');
-  console.log('\n💡 If you see "Missing or insufficient permissions" errors:');
-  console.log('   1. Ensure the tenant_users document exists with your user ID and tenant ID');
-  console.log('   2. Check that your role in tenant_users has the required permissions');
-  console.log('   3. Verify the collection name format is: labflow_{tenantId}_{collection}');
-  console.log('   4. Make sure Firebase rules and indexes are deployed');
+  logger.log('\n✅ Permission test complete!');
+  logger.log('\n💡 If you see "Missing or insufficient permissions" errors:');
+  logger.log('   1. Ensure the tenant_users document exists with your user ID and tenant ID');
+  logger.log('   2. Check that your role in tenant_users has the required permissions');
+  logger.log('   3. Verify the collection name format is: labflow_{tenantId}_{collection}');
+  logger.log('   4. Make sure Firebase rules and indexes are deployed');
 };
 
 // Make it available globally
 if (typeof window !== 'undefined') {
   (window as any).testFirebasePermissions = runPermissionTests;
-  console.log('💡 Run testFirebasePermissions() to test Firebase permissions');
+  logger.log('💡 Run testFirebasePermissions() to test Firebase permissions');
 }

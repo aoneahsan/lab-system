@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BeakerIcon, CloudArrowUpIcon } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/stores/auth.store';
 import { unifiedStorage, STORAGE_KEYS } from '@/services/unified-storage.service';
+import { uiLogger } from '@/services/logger.service';
 
 const DemoDataLoader: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +35,7 @@ const DemoDataLoader: React.FC = () => {
 
       setStatus('Demo data loaded successfully! Refresh the page to see the data.');
     } catch (error) {
-      console.error('Error loading demo data:', error);
+      uiLogger.error('Error loading demo data:', error);
       setStatus('Error loading demo data. Please run "yarn generate:demo" first.');
     } finally {
       setIsLoading(false);

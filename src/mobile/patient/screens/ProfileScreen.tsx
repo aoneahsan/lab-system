@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { biometricAuth } from '@/services/biometric-auth.service';
 import { modalService } from '@/services/modal.service';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/services/logger.service';
 
 export const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export const ProfileScreen: React.FC = () => {
         setBiometricEnabled(enabled);
       }
     } catch (error) {
-      console.error('Error checking biometric status:', error);
+      logger.error('Error checking biometric status:', error);
     }
   };
 
@@ -65,7 +66,7 @@ export const ProfileScreen: React.FC = () => {
       }
     } catch (error) {
       toast.error('Failed to update biometric settings');
-      console.error('Biometric toggle error:', error);
+      logger.error('Biometric toggle error:', error);
     }
   };
 

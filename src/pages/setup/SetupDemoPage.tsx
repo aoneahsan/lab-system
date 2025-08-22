@@ -4,6 +4,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
 import { Building2, CheckCircle, Loader2 } from 'lucide-react';
+import { uiLogger } from '@/services/logger.service';
 
 const SetupDemoPage: React.FC = () => {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const SetupDemoPage: React.FC = () => {
       setCreatedCode(demoCode);
       toast.success('Demo Created', `Your demo laboratory code is: ${demoCode}`);
     } catch (error) {
-      console.error('Error creating demo tenant:', error);
+      uiLogger.error('Error creating demo tenant:', error);
       toast.error('Setup Failed', 'Failed to create demo laboratory');
     } finally {
       setIsCreating(false);

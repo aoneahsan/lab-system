@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { voiceDictationService, VoiceDictationOptions } from '@/services/voice-dictation.service';
 import { toast } from 'sonner';
+import { logger } from '@/services/logger.service';
 
 interface UseVoiceDictationOptions extends Omit<VoiceDictationOptions, 'onResult' | 'onError' | 'onEnd'> {
   onTranscript?: (transcript: string, isFinal: boolean) => void;
@@ -68,7 +69,7 @@ export const useVoiceDictation = (options: UseVoiceDictationOptions = {}): UseVo
   }, [options]);
 
   const handleError = useCallback((error: any) => {
-    console.error('Voice dictation error:', error);
+    logger.error('Voice dictation error:', error);
     setIsListening(false);
     
     let errorMessage = 'Voice dictation error';
@@ -131,7 +132,7 @@ export const useVoiceDictation = (options: UseVoiceDictationOptions = {}): UseVo
       setInterimTranscript('');
       toast.info('Voice dictation stopped');
     } catch (error) {
-      console.error('Error stopping voice dictation:', error);
+      logger.error('Error stopping voice dictation:', error);
     }
   }, [isListening]);
 

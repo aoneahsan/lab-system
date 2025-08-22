@@ -1,5 +1,6 @@
 import { Network } from '@capacitor/network';
 import { offlineDbService } from './offline-db.service';
+import { logger } from '@/services/logger.service';
 
 export interface OfflineAwareOptions {
   collection: string;
@@ -62,7 +63,7 @@ class OfflineAwareService {
 
         return result;
       } catch (error) {
-        console.error('Online create failed, queuing for offline sync:', error);
+        logger.error('Online create failed, queuing for offline sync:', error);
         // Fall through to offline handling
       }
     }
@@ -105,7 +106,7 @@ class OfflineAwareService {
 
         return result;
       } catch (error) {
-        console.error('Online read failed, using cached data:', error);
+        logger.error('Online read failed, using cached data:', error);
         // Fall through to offline handling
       }
     }
@@ -137,7 +138,7 @@ class OfflineAwareService {
 
         return;
       } catch (error) {
-        console.error('Online update failed, queuing for offline sync:', error);
+        logger.error('Online update failed, queuing for offline sync:', error);
         // Fall through to offline handling
       }
     }
@@ -171,7 +172,7 @@ class OfflineAwareService {
 
         return;
       } catch (error) {
-        console.error('Online delete failed, queuing for offline sync:', error);
+        logger.error('Online delete failed, queuing for offline sync:', error);
         // Fall through to offline handling
       }
     }
@@ -195,7 +196,7 @@ class OfflineAwareService {
         const result = await this.execute(operation);
         results.push(result);
       } catch (error) {
-        console.error('Batch operation failed:', error);
+        logger.error('Batch operation failed:', error);
         results.push({ error: error });
       }
     }

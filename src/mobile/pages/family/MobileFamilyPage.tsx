@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Users, UserPlus, Phone, Calendar, ChevronRight, Mail, Heart, Edit, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { uiLogger } from '@/services/logger.service';
 
 interface FamilyMember {
   id: string;
@@ -89,23 +90,23 @@ const MobileFamilyPage: React.FC = () => {
 
   const handleAddMember = () => {
     // In production, this would navigate to add member form
-    console.log('Add family member');
+    uiLogger.log('Add family member');
     setShowAddMember(false);
   };
 
   const handleEditMember = (member: FamilyMember) => {
     // In production, this would navigate to edit form
-    console.log('Edit member:', member.id);
+    uiLogger.log('Edit member:', member.id);
   };
 
   const handleRemoveMember = (member: FamilyMember) => {
     // In production, this would show confirmation and remove
-    console.log('Remove member:', member.id);
+    uiLogger.log('Remove member:', member.id);
   };
 
   const handleToggleAccess = (member: FamilyMember) => {
     // In production, this would update access permissions
-    console.log('Toggle access for:', member.id);
+    uiLogger.log('Toggle access for:', member.id);
   };
 
   return (

@@ -8,6 +8,7 @@ import { PatientEditForm } from '@/components/patients/PatientEditForm';
 import type { UpdatePatientData } from '@/types/patient.types';
 import PageHeader from '@/components/common/PageHeader';
 import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
+import { uiLogger } from '@/services/logger.service';
 
 const PatientEditPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -42,7 +43,7 @@ const PatientEditPage = () => {
       toast.success('Patient Updated', 'Patient information has been updated successfully');
       navigate(`/patients/${patientId}`);
     } catch (error) {
-      console.error('Error updating patient:', error);
+      uiLogger.error('Error updating patient:', error);
       toast.error('Update Failed', 'Unable to update patient information');
     } finally {
       setIsSubmitting(false);

@@ -1,5 +1,6 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { firestore } from '../config/firebase.config';
+import { logger } from '@/services/logger.service';
 
 // This script creates a demo tenant that users can use immediately
 // Run this once to set up the demo tenant in Firestore
@@ -47,9 +48,9 @@ export const createDemoTenant = async () => {
       updatedAt: new Date(),
     });
 
-    console.log('Demo tenant created successfully with code: DEMO');
+    logger.log('Demo tenant created successfully with code: DEMO');
   } catch (error) {
-    console.error('Error creating demo tenant:', error);
+    logger.error('Error creating demo tenant:', error);
   }
 };
 

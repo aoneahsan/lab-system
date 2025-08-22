@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, Mail, Calendar, Shield, ChevronRight, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth.store';
+import { logger } from '@/services/logger.service';
 
 const ProfileScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const ProfileScreen: React.FC = () => {
       await logout();
       navigate('/login');
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
     }
   };
 

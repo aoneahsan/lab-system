@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/stores/toast.store';
+import { uiLogger } from '@/services/logger.service';
 
 interface BiometricLockProps {
   onSuccess: () => void;
@@ -34,7 +35,7 @@ export const BiometricLock: React.FC<BiometricLockProps> = ({
         setBiometricType(biometryType === 'face' ? 'face' : 'fingerprint');
       }
     } catch (error) {
-      console.error('Biometric check failed:', error);
+      uiLogger.error('Biometric check failed:', error);
       setBiometricType('none');
     }
   };
@@ -64,7 +65,7 @@ export const BiometricLock: React.FC<BiometricLockProps> = ({
         toast.error('Authentication Failed', 'Please try again');
       }
     } catch (error) {
-      console.error('Biometric authentication failed:', error);
+      uiLogger.error('Biometric authentication failed:', error);
       toast.error('Authentication Error', 'Unable to authenticate');
     } finally {
       setIsAuthenticating(false);

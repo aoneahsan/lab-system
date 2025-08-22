@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
+import { uiLogger } from '@/services/logger.service';
 // import { COLLECTIONS } from '@/config/firebase-collections';
 
 const InitializeDemoTenant = () => {
@@ -11,7 +12,7 @@ const InitializeDemoTenant = () => {
     const initializeDemoTenant = async () => {
       try {
         if (!firestore) {
-          console.warn('Firestore not initialized yet');
+          uiLogger.warn('Firestore not initialized yet');
           return;
         }
         
@@ -83,7 +84,7 @@ const InitializeDemoTenant = () => {
             updatedAt: new Date(),
           });
 
-          console.log('DEMO tenant created successfully');
+          uiLogger.log('DEMO tenant created successfully');
 
           // Create demo insurance providers
           const providersRef = collection(firestore, 'demo_insurance_providers');
@@ -260,15 +261,15 @@ const InitializeDemoTenant = () => {
               await setDoc(doc(collection(firestore, 'demo_insurance_providers')), provider);
             }
 
-            console.log('Demo insurance providers created successfully');
+            uiLogger.log('Demo insurance providers created successfully');
           }
         }
 
         // Mark as initialized for this session
         sessionStorage.setItem('demo-tenant-initialized', 'true');
-        console.log('Demo tenant initialization completed');
+        uiLogger.log('Demo tenant initialization completed');
       } catch (error) {
-        console.error('Error initializing DEMO tenant:', error);
+        uiLogger.error('Error initializing DEMO tenant:', error);
       }
     };
 

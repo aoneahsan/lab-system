@@ -8,6 +8,7 @@ import { twoFactorAuthService } from '@/services/two-factor-auth.service';
 import { subscriptionService } from '@/services/subscription.service';
 import { modalService } from '@/services/modal.service';
 import type { TwoFactorMethod, UserTwoFactorPermissions, TwoFactorSetupData } from '@/types/two-factor.types';
+import { uiLogger } from '@/services/logger.service';
 
 const TwoFactorAuthPage: React.FC = () => {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ const TwoFactorAuthPage: React.FC = () => {
             setSetupData(setup);
           }
         } catch (error) {
-          console.error('Error initializing from URL:', error);
+          uiLogger.error('Error initializing from URL:', error);
         } finally {
           setIsLoading(false);
         }

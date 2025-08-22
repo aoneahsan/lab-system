@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/services/logger.service';
 
 // Mock implementation for web, real implementation for mobile
 const BiometricAuthentication = {
@@ -10,7 +11,7 @@ const BiometricAuthentication = {
         const result = await BiometricAuth.isAvailable();
         return { isAvailable: result };
       } catch (error) {
-        console.log('Biometric plugin not available:', error);
+        logger.log('Biometric plugin not available:', error);
         return { isAvailable: false };
       }
     }
@@ -50,7 +51,7 @@ const BiometricAuthentication = {
         });
         return true;
       } catch (error) {
-        console.error('Failed to enable biometric auth:', error);
+        logger.error('Failed to enable biometric auth:', error);
         return false;
       }
     }
@@ -90,7 +91,7 @@ const BiometricAuthentication = {
         const { Preferences } = await import('@capacitor/preferences');
         await Preferences.remove({ key: 'biometric_credentials' });
       } catch (error) {
-        console.error('Failed to disable biometric auth:', error);
+        logger.error('Failed to disable biometric auth:', error);
       }
     } else {
       // Web fallback
@@ -105,7 +106,7 @@ class BiometricAuthService {
       const result = await BiometricAuthentication.isAvailable();
       return result.isAvailable;
     } catch (error) {
-      console.error('Error checking biometric availability:', error);
+      logger.error('Error checking biometric availability:', error);
       return false;
     }
   }
@@ -137,7 +138,7 @@ class BiometricAuthService {
       // Store credentials securely
       return await BiometricAuthentication.enableBiometric({ email, password });
     } catch (error) {
-      console.error('Failed to enable biometric auth:', error);
+      logger.error('Failed to enable biometric auth:', error);
       return false;
     }
   }

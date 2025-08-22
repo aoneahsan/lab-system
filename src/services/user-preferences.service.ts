@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { HotkeyConfig } from './hotkeys.service';
+import { logger } from '@/services/logger.service';
 
 export interface UserPreferencesExtended {
   theme: 'light' | 'dark' | 'system';
@@ -73,7 +74,7 @@ class UserPreferencesService {
         this.cache.set(userId, defaultPrefs);
         return defaultPrefs;
       }
-      console.error('Error fetching user preferences:', error);
+      logger.error('Error fetching user preferences:', error);
       return null;
     }
   }
@@ -107,7 +108,7 @@ class UserPreferencesService {
       // Sync to localStorage for offline support
       this.syncToLocalStorage(userId, preferences);
     } catch (error) {
-      console.error('Error updating user preferences:', error);
+      logger.error('Error updating user preferences:', error);
       throw error;
     }
   }
@@ -184,7 +185,7 @@ class UserPreferencesService {
       const updated = { ...current, ...preferences };
       localStorage.setItem(key, JSON.stringify(updated));
     } catch (error) {
-      console.error('Error syncing to localStorage:', error);
+      logger.error('Error syncing to localStorage:', error);
     }
   }
 
@@ -199,7 +200,7 @@ class UserPreferencesService {
       }
       return null;
     } catch (error) {
-      console.error('Error loading from localStorage:', error);
+      logger.error('Error loading from localStorage:', error);
       return null;
     }
   }

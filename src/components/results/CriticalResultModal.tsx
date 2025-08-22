@@ -6,6 +6,7 @@ import { doc, updateDoc, serverTimestamp, addDoc, collection } from 'firebase/fi
 import { firestore } from '@/config/firebase.config';
 // import { useTenant } from '@/hooks/useTenant';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { uiLogger } from '@/services/logger.service';
 
 interface CriticalResultModalProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ const CriticalResultModal: React.FC<CriticalResultModalProps> = ({ isOpen, onClo
       );
       onClose();
     } catch (error) {
-      console.error('Error recording critical notification:', error);
+      uiLogger.error('Error recording critical notification:', error);
       toast.error('Notification Failed', 'Failed to record critical value notification');
     } finally {
       setIsSubmitting(false);

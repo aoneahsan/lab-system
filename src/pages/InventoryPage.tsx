@@ -10,6 +10,7 @@ import { InventoryItemForm } from '@/components/inventory/InventoryItemForm';
 import { StockTransactionForm } from '@/components/inventory/StockTransactionForm';
 import { InventoryAlerts } from '@/components/inventory/InventoryAlerts';
 import { InventoryStats } from '@/components/inventory/InventoryStats';
+import { uiLogger } from '@/services/logger.service';
 import {
   useInventoryItems,
   useCreateInventoryItem,
@@ -113,7 +114,7 @@ export default function InventoryPage() {
       toast.success('Export Complete', 'Inventory data exported successfully');
     } catch (error) {
       toast.error('Export Failed', 'Unable to export inventory data');
-      console.error('Export error:', error);
+      uiLogger.error('Export error:', error);
     }
   };
 
@@ -140,7 +141,7 @@ export default function InventoryPage() {
             }, 2000);
           } catch (error) {
             toast.error('Import Failed', 'Unable to parse CSV file');
-            console.error('Import error:', error);
+            uiLogger.error('Import error:', error);
           }
         };
         reader.readAsText(file);

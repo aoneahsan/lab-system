@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, X, AlertCircle } from 'lucide-react';
 import { QRScanner } from 'code-craft-studio';
+import { logger } from '@/services/logger.service';
 
 const ScanScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const ScanScreen: React.FC = () => {
 
   const handleScanResult = (content: string) => {
     // Parse the barcode content and navigate to appropriate screen
-    console.log('Scanned:', content);
+    logger.log('Scanned:', content);
     setScanError(null);
     setIsScanning(false);
 

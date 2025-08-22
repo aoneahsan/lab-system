@@ -3,6 +3,7 @@ import { sampleService } from '@/services/sample.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { useTenant } from '@/hooks/useTenant';
 import type { Sample, SampleCollection } from '@/types/sample.types';
+import { logger } from '@/services/logger.service';
 
 interface SampleStore {
   samples: Sample[];
@@ -213,7 +214,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       const { tenant } = useTenant.getState();
       
       if (!currentUser || !tenant) {
-        console.warn('Cannot fetch sample: missing auth or tenant context');
+        logger.warn('Cannot fetch sample: missing auth or tenant context');
         return null;
       }
 
@@ -226,7 +227,7 @@ export const useSampleStore = create<SampleStore>((set, get) => ({
       }
       return fetchedSample;
     } catch (error) {
-      console.error('Error fetching sample by barcode:', error);
+      logger.error('Error fetching sample by barcode:', error);
       return null;
     }
   },

@@ -10,6 +10,7 @@ import type {
   EMRMessageFilter,
 } from '@/types/emr.types';
 import type { FHIRServiceRequest, FHIRDiagnosticReport } from '@/services/fhir.service';
+import { logger } from '@/services/logger.service';
 
 // Query keys
 const EMR_KEYS = {
@@ -71,7 +72,7 @@ export const useCreateEMRConnection = () => {
     },
     onError: (error) => {
       toast.error('Failed to create EMR connection');
-      console.error('Error creating EMR connection:', error);
+      logger.error('Error creating EMR connection:', error);
     },
   });
 };
@@ -104,7 +105,7 @@ export const useUpdateEMRConnection = () => {
     },
     onError: (error) => {
       toast.error('Failed to update EMR connection');
-      console.error('Error updating EMR connection:', error);
+      logger.error('Error updating EMR connection:', error);
     },
   });
 };
@@ -124,7 +125,7 @@ export const useDeleteEMRConnection = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete EMR connection');
-      console.error('Error deleting EMR connection:', error);
+      logger.error('Error deleting EMR connection:', error);
     },
   });
 };
@@ -144,7 +145,7 @@ export const useTestEMRConnection = () => {
     },
     onError: (error) => {
       toast.error('Connection test failed');
-      console.error('Error testing connection:', error);
+      logger.error('Error testing connection:', error);
     },
   });
 };
@@ -185,7 +186,7 @@ export const useSyncFHIRPatient = () => {
     },
     onError: (error) => {
       toast.error('Failed to sync patient');
-      console.error('Error syncing patient:', error);
+      logger.error('Error syncing patient:', error);
     },
   });
 };
@@ -210,7 +211,7 @@ export const useCreateFHIRLabOrder = () => {
     },
     onError: (error) => {
       toast.error('Failed to create lab order');
-      console.error('Error creating lab order:', error);
+      logger.error('Error creating lab order:', error);
     },
   });
 };
@@ -248,7 +249,7 @@ export const useSendFHIRResults = () => {
     },
     onError: (error) => {
       toast.error('Failed to send lab results');
-      console.error('Error sending lab results:', error);
+      logger.error('Error sending lab results:', error);
     },
   });
 };
@@ -286,7 +287,7 @@ export const useCreateWebhookEndpoint = () => {
     },
     onError: (error) => {
       toast.error('Failed to create webhook endpoint');
-      console.error('Error creating webhook endpoint:', error);
+      logger.error('Error creating webhook endpoint:', error);
     },
   });
 };
@@ -302,7 +303,7 @@ export const useTestWebhook = () => {
     },
     onError: (error) => {
       toast.error('Webhook test failed');
-      console.error('Error testing webhook:', error);
+      logger.error('Error testing webhook:', error);
     },
   });
 };
@@ -323,7 +324,7 @@ export const useProcessEMRMessage = () => {
     },
     onError: (error) => {
       toast.error('Failed to process message');
-      console.error('Error processing message:', error);
+      logger.error('Error processing message:', error);
     },
   });
 };

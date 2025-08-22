@@ -1,6 +1,7 @@
 import { collection, doc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { COLLECTIONS } from '@/config/firebase-collections';
+import { logger } from '@/services/logger.service';
 import type {
   EMRConnection,
   FHIRAuthConfig,
@@ -235,7 +236,7 @@ class FHIRService {
 
       return `Bearer ${token}`;
     } catch (error) {
-      console.error('OAuth2 authentication failed:', error);
+      logger.error('OAuth2 authentication failed:', error);
       throw error;
     }
   }
@@ -344,7 +345,7 @@ class FHIRService {
       );
       await setDoc(doc(messagesRef), message);
     } catch (error) {
-      console.error('Failed to sync patient:', error);
+      logger.error('Failed to sync patient:', error);
       throw error;
     }
   }
@@ -388,7 +389,7 @@ class FHIRService {
 
       return createdOrder.id!;
     } catch (error) {
-      console.error('Failed to create lab order:', error);
+      logger.error('Failed to create lab order:', error);
       throw error;
     }
   }
@@ -450,7 +451,7 @@ class FHIRService {
       );
       await setDoc(doc(messagesRef), message);
     } catch (error) {
-      console.error('Failed to send lab results:', error);
+      logger.error('Failed to send lab results:', error);
       throw error;
     }
   }

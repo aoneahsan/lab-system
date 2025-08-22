@@ -9,6 +9,7 @@ import { useOfflineStore } from '@/mobile/stores/offline.store';
 import { Network } from '@capacitor/network';
 import { toast } from '@/hooks/useToast';
 import { EmailField, PasswordField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email'),
@@ -49,7 +50,7 @@ const PhlebotomistLoginPage: React.FC = () => {
         toast.info(status.connected ? 'Back online' : 'Working offline');
       });
     } catch (_error) {
-      console.error('Failed to initialize offline support:', _error);
+      uiLogger.error('Failed to initialize offline support:', _error);
     }
     };
     

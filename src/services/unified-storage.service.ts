@@ -1,5 +1,6 @@
 import { storage } from 'strata-storage';
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/services/logger.service';
 
 export interface StorageConfig {
   encryption?: boolean;
@@ -18,7 +19,7 @@ class UnifiedStorageService {
 
   constructor() {
     // Strata-storage has zero configuration - works immediately
-    console.log('UnifiedStorageService initialized with strata-storage');
+    logger.log('UnifiedStorageService initialized with strata-storage');
   }
 
   async initialize(): Promise<void> {
@@ -33,16 +34,16 @@ class UnifiedStorageService {
         try {
           const { registerCapacitorAdapters } = await import('strata-storage/capacitor');
           await registerCapacitorAdapters(storage);
-          console.log('Capacitor storage adapters registered');
+          logger.log('Capacitor storage adapters registered');
         } catch (error) {
-          console.warn('Failed to register Capacitor adapters:', error);
+          logger.warn('Failed to register Capacitor adapters:', error);
         }
       }
 
       this.initialized = true;
-      console.log(`Storage initialized for ${isNative ? 'native' : 'web'} platform`);
+      logger.log(`Storage initialized for ${isNative ? 'native' : 'web'} platform`);
     } catch (error) {
-      console.error('Storage initialization error:', error);
+      logger.error('Storage initialization error:', error);
       this.initialized = true; // Mark as initialized even if there's an error
     }
   }
@@ -65,7 +66,7 @@ class UnifiedStorageService {
         tags: config?.tags
       });
     } catch (error) {
-      console.error(`Error setting storage key ${key}:`, error);
+      logger.error(`Error setting storage key ${key}:`, error);
       // Try memory storage as last resort
       try {
         await storage.set(prefixedKey, value, {
@@ -74,7 +75,7 @@ class UnifiedStorageService {
           tags: config?.tags
         });
       } catch (memoryError) {
-        console.error('Failed to store in memory:', memoryError);
+        logger.error('Failed to store in memory:', memoryError);
         throw error;
       }
     }
@@ -88,7 +89,7 @@ class UnifiedStorageService {
       const value = await storage.get<T>(prefixedKey);
       return value ?? null;
     } catch (error) {
-      console.error(`Error getting storage key ${key}:`, error);
+      logger.error(`Error getting storage key ${key}:`, error);
       return null;
     }
   }
@@ -100,7 +101,7 @@ class UnifiedStorageService {
     try {
       await storage.remove(prefixedKey);
     } catch (error) {
-      console.error(`Error removing storage key ${key}:`, error);
+      logger.error(`Error removing storage key ${key}:`, error);
     }
   }
 
@@ -117,7 +118,7 @@ class UnifiedStorageService {
         await storage.remove(key);
       }
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      logger.error('Error clearing storage:', error);
     }
   }
 
@@ -131,7 +132,7 @@ class UnifiedStorageService {
         .filter(key => key.startsWith(this.projectPrefix))
         .map(key => key.replace(`${this.projectPrefix}_`, ''));
     } catch (error) {
-      console.error('Error getting storage keys:', error);
+      logger.error('Error getting storage keys:', error);
       return [];
     }
   }
@@ -143,7 +144,7 @@ class UnifiedStorageService {
     try {
       return await storage.has(prefixedKey);
     } catch (error) {
-      console.error(`Error checking storage key ${key}:`, error);
+      logger.error(`Error checking storage key ${key}:`, error);
       return false;
     }
   }
@@ -202,7 +203,7 @@ class UnifiedStorageService {
       
       return results;
     } catch (error) {
-      console.error('Error querying storage:', error);
+      logger.error('Error querying storage:', error);
       return [];
     }
   }

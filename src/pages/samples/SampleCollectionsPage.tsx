@@ -11,6 +11,7 @@ import { COLLECTIONS } from '@/config/firebase-collections';
 import BatchCollectionModal from '@/components/samples/BatchCollectionModal';
 import BatchBarcodesPrint from '@/components/samples/BatchBarcodesPrint';
 import type { SampleFormData, Sample, CollectionBatch } from '@/types/sample.types';
+import { uiLogger } from '@/services/logger.service';
 
 const SampleCollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const SampleCollectionsPage: React.FC = () => {
           }
           created++;
         } catch (error) {
-          console.error('Error creating sample:', error);
+          uiLogger.error('Error creating sample:', error);
         }
       }
 

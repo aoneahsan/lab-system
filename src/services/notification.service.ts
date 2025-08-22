@@ -1,6 +1,7 @@
 import { functions } from '@/config/firebase.config';
 import { httpsCallable } from 'firebase/functions';
 import type { NotificationChannel, NotificationTemplate } from '@/types/notification.types';
+import { logger } from '@/services/logger.service';
 
 interface CriticalResultNotificationData {
   method: 'phone' | 'sms' | 'email';
@@ -44,7 +45,7 @@ class NotificationService {
 
       return result.data;
     } catch (error) {
-      console.error('Failed to send notification:', error);
+      logger.error('Failed to send notification:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to send notification',
@@ -99,7 +100,7 @@ class NotificationService {
       const result = await sendBulkNotifications({ notifications });
       return result.data.results;
     } catch (error) {
-      console.error('Failed to send bulk notifications:', error);
+      logger.error('Failed to send bulk notifications:', error);
       return notifications.map(() => ({
         success: false,
         error: 'Failed to send notification',

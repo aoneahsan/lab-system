@@ -18,6 +18,7 @@ import AdvancedFeaturesPage from './AdvancedFeaturesPage';
 import { PermissionManagementPage } from './PermissionManagementPage';
 import type { User } from '@/types/auth.types';
 import { TextField, SelectField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 interface AdminUser {
   id: string;
@@ -121,7 +122,7 @@ const AdminPanel = () => {
       setUsers(usersData);
     } catch (error) {
       toast.error('Failed to load users', 'Unable to fetch user data');
-      console.error('Error fetching users:', error);
+      uiLogger.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
@@ -142,7 +143,7 @@ const AdminPanel = () => {
       setTenants(tenantsData);
     } catch (error) {
       toast.error('Failed to load tenants', 'Unable to fetch tenant data');
-      console.error('Error fetching tenants:', error);
+      uiLogger.error('Error fetching tenants:', error);
     } finally {
       setLoading(false);
     }
@@ -195,7 +196,7 @@ const AdminPanel = () => {
           }
         } catch (error) {
           // Skip tenant if no access or error
-          console.warn(`Unable to fetch revenue data for tenant ${tenant.id}:`, error);
+          uiLogger.warn(`Unable to fetch revenue data for tenant ${tenant.id}:`, error);
         }
       }
 
@@ -207,7 +208,7 @@ const AdminPanel = () => {
       });
     } catch (error) {
       toast.error('Failed to load revenue data', 'Unable to fetch financial information');
-      console.error('Error fetching revenue data:', error);
+      uiLogger.error('Error fetching revenue data:', error);
     } finally {
       setLoading(false);
     }
@@ -231,7 +232,7 @@ const AdminPanel = () => {
       );
     } catch (error) {
       toast.error('Update failed', 'Unable to update user status');
-      console.error('Error updating user:', error);
+      uiLogger.error('Error updating user:', error);
     } finally {
       setUpdating(null);
     }
@@ -255,7 +256,7 @@ const AdminPanel = () => {
       );
     } catch (error) {
       toast.error('Update failed', 'Unable to update tenant status');
-      console.error('Error updating tenant:', error);
+      uiLogger.error('Error updating tenant:', error);
     } finally {
       setUpdating(null);
     }

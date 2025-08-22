@@ -2,6 +2,7 @@ import { api } from './api';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import { logger } from '@/services/logger.service';
 import 'jspdf-autotable';
 
 export interface ExportOptions {
@@ -46,7 +47,7 @@ class DataExportService {
           break;
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', error);
       throw error;
     }
   }
@@ -78,7 +79,7 @@ class DataExportService {
 
       return results;
     } catch (error) {
-      console.error('Import failed:', error);
+      logger.error('Import failed:', error);
       throw error;
     }
   }

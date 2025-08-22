@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import { logger } from '@/services/logger.service';
 
 interface TrackingContextType {
   trackEvent: (eventName: string, properties?: any) => Promise<void>;
@@ -9,16 +10,16 @@ interface TrackingContextType {
 
 const trackingInstance = {
   trackEvent: async (eventName: string, properties?: any) => {
-    console.log('Event tracked:', eventName, properties);
+    logger.log('Event tracked:', eventName, properties);
   },
   trackPageView: async (pageName?: string, properties?: any) => {
-    console.log('Page view tracked:', pageName, properties);
+    logger.log('Page view tracked:', pageName, properties);
   },
   setUser: async (userId: string, traits?: any) => {
-    console.log('User set:', userId, traits);
+    logger.log('User set:', userId, traits);
   },
   clearUser: async () => {
-    console.log('User cleared');
+    logger.log('User cleared');
   }
 };
 

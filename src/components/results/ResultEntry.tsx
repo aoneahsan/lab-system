@@ -3,6 +3,7 @@ import { Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { useResultStore } from '@/stores/result.store';
 import { useAuthStore } from '@/stores/auth.store';
 import type { ResultEntryTest } from '@/types/result.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface ResultEntryProps {
   orderId: string;
@@ -66,7 +67,7 @@ export default function ResultEntry({ orderId, sampleId, tests }: ResultEntryPro
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error saving results:', error);
+      uiLogger.error('Error saving results:', error);
     }
   };
 

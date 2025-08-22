@@ -20,6 +20,7 @@ import { firestore } from '@/config/firebase.config';
 import { getFirestoreCollectionName, COLLECTION_NAMES } from '@/config/firebase-collections-helper';
 import { webhookService } from '@/services/webhook.service';
 import { trackingInstance } from '@/providers/TrackingProvider';
+import { logger } from '@/services/logger.service';
 import type {
   Patient,
   CreatePatientData,
@@ -208,7 +209,7 @@ class PatientService {
           },
         });
       } catch (webhookError) {
-        console.error('Error triggering webhook:', webhookError);
+        logger.error('Error triggering webhook:', webhookError);
         // Don't fail the patient creation if webhook fails
       }
 
@@ -233,7 +234,7 @@ class PatientService {
         error: (error as Error).message,
         duration: Date.now() - startTime,
       });
-      console.error('Error creating patient:', error);
+      logger.error('Error creating patient:', error);
       throw error;
     }
   }
@@ -275,7 +276,7 @@ class PatientService {
           },
         });
       } catch (webhookError) {
-        console.error('Error triggering webhook:', webhookError);
+        logger.error('Error triggering webhook:', webhookError);
         // Don't fail the patient update if webhook fails
       }
 
@@ -300,7 +301,7 @@ class PatientService {
         error: (error as Error).message,
         duration: Date.now() - startTime,
       });
-      console.error('Error updating patient:', error);
+      logger.error('Error updating patient:', error);
       throw error;
     }
   }
@@ -320,7 +321,7 @@ class PatientService {
         ...docSnap.data(),
       });
     } catch (error) {
-      console.error('Error fetching patient:', error);
+      logger.error('Error fetching patient:', error);
       throw error;
     }
   }
@@ -386,7 +387,7 @@ class PatientService {
         hasMore: snapshot.docs.length > pageSize,
       };
     } catch (error) {
-      console.error('Error searching patients:', error);
+      logger.error('Error searching patients:', error);
       throw error;
     }
   }
@@ -419,7 +420,7 @@ class PatientService {
       
       return patients;
     } catch (error) {
-      console.error('Error fetching patients:', error);
+      logger.error('Error fetching patients:', error);
       throw error;
     }
   }
@@ -498,7 +499,7 @@ class PatientService {
 
       return stats;
     } catch (error) {
-      console.error('Error fetching patient stats:', error);
+      logger.error('Error fetching patient stats:', error);
       throw error;
     }
   }
@@ -532,7 +533,7 @@ class PatientService {
         updatedBy: uploadedBy,
       });
     } catch (error) {
-      console.error('Error adding document:', error);
+      logger.error('Error adding document:', error);
       throw error;
     }
   }
@@ -543,7 +544,7 @@ class PatientService {
       const docRef = doc(firestore, collectionName, patientId);
       await deleteDoc(docRef);
     } catch (error) {
-      console.error('Error deleting patient:', error);
+      logger.error('Error deleting patient:', error);
       throw error;
     }
   }
@@ -555,7 +556,7 @@ class PatientService {
         updatedBy,
       });
     } catch (error) {
-      console.error('Error deactivating patient:', error);
+      logger.error('Error deactivating patient:', error);
       throw error;
     }
   }
@@ -567,7 +568,7 @@ class PatientService {
         updatedBy,
       });
     } catch (error) {
-      console.error('Error activating patient:', error);
+      logger.error('Error activating patient:', error);
       throw error;
     }
   }

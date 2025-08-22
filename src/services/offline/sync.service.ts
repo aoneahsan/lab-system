@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 import { toast } from 'sonner';
+import { logger } from '@/services/logger.service';
 
 export interface SyncStatus {
   isSyncing: boolean;
@@ -34,7 +35,7 @@ class SyncService {
 
       // Set up network monitoring
       this.networkListener = await Network.addListener('networkStatusChange', async (status) => {
-        console.log('Network status changed:', status);
+        logger.log('Network status changed:', status);
         if (status.connected) {
           // Network is back online, trigger sync
           this.sync();
@@ -50,7 +51,7 @@ class SyncService {
         this.sync();
       }
     } catch (error) {
-      console.error('Error initializing sync service:', error);
+      logger.error('Error initializing sync service:', error);
     }
   }
 
@@ -68,7 +69,7 @@ class SyncService {
 
     const networkStatus = await Network.getStatus();
     if (!networkStatus.connected) {
-      console.log('No network connection, skipping sync');
+      logger.log('No network connection, skipping sync');
       return;
     }
 
@@ -76,11 +77,11 @@ class SyncService {
     this.notifyListeners();
 
     try {
-      console.log('Starting sync...');
+      logger.log('Starting sync...');
 
       // Get unsynced changes
       const unsyncedRecords = await offlineDatabase.getUnsynced();
-      console.log(`Found ${unsyncedRecords.length} unsynced records`);
+      logger.log(`Found ${unsyncedRecords.length} unsynced records`);
 
       // Process each record
       for (const record of unsyncedRecords) {
@@ -88,7 +89,7 @@ class SyncService {
           await this.processSyncRecord(record);
           await offlineDatabase.markSynced(record.id);
         } catch (error) {
-          console.error(`Error syncing record ${record.id}:`, error);
+          logger.error(`Error syncing record ${record.id}:`, error);
           await offlineDatabase.markSyncError(
             record.id,
             error instanceof Error ? error.message : 'Unknown error'
@@ -105,10 +106,10 @@ class SyncService {
         timestamp: Date.now()
       });
 
-      console.log('Sync completed successfully');
+      logger.log('Sync completed successfully');
       toast.success('Data synchronized successfully');
     } catch (error) {
-      console.error('Sync error:', error);
+      logger.error('Sync error:', error);
       await offlineDatabase.updateSyncMetadata('all', {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -194,7 +195,7 @@ class SyncService {
           timestamp: Date.now()
         });
       } catch (error) {
-        console.error(`Error pulling data for ${collectionName}:`, error);
+        logger.error(`Error pulling data for ${collectionName}:`, error);
         await offlineDatabase.updateSyncMetadata(collectionName, {
           status: 'error',
           error: error instanceof Error ? error.message : 'Unknown error',

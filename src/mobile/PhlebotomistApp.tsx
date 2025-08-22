@@ -5,6 +5,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Geolocation } from '@capacitor/geolocation';
 import { Network } from '@capacitor/network';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { logger } from '@/services/logger.service';
 import {
   HomeScreen,
   CollectionScreen,
@@ -57,7 +58,7 @@ export const PhlebotomistApp: React.FC = () => {
         lng: coordinates.coords.longitude,
       });
     } catch (error) {
-      console.error('Error getting location:', error);
+      logger.error('Error getting location:', error);
     }
   };
 

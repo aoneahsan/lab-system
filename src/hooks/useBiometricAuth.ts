@@ -7,6 +7,7 @@ import type {
   BiometricAuthConfig,
 } from '@/types/biometric.types';
 import { useToast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 
 export const useBiometricAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +21,7 @@ export const useBiometricAuth = () => {
       const status = await biometricService.checkBiometricStatus();
       setBiometricStatus(status);
     } catch (error) {
-      console.error('Error checking biometric status:', error);
+      logger.error('Error checking biometric status:', error);
     } finally {
       setIsLoading(false);
     }
@@ -31,7 +32,7 @@ export const useBiometricAuth = () => {
       const prefs = await biometricService.getPreferences();
       setPreferences(prefs);
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      logger.error('Error loading preferences:', error);
     }
   }, []);
 
@@ -92,7 +93,7 @@ export const useBiometricAuth = () => {
 
         return result;
       } catch (error) {
-        console.error('Authentication error:', error);
+        logger.error('Authentication error:', error);
         showToast({
           type: 'error',
           title: 'Authentication Error',
@@ -125,7 +126,7 @@ export const useBiometricAuth = () => {
           message: 'Biometric preferences saved successfully',
         });
       } catch (error) {
-        console.error('Error updating preferences:', error);
+        logger.error('Error updating preferences:', error);
         showToast({
           type: 'error',
           title: 'Update Failed',
@@ -143,7 +144,7 @@ export const useBiometricAuth = () => {
     try {
       return await biometricService.isRecentAuthRequired();
     } catch (error) {
-      console.error('Error checking recent auth:', error);
+      logger.error('Error checking recent auth:', error);
       return true;
     }
   }, []);
@@ -153,7 +154,7 @@ export const useBiometricAuth = () => {
       await biometricService.clearBiometricData();
       setPreferences(null);
     } catch (error) {
-      console.error('Error clearing biometric data:', error);
+      logger.error('Error clearing biometric data:', error);
     }
   }, []);
 

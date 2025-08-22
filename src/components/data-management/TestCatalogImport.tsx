@@ -10,6 +10,7 @@ import { useTestStore } from '@/stores/test.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { TestDefinition } from '@/types';
 import { toast } from 'sonner';
+import { uiLogger } from '@/services/logger.service';
 
 interface ImportProgress {
   total: number;
@@ -83,7 +84,7 @@ export const TestCatalogImport: React.FC = () => {
         toast.error(`Validation failed: ${validation.errors.length} errors found`);
       }
     } catch (error) {
-      console.error('Import error:', error);
+      uiLogger.error('Import error:', error);
       setProgress({ ...progress, status: 'error' });
       toast.error('Failed to parse file');
     }
@@ -155,7 +156,7 @@ export const TestCatalogImport: React.FC = () => {
           successful: prev.successful + 1,
         }));
       } catch (error) {
-        console.error('Failed to import test:', error);
+        uiLogger.error('Failed to import test:', error);
         setProgress(prev => ({
           ...prev,
           processed: prev.processed + 1,

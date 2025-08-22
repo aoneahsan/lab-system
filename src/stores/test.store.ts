@@ -3,6 +3,7 @@ import { collection, query, addDoc, updateDoc, deleteDoc, doc, getDocs, orderBy,
 import { db } from '@/config/firebase.config';
 import type { TestDefinition } from '@/types/test.types';
 import { toast } from 'sonner';
+import { logger } from '@/services/logger.service';
 
 interface TestStore {
   tests: TestDefinition[];
@@ -34,7 +35,7 @@ export const useTestStore = create<TestStore>((set) => ({
       
       set({ tests, isLoading: false });
     } catch (error) {
-      console.error('Error fetching tests:', error);
+      logger.error('Error fetching tests:', error);
       set({ error: 'Failed to fetch tests', isLoading: false });
       toast.error('Failed to fetch tests');
     }
@@ -54,7 +55,7 @@ export const useTestStore = create<TestStore>((set) => ({
       
       toast.success('Test created successfully');
     } catch (error) {
-      console.error('Error creating test:', error);
+      logger.error('Error creating test:', error);
       toast.error('Failed to create test');
       throw error;
     }
@@ -76,7 +77,7 @@ export const useTestStore = create<TestStore>((set) => ({
       
       toast.success('Test updated successfully');
     } catch (error) {
-      console.error('Error updating test:', error);
+      logger.error('Error updating test:', error);
       toast.error('Failed to update test');
       throw error;
     }
@@ -93,7 +94,7 @@ export const useTestStore = create<TestStore>((set) => ({
       
       toast.success('Test deleted successfully');
     } catch (error) {
-      console.error('Error deleting test:', error);
+      logger.error('Error deleting test:', error);
       toast.error('Failed to delete test');
       throw error;
     }

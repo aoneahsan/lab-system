@@ -26,6 +26,7 @@ import { BaseFormFieldProps, FormFieldWrapper } from './BaseFormField';
 import { EnhancedToolbarPlugin } from './editor/EnhancedToolbarPlugin';
 import { ImageNode } from './editor/ImageNode';
 import { useAuthStore } from '@/stores/auth.store';
+import { uiLogger } from '@/services/logger.service';
 
 interface RichTextEditorFieldProps extends BaseFormFieldProps {
   value?: string;
@@ -106,7 +107,7 @@ export const RichTextEditorField: React.FC<RichTextEditorFieldProps> = ({
     namespace: `RichTextEditorV2_${name}`,
     theme,
     onError: (error: Error) => {
-      console.error('Lexical Error:', error);
+      uiLogger.error('Lexical Error:', error);
     },
     nodes: [
       HeadingNode,

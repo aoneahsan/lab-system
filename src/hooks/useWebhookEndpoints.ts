@@ -4,6 +4,7 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from '@/hooks/useToast';
 import type { WebhookEndpointFormData, WebhookTestPayload } from '@/types/webhook.types';
+import { logger } from '@/services/logger.service';
 
 // Query keys
 const WEBHOOK_KEYS = {
@@ -63,7 +64,7 @@ export const useCreateWebhookEndpoint = () => {
     },
     onError: (error) => {
       toast.error('Failed to create webhook endpoint');
-      console.error('Error creating webhook endpoint:', error);
+      logger.error('Error creating webhook endpoint:', error);
     },
   });
 };
@@ -91,7 +92,7 @@ export const useUpdateWebhookEndpoint = () => {
     },
     onError: (error) => {
       toast.error('Failed to update webhook endpoint');
-      console.error('Error updating webhook endpoint:', error);
+      logger.error('Error updating webhook endpoint:', error);
     },
   });
 };
@@ -111,7 +112,7 @@ export const useDeleteWebhookEndpoint = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete webhook endpoint');
-      console.error('Error deleting webhook endpoint:', error);
+      logger.error('Error deleting webhook endpoint:', error);
     },
   });
 };
@@ -141,7 +142,7 @@ export const useTestWebhook = () => {
     },
     onError: (error) => {
       toast.error('Failed to test webhook');
-      console.error('Error testing webhook:', error);
+      logger.error('Error testing webhook:', error);
     },
   });
 };
@@ -175,7 +176,7 @@ export const useResendWebhookEvent = () => {
     },
     onError: (error) => {
       toast.error('Failed to resend webhook event');
-      console.error('Error resending webhook event:', error);
+      logger.error('Error resending webhook event:', error);
     },
   });
 };
@@ -211,7 +212,7 @@ export const useProcessWebhookBatch = () => {
     },
     onError: (error) => {
       toast.error('Failed to process webhook batch');
-      console.error('Error processing webhook batch:', error);
+      logger.error('Error processing webhook batch:', error);
     },
   });
 };
@@ -244,7 +245,7 @@ export const useVerifyWebhookSignature = () => {
     },
     onError: (error) => {
       toast.error('Failed to verify webhook signature');
-      console.error('Error verifying webhook signature:', error);
+      logger.error('Error verifying webhook signature:', error);
     },
   });
 };

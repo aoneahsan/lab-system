@@ -21,6 +21,7 @@ import { TableNode, TableCellNode, TableRowNode } from '@lexical/table';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { uiLogger } from '@/services/logger.service';
 import { 
   FORMAT_TEXT_COMMAND,
   FORMAT_ELEMENT_COMMAND,
@@ -194,7 +195,7 @@ export const LexicalEditorField: React.FC<LexicalEditorFieldProps> = ({
     namespace: name || 'LexicalEditor',
     theme,
     onError: (error: Error) => {
-      console.error('Lexical Editor Error:', error);
+      uiLogger.error('Lexical Editor Error:', error);
     },
     nodes: [
       HeadingNode,

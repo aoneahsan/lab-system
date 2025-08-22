@@ -4,6 +4,7 @@ import { patientService } from '@/services/patient.service';
 import { testService } from '@/services/test.service';
 import { resultService } from '@/services/result.service';
 import { billingService } from '@/services/billing.service';
+import { logger } from '@/services/logger.service';
 
 export interface DashboardSummary {
   totalPatients: number;
@@ -38,7 +39,7 @@ export const useDashboardSummary = () => {
 
         return summary;
       } catch (error) {
-        console.error('Error fetching dashboard summary:', error);
+        logger.error('Error fetching dashboard summary:', error);
         // Return default values on error
         return {
           totalPatients: 0,
@@ -83,7 +84,7 @@ export const useRecentTests = (limit: number = 5) => {
           orderedAt: order.orderDate instanceof Date ? order.orderDate : order.orderDate.toDate(),
         }));
       } catch (error) {
-        console.error('Error fetching recent tests:', error);
+        logger.error('Error fetching recent tests:', error);
         return [];
       }
     },
@@ -128,7 +129,7 @@ export const useCriticalResults = (limit: number = 3) => {
             result.createdAt instanceof Date ? result.createdAt : result.createdAt.toDate(),
         }));
       } catch (error) {
-        console.error('Error fetching critical results:', error);
+        logger.error('Error fetching critical results:', error);
         return [];
       }
     },

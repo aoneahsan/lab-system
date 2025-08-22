@@ -13,6 +13,7 @@ import {
 import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
 import { toast } from '@/hooks/useToast';
+import { uiLogger } from '@/services/logger.service';
 
 interface RouteStop {
   id: string;
@@ -93,7 +94,7 @@ const PhlebotomistRoutePage: React.FC = () => {
         lng: position.coords.longitude,
       });
     } catch (error) {
-      console.error('Failed to get location:', error);
+      uiLogger.error('Failed to get location:', error);
       toast.error('Unable to get current location');
     }
   };

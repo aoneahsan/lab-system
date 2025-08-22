@@ -1,4 +1,5 @@
 import { unifiedStorage, STORAGE_KEYS } from './unified-storage.service';
+import { logger } from '@/services/logger.service';
 import type {
   OfflineDatabase,
   OfflinePatient,
@@ -37,9 +38,9 @@ export class UnifiedOfflineDatabase implements OfflineDatabase {
       await this.ensureCollections();
       
       this.initialized = true;
-      console.log('Unified offline database initialized');
+      logger.log('Unified offline database initialized');
     } catch (error) {
-      console.error('Failed to initialize unified offline database:', error);
+      logger.error('Failed to initialize unified offline database:', error);
       throw error;
     }
   }

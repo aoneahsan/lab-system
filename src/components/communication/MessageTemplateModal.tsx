@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCreateTemplate, useUpdateTemplate } from '@/hooks/useCommunication';
 import { MessageTemplate, MessageTemplateFormData } from '@/types/communication.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface MessageTemplateModalProps {
   template?: MessageTemplate | null;
@@ -50,7 +51,7 @@ export default function MessageTemplateModal({ template, onClose }: MessageTempl
       }
       onClose();
     } catch (error) {
-      console.error('Failed to save template:', error);
+      uiLogger.error('Failed to save template:', error);
     }
   };
 

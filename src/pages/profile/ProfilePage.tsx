@@ -8,6 +8,7 @@ import { biometricService } from '@/services/biometric.service';
 import { modalService } from '@/services/modal.service';
 import { Shield, Keyboard, Eye } from 'lucide-react';
 import PageHeader from '@/components/common/PageHeader';
+import { uiLogger } from '@/services/logger.service';
 
 const ProfilePage = () => {
   const { currentUser, updateUserProfile } = useAuthStore();
@@ -41,7 +42,7 @@ const ProfilePage = () => {
         const preferences = await biometricService.getPreferences();
         setBiometricEnabled(preferences.enabled);
       } catch (error) {
-        console.error('Error checking security status:', error);
+        uiLogger.error('Error checking security status:', error);
       }
     };
     

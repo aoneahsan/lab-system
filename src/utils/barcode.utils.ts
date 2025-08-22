@@ -4,6 +4,7 @@
  */
 
 import { QRCodeStudio, QRType } from 'qrcode-studio';
+import { logger } from '@/services/logger.service';
 
 /**
  * Interface for barcode data structure
@@ -95,7 +96,7 @@ export function parseBarcodeData(barcodeString: string): ParsedBarcodeData | nul
     const parts = barcodeString.split(DELIMITER);
     
     if (parts.length < 5) {
-      console.error('Invalid barcode format: insufficient data parts');
+      logger.error('Invalid barcode format: insufficient data parts');
       return null;
     }
     
@@ -108,7 +109,7 @@ export function parseBarcodeData(barcodeString: string): ParsedBarcodeData | nul
       tenantId: parts[5] || undefined
     };
   } catch (error) {
-    console.error('Error parsing barcode data:', error);
+    logger.error('Error parsing barcode data:', error);
     return null;
   }
 }
@@ -146,7 +147,7 @@ export async function generateSampleQRCode(
     
     return result.dataUrl;
   } catch (error) {
-    console.error('Error generating QR code:', error);
+    logger.error('Error generating QR code:', error);
     throw new Error('Failed to generate QR code');
   }
 }
@@ -197,7 +198,7 @@ export async function generateSampleQRCodeToCanvas(
     };
     img.src = result.dataUrl;
   } catch (error) {
-    console.error('Error generating QR code to canvas:', error);
+    logger.error('Error generating QR code to canvas:', error);
     throw new Error('Failed to generate QR code to canvas');
   }
 }
@@ -295,10 +296,10 @@ export function importBarcodeDataFromJson(jsonString: string): BarcodeData | nul
       return parsed;
     }
     
-    console.error('Invalid barcode data in JSON');
+    logger.error('Invalid barcode data in JSON');
     return null;
   } catch (error) {
-    console.error('Error parsing barcode JSON:', error);
+    logger.error('Error parsing barcode JSON:', error);
     return null;
   }
 }

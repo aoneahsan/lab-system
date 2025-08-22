@@ -6,6 +6,7 @@ import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { EmailField, PasswordField, CheckboxField } from '@/components/form-fields';
 import { twoFactorAuthService } from '@/services/two-factor-auth.service';
 import { Shield } from 'lucide-react';
+import { uiLogger } from '@/services/logger.service';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const LoginPage = () => {
         navigate(user?.role === 'super_admin' ? '/admin' : '/dashboard');
       }
     } catch (error) {
-      console.error('Biometric login error:', error);
+      uiLogger.error('Biometric login error:', error);
     } finally {
       setIsAuthenticatingBiometric(false);
     }

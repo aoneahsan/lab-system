@@ -7,6 +7,7 @@ import { LexicalEditorField } from '@/components/form-fields/LexicalEditorField'
 import { SelectField } from '@/components/form-fields/SelectField';
 import { DateField } from '@/components/form-fields/DateField';
 import { Controller } from 'react-hook-form';
+import { uiLogger } from '@/services/logger.service';
 
 interface AddMedicalHistoryModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export const AddMedicalHistoryModal = ({ isOpen, onClose, onSubmit, history }: A
       reset();
       onClose();
     } catch (error) {
-      console.error('Error adding medical history:', error);
+      uiLogger.error('Error adding medical history:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { useUrlState } from '@/hooks/useUrlState';
 import AdvancedWorkflowBuilder from '@/components/workflow/AdvancedWorkflowBuilder';
 import DynamicFieldBuilder from '@/components/custom-fields/DynamicFieldBuilder';
 import { CheckboxField, NumberField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 export default function AdvancedFeaturesPage() {
   const [activeTab, setActiveTab] = useUrlState('tab', {
@@ -72,7 +73,7 @@ export default function AdvancedFeaturesPage() {
                     <DynamicFieldBuilder
                       entityType={entityType as any}
                       onSave={(fields) => {
-                        console.log(`Saving ${entityType} fields:`, fields);
+                        uiLogger.log(`Saving ${entityType} fields:`, fields);
                       }}
                     />
                   </div>

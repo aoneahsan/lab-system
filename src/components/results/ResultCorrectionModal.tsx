@@ -10,6 +10,7 @@ import { toast } from '@/stores/toast.store';
 import { resultValidationService } from '@/services/result-validation.service';
 import type { TestResult } from '@/types/result.types';
 import type { Test } from '@/types/test.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface ResultCorrectionModalProps {
   isOpen: boolean;
@@ -107,7 +108,7 @@ const ResultCorrectionModal: React.FC<ResultCorrectionModalProps> = ({
         );
         setValidationResult(validation);
       } catch (error) {
-        console.error('Validation error:', error);
+        uiLogger.error('Validation error:', error);
       }
     }
   };

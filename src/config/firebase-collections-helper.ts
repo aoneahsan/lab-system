@@ -4,6 +4,7 @@
  */
 
 import { useTenantStore } from '@/stores/tenant.store';
+import { logger } from '@/services/logger.service';
 
 // Project prefix constant
 const PROJECT_PREFIX = 'labflow';
@@ -21,7 +22,7 @@ export const getFirestoreCollectionName = (collectionName: string, tenantId?: st
   // Otherwise, get from tenant store
   const currentTenant = useTenantStore.getState().currentTenant;
   if (!currentTenant?.id) {
-    console.warn('No tenant ID available for collection:', collectionName);
+    logger.warn('No tenant ID available for collection:', collectionName);
     // Return with just project prefix as fallback
     return `${PROJECT_PREFIX}_${collectionName}`;
   }
@@ -41,7 +42,7 @@ export const getFirestoreStoragePath = (path: string, tenantId?: string): string
   // Otherwise, get from tenant store
   const currentTenant = useTenantStore.getState().currentTenant;
   if (!currentTenant?.id) {
-    console.warn('No tenant ID available for storage path:', path);
+    logger.warn('No tenant ID available for storage path:', path);
     return `${PROJECT_PREFIX}/${path}`;
   }
 

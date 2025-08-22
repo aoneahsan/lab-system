@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { PerformanceMonitor } from '@/utils/performance';
+import { logger } from '@/services/logger.service';
 
 interface PerformanceMetrics {
   fcp?: number; // First Contentful Paint
@@ -138,7 +139,7 @@ function reportMetric(name: string, value: number) {
   
   // Also log to console in development
   if (import.meta.env.DEV) {
-    console.log(`Performance metric - ${name}: ${value.toFixed(2)}ms`);
+    logger.log(`Performance metric - ${name}: ${value.toFixed(2)}ms`);
   }
 }
 
@@ -157,7 +158,7 @@ export function useRenderPerformance(componentName: string) {
         const renderTime = performance.now() - renderStartRef.current;
         
         if (import.meta.env.DEV && renderTime > 16) { // Longer than one frame
-          console.warn(
+          logger.warn(
             `Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (render #${renderCount.current})`
           );
         }

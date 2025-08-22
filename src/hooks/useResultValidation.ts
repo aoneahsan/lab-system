@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { resultValidationService } from '@/services/result-validation.service';
 import type { ResultValidationRule } from '@/types/result.types';
 import { toast } from '@/hooks/useToast';
+import { logger } from '@/services/logger.service';
 
 const VALIDATION_RULES_KEY = 'validation-rules';
 
@@ -24,7 +25,7 @@ export const useCreateValidationRule = () => {
     },
     onError: (error) => {
       toast.error('Failed to create validation rule');
-      console.error('Error creating validation rule:', error);
+      logger.error('Error creating validation rule:', error);
     },
   });
 };
@@ -41,7 +42,7 @@ export const useUpdateValidationRule = () => {
     },
     onError: (error) => {
       toast.error('Failed to update validation rule');
-      console.error('Error updating validation rule:', error);
+      logger.error('Error updating validation rule:', error);
     },
   });
 };
@@ -57,7 +58,7 @@ export const useDeleteValidationRule = () => {
     },
     onError: (error) => {
       toast.error('Failed to delete validation rule');
-      console.error('Error deleting validation rule:', error);
+      logger.error('Error deleting validation rule:', error);
     },
   });
 };

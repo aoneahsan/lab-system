@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { SpeechRecognition } from '@capacitor-community/speech-recognition';
+import { logger } from '@/services/logger.service';
 
 interface VoiceCommand {
   command: string;
@@ -56,7 +57,7 @@ class VoiceDictationService {
 
   async startDictation(options: VoiceDictationOptions = {}) {
     if (this.isListening) {
-      console.warn('Voice dictation is already active');
+      logger.warn('Voice dictation is already active');
       return;
     }
 
@@ -162,14 +163,14 @@ class VoiceDictationService {
         await SpeechRecognition.stop();
         await SpeechRecognition.removeAllListeners();
       } catch (error) {
-        console.error('Error stopping speech recognition:', error);
+        logger.error('Error stopping speech recognition:', error);
       }
     } else {
       if (this.recognition) {
         try {
           this.recognition.stop();
         } catch (error) {
-          console.error('Error stopping speech recognition:', error);
+          logger.error('Error stopping speech recognition:', error);
         }
       }
     }

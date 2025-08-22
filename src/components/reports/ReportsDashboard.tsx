@@ -10,6 +10,7 @@ import ReportPreview from './ReportPreview';
 import ScheduledReports from './ScheduledReports';
 import ReportAnalytics from './ReportAnalytics';
 import type { ReportFormData } from '@/types/report.types';
+import { uiLogger } from '@/services/logger.service';
 
 export default function ReportsDashboard() {
   const [activeTab, setActiveTab] = useUrlState('tab', {
@@ -39,7 +40,7 @@ export default function ReportsDashboard() {
       await generateReport.mutateAsync(reportId);
       setShowBuilder(false);
     } catch (error) {
-      console.error('Failed to generate report:', error);
+      uiLogger.error('Failed to generate report:', error);
     }
   };
 
@@ -211,7 +212,7 @@ export default function ReportsDashboard() {
         <ReportPreview
           templateId={selectedReport}
           filters={filters}
-          onGenerate={(format) => console.log('Generate in format:', format)}
+          onGenerate={(format) => uiLogger.log('Generate in format:', format)}
           isGenerating={generateReport.isPending}
         />
       )}

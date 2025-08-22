@@ -3,6 +3,7 @@ import { Save, X, User, TestTube, Calendar, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSampleStore } from '@/stores/sample.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { uiLogger } from '@/services/logger.service';
 import type {
   SampleFormData,
   SampleType,
@@ -86,7 +87,7 @@ export default function SampleRegistration() {
       await createSample(currentUser.tenantId, currentUser.uid, formData);
       navigate('/samples');
     } catch (error) {
-      console.error('Error creating sample:', error);
+      uiLogger.error('Error creating sample:', error);
       setErrors({ submit: 'Failed to create sample. Please try again.' });
     }
   };

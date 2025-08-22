@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { BiometricAuth } from 'capacitor-biometric-authentication';
 import { toast } from '@/hooks/useToast';
 import { EmailField, PasswordField } from '@/components/form-fields';
+import { uiLogger } from '@/services/logger.service';
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -42,7 +43,7 @@ const LabStaffLoginPage: React.FC = () => {
       const result = await BiometricAuth.isAvailable();
       setBiometricAvailable(result || false);
     } catch (_error) {
-      console.error('Biometric check failed:', _error);
+      uiLogger.error('Biometric check failed:', _error);
     }
   };
 

@@ -1,4 +1,5 @@
 import { lazy, ComponentType, LazyExoticComponent } from 'react';
+import { logger } from '@/services/logger.service';
 
 /**
  * Enhanced lazy loading with retry logic
@@ -205,7 +206,7 @@ export class PerformanceMonitor {
   measure(name: string, startMark: string): number {
     const startTime = this.marks.get(startMark);
     if (!startTime) {
-      console.warn(`No mark found with name: ${startMark}`);
+      logger.warn(`No mark found with name: ${startMark}`);
       return 0;
     }
 

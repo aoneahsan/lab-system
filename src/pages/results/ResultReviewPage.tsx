@@ -18,6 +18,7 @@ import { COLLECTIONS } from '@/config/firebase-collections';
 import { modalService } from '@/services/modal.service';
 import { toast } from '@/stores/toast.store';
 import type { TestResult } from '@/types/result.types';
+import { uiLogger } from '@/services/logger.service';
 
 interface ReviewResult extends TestResult {
   patientName?: string;
@@ -89,7 +90,7 @@ const ResultReviewPage: React.FC = () => {
     },
     onError: (error) => {
       toast.error('Approval Failed', 'Failed to approve results');
-      console.error('Approval error:', error);
+      uiLogger.error('Approval error:', error);
     },
   });
 
@@ -119,7 +120,7 @@ const ResultReviewPage: React.FC = () => {
     },
     onError: (error) => {
       toast.error('Rejection Failed', 'Failed to reject results');
-      console.error('Rejection error:', error);
+      uiLogger.error('Rejection error:', error);
     },
   });
 

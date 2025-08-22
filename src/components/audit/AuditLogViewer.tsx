@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { auditService } from '../../services/audit';
 import { formatDistanceToNow } from 'date-fns';
+import { uiLogger } from '@/services/logger.service';
 import {
   FunnelIcon,
   CheckCircleIcon,
@@ -42,7 +43,7 @@ const AuditLogViewer: React.FC = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error exporting audit logs:', error);
+      uiLogger.error('Error exporting audit logs:', error);
     }
   };
 

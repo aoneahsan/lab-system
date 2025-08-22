@@ -7,6 +7,7 @@ import type {
   BiometricPreferences,
 } from '@/types/biometric.types';
 import { DEFAULT_BIOMETRIC_CONFIG, DEFAULT_BIOMETRIC_PREFERENCES } from '@/types/biometric.types';
+import { logger } from '@/services/logger.service';
 
 const BIOMETRIC_PREFS_KEY = 'biometric_preferences';
 const LAST_AUTH_KEY = 'last_biometric_auth';
@@ -43,7 +44,7 @@ class BiometricService {
         biometryType: biometryType as 'face' | 'fingerprint' | 'iris' | 'unknown',
       };
     } catch (error) {
-      console.error('Error checking biometric status:', error);
+      logger.error('Error checking biometric status:', error);
       return {
         isAvailable: false,
         isEnrolled: false,
@@ -84,7 +85,7 @@ class BiometricService {
         errorCode: result.error && typeof result.error === 'object' ? result.error.code : undefined,
       };
     } catch (error) {
-      console.error('Biometric authentication failed:', error);
+      logger.error('Biometric authentication failed:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Authentication failed',
@@ -101,7 +102,7 @@ class BiometricService {
       const preferences = await storageHelpers.getSecure<BiometricPreferences>(BIOMETRIC_PREFS_KEY);
       return preferences || DEFAULT_BIOMETRIC_PREFERENCES;
     } catch (error) {
-      console.error('Error loading biometric preferences:', error);
+      logger.error('Error loading biometric preferences:', error);
       return DEFAULT_BIOMETRIC_PREFERENCES;
     }
   }
@@ -113,7 +114,7 @@ class BiometricService {
     try {
       await storageHelpers.setSecure(BIOMETRIC_PREFS_KEY, preferences);
     } catch (error) {
-      console.error('Error saving biometric preferences:', error);
+      logger.error('Error saving biometric preferences:', error);
       throw error;
     }
   }
@@ -137,7 +138,7 @@ class BiometricService {
 
       return now - lastAuthTime > thresholdMs;
     } catch (error) {
-      console.error('Error checking recent auth:', error);
+      logger.error('Error checking recent auth:', error);
       return true; // Require auth on error
     }
   }
@@ -149,7 +150,7 @@ class BiometricService {
     try {
       await storageHelpers.setSecure(LAST_AUTH_KEY, Date.now());
     } catch (error) {
-      console.error('Error updating last auth time:', error);
+      logger.error('Error updating last auth time:', error);
     }
   }
 
@@ -160,7 +161,7 @@ class BiometricService {
     try {
       await storageHelpers.clearSecure();
     } catch (error) {
-      console.error('Error clearing biometric data:', error);
+      logger.error('Error clearing biometric data:', error);
     }
   }
 

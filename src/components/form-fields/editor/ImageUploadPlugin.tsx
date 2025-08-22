@@ -5,6 +5,7 @@ import { $createImageNode, ImagePayload } from './ImageNode';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { Image, Upload, X, Loader2 } from 'lucide-react';
 import { ToolbarButton } from './ToolbarComponents';
+import { uiLogger } from '@/services/logger.service';
 
 interface ImageUploadPluginProps {
   disabled?: boolean;
@@ -64,7 +65,7 @@ export const ImageUploadPlugin: React.FC<ImageUploadPluginProps> = ({
       setAltText(file.name);
       setShowUploadModal(true);
     } catch (error) {
-      console.error('Failed to upload image:', error);
+      uiLogger.error('Failed to upload image:', error);
     }
 
     // Reset input
@@ -107,7 +108,7 @@ export const ImageUploadPlugin: React.FC<ImageUploadPluginProps> = ({
           maxWidth: 800,
         });
       }).catch(error => {
-        console.error('Failed to upload dropped image:', error);
+        uiLogger.error('Failed to upload dropped image:', error);
       });
     }
     

@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { CapacitorNativeUpdate } from 'capacitor-native-update';
 import { toast } from '@/stores/toast.store';
+import { logger } from '@/services/logger.service';
 
 interface UpdateCheckResult {
   available: boolean;
@@ -20,7 +21,7 @@ export const appUpdateService = {
   // Initialize the update service
   initialize: async () => {
     if (!Capacitor.isNativePlatform()) {
-      console.log('App updates are only available on native platforms');
+      logger.log('App updates are only available on native platforms');
       return;
     }
 
@@ -35,12 +36,12 @@ export const appUpdateService = {
         updateStrategy: 'background', // background, immediate, or manual
       } as any);
 
-      console.log('📱 Native update service initialized');
+      logger.log('📱 Native update service initialized');
       
       // Check for updates on startup
       await appUpdateService.checkForUpdates(true);
     } catch (error) {
-      console.error('Failed to initialize update service:', error);
+      logger.error('Failed to initialize update service:', error);
     }
   },
 
@@ -96,7 +97,7 @@ export const appUpdateService = {
       
       return { available: false };
     } catch (error) {
-      console.error('Failed to check for updates:', error);
+      logger.error('Failed to check for updates:', error);
       if (!silent) {
         toast.error('Update Check Failed', 'Unable to check for updates. Please try again later.');
       }
@@ -113,7 +114,7 @@ export const appUpdateService = {
     try {
       await (CapacitorNativeUpdate as any).download({
         onProgress: (progress) => {
-          console.log(`Download progress: ${progress.percent}%`);
+          logger.log(`Download progress: ${progress.percent}%`);
           if (onProgress) {
             onProgress(progress);
           }
@@ -123,7 +124,7 @@ export const appUpdateService = {
       toast.success('Download Complete', 'Update downloaded successfully.');
       return true;
     } catch (error) {
-      console.error('Failed to download update:', error);
+      logger.error('Failed to download update:', error);
       toast.error('Download Failed', 'Unable to download the update. Please try again.');
       return false;
     }
@@ -144,7 +145,7 @@ export const appUpdateService = {
       // Apply update - this will restart the app
       await (CapacitorNativeUpdate as any).apply();
     } catch (error) {
-      console.error('Failed to apply update:', error);
+      logger.error('Failed to apply update:', error);
       toast.error('Update Failed', 'Unable to apply the update. Please restart the app manually.');
     }
   },
@@ -158,7 +159,7 @@ export const appUpdateService = {
     try {
       await CapacitorNativeUpdate.openAppStore();
     } catch (error) {
-      console.error('Failed to open app store:', error);
+      logger.error('Failed to open app store:', error);
       toast.error('Error', 'Unable to open the app store.');
     }
   },
@@ -181,7 +182,7 @@ export const appUpdateService = {
         live: versionInfo.liveUpdateVersion || null
       };
     } catch (error) {
-      console.error('Failed to get version info:', error);
+      logger.error('Failed to get version info:', error);
       return {
         native: 'Unknown',
         build: 'Unknown',
@@ -200,7 +201,7 @@ export const appUpdateService = {
       const result = await (CapacitorNativeUpdate as any).isLive();
       return result.isLiveUpdate;
     } catch (error) {
-      console.error('Failed to check live update status:', error);
+      logger.error('Failed to check live update status:', error);
       return false;
     }
   },
@@ -215,7 +216,7 @@ export const appUpdateService = {
     try {
       await CapacitorNativeUpdate.reload();
     } catch (error) {
-      console.error('Failed to reload app:', error);
+      logger.error('Failed to reload app:', error);
       // Fallback to web reload
       window.location.reload();
     }
@@ -234,7 +235,7 @@ export const appUpdateService = {
       // Reload after reset
       await appUpdateService.reload();
     } catch (error) {
-      console.error('Failed to reset app:', error);
+      logger.error('Failed to reset app:', error);
       toast.error('Reset Failed', 'Unable to reset the app.');
     }
   },
@@ -250,7 +251,7 @@ export const appUpdateService = {
       const result = await CapacitorNativeUpdate.requestReview();
       return (result as any).success || false;
     } catch (error) {
-      console.error('Failed to request review:', error);
+      logger.error('Failed to request review:', error);
       return false;
     }
   }
@@ -269,7 +270,7 @@ export const handleUpdateFlow = async (updateInfo: UpdateCheckResult) => {
       // For mandatory updates, download and apply immediately
       const downloaded = await appUpdateService.downloadUpdate((progress) => {
         // Could show a progress modal here
-        console.log(`Downloading mandatory update: ${progress.percent}%`);
+        logger.log(`Downloading mandatory update: ${progress.percent}%`);
       });
       
       if (downloaded) {
