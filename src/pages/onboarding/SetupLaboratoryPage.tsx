@@ -13,6 +13,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useOnboardingStore } from '@/stores/onboarding.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
+import { onboardingLogger } from '@/services/logger.service';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
@@ -231,7 +232,7 @@ const SetupLaboratoryPage = () => {
         });
       }
     } catch (error) {
-      console.error('Error checking code:', error);
+      onboardingLogger.error('Error checking code:', error);
       setCodeValidation({
         isChecking: false,
         isAvailable: false,
@@ -347,7 +348,7 @@ const SetupLaboratoryPage = () => {
           await handleSubmit();
         }
       } catch (error: any) {
-        console.error('Error saving step:', error);
+        onboardingLogger.error('Error saving step:', error);
         toast.error('Save failed', error.message || 'Could not save your progress');
       }
     }
@@ -566,7 +567,7 @@ const SetupLaboratoryPage = () => {
       toast.success('Laboratory created!', `Your laboratory code is: ${formData.code}`);
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error creating laboratory:', error);
+      onboardingLogger.error('Error creating laboratory:', error);
       toast.error('Creation failed', 'Failed to create laboratory. Please try again.');
     } finally {
       setIsCreating(false);

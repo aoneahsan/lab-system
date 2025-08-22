@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { authLogger } from '@/services/logger.service';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -200,7 +201,7 @@ export const useAuthStore = create<AuthStore>()(
 
           return { success: true };
         } catch (error) {
-          console.error('Biometric login error:', error);
+          authLogger.error('Biometric login error:', error);
           return {
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -257,7 +258,7 @@ export const useAuthStore = create<AuthStore>()(
           const userDoc = await getDoc(doc(firestore, COLLECTION_NAMES.USERS, uid));
 
           if (!userDoc.exists()) {
-            console.error('User document not found for uid:', uid);
+            authLogger.error('User document not found for uid:', uid);
             return null;
           }
 
@@ -273,7 +274,7 @@ export const useAuthStore = create<AuthStore>()(
           setCurrentUser(userData);
           return userData;
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          authLogger.error('Error fetching user data:', error);
           return null;
         }
       },

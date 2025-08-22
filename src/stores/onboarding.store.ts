@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import onboardingService, { OnboardingData } from '@/services/OnboardingService';
 import { toast } from '@/stores/toast.store';
+import { onboardingLogger } from '@/services/logger.service';
 
 interface OnboardingStore {
   // State
@@ -72,7 +73,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
               });
             }
           } catch (error) {
-            console.error('Error initializing onboarding:', error);
+            onboardingLogger.error('Error initializing onboarding:', error);
             // Start fresh on error
             set({ 
               isLoading: false,
@@ -169,7 +170,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
               toast.success('Step completed', 'Your progress has been saved');
             }
           } catch (error: any) {
-            console.error('Error saving step data:', error);
+            onboardingLogger.error('Error saving step data:', error);
             toast.error('Save failed', error.message || 'Could not save your progress');
             set({ isSaving: false });
           }

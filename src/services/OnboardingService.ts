@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
+import { onboardingLogger } from '@/services/logger.service';
 
 export interface OnboardingData {
   userId: string;
@@ -75,7 +76,7 @@ class OnboardingService {
       // Fallback to localStorage if not in Firestore
       return this.getFromLocalStorage(userId);
     } catch (error) {
-      console.error('Error getting onboarding progress:', error);
+      onboardingLogger.error('Error getting onboarding progress:', error);
       // Fallback to localStorage on error
       return this.getFromLocalStorage(userId);
     }
@@ -144,7 +145,7 @@ class OnboardingService {
       // Also save to localStorage
       this.saveToLocalStorage(updatedData);
     } catch (error) {
-      console.error('Error saving step progress:', error);
+      onboardingLogger.error('Error saving step progress:', error);
       // Re-throw the error so the UI can handle it
       throw error;
     }
@@ -184,7 +185,7 @@ class OnboardingService {
       // Clear from localStorage after completion
       this.clearLocalStorage();
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      onboardingLogger.error('Error completing onboarding:', error);
       throw error;
     }
   }
@@ -420,7 +421,7 @@ class OnboardingService {
       await deleteDoc(docRef);
       this.clearLocalStorage();
     } catch (error) {
-      console.error('Error clearing onboarding data:', error);
+      onboardingLogger.error('Error clearing onboarding data:', error);
       this.clearLocalStorage();
     }
   }
@@ -448,7 +449,7 @@ class OnboardingService {
         updatedAt: serverTimestamp(),
       });
     } catch (error) {
-      console.error('Error cleaning invalid data:', error);
+      onboardingLogger.error('Error cleaning invalid data:', error);
     }
   }
 
@@ -459,7 +460,7 @@ class OnboardingService {
     try {
       localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      onboardingLogger.error('Error saving to localStorage:', error);
     }
   }
 
@@ -474,7 +475,7 @@ class OnboardingService {
         }
       }
     } catch (error) {
-      console.error('Error reading from localStorage:', error);
+      onboardingLogger.error('Error reading from localStorage:', error);
     }
     return null;
   }
@@ -483,7 +484,7 @@ class OnboardingService {
     try {
       localStorage.removeItem(this.LOCAL_STORAGE_KEY);
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
+      onboardingLogger.error('Error clearing localStorage:', error);
     }
   }
 }

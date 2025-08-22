@@ -13,6 +13,7 @@ import { MobileAppSelector } from '@/mobile/MobileAppSelector';
 import { PerformanceProvider } from '@/providers/PerformanceProvider';
 import { performanceMonitor } from '@/utils/performance-monitoring';
 import { PerformanceMetrics } from '@/components/performance/PerformanceMetrics';
+import { logger } from '@/services/logger.service';
 import { OfflineIndicator } from '@/components/offline/OfflineIndicator';
 import { TrackingProvider } from '@/providers/TrackingProvider';
 import { ErrorHandlingProvider } from '@/providers/ErrorHandlingProvider';
@@ -57,7 +58,7 @@ function App() {
         // Initialize subscription plans
         await subscriptionService.initializeDefaultPlans();
       } catch (error) {
-        console.error('App initialization error:', error);
+        logger.error('App initialization error:', error);
         // Continue app loading even if some services fail
       }
     };

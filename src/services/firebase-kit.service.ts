@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { firebaseLogger } from '@/services/logger.service';
 // TODO: Fix build issue with capacitor-firebase-kit
 // import { FirebaseKit } from 'capacitor-firebase-kit';
 const FirebaseKit = {
@@ -69,12 +70,12 @@ export const initializeFirebaseKit = async () => {
         });
       }
       
-      console.log('📱 Firebase Kit initialized for native platform');
+      firebaseLogger.info('📱 Firebase Kit initialized for native platform');
     } else {
-      console.log('🌐 Running on web platform - Firebase Kit not needed');
+      firebaseLogger.info('🌐 Running on web platform - Firebase Kit not needed');
     }
   } catch (error) {
-    console.error('Failed to initialize Firebase Kit:', error);
+    firebaseLogger.error('Failed to initialize Firebase Kit:', error);
     // Don't throw - allow app to continue
   }
 };
@@ -143,7 +144,7 @@ export const crashlytics = {
     } else {
       // Web: Log to console in development
       if (import.meta.env.DEV) {
-        console.log('[Crashlytics]', message);
+        firebaseLogger.debug('[Crashlytics]', message);
       }
     }
   },
@@ -169,7 +170,7 @@ export const crashlytics = {
       });
     } else {
       // Web: Report to error tracking service
-      console.error('[Crashlytics]', error);
+      firebaseLogger.error('[Crashlytics]', error);
     }
   },
   

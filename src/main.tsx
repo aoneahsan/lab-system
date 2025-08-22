@@ -4,6 +4,9 @@ import './index.css';
 import App from './App.tsx';
 import { runStorageMigration } from './utils/storage-migration';
 import { unifiedStorage } from './services/unified-storage.service';
+// Initialize logger first
+import './config/logger.config';
+import { logger } from './services/logger.service';
 
 // Initialize unified storage and run migration
 async function initializeApp() {
@@ -14,7 +17,7 @@ async function initializeApp() {
     // Run storage migration
     await runStorageMigration();
   } catch (error) {
-    console.error('Failed to initialize app:', error);
+    logger.error('Failed to initialize app:', error);
   }
 }
 

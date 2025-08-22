@@ -5,6 +5,7 @@ import { useTenant } from '@/hooks/useTenant';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { useImpersonationStore } from '@/stores/impersonation.store';
 import onboardingService from '@/services/OnboardingService';
+import { uiLogger } from '@/services/logger.service';
 
 interface ProtectedRouteProps {
   allowedRoles?: string[];
@@ -44,7 +45,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
           isLoading: false,
         });
       } catch (error) {
-        console.error('Error checking onboarding status:', error);
+        uiLogger.error('Error checking onboarding status:', error);
         setOnboardingStatus({ isComplete: false, nextStep: 0, isLoading: false });
       }
     };
