@@ -36,7 +36,7 @@ class HotkeysService {
   private actionListeners: Map<string, ((event: KeyboardEvent) => void)[]> = new Map();
   private contextId = 'legacy-hotkeys';
   private enabled: boolean = true;
-  private navigate: any = null;
+  private navigateFn: any = null;
   private gestures: GestureBinding[] = [];
 
   constructor() {
@@ -108,7 +108,7 @@ class HotkeysService {
       // Default navigation actions
       if (action.startsWith('navigate.')) {
         const route = action.replace('navigate.', '');
-        this.navigate(route);
+        this.navigateToRoute(route);
       }
     }
   }
@@ -116,7 +116,7 @@ class HotkeysService {
   /**
    * Navigate to a route
    */
-  private navigate(route: string): void {
+  private navigateToRoute(route: string): void {
     const routeMap: Record<string, string> = {
       'dashboard': '/dashboard',
       'patients': '/patients',
@@ -195,7 +195,7 @@ class HotkeysService {
    * Initialize the service with navigation
    */
   initialize(navigateFn?: any): void {
-    this.navigate = navigateFn;
+    this.navigateFn = navigateFn;
     console.warn('initialize is deprecated. KeyboardShortcutsService auto-initializes.');
   }
 
