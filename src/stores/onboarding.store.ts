@@ -45,7 +45,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
           try {
             const progress = await onboardingService.getProgress(userId);
             
-            if (progress) {
+            if (progress && progress.laboratoryData && Object.keys(progress.laboratoryData).length > 0) {
               // Re-validate all completed steps with current data
               const revalidatedSteps = await onboardingService.revalidateCompletedSteps(
                 userId,
@@ -59,7 +59,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
                 isLoading: false,
               });
             } else {
-              // New onboarding
+              // New onboarding - start fresh
               set({
                 currentStep: 0,
                 completedSteps: [],
@@ -69,8 +69,13 @@ export const useOnboardingStore = create<OnboardingStore>()(
             }
           } catch (error) {
             console.error('Error initializing onboarding:', error);
-            toast.error('Failed to load progress', 'Could not load your onboarding progress');
-            set({ isLoading: false });
+            // Start fresh on error
+            set({ 
+              isLoading: false,
+              currentStep: 0,
+              completedSteps: [],
+              laboratoryData: {},
+            });
           }
         },
 
@@ -232,8 +237,9 @@ export const useOnboardingStore = create<OnboardingStore>()(
       {
         name: 'onboarding-store',
         partialize: (state) => ({
+          // Only persist current step and laboratory data
+          // Completed steps will be revalidated on load
           currentStep: state.currentStep,
-          completedSteps: state.completedSteps,
           laboratoryData: state.laboratoryData,
         }),
       }

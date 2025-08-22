@@ -90,12 +90,19 @@ const SetupLaboratoryPage = () => {
   // Initialize onboarding data on component mount
   useEffect(() => {
     if (currentUser?.id && !isInitialized) {
-      // Clear any stale data first
-      useOnboardingStore.getState().clearOnboarding();
-      
-      initializeOnboarding(currentUser.id).then(() => {
+      const initOnboarding = async () => {
+        // Clear any stale local storage data first
+        useOnboardingStore.getState().clearOnboarding();
+        
+        // Small delay to ensure state is cleared
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Now initialize with fresh data from Firebase
+        await initializeOnboarding(currentUser.id);
         setIsInitialized(true);
-      });
+      };
+      
+      initOnboarding();
     }
   }, [currentUser?.id, initializeOnboarding, isInitialized]);
 
@@ -260,6 +267,31 @@ const SetupLaboratoryPage = () => {
       case 2: // Contact
         if (!formData.email || !formData.phone) {
           toast.error('Missing information', 'Email and phone are required');
+          return false;
+        }
+        break;
+      case 3: // Settings
+        if (!formData.timezone || !formData.currency || !formData.resultFormat) {
+          toast.error('Missing information', 'Please select timezone, currency, and result format');
+          return false;
+        }
+        if (!formData.enabledFeatures || formData.enabledFeatures.length === 0) {
+          toast.error('Missing features', 'Please select at least one feature to enable');
+          return false;
+        }
+        break;
+      case 4: // Custom Configuration
+        // At least some configuration should be provided
+        const hasConfig = 
+          formData.referenceLabName?.trim() ||
+          formData.referenceLabContact?.trim() ||
+          formData.customReportHeader?.trim() ||
+          formData.customReportFooter?.trim() ||
+          (formData.communicationOptions && formData.communicationOptions.length > 0) ||
+          (formData.resultManagementOptions && formData.resultManagementOptions.length > 0);
+        
+        if (!hasConfig) {
+          toast.error('Missing configuration', 'Please configure at least one custom setting');
           return false;
         }
         break;
@@ -1065,8 +1097,8 @@ const SetupLaboratoryPage = () => {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8 overflow-x-auto">
+          <div className="flex items-center justify-between min-w-fit">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = index === currentStep;
@@ -1075,9 +1107,9 @@ const SetupLaboratoryPage = () => {
               const isNext = !isCompleted && isAccessible;
 
               return (
-                <div key={step.id} className="flex items-center">
+                <div key={step.id} className="flex items-center flex-1">
                   <div 
-                    className={`flex flex-col items-center ${
+                    className={`flex flex-col items-center min-w-[100px] ${
                       isAccessible || isCompleted ? 'cursor-pointer' : 'cursor-not-allowed'
                     }`}
                     onClick={() => {
@@ -1092,7 +1124,7 @@ const SetupLaboratoryPage = () => {
                     }}
                   >
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                         isActive
                           ? 'bg-primary-600 text-white ring-4 ring-primary-100 dark:ring-primary-900'
                           : isCompleted
@@ -1103,14 +1135,14 @@ const SetupLaboratoryPage = () => {
                       }`}
                     >
                       {isCompleted ? (
-                        <Check className="h-6 w-6" />
+                        <Check className="h-5 w-5" />
                       ) : (
-                        <Icon className="h-6 w-6" />
+                        <Icon className="h-5 w-5" />
                       )}
                     </div>
-                    <div className="mt-2 text-center">
+                    <div className="mt-2 text-center px-2">
                       <p
-                        className={`text-sm font-medium ${
+                        className={`text-xs font-medium ${
                           isActive
                             ? 'text-primary-600 dark:text-primary-400'
                             : isCompleted
@@ -1120,17 +1152,19 @@ const SetupLaboratoryPage = () => {
                       >
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 hidden lg:block">
                         {step.description}
                       </p>
                     </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div
-                      className={`h-0.5 w-24 mx-4 transition-colors ${
-                        isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
-                      }`}
-                    />
+                    <div className="flex-1 max-w-[100px] px-2">
+                      <div
+                        className={`h-0.5 w-full transition-colors ${
+                          isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                      />
+                    </div>
                   )}
                 </div>
               );

@@ -268,7 +268,20 @@ class OnboardingService {
         break;
         
       case 4: // Custom Configuration
-        // All fields are optional in this step
+        // At least some configuration should be provided
+        const hasCustomConfig = 
+          (data.defaultTestTurnaround && data.defaultTestTurnaround !== '24') ||
+          (data.referenceLabName && data.referenceLabName.trim().length > 0) ||
+          (data.referenceLabContact && data.referenceLabContact.trim().length > 0) ||
+          (data.customReportHeader && data.customReportHeader.trim().length > 0) ||
+          (data.customReportFooter && data.customReportFooter.trim().length > 0) ||
+          (data.communicationOptions && data.communicationOptions.length > 0) ||
+          (data.resultManagementOptions && data.resultManagementOptions.length > 0) ||
+          (data.defaultTurnaroundMode && data.defaultTurnaroundMode !== 'standard');
+        
+        if (!hasCustomConfig) {
+          errors.push('Please configure at least one custom setting');
+        }
         break;
     }
     
@@ -287,8 +300,14 @@ class OnboardingService {
   ): Promise<number[]> {
     const validatedSteps: number[] = [];
     
+    // Only validate steps that have meaningful data, not just defaults
     for (let step = 0; step < this.TOTAL_STEPS; step++) {
       const stepData = this.extractStepData(step, laboratoryData);
+      
+      // Check if step has actual data (not just empty/default values)
+      const hasData = this.stepHasActualData(step, stepData);
+      if (!hasData) continue;
+      
       const validation = this.validateStepData(step, stepData);
       
       if (validation.isValid) {
@@ -297,6 +316,35 @@ class OnboardingService {
     }
     
     return validatedSteps;
+  }
+
+  /**
+   * Check if step has actual data (not just empty/default values)
+   */
+  private stepHasActualData(step: number, data: any): boolean {
+    if (!data) return false;
+    
+    switch (step) {
+      case 0:
+        return Boolean(data.code && data.name && data.type);
+      case 1:
+        return Boolean(data.street && data.city && data.state && data.zipCode);
+      case 2:
+        return Boolean(data.email && data.phone);
+      case 3:
+        return Boolean(data.timezone && data.currency && data.enabledFeatures?.length > 0);
+      case 4:
+        return Boolean(
+          data.referenceLabName || 
+          data.referenceLabContact || 
+          data.customReportHeader || 
+          data.customReportFooter ||
+          (data.communicationOptions && data.communicationOptions.length > 0) ||
+          (data.resultManagementOptions && data.resultManagementOptions.length > 0)
+        );
+      default:
+        return false;
+    }
   }
 
   /**
