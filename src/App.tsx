@@ -21,7 +21,6 @@ import { initializeNotifications } from '@/services/app-notification.service';
 import { firebaseKit } from '@/services/firebase-kit.service';
 import { appUpdateService } from '@/services/app-update.service';
 import { HotkeyManager } from '@/components/navigation/HotkeyManager';
-import { HotkeysProvider } from '@/providers/HotkeysProvider';
 import { subscriptionService } from '@/services/subscription.service';
 
 const queryClient = new QueryClient({
@@ -85,19 +84,17 @@ function App() {
           <ErrorHandlingProvider>
             <TrackingProvider>
               <PerformanceProvider>
-                <HotkeysProvider>
-                  <InitializeDemoTenant />
-                  <HotkeyManager />
-                  <RouterComponent />
-                  <Toaster />
-                  <PerformanceMetrics />
-                  <OfflineIndicator />
-                </HotkeysProvider>
+                <InitializeDemoTenant />
+                <HotkeyManager />
+                <RouterComponent />
+                <Toaster />
+                <PerformanceMetrics />
+                <OfflineIndicator />
               </PerformanceProvider>
             </TrackingProvider>
           </ErrorHandlingProvider>
         </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ErrorBoundary>
   );

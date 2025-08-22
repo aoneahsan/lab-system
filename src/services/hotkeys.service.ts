@@ -41,7 +41,7 @@ class HotkeysService {
   private gestures: GestureBinding[] = [];
 
   constructor() {
-    logger.warn('HotkeysService is deprecated. Use KeyboardShortcutsService directly.');
+    // Only warn when actually used, not when imported
   }
 
   /**
@@ -389,6 +389,22 @@ class HotkeysService {
   }
 }
 
-// Export singleton instance for backward compatibility
-export const hotkeysService = new HotkeysService();
-export default hotkeysService;
+// Lazy singleton instance for backward compatibility
+let hotkeysServiceInstance: HotkeysService | null = null;
+
+export const hotkeysService = {
+  get instance() {
+    if (!hotkeysServiceInstance) {
+      logger.warn('HotkeysService is deprecated. Use KeyboardShortcutsService directly.');
+      hotkeysServiceInstance = new HotkeysService();
+    }
+    return hotkeysServiceInstance;
+  }
+};
+
+// Proxy all methods for backward compatibility
+export default new Proxy({} as HotkeysService, {
+  get(target, prop) {
+    return hotkeysService.instance[prop as keyof HotkeysService];
+  }
+});
