@@ -14,7 +14,7 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 const OnboardingPage = lazy(() => import('@/pages/onboarding/OnboardingPage'));
-const SetupLaboratoryPage = lazy(() => import('@/pages/onboarding/SetupLaboratoryPageV2'));
+const SetupLaboratoryPage = lazy(() => import('@/pages/onboarding/SetupLaboratoryPage'));
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'));
 const DebugDashboard = lazy(() => import('@/pages/dashboard/DebugDashboard'));
 const PatientsPage = lazy(() => import('@/pages/patients/PatientsPage'));

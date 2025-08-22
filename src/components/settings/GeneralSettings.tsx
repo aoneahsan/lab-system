@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { GeneralSettings as GeneralSettingsType } from '../../services/settings';
-import { TextField, UrlField, EmailField, PhoneField, SelectField, ZipCodeField, CountryField, StateField, CityField } from '@/components/form-fields';
+import { TextField, UrlField, EmailField, CustomPhoneField, SelectField, ZipCodeField, CountryField, StateField, CityField } from '@/components/form-fields';
 
 interface GeneralSettingsProps {
   settings: GeneralSettingsType;

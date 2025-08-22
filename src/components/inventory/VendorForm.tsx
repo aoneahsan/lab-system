@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button } from '@/components/ui/Button';
 import type { Vendor } from '@/types/inventory.types';
-import { TextField, EmailField, PhoneField, UrlField, TextareaField, NumberField } from '@/components/form-fields';
+import { TextField, EmailField, CustomPhoneField, UrlField, TextareaField, NumberField } from '@/components/form-fields';
 
 const schema = yup.object({
   name: yup.string().required('Vendor name is required'),

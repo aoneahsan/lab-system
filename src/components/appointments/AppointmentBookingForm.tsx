@@ -8,9 +8,6 @@ import { usePatients } from '@/hooks/usePatients';
 import { useTests } from '@/hooks/useTests';
 import { useAvailableSlots, useCreateAppointment } from '@/hooks/useAppointments';
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui/Label';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
 import { SelectField, DateField, TimeField, TextField, LexicalEditorField, CheckboxField } from '@/components/form-fields';
 
 const schema = yup.object({
@@ -181,19 +178,13 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       )}
 
       {/* Date Selection */}
-      <div>
-        <Label htmlFor="scheduledDate">Appointment Date *</Label>
-        <Input
-          id="scheduledDate"
-          type="date"
-          {...register('scheduledDate')}
-          min={today}
-          className="mt-1"
-        />
-        {errors.scheduledDate && (
-          <p className="mt-1 text-sm text-red-600">{errors.scheduledDate.message}</p>
-        )}
-      </div>
+      <DateField
+        label="Appointment Date *"
+        {...register('scheduledDate')}
+        error={errors.scheduledDate}
+        min={today}
+        required
+      />
 
       {/* Time Slot Selection */}
       <div>
@@ -265,24 +256,22 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
             placeholder="Full address for home collection"
           />
 
-          <div>
-            <Label htmlFor="homeLandmark">Landmark</Label>
-            <Input
-              id="homeLandmark"
-              {...register('homeLandmark')}
-              className="mt-1"
-              placeholder="Near..."
-            />
-          </div>
+          <TextField
+            label="Landmark"
+            {...register('homeLandmark')}
+            placeholder="Near..."
+          />
 
-          <div>
-            <Label htmlFor="preferredTimeSlot">Preferred Time Slot</Label>
-            <Select id="preferredTimeSlot" {...register('preferredTimeSlot')} className="mt-1">
-              <option value="">Any Time</option>
-              <option value="morning">Morning (8 AM - 12 PM)</option>
-              <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
-              <option value="evening">Evening (5 PM - 8 PM)</option>
-            </Select>
+          <SelectField
+            label="Preferred Time Slot"
+            {...register('preferredTimeSlot')}
+            options={[
+              { value: '', label: 'Any Time' },
+              { value: 'morning', label: 'Morning (8 AM - 12 PM)' },
+              { value: 'afternoon', label: 'Afternoon (12 PM - 5 PM)' },
+              { value: 'evening', label: 'Evening (5 PM - 8 PM)' },
+            ]}
+          />
           </div>
         </div>
       )}
