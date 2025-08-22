@@ -106,6 +106,14 @@ service cloud.firestore {
       allow delete: if hasRole('super_admin');
     }
     
+    // Onboarding progress collection
+    match /onboarding_progress/{userId} {
+      allow read: if isOwner(userId) || hasRole('super_admin');
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || hasRole('super_admin');
+      allow delete: if hasRole('super_admin');
+    }
+    
     // Catch-all for tenant collections using a wildcard
     match /{collection}/{document} {
       // Check if this is a tenant-prefixed collection
