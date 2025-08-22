@@ -5,12 +5,13 @@ import {
   CreditCard, Package, CheckCircle, Wifi, Smartphone, Bell, BarChart3, Users,
   Mail, MessageSquare, FileBarChart, Shield, Clock, Zap,
   FlaskConical, Building, PhoneCall, UserCheck, ClipboardCheck, AlertCircle,
-  FileCheck, Bot, Timer, SendHorizontal, Database, LayoutTemplate
+  FileCheck, Bot, Timer, SendHorizontal, Database, LayoutTemplate, Lock
 } from 'lucide-react';
 import { doc, getDoc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { firestore } from '@/config/firebase.config';
 import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useOnboardingStore } from '@/stores/onboarding.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
@@ -69,11 +70,60 @@ const SetupLaboratoryPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useAuthStore();
+  const { 
+    initializeOnboarding, 
+    navigateToStep, 
+    saveStepData,
+    canAccessStep,
+    completedSteps,
+    laboratoryData: savedData,
+    isLoading: isLoadingOnboarding,
+    isSaving
+  } = useOnboardingStore();
   
   // Get initial step from URL
   const stepFromUrl = parseInt(searchParams.get('step') || '0');
   const [currentStep, setCurrentStep] = useState(stepFromUrl);
   const [isCreating, setIsCreating] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize onboarding data on component mount
+  useEffect(() => {
+    if (currentUser?.id && !isInitialized) {
+      initializeOnboarding(currentUser.id).then(() => {
+        setIsInitialized(true);
+      });
+    }
+  }, [currentUser?.id, initializeOnboarding, isInitialized]);
+
+  // Check step access and redirect if needed
+  useEffect(() => {
+    if (isInitialized && currentUser?.id) {
+      // Check if user can access the requested step
+      if (!canAccessStep(stepFromUrl)) {
+        // Find the first incomplete step
+        let firstIncompleteStep = 0;
+        for (let i = 0; i < steps.length; i++) {
+          if (!completedSteps.includes(i)) {
+            firstIncompleteStep = i;
+            break;
+          }
+        }
+        
+        // Redirect to the first incomplete step
+        if (firstIncompleteStep !== stepFromUrl) {
+          toast.error(
+            'Complete previous steps',
+            `Please complete step ${firstIncompleteStep + 1} before proceeding`
+          );
+          setCurrentStep(firstIncompleteStep);
+          setSearchParams({ step: firstIncompleteStep.toString() });
+        }
+      } else {
+        setCurrentStep(stepFromUrl);
+      }
+    }
+  }, [stepFromUrl, canAccessStep, completedSteps, isInitialized, currentUser?.id, setSearchParams]);
 
   // Update URL when step changes
   useEffect(() => {
@@ -81,26 +131,26 @@ const SetupLaboratoryPage = () => {
   }, [currentStep, setSearchParams]);
   
   const [formData, setFormData] = useState({
-    code: '',
-    name: '',
-    type: 'clinical_lab',
-    licenseNumber: '',
-    accreditationNumber: '',
-    street: '',
-    city: '',
-    cityId: '',
-    state: '',
-    stateId: '',
-    zipCode: '',
-    country: 'USA',
-    countryId: '233',  // USA country ID for react-country-state-city
-    email: '',
-    phone: '',
-    fax: '',
-    website: '',
-    timezone: 'America/New_York',
-    currency: 'USD',
-    resultFormat: 'standard',
+    code: savedData?.code || '',
+    name: savedData?.name || '',
+    type: savedData?.type || 'clinical_lab',
+    licenseNumber: savedData?.licenseNumber || '',
+    accreditationNumber: savedData?.accreditationNumber || '',
+    street: savedData?.street || '',
+    city: savedData?.city || '',
+    cityId: savedData?.cityId || '',
+    state: savedData?.state || '',
+    stateId: savedData?.stateId || '',
+    zipCode: savedData?.zipCode || '',
+    country: savedData?.country || 'USA',
+    countryId: savedData?.countryId || '233',  // USA country ID for react-country-state-city
+    email: savedData?.email || '',
+    phone: savedData?.phone || '',
+    fax: savedData?.fax || '',
+    website: savedData?.website || '',
+    timezone: savedData?.timezone || 'America/New_York',
+    currency: savedData?.currency || 'USD',
+    resultFormat: savedData?.resultFormat || 'standard',
     criticalValueNotification: true,
     billing: true,
     inventory: true,
@@ -108,18 +158,28 @@ const SetupLaboratoryPage = () => {
     emrIntegration: true,
     mobileApps: true,
     // Custom configuration fields
-    defaultTestTurnaround: '24',
-    referenceLabName: '',
-    referenceLabContact: '',
-    customReportHeader: '',
-    customReportFooter: '',
+    defaultTestTurnaround: savedData?.defaultTestTurnaround || '24',
+    referenceLabName: savedData?.referenceLabName || '',
+    referenceLabContact: savedData?.referenceLabContact || '',
+    customReportHeader: savedData?.customReportHeader || '',
+    customReportFooter: savedData?.customReportFooter || '',
     // Features as array for FeatureToggleField
-    enabledFeatures: ['billing', 'inventory', 'qualityControl', 'emrIntegration', 'mobileApps', 'criticalAlerts'],
+    enabledFeatures: savedData?.enabledFeatures || ['billing', 'inventory', 'qualityControl', 'emrIntegration', 'mobileApps', 'criticalAlerts'],
     // New fields for step 4
-    communicationOptions: ['patientPortal', 'emailNotifications'],
-    resultManagementOptions: [],
-    defaultTurnaroundMode: 'standard',
+    communicationOptions: savedData?.communicationOptions || ['patientPortal', 'emailNotifications'],
+    resultManagementOptions: savedData?.resultManagementOptions || [],
+    defaultTurnaroundMode: savedData?.defaultTurnaroundMode || 'standard',
   });
+
+  // Update formData when savedData changes
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        ...savedData,
+      }));
+    }
+  }, [savedData]);
 
   const [codeValidation, setCodeValidation] = useState<{
     isChecking: boolean;
@@ -210,18 +270,88 @@ const SetupLaboratoryPage = () => {
     return true;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!currentUser?.id) {
+      toast.error('Authentication required', 'Please log in to continue');
+      return;
+    }
+
     if (validateCurrentStep()) {
+      // Save current step data and mark as complete
+      const stepData = getStepData(currentStep);
+      await saveStepData(currentStep, stepData, currentUser.id, true);
+      
       if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
+        const nextStep = currentStep + 1;
+        const canAccess = await navigateToStep(nextStep, currentUser.id);
+        if (canAccess) {
+          setCurrentStep(nextStep);
+        }
       } else {
         handleSubmit();
       }
     }
   };
 
-  const handleBack = () => {
+  // Helper function to extract step data
+  const getStepData = (step: number) => {
+    switch (step) {
+      case 0:
+        return {
+          code: formData.code,
+          name: formData.name,
+          type: formData.type,
+          licenseNumber: formData.licenseNumber,
+          accreditationNumber: formData.accreditationNumber,
+        };
+      case 1:
+        return {
+          street: formData.street,
+          city: formData.city,
+          cityId: formData.cityId,
+          state: formData.state,
+          stateId: formData.stateId,
+          zipCode: formData.zipCode,
+          country: formData.country,
+          countryId: formData.countryId,
+        };
+      case 2:
+        return {
+          email: formData.email,
+          phone: formData.phone,
+          fax: formData.fax,
+          website: formData.website,
+        };
+      case 3:
+        return {
+          timezone: formData.timezone,
+          currency: formData.currency,
+          resultFormat: formData.resultFormat,
+          enabledFeatures: formData.enabledFeatures,
+        };
+      case 4:
+        return {
+          defaultTestTurnaround: formData.defaultTestTurnaround,
+          referenceLabName: formData.referenceLabName,
+          referenceLabContact: formData.referenceLabContact,
+          customReportHeader: formData.customReportHeader,
+          customReportFooter: formData.customReportFooter,
+          communicationOptions: formData.communicationOptions,
+          resultManagementOptions: formData.resultManagementOptions,
+          defaultTurnaroundMode: formData.defaultTurnaroundMode,
+        };
+      default:
+        return {};
+    }
+  };
+
+  const handleBack = async () => {
     if (currentStep > 0) {
+      // Save current step data without marking as complete (draft save)
+      if (currentUser?.id) {
+        const stepData = getStepData(currentStep);
+        await saveStepData(currentStep, stepData, currentUser.id, false);
+      }
       setCurrentStep(currentStep - 1);
     } else {
       navigate('/onboarding?option=create');
@@ -943,31 +1073,61 @@ const SetupLaboratoryPage = () => {
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = index === currentStep;
-              const isCompleted = index < currentStep;
+              const isCompleted = completedSteps.includes(index);
+              const isAccessible = canAccessStep(index);
+              const isLocked = !isAccessible && index !== currentStep;
 
               return (
                 <div key={step.id} className="flex items-center">
-                  <div className="flex flex-col items-center">
+                  <div 
+                    className="flex flex-col items-center cursor-pointer relative"
+                    onClick={() => {
+                      if (isAccessible && index !== currentStep) {
+                        setCurrentStep(index);
+                      } else if (isLocked) {
+                        toast.error(
+                          'Step locked',
+                          `Complete step ${completedSteps.length + 1} first`
+                        );
+                      }
+                    }}
+                  >
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                         isActive
-                          ? 'bg-primary-600 text-white'
+                          ? 'bg-primary-600 text-white ring-4 ring-primary-100 dark:ring-primary-900'
                           : isCompleted
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                          ? 'bg-green-500 text-white hover:bg-green-600'
+                          : isLocked
+                          ? 'bg-gray-300 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-600'
                       }`}
                     >
                       {isCompleted ? (
                         <Check className="h-6 w-6" />
+                      ) : isLocked ? (
+                        <Lock className="h-5 w-5" />
                       ) : (
                         <Icon className="h-6 w-6" />
                       )}
                     </div>
+                    {isLocked && (
+                      <div className="absolute -top-1 -right-1">
+                        <span className="flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                      </div>
+                    )}
                     <div className="mt-2 text-center">
                       <p
                         className={`text-sm font-medium ${
                           isActive
                             ? 'text-primary-600 dark:text-primary-400'
+                            : isCompleted
+                            ? 'text-green-600 dark:text-green-400'
+                            : isLocked
+                            ? 'text-gray-400 dark:text-gray-500'
                             : 'text-gray-500 dark:text-gray-400'
                         }`}
                       >
@@ -976,12 +1136,22 @@ const SetupLaboratoryPage = () => {
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                         {step.description}
                       </p>
+                      {isCompleted && (
+                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                          ✓ Completed
+                        </span>
+                      )}
+                      {isLocked && (
+                        <span className="text-xs text-red-500 dark:text-red-400 font-medium">
+                          Locked
+                        </span>
+                      )}
                     </div>
                   </div>
                   {index < steps.length - 1 && (
                     <div
                       className={`h-0.5 w-24 mx-4 transition-colors ${
-                        isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
+                        completedSteps.includes(index) ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'
                       }`}
                     />
                   )}
@@ -993,44 +1163,89 @@ const SetupLaboratoryPage = () => {
 
         {/* Form Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            {steps[currentStep].title}
-          </h2>
-          {renderStepContent()}
+          {isLoadingOnboarding ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <LoadingSpinner size="lg" />
+              <p className="mt-4 text-gray-500 dark:text-gray-400">Loading your progress...</p>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                {steps[currentStep].title}
+              </h2>
+              {!canAccessStep(currentStep) && currentStep !== 0 ? (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+                  <div className="flex items-start space-x-3">
+                    <Lock className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
+                    <div>
+                      <h3 className="text-sm font-medium text-red-900 dark:text-red-300">
+                        Step Locked
+                      </h3>
+                      <p className="text-sm text-red-700 dark:text-red-400 mt-1">
+                        Please complete all previous steps before accessing this step.
+                      </p>
+                      <button
+                        onClick={() => {
+                          const nextIncomplete = completedSteps.length;
+                          setCurrentStep(Math.min(nextIncomplete, steps.length - 1));
+                        }}
+                        className="mt-3 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-500"
+                      >
+                        Go to step {completedSteps.length + 1} →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                renderStepContent()
+              )}
+            </>
+          )}
         </div>
 
         {/* Navigation Buttons */}
         <div className="flex justify-between">
           <button
             onClick={handleBack}
-            className="btn btn-secondary flex items-center gap-2"
+            disabled={isLoadingOnboarding || isSaving}
+            className="btn btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-4 w-4" />
             {currentStep === 0 ? 'Back to Options' : 'Previous'}
           </button>
 
-          <button
-            onClick={handleNext}
-            disabled={isCreating}
-            className="btn btn-primary flex items-center gap-2"
-          >
-            {isCreating ? (
-              <>
-                <LoadingSpinner size="sm" />
-                Creating Laboratory...
-              </>
-            ) : currentStep === steps.length - 1 ? (
-              <>
-                Create Laboratory
-                <Check className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Progress indicator */}
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              Step {currentStep + 1} of {steps.length}
+              {completedSteps.includes(currentStep) && (
+                <span className="ml-2 text-green-600 dark:text-green-400">✓ Completed</span>
+              )}
+            </div>
+
+            <button
+              onClick={handleNext}
+              disabled={isCreating || isSaving || isLoadingOnboarding || (!canAccessStep(currentStep) && currentStep !== 0)}
+              className="btn btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating || isSaving ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  {isCreating ? 'Creating Laboratory...' : 'Saving...'}
+                </>
+              ) : currentStep === steps.length - 1 ? (
+                <>
+                  Create Laboratory
+                  <Check className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  {completedSteps.includes(currentStep) ? 'Next' : 'Save & Continue'}
+                  <ChevronRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
