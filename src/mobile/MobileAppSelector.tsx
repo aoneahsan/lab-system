@@ -2,9 +2,12 @@ import React from 'react';
 import { PatientApp } from './PatientApp';
 import { PhlebotomistApp } from './PhlebotomistApp';
 import { LabStaffApp } from './LabStaffApp';
-import { ClinicianApp } from '@/apps/clinician/ClinicianApp';
 import { storageHelpers, STORAGE_KEYS } from '@/services/unified-storage.service';
 import { useAuthStore } from '@/stores/auth.store';
+
+const ClinicianApp = React.lazy(() => 
+  import('@/apps/clinician/ClinicianApp').then((module) => ({ default: module.ClinicianApp }))
+);
 
 export const MobileAppSelector: React.FC = () => {
   const [appType, setAppType] = React.useState<
@@ -57,7 +60,11 @@ export const MobileAppSelector: React.FC = () => {
     case 'labstaff':
       return <LabStaffApp />;
     case 'clinician':
-      return <ClinicianApp />;
+      return (
+        <React.Suspense fallback={<div className="flex justify-center items-center h-screen">Loading Clinician App...</div>}>
+          <ClinicianApp />
+        </React.Suspense>
+      );
     default:
       return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }

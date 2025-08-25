@@ -1,4 +1,6 @@
 import { Capacitor } from '@capacitor/core';
+import { BiometricAuth } from 'capacitor-biometric-authentication';
+import { Preferences } from '@capacitor/preferences';
 import { logger } from '@/services/logger.service';
 
 // Mock implementation for web, real implementation for mobile
@@ -6,8 +8,6 @@ const BiometricAuthentication = {
   async isAvailable(): Promise<{ isAvailable: boolean }> {
     if (Capacitor.isNativePlatform()) {
       try {
-        // Try to import the actual plugin
-        const { BiometricAuth } = await import('capacitor-biometric-authentication');
         const result = await BiometricAuth.isAvailable();
         return { isAvailable: result };
       } catch (error) {
@@ -24,7 +24,6 @@ const BiometricAuthentication = {
   async authenticate(reason: string): Promise<{ success: boolean; error?: string }> {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { BiometricAuth } = await import('capacitor-biometric-authentication');
         const result = await BiometricAuth.authenticate({ reason });
         return { success: result.success, error: result.error?.message };
       } catch (error: any) {
@@ -44,7 +43,6 @@ const BiometricAuthentication = {
     if (Capacitor.isNativePlatform()) {
       try {
         // Store credentials securely for biometric access
-        const { Preferences } = await import('@capacitor/preferences');
         await Preferences.set({
           key: 'biometric_credentials',
           value: JSON.stringify(credentials),
@@ -68,7 +66,6 @@ const BiometricAuthentication = {
   async getStoredCredentials(): Promise<{ email: string; password: string } | null> {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { Preferences } = await import('@capacitor/preferences');
         const result = await Preferences.get({ key: 'biometric_credentials' });
         return result.value ? JSON.parse(result.value) : null;
       } catch (error) {
@@ -88,7 +85,6 @@ const BiometricAuthentication = {
   async disableBiometric(): Promise<void> {
     if (Capacitor.isNativePlatform()) {
       try {
-        const { Preferences } = await import('@capacitor/preferences');
         await Preferences.remove({ key: 'biometric_credentials' });
       } catch (error) {
         logger.error('Failed to disable biometric auth:', error);

@@ -566,7 +566,8 @@
       "Bash(cloc:*)",
       "Bash(./scripts/deploy.sh:*)",
       "Bash(firebase hosting:sites:list:*)",
-      "Bash(firebase firestore:rules:get:*)"
+      "Bash(firebase firestore:rules:get:*)",
+      "Bash(timeout 30 yarn build:*)"
     ],
     "deny": []
   }

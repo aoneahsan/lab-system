@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { LOINCCode } from '@/types/test.types';
 import { logger } from '@/services/logger.service';
+import { mockLoincService } from '@/data/mock-loinc.data';
 
 // LOINC FHIR API configuration
 const LOINC_API_BASE_URL = 'https://fhir.loinc.org';
@@ -139,8 +140,7 @@ export const loincApiService = {
     } catch (error) {
       logger.error('LOINC API search error:', error);
       // Fall back to local search using mock data
-      const { loincService } = await import('./loinc.service');
-      return loincService.searchLOINCCodes(searchTerm);
+      return mockLoincService.searchLOINCCodes(searchTerm);
     }
   },
 
@@ -187,8 +187,7 @@ export const loincApiService = {
     } catch (error) {
       logger.error('LOINC API lookup error:', error);
       // Fall back to local lookup
-      const { loincService } = await import('./loinc.service');
-      return loincService.getLOINCByCode(code);
+      return mockLoincService.getLOINCByCode(code);
     }
   },
 
@@ -240,8 +239,7 @@ export const loincApiService = {
     } catch (error) {
       logger.error('LOINC API common tests error:', error);
       // Fall back to local common tests
-      const { loincService } = await import('./loinc.service');
-      return loincService.getCommonTests();
+      return mockLoincService.getCommonTests();
     }
   },
 
@@ -281,9 +279,7 @@ export const loincApiService = {
     } catch (error) {
       logger.error('LOINC API category search error:', error);
       // Fall back to local search filtered by category
-      const { loincService } = await import('./loinc.service');
-      const allTests = await loincService.searchLOINCCodes('');
-      return allTests.filter((test) => test.class === category);
+      return mockLoincService.getTestsByCategory(category);
     }
   },
 
