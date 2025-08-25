@@ -201,7 +201,7 @@ const SetupLaboratoryPage = () => {
         checkCodeAvailability(savedData.code);
       }
     }
-  }, [savedData]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [savedData]);  
 
   const [codeValidation, setCodeValidation] = useState<{
     isChecking: boolean;
@@ -331,7 +331,7 @@ const SetupLaboratoryPage = () => {
         if (!formData.country) errors.country = 'Country is required';
         break;
         
-      case 2: // Contact
+      case 2: { // Contact
         if (!formData.email) errors.email = 'Email is required';
         if (!formData.phone) errors.phone = 'Phone number is required';
         // Email validation
@@ -340,6 +340,7 @@ const SetupLaboratoryPage = () => {
           errors.email = 'Please enter a valid email address';
         }
         break;
+      }
         
       case 3: // Settings
         if (!formData.timezone) errors.timezone = 'Timezone is required';
@@ -350,7 +351,7 @@ const SetupLaboratoryPage = () => {
         }
         break;
         
-      case 4: // Custom Configuration
+      case 4: { // Custom Configuration
         // At least some configuration should be provided
         const hasConfig = 
           formData.referenceLabName?.trim() ||
@@ -364,6 +365,7 @@ const SetupLaboratoryPage = () => {
           errors.configuration = 'Please configure at least one custom setting';
         }
         break;
+      }
     }
     
     setFieldErrors(errors);

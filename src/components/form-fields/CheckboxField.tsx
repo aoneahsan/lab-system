@@ -180,11 +180,11 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
     </button>
   );
 
-  if (register) {
-    React.useEffect(() => {
+  React.useEffect(() => {
+    if (register) {
       register.onChange({ target: { name, value: isChecked } } as any);
-    }, [isChecked, name, register]);
-  }
+    }
+  }, [isChecked, name, register]);
 
   return (
     <div className={`switch-field ${containerClassName}`}>

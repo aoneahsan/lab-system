@@ -4,13 +4,13 @@ import { emailService } from '../services/emailService';
 
 const db = admin.firestore();
 
-export const createUserAccount = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
+export const createUserAccount = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
   // Verify admin role
-  if (!request.auth || request.auth.token.role !== 'ADMIN') {
+  if (!context.auth || (context.auth.token as any).role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { email, password, displayName, role, tenantId } = request.data;
+  const { email, password, displayName, role, tenantId } = data;
 
   try {
     // Create Firebase Auth user
@@ -34,27 +34,27 @@ export const createUserAccount = functions.https.onCall(async (request: function
       tenantId,
       active: true,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: request.auth.uid,
+      createdBy: context.auth.uid,
     });
 
-    return { uid: userRecord.uid, email: userRecord.email };
+    return { success: true, userId: userRecord.uid };
   } catch (error) {
     console.error('Error creating user:', error);
     throw new functions.https.HttpsError('internal', 'Failed to create user');
   }
 });
 
-export const updateUserRole = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
-  if (!request.auth || request.auth.token.role !== 'ADMIN') {
+export const updateUserRole = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  if (!context.auth || (context.auth.token as any).role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { userId, newRole } = request.data;
+  const { userId, newRole } = data;
 
   try {
     // Update custom claims
     await admin.auth().setCustomUserClaims(userId, {
-      ...request.auth.token,
+      ...context.auth.token,
       role: newRole,
     });
 
@@ -62,7 +62,7 @@ export const updateUserRole = functions.https.onCall(async (request: functions.h
     await db.collection('labflow_users').doc(userId).update({
       role: newRole,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedBy: request.auth.uid,
+      updatedBy: context.auth.uid,
     });
 
     return { success: true };
@@ -72,12 +72,12 @@ export const updateUserRole = functions.https.onCall(async (request: functions.h
   }
 });
 
-export const deactivateUser = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
-  if (!request.auth || request.auth.token.role !== 'ADMIN') {
+export const deactivateUser = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  if (!context.auth || (context.auth.token as any).role !== 'ADMIN') {
     throw new functions.https.HttpsError('permission-denied', 'Unauthorized');
   }
 
-  const { userId } = request.data;
+  const { userId } = data;
 
   try {
     // Disable user in Firebase Auth
@@ -89,7 +89,7 @@ export const deactivateUser = functions.https.onCall(async (request: functions.h
     await db.collection('labflow_users').doc(userId).update({
       active: false,
       deactivatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      deactivatedBy: request.auth.uid,
+      deactivatedBy: context.auth.uid,
     });
 
     return { success: true };
@@ -99,71 +99,28 @@ export const deactivateUser = functions.https.onCall(async (request: functions.h
   }
 });
 
-export const sendSuperAdminCredentials = functions.https.onCall(async (request: functions.https.CallableRequest<any>) => {
-  const { email, password, firstName, lastName } = request.data;
+export const sendSuperAdminCredentials = functions.https.onCall(async (data: any, context: functions.https.CallableContext) => {
+  const { email, password, firstName, lastName } = data;
 
   try {
-    // Email template
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background-color: #4f46e5; color: white; padding: 20px; text-align: center; }
-            .content { background-color: #f9fafb; padding: 30px; margin-top: 20px; }
-            .credentials { background-color: white; padding: 20px; margin: 20px 0; border: 1px solid #e5e7eb; }
-            .important { color: #dc2626; font-weight: bold; }
-            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>LabFlow Super Admin Account Created</h1>
-            </div>
-            <div class="content">
-              <p>Hello ${firstName} ${lastName},</p>
-              
-              <p>Your super admin account has been successfully created. Below are your login credentials:</p>
-              
-              <div class="credentials">
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Password:</strong> ${password}</p>
-                <p><strong>Role:</strong> Super Admin</p>
-              </div>
-              
-              <p class="important">⚠️ Important Security Notice:</p>
-              <ul>
-                <li>Please save these credentials securely</li>
-                <li>We recommend changing your password after first login</li>
-                <li>Do not share these credentials with anyone</li>
-              </ul>
-              
-              <p>You can now access the admin panel at: <strong>/admin</strong></p>
-              
-              <p>If you didn't request this account, please ignore this email and contact support immediately.</p>
-            </div>
-            <div class="footer">
-              <p>This is an automated message from LabFlow</p>
-              <p>© ${new Date().getFullYear()} LabFlow. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
+    // Send email with credentials
+    await emailService.sendEmail({
+      to: email,
+      subject: 'Your LabFlow Super Admin Credentials',
+      html: `
+        <h2>Welcome to LabFlow, ${firstName} ${lastName}!</h2>
+        <p>Your super admin account has been created. Here are your login credentials:</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Password:</strong> ${password}</p>
+        <p><strong>Login URL:</strong> https://labflow.app/login</p>
+        <p>Please change your password after your first login.</p>
+        <p>Thank you for choosing LabFlow!</p>
+      `,
+    });
 
-    // Send email
-    await emailService.send(
-      email,
-      'Your LabFlow Super Admin Credentials',
-      emailHtml
-    );
-
-    return { success: true, message: 'Credentials sent successfully' };
+    return { success: true };
   } catch (error) {
-    console.error('Error sending super admin credentials:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to send credentials email');
+    console.error('Error sending credentials:', error);
+    throw new functions.https.HttpsError('internal', 'Failed to send credentials');
   }
 });

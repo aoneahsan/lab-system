@@ -311,7 +311,7 @@ describe('Complete Test Coverage Suite', () => {
       it('validates barcode formats', () => {
         const validateBarcode = (code: string, format: string) => {
           const patterns: Record<string, RegExp> = {
-            CODE128: /^[A-Za-z0-9\-\.\/\$ \+\%]+$/,
+            CODE128: /^[A-Za-z0-9\-./$+%\s]+$/,
             EAN13: /^\d{13}$/,
             UPC: /^\d{12}$/
           };

@@ -445,7 +445,7 @@ describe('Comprehensive Test Suite for LabFlow', () => {
   describe('Store Tests', () => {
     describe('Auth Store', () => {
       it('manages authentication state', () => {
-        let authState = {
+        const authState = {
           user: null as any,
           isAuthenticated: false,
         };

@@ -106,7 +106,7 @@ class OnboardingService {
       
       // Keep existing completed steps and timestamps
       let completedSteps = existingData?.completedSteps || [];
-      let stepCompletionDates = existingData?.stepCompletionDates || {};
+      const stepCompletionDates = existingData?.stepCompletionDates || {};
       
       // Only add to completed steps if explicitly marking as complete AND validation passes
       if (markAsComplete) {
@@ -248,11 +248,12 @@ class OnboardingService {
         if (!data.country || !data.countryId) errors.push('Country is required');
         break;
         
-      case 2: // Contact
+      case 2: { // Contact
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!data.email || !emailRegex.test(data.email)) errors.push('Valid email is required');
         if (!data.phone || data.phone.replace(/\D/g, '').length < 10) errors.push('Valid phone number is required (min 10 digits)');
         break;
+      }
         
       case 3: // Settings
         if (!data.timezone) errors.push('Timezone is required');
@@ -261,7 +262,7 @@ class OnboardingService {
         if (!data.enabledFeatures || data.enabledFeatures.length === 0) errors.push('At least one feature must be enabled');
         break;
         
-      case 4: // Custom Configuration
+      case 4: { // Custom Configuration
         // At least some configuration should be provided
         const hasCustomConfig = 
           (data.defaultTestTurnaround && data.defaultTestTurnaround !== '24') ||
@@ -277,6 +278,7 @@ class OnboardingService {
           errors.push('Please configure at least one custom setting');
         }
         break;
+      }
     }
     
     return {
