@@ -7,7 +7,6 @@ import { getAnalytics } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
 import { getRemoteConfig } from 'firebase/remote-config';
 import { getMessaging } from 'firebase/messaging';
-import { getDatabase, connectDatabaseEmulator } from 'firebase/database';
 import { logger } from '@/services/logger.service';
 
 export const firebaseConfig = {
@@ -18,7 +17,6 @@ export const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -33,7 +31,6 @@ export const performance = typeof window !== 'undefined' ? getPerformance(app) :
 export const remoteConfig = getRemoteConfig(app);
 export const messaging =
   typeof window !== 'undefined' && 'Notification' in window ? getMessaging(app) : null;
-export const database = getDatabase(app);
 
 // Connect to Firebase Emulators if enabled
 if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
@@ -48,9 +45,6 @@ if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
 
   // Functions emulator
   connectFunctionsEmulator(functions, 'localhost', 5001);
-
-  // Database emulator
-  connectDatabaseEmulator(database, 'localhost', 9000);
 
   logger.log('🔧 Firebase Emulators connected');
 }

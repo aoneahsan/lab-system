@@ -13,7 +13,7 @@ import { toast } from '@/stores/toast.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useOnboardingStore } from '@/stores/onboarding.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
-import { onboardingLogger } from '@/services/logger.service';
+import { onboardingLogger, logger } from '@/services/logger.service';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
@@ -96,6 +96,12 @@ const SetupLaboratoryPage = () => {
 
   // Initialize onboarding data on component mount
   useEffect(() => {
+    // Enable debug mode temporarily to see detailed logs
+    if (import.meta.env.DEV) {
+      logger.enableDebugMode();
+      onboardingLogger.warn('Debug mode enabled for troubleshooting');
+    }
+    
     if (currentUser?.id && !isInitialized) {
       const initOnboarding = async () => {
         // Clear local storage to start fresh
@@ -541,13 +547,29 @@ const SetupLaboratoryPage = () => {
     setIsCreating(true);
 
     try {
+      onboardingLogger.info('Starting laboratory creation process', {
+        code: formData.code,
+        name: formData.name,
+        userEmail: currentUser?.email
+      });
+
+      // Validate all required data before submission
+      if (!formData.code || !formData.name || !formData.email) {
+        throw new Error('Missing required laboratory information');
+      }
+
+      // Check if Firebase is properly initialized
+      if (!firestore) {
+        throw new Error('Firebase connection not initialized. Please refresh the page.');
+      }
+
       const tenantData = {
         id: formData.code.toLowerCase(),
         code: formData.code,
         name: formData.name,
         type: formData.type,
-        licenseNumber: formData.licenseNumber,
-        accreditationNumber: formData.accreditationNumber,
+        licenseNumber: formData.licenseNumber || '',
+        accreditationNumber: formData.accreditationNumber || '',
         address: {
           street: formData.street,
           city: formData.city,
@@ -558,17 +580,17 @@ const SetupLaboratoryPage = () => {
         contact: {
           email: formData.email,
           phone: formData.phone,
-          fax: formData.fax,
-          website: formData.website,
+          fax: formData.fax || '',
+          website: formData.website || '',
         },
         settings: {
           timezone: formData.timezone,
           currency: formData.currency,
           resultFormat: formData.resultFormat,
-          criticalValueNotification: formData.criticalValueNotification,
+          criticalValueNotification: formData.enabledFeatures.includes('criticalAlerts'),
           defaultTestTurnaround: parseInt(formData.defaultTestTurnaround) || 24,
-          autoReleaseNormalResults: formData.autoReleaseNormalResults,
-          requirePhysicianApproval: formData.requirePhysicianApproval,
+          autoReleaseNormalResults: formData.resultManagementOptions?.includes('autoRelease') || false,
+          requirePhysicianApproval: formData.resultManagementOptions?.includes('physicianApproval') || false,
         },
         features: {
           billing: formData.enabledFeatures.includes('billing'),
@@ -585,10 +607,13 @@ const SetupLaboratoryPage = () => {
           auditLogs: formData.enabledFeatures.includes('auditLogs'),
         },
         customConfiguration: {
-          referenceLabName: formData.referenceLabName,
-          referenceLabContact: formData.referenceLabContact,
-          reportHeader: formData.customReportHeader,
-          reportFooter: formData.customReportFooter,
+          referenceLabName: formData.referenceLabName || '',
+          referenceLabContact: formData.referenceLabContact || '',
+          reportHeader: formData.customReportHeader || '',
+          reportFooter: formData.customReportFooter || '',
+          communicationOptions: formData.communicationOptions || [],
+          resultManagementOptions: formData.resultManagementOptions || [],
+          defaultTurnaroundMode: formData.defaultTurnaroundMode || 'standard',
         },
         subscription: {
           plan: 'trial',
@@ -600,37 +625,72 @@ const SetupLaboratoryPage = () => {
         updatedAt: serverTimestamp(),
       };
 
+      onboardingLogger.info('Creating tenant document in Firestore', { tenantId: formData.code.toLowerCase() });
+      
+      // Create tenant document
       await setDoc(doc(firestore, 'tenants', formData.code.toLowerCase()), tenantData);
+      onboardingLogger.info('Tenant document created successfully');
 
       // If user is authenticated, create tenant_user entry and update user record
-      if (currentUser) {
-        // Create tenant_users entry with lab_admin role
-        const tenantUserId = `${currentUser.id}_${formData.code.toLowerCase()}`;
-        await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
-          userId: currentUser.id,
-          tenantId: formData.code.toLowerCase(),
-          role: 'lab_admin',
-          permissions: [],
-          isActive: true,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
+      if (currentUser && currentUser.id) {
+        try {
+          // Create tenant_users entry with lab_admin role
+          const tenantUserId = `${currentUser.id}_${formData.code.toLowerCase()}`;
+          onboardingLogger.info('Creating tenant_users entry', { tenantUserId });
+          
+          await setDoc(doc(firestore, 'tenant_users', tenantUserId), {
+            userId: currentUser.id,
+            tenantId: formData.code.toLowerCase(),
+            role: 'lab_admin',
+            permissions: [],
+            isActive: true,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          onboardingLogger.info('Tenant_users entry created successfully');
 
-        // Update user's tenantId
-        await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, currentUser.id), {
-          tenantId: formData.code.toLowerCase(),
-          updatedAt: serverTimestamp(),
-        });
+          // Update user's tenantId
+          onboardingLogger.info('Updating user tenantId', { userId: currentUser.id });
+          await updateDoc(doc(firestore, COLLECTION_NAMES.USERS, currentUser.id), {
+            tenantId: formData.code.toLowerCase(),
+            updatedAt: serverTimestamp(),
+          });
+          onboardingLogger.info('User tenantId updated successfully');
 
-        // Update the auth store
-        await useAuthStore.getState().refreshUser();
+          // Update the auth store
+          await useAuthStore.getState().refreshUser();
+          onboardingLogger.info('Auth store refreshed successfully');
+        } catch (userUpdateError) {
+          onboardingLogger.error('Error updating user associations:', userUpdateError);
+          // Don't fail the entire process if user update fails
+          toast.warn('Laboratory created', 'Laboratory was created but user association failed. Please contact support.');
+        }
       }
 
+      // Clear onboarding data after successful creation
+      useOnboardingStore.getState().clearOnboarding();
+      
       toast.success('Laboratory created!', `Your laboratory code is: ${formData.code}`);
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       onboardingLogger.error('Error creating laboratory:', error);
-      toast.error('Creation failed', 'Failed to create laboratory. Please try again.');
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to create laboratory. ';
+      
+      if (error?.code === 'permission-denied') {
+        errorMessage += 'You do not have permission to create a laboratory. Please check your authentication.';
+      } else if (error?.code === 'unavailable') {
+        errorMessage += 'Firebase service is temporarily unavailable. Please try again in a moment.';
+      } else if (error?.code === 'unauthenticated') {
+        errorMessage += 'Your session has expired. Please log in again.';
+      } else if (error?.message) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Please check your internet connection and try again.';
+      }
+      
+      toast.error('Creation failed', errorMessage);
     } finally {
       setIsCreating(false);
     }
