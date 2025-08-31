@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
 import { ErrorBoundary } from 'unified-error-handling/react';
 import { initialize, useAdapter as setAdapter, captureError, setUser } from 'unified-error-handling';
-import { useTracking } from './TrackingProvider';
 import { toast } from '@/stores/toast.store';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
+import { trackingInstance } from './TrackingProvider';
 
 // Initialize unified error handling
 let initialized = false;
@@ -85,7 +85,6 @@ const ErrorFallback: React.FC<{
 };
 
 export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ children }) => {
-  const { trackError } = useTracking();
   const { currentUser } = useAuthStore();
 
   // Initialize error handling on mount
@@ -122,7 +121,7 @@ export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ ch
       });
 
       // Track error with analytics
-      trackError(error, {
+      trackingInstance.logError(error, {
         errorInfo,
         component: errorInfo?.componentStack,
       });
@@ -132,7 +131,7 @@ export const ErrorHandlingProvider: React.FC<ErrorHandlingProviderProps> = ({ ch
         toast.error('An error occurred', 'Our team has been notified.');
       }
     },
-    [trackError]
+    []
   );
 
   // Handle unhandled promise rejections

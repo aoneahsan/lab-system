@@ -49,7 +49,10 @@ interface TrackingProviderProps {
 }
 
 export const trackingInstance = UnifiedTracking;
-export const useTracking = () => ({ trackEvent: UnifiedTracking.trackEvent });
+export const useTracking = () => ({ 
+  trackEvent: UnifiedTracking.trackEvent,
+  trackError: UnifiedTracking.logError 
+});
 
 export const TrackingProvider: React.FC<TrackingProviderProps> = ({ children }) => {
   const { currentUser } = useAuthStore();

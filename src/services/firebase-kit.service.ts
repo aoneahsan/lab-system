@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { firebaseLogger } from '@/services/logger.service';
-import { analytics, remoteConfig } from '@/config/firebase.config';
+import { analytics as firebaseAnalytics, remoteConfig as firebaseRemoteConfig } from '@/config/firebase.config';
 import { logEvent, setUserId, setUserProperties } from 'firebase/analytics';
 import { fetchAndActivate, getString, getBoolean, getNumber } from 'firebase/remote-config';
 // TODO: Fix build issue with capacitor-firebase-kit
@@ -84,14 +84,14 @@ export const initializeFirebaseKit = async () => {
 };
 
 // Unified Analytics Service
-export const analytics = {
+export const analyticsService = {
   logEvent: async (eventName: string, params?: Record<string, any>) => {
     if (Capacitor.isNativePlatform()) {
       await FirebaseKit.analytics.logEvent({ name: eventName, params });
     } else {
       // Web implementation using Firebase Analytics
-      if (analytics) {
-        logEvent(analytics, eventName, params);
+      if (firebaseAnalytics) {
+        logEvent(firebaseAnalytics, eventName, params);
       }
     }
   },
@@ -100,8 +100,8 @@ export const analytics = {
     if (Capacitor.isNativePlatform()) {
       await FirebaseKit.analytics.setUserId({ userId });
     } else {
-      if (analytics) {
-        setUserId(analytics, userId);
+      if (firebaseAnalytics) {
+        setUserId(firebaseAnalytics, userId);
       }
     }
   },
@@ -110,8 +110,8 @@ export const analytics = {
     if (Capacitor.isNativePlatform()) {
       await FirebaseKit.analytics.setUserProperty({ name, value });
     } else {
-      if (analytics) {
-        setUserProperties(analytics, { [name]: value });
+      if (firebaseAnalytics) {
+        setUserProperties(firebaseAnalytics, { [name]: value });
       }
     }
   },
@@ -124,7 +124,7 @@ export const analytics = {
       });
     } else {
       // Web: log as page_view event
-      await analytics.logEvent('page_view', {
+      await analyticsService.logEvent('page_view', {
         page_title: screenName,
         page_location: window.location.href,
         page_path: window.location.pathname
@@ -221,14 +221,14 @@ export const performance = {
 };
 
 // Unified Remote Config Service
-export const remoteConfig = {
+export const remoteConfigService = {
   fetchAndActivate: async () => {
     if (Capacitor.isNativePlatform()) {
       const result = await FirebaseKit.remoteConfig.fetchAndActivate();
       return result.isFetchedRemote;
     } else {
       // Web: Use Firebase Remote Config
-      return await fetchAndActivate(remoteConfig);
+      return await fetchAndActivate(firebaseRemoteConfig);
     }
   },
   
@@ -237,7 +237,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getString({ key });
       return result.value;
     } else {
-      return getString(remoteConfig, key);
+      return getString(firebaseRemoteConfig, key);
     }
   },
   
@@ -246,7 +246,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getBoolean({ key });
       return result.value;
     } else {
-      return getBoolean(remoteConfig, key);
+      return getBoolean(firebaseRemoteConfig, key);
     }
   },
   
@@ -255,7 +255,7 @@ export const remoteConfig = {
       const result = await FirebaseKit.remoteConfig.getNumber({ key });
       return result.value;
     } else {
-      return getNumber(remoteConfig, key);
+      return getNumber(firebaseRemoteConfig, key);
     }
   }
 };
@@ -263,8 +263,8 @@ export const remoteConfig = {
 // Export unified Firebase services
 export const firebaseKit = {
   initialize: initializeFirebaseKit,
-  analytics,
+  analytics: analyticsService,
   crashlytics,
   performance,
-  remoteConfig
+  remoteConfig: remoteConfigService
 };
