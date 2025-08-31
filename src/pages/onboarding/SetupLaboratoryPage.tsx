@@ -14,6 +14,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useOnboardingStore } from '@/stores/onboarding.store';
 import { COLLECTION_NAMES } from '@/constants/tenant.constants';
 import { onboardingLogger, logger } from '@/services/logger.service';
+import { testFirestoreConnection } from '@/utils/testFirestoreConnection';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SelectField } from '@/components/form-fields/SelectField';
 import { CountryField, StateField, CityField } from '@/components/form-fields/CountryField';
@@ -561,6 +562,12 @@ const SetupLaboratoryPage = () => {
       // Check if Firebase is properly initialized
       if (!firestore) {
         throw new Error('Firebase connection not initialized. Please refresh the page.');
+      }
+      
+      // Test Firestore connection before proceeding
+      const connectionOk = await testFirestoreConnection();
+      if (!connectionOk) {
+        throw new Error('Unable to connect to Firestore. Please check your internet connection and try again.');
       }
 
       const tenantData = {
