@@ -32,6 +32,7 @@ import { scrollToFirstError } from '@/components/form-fields/FieldError';
 import { useFormKeyboardShortcuts, useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { KeyboardShortcut } from '@/services/KeyboardShortcutsService';
 import KeyboardShortcutsIndicator from '@/components/common/KeyboardShortcutsIndicator';
+import { OnboardingHeader } from '@/components/onboarding/OnboardingHeader';
 
 interface SetupStep {
   id: string;
@@ -1289,9 +1290,11 @@ const SetupLaboratoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      {/* Keyboard Shortcuts Indicator */}
-      <KeyboardShortcutsIndicator
+    <>
+      <OnboardingHeader />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-8">
+        {/* Keyboard Shortcuts Indicator */}
+        <KeyboardShortcutsIndicator
         showFormShortcuts
         shortcuts={[
           { key: '→', modifier: 'alt', description: 'Next step' },
@@ -1459,6 +1462,7 @@ const SetupLaboratoryPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

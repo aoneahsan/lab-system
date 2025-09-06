@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 import validator from 'validator';
+import { Info } from 'lucide-react';
 import { TextField } from './TextField';
 import { NumberField } from './NumberField';
 
@@ -84,43 +85,124 @@ interface UrlFieldProps {
 
 export const UrlField: React.FC<UrlFieldProps> = ({
   label = 'Website URL',
-  protocols = ['http', 'https'],
+  protocols = ['https'],
   requireProtocol = true,
-  helpText = 'Enter a valid URL (e.g., https://example.com)',
+  helpText,
+  value = '',
+  onChange,
+  onBlur,
   ...props
 }) => {
   const [localError, setLocalError] = useState<string>('');
+  const [showHttpsInfo, setShowHttpsInfo] = useState<boolean>(false);
 
-  const validateUrl = (url: string): string => {
+  const normalizeUrl = useCallback((url: string): string => {
+    if (!url) return '';
+    
+    // Remove any whitespace
+    url = url.trim();
+    
+    // If URL doesn't start with a protocol, add https://
+    if (!url.match(/^https?:\/\//i)) {
+      url = `https://${url}`;
+    }
+    
+    // If URL starts with http://, replace with https:// and show info
+    if (url.match(/^http:\/\//i)) {
+      url = url.replace(/^http:/i, 'https:');
+      setShowHttpsInfo(true);
+    }
+    
+    return url;
+  }, []);
+
+  const validateUrl = useCallback((url: string): string => {
     if (!url && props.required) {
       return 'URL is required';
     }
     if (url) {
+      // Validate the normalized URL
+      const normalizedUrl = normalizeUrl(url);
       const options = {
-        protocols: protocols as any,
-        require_protocol: requireProtocol,
+        protocols: ['https', 'http'] as any,
+        require_protocol: true,
         require_valid_protocol: true,
       };
-      if (!validator.isURL(url, options)) {
+      if (!validator.isURL(normalizedUrl, options)) {
         return 'Please enter a valid URL';
       }
     }
     return '';
-  };
+  }, [normalizeUrl, props.required]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const error = validateUrl(e.target.value);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    
+    // Don't normalize while user is typing, only on blur
+    if (onChange) {
+      onChange(e);
+    }
+    
+    // Hide HTTPS info when user modifies the field
+    setShowHttpsInfo(false);
+  }, [onChange]);
+
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const normalizedUrl = normalizeUrl(e.target.value);
+    
+    // Update the field with normalized URL
+    if (normalizedUrl !== e.target.value) {
+      const syntheticEvent = {
+        ...e,
+        target: {
+          ...e.target,
+          value: normalizedUrl,
+          name: props.name || '',
+        },
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      if (onChange) {
+        onChange(syntheticEvent);
+      }
+    }
+    
+    const error = validateUrl(normalizedUrl);
     setLocalError(error);
-    props.onBlur?.(e);
-  };
+    
+    if (onBlur) {
+      onBlur(e);
+    }
+  }, [normalizeUrl, validateUrl, onChange, onBlur, props.name]);
+
+  const customHelpText = (
+    <div className="flex items-start space-x-1">
+      {showHttpsInfo && (
+        <div className="flex items-center space-x-1 text-blue-600">
+          <Info className="h-3 w-3 flex-shrink-0 mt-0.5" />
+          <span className="text-xs">We automatically upgrade HTTP to HTTPS for security</span>
+        </div>
+      )}
+      {!showHttpsInfo && helpText && (
+        <span className="text-xs text-gray-500">{helpText}</span>
+      )}
+      {!showHttpsInfo && !helpText && (
+        <div className="flex items-center space-x-1 text-gray-500">
+          <Info className="h-3 w-3 flex-shrink-0 mt-0.5" />
+          <span className="text-xs">Enter your website URL (e.g., example.com). We'll add https:// automatically</span>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <TextField
       label={label}
       type="url"
-      placeholder="https://example.com"
-      helpText={helpText}
+      placeholder="example.com"
+      helpText={customHelpText}
       error={props.error || localError}
+      value={value}
+      onChange={handleChange}
       onBlur={handleBlur}
       {...props}
     />

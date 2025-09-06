@@ -286,8 +286,10 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
 
   const formatPhoneNumber = useCallback((input: string, countryCode: string): string => {
     try {
+      // Clean input for formatting
+      const cleanInput = input.replace(/[\s()-]/g, '');
       const formatter = new AsYouType(countryCode as CountryCode);
-      return formatter.input(input);
+      return formatter.input(cleanInput);
     } catch {
       return input;
     }
@@ -297,7 +299,11 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
     (number: string, countryCode: string): boolean => {
       if (!number) return !required;
       try {
-        const fullNumber = `${selectedCountry?.dialCode || ''}${number}`;
+        // Clean the number first - remove any spaces, dashes, parentheses
+        const cleanNumber = number.replace(/[\s()-]/g, '');
+        if (!cleanNumber) return !required;
+        
+        const fullNumber = `${selectedCountry?.dialCode || ''}${cleanNumber}`;
         const parsed = parsePhoneNumber(fullNumber, countryCode as CountryCode);
         return parsed ? parsed.isValid() : false;
       } catch {
@@ -309,7 +315,22 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
 
   const handlePhoneChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target.value.replace(/[^\d\s()-]/g, '');
+      let input = e.target.value.replace(/[^\d\s()-]/g, '');
+      
+      if (selectedCountry) {
+        // Remove country code if user accidentally includes it
+        const dialCodeWithoutPlus = selectedCountry.dialCode.replace('+', '');
+        if (input.startsWith(dialCodeWithoutPlus)) {
+          input = input.substring(dialCodeWithoutPlus.length);
+        }
+        // Also check if it starts with 0 followed by country code (common mistake)
+        if (input.startsWith('0' + dialCodeWithoutPlus)) {
+          input = input.substring(dialCodeWithoutPlus.length + 1);
+        }
+        // Remove leading zeros (common in some countries but not needed for international format)
+        input = input.replace(/^0+/, '');
+      }
+      
       setPhoneNumber(input);
 
       if (selectedCountry) {
@@ -535,7 +556,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
 
       {selectedCountry && phoneNumber && (
         <p className="mt-1 text-xs text-gray-500">
-          International format: {selectedCountry.dialCode} {phoneNumber}
+          International format: {selectedCountry.dialCode} {formatPhoneNumber(phoneNumber, selectedCountry.value)}
         </p>
       )}
     </FormFieldWrapper>
