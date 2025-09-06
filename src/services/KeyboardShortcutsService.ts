@@ -127,12 +127,13 @@ class KeyboardShortcutsService {
    */
   private matchesShortcut(event: KeyboardEvent, shortcut: KeyboardShortcut): boolean {
     if (shortcut.enabled === false) return false;
+    if (!shortcut.key) return false;
 
     // Check key
-    const key = event.key.toLowerCase();
+    const key = event.key?.toLowerCase();
     const shortcutKey = shortcut.key.toLowerCase();
     
-    if (key !== shortcutKey) return false;
+    if (!key || key !== shortcutKey) return false;
 
     // Check modifiers
     if (shortcut.modifier) {

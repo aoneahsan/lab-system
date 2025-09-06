@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EditorState } from 'lexical';
+import { EditorState, LexicalEditor } from 'lexical';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -134,9 +134,9 @@ export const RichTextEditorField: React.FC<RichTextEditorFieldProps> = ({
     } : undefined,
   };
 
-  const handleChange = (editorState: EditorState) => {
+  const handleChange = (editorState: EditorState, editor: LexicalEditor) => {
     editorState.read(() => {
-      const htmlString = $generateHtmlFromNodes(null);
+      const htmlString = $generateHtmlFromNodes(editor);
       onChange?.(htmlString);
     });
   };
